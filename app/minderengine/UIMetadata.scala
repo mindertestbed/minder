@@ -70,7 +70,7 @@ object IdFactory{
   /**
    * Current integer value
    */
-  private var _next : AtomicInteger = new AtomicInteger(0)
+  private var _next = new scala.actors.threadpool.AtomicInteger(0)
   
   /**
    * Static function to increment and get the id. But get comes first.
