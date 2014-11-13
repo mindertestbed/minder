@@ -17,6 +17,5 @@ libraryDependencies ++= Seq(
   "org.scala-lang" % "scala-actors" % "2.11.4",
   "org.scala-lang.modules" % "scala-xml_2.11" % "1.0.2",
   "com.typesafe.slick" % "slick_2.11" % "2.1.0",
-  "org.slf4j" % "slf4j-nop" % "1.6.4",
-  "com.h2database" % "h2" % "1.3.166"
+  "postgresql" % "postgresql" % "9.1-901-1.jdbc4"
 )
