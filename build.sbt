@@ -15,5 +15,7 @@ libraryDependencies ++= Seq(
   "org.scala-lang" % "scala-library" % "2.11.4",
   "org.scala-lang" % "scala-reflect" % "2.11.4",
   "org.scala-lang" % "scala-actors" % "2.11.4",
-  "org.scala-lang.modules" % "scala-xml_2.11" % "1.0.2"
+  "org.scala-lang.modules" % "scala-xml_2.11" % "1.0.2",
+  "com.typesafe.slick" % "slick_2.11" % "2.1.0",
+  "postgresql" % "postgresql" % "9.1-901-1.jdbc4"
 )
