@@ -1,5 +1,7 @@
 package model.facade
 
+import controllers.common.Constants
+
 case class User(name: String, password: String, id: Option[Int] = None)
 
 // UserComponent provides database definitions for User objects 
@@ -7,7 +9,7 @@ trait UserComponent { this: DriverComponent =>
   import driver.simple._
   //import query language features from the driver
 
-  class Users(tag: Tag) extends Table[(String, String, Option[Int])](tag, "USERS") {
+  class Users(tag: Tag) extends Table[(String, String, Option[Int])](tag, Constants.TABLE_NAME_USER) {
     def id = column[Option[Int]]("USER_ID", O.PrimaryKey, O.AutoInc)
     def name = column[String]("USER_MANE", O.NotNull)
     def password = column[String]("USER_PASSWORD", O.NotNull)
