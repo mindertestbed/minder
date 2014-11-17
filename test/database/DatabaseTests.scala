@@ -17,26 +17,24 @@ import org.junit.runner._
 import play.api.test._
 import play.api.test.Helpers._
 import minderengine.TimeProvider
+import org.specs2.specification.Example
+import org.specs2.specification.Fragment
 
 @RunWith(classOf[JUnitRunner])
 class DatabaseTests extends Specification {
   "Application" should {
     "insert into and retrieve data from the database" in new WithApplication {
       try {
-
-        println("DO Test")
-        val database = Database.forURL(current.configuration.getString("db.default.url").get,
-          driver = current.configuration.getString("db.default.driver").get,
-          user = current.configuration.getString("db.default.user").get,
-          password = current.configuration.getString("db.default.password").get)
+        val database = Database.forURL(current.configuration.getString("db.test.url").get,
+          driver = current.configuration.getString("db.test.driver").get,
+          user = current.configuration.getString("db.test.user").get,
+          password = current.configuration.getString("db.test.password").get)
 
         //        val dataAcessInstance = { println("Create new dataAcess"); new DataAccessRegistry(PostgresDriver) }
         val dataAcessInstance = { println("Create new dataAcess"); new DataAccessRegistry(PostgresDriver) }
         //        implicit dataAccess: DataAccessRegistry => dataAcessInstance
         insertIntoDb(dataAcessInstance, database)
         retrieveFromDb(dataAcessInstance, database)
-
-        println("Exit test")
       } catch {
         case t: Throwable => t.printStackTrace(); throw t
       } finally Util.unloadDrivers
@@ -48,19 +46,21 @@ class DatabaseTests extends Specification {
     println("start")
     println("Running test against " + dataAccess.driver)
     db withSession { implicit session: Session =>
-      dataAccess.create
+      dataAccess.dropAndCreate
 
       // Inserting users
       println("- Inserted user: " + dataAccess.insert(User("melis", "123")))
       println("- Inserted user: " + dataAccess.insert(User("ozgur", "4567")))
 
-      println("- All users: " + dataAccess.users.list)
+      //get all users' list
+      val lst = dataAccess.users.list
+      println(lst.size)
+      lst.foreach(f => {println("User: " + f)})
     }
   }
 
   def retrieveFromDb(dataAccess: DataAccessRegistry, db: Database) {
     import dataAccess.driver.simple._
-
     println("Running test against " + dataAccess.driver)
     db withSession {
       //EDIT: MUHAMMET

@@ -1,6 +1,8 @@
-name := """minder"""
+organization := "gov.tubitak.minder"
 
-version := "1.0-SNAPSHOT"
+name := "minder"
+
+version := "0.0.1"
 
 resolvers += "Eid public repository" at "http://eidrepo:8081/nexus/content/groups/public/"
 
@@ -8,7 +10,7 @@ resolvers += Resolver.mavenLocal
 
 lazy val root = (project in file(".")).enablePlugins(PlayScala)
 
-scalaVersion := "2.11.1"
+scalaVersion := "2.11.2"
 
 libraryDependencies ++= Seq(
   jdbc,
@@ -22,5 +24,6 @@ libraryDependencies ++= Seq(
   "org.scala-lang.modules" % "scala-xml_2.11" % "1.0.2",
   "com.typesafe.slick" % "slick_2.11" % "2.1.0",
   "postgresql" % "postgresql" % "9.1-901-1.jdbc4",
-  "org.beybunproject" % "xoola" % "1.0.0-RC1"
+  "org.beybunproject" % "xoola" % "1.0.0-RC1",
+  "gov.tubitak.minder" %% "minder-common" % "0.0.1"
 )
