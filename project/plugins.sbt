@@ -1,5 +1,3 @@
-
-
 resolvers ++= Seq(
   "Sonatype OSS Snapshots" at "https://oss.sonatype.org/content/repositories/snapshots",
   "Typesafe Releases" at "http://repo.typesafe.com/typesafe/maven-releases/",
@@ -7,7 +5,7 @@ resolvers ++= Seq(
 )
 
 // The Play plugin
-addSbtPlugin("com.typesafe.play" % "sbt-plugin" % "2.3.6")
+addSbtPlugin("com.typesafe.play" % "sbt-plugin" % "2.3.5")
 
 // web plugins
 
@@ -22,3 +20,5 @@ addSbtPlugin("com.typesafe.sbt" % "sbt-rjs" % "1.0.1")
 addSbtPlugin("com.typesafe.sbt" % "sbt-digest" % "1.0.0")
 
 addSbtPlugin("com.typesafe.sbt" % "sbt-mocha" % "1.0.0")
+
+addSbtPlugin("com.typesafe.sbt" % "sbt-native-packager" % "0.8.0-M2")
