@@ -44,21 +44,4 @@ public class SecurityRole extends Model implements Role {
 	public static SecurityRole findByRoleName(String roleName) {
 		return find.where().eq("roleName", roleName).findUnique();
 	}
-
-	public Long getId() {
-		return id;
-	}
-
-	public void setId(Long id) {
-		this.id = id;
-	}
-
-	public String getRoleName() {
-		return roleName;
-	}
-
-	public void setRoleName(String roleName) {
-		this.roleName = roleName;
-	}
-	
 }

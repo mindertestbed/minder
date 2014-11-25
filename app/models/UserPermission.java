@@ -28,16 +28,4 @@ public class UserPermission extends Model implements Permission {
 	public static UserPermission findByValue(String value) {
 		return find.where().eq("value", value).findUnique();
 	}
-
-	public Long getId() {
-		return id;
-	}
-
-	public void setId(Long id) {
-		this.id = id;
-	}
-
-	public void setValue(String value) {
-		this.value = value;
-	}
 }

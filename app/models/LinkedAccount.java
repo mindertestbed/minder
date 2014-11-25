@@ -51,38 +51,4 @@ public class LinkedAccount extends Model {
 
 		return ret;
 	}
-
-	public Long getId() {
-		return id;
-	}
-
-	public void setId(Long id) {
-		this.id = id;
-	}
-
-	public User getUser() {
-		return user;
-	}
-
-	public void setUser(User user) {
-		this.user = user;
-	}
-
-	public String getProviderUserId() {
-		return providerUserId;
-	}
-
-	public void setProviderUserId(String providerUserId) {
-		this.providerUserId = providerUserId;
-	}
-
-	public String getProviderKey() {
-		return providerKey;
-	}
-
-	public void setProviderKey(String providerKey) {
-		this.providerKey = providerKey;
-	}
-	
-	
 }
