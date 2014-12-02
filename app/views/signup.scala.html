@@ -31,7 +31,23 @@
              @_emailPartial(signupForm)
 
              @_passwordPartial(signupForm)
-
+             
+             
+            <div class="row">
+                <div class="col-xs-6 col-md-9">
+		             <strong>@Messages("playauthenticate.signup.role")</strong>
+                </div>
+		        <div class="col-xs-6 col-md-4">
+		       	     @checkbox(field = signupForm("isTestDesigner"),'_label -> Messages("playauthenticate.signup.role.testdesigner"))		        
+		       	</div>
+		        <div class="col-xs-6 col-md-4">
+		             @checkbox(field = signupForm("isTestDeveloper"),'_label -> Messages("playauthenticate.signup.role.testdeveloper"))
+		       </div>
+		       <div class="col-xs-6 col-sm-4">
+		             @checkbox(field = signupForm("isObserver"),'_label -> Messages("playauthenticate.signup.role.observer"))
+		       </div>
+      		</div>
+                     
             <button type="submit" class="btn btn-default">@Messages("playauthenticate.signup.now")</button>
     	}
     </div>

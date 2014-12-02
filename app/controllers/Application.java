@@ -28,7 +28,9 @@ public class Application extends Controller {
 
 	public static final String FLASH_MESSAGE_KEY = "message";
 	public static final String FLASH_ERROR_KEY = "error";
-	public static final String USER_ROLE = "user";
+	public static final String OBSERVER_ROLE = "observer";
+	public static final String TEST_DESIGNER_ROLE = "Test Designer";
+	public static final String TEST_DEVELOPER_ROLE = "Test Developer";
 
 	public static Result index() {
 		
@@ -41,13 +43,25 @@ public class Application extends Controller {
 		return localUser;
 	}
 
-	@Restrict(@Group(Application.USER_ROLE))
-	public static Result restricted() {
+	@Restrict(@Group(Application.OBSERVER_ROLE))
+	public static Result restrictedObserver() {
 		final User localUser = getLocalUser(session());
-		return ok(restricted.render(localUser));
+		return ok(restrictedObserver.render(localUser));
 	}
 
-	@Restrict(@Group(Application.USER_ROLE))
+	@Restrict(@Group(Application.TEST_DESIGNER_ROLE))
+	public static Result restrictedTestDesigner() {
+		final User localUser = getLocalUser(session());
+		return ok(restrictedTestDesigner.render(localUser));
+	}
+	
+	@Restrict(@Group(Application.TEST_DEVELOPER_ROLE))
+	public static Result restrictedTestDeveloper() {
+		final User localUser = getLocalUser(session());
+		return ok(restrictedTestDeveloper.render(localUser));
+	}
+	
+	@Restrict({@Group(Application.OBSERVER_ROLE),@Group(Application.TEST_DESIGNER_ROLE),@Group(Application.TEST_DEVELOPER_ROLE)})
 	public static Result profile() {
 		final User localUser = getLocalUser(session());
 		return ok(profile.render(localUser));

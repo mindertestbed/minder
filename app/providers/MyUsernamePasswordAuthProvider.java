@@ -103,8 +103,19 @@ public class MyUsernamePasswordAuthProvider
 				return Messages
 						.get("playauthenticate.password.signup.error.passwords_not_same");
 			}
+			
+			if (!isTestDesigner && !isTestDeveloper && !isObserver) {
+				return Messages
+						.get("playauthenticate.roles.signup.error.chooseatleastonerole");
+			}
 			return null;
 		}
+		
+		public boolean isTestDesigner;
+		
+		public boolean isTestDeveloper;
+		
+		public boolean isObserver;
 	}
 
 	public static final Form<MySignup> SIGNUP_FORM = form(MySignup.class);

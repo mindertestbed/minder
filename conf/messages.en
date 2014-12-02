@@ -68,6 +68,10 @@ playauthenticate.login.basic=or try HTTP basic auth (as example/secret)
 playauthenticate.signup.title=Signup
 playauthenticate.signup.name=Your name
 playauthenticate.signup.now=Sign up now
+playauthenticate.signup.role = Your role
+playauthenticate.signup.role.testdesigner = Test designer
+playauthenticate.signup.role.testdeveloper = Test developer
+playauthenticate.signup.role.observer = Observer
 playauthenticate.signup.oauth=or sign up using one of the following providers:
 
 playauthenticate.verify.account.title=E-mail verification required
@@ -118,7 +122,9 @@ playauthenticate.navigation.link_more=Link more providers
 playauthenticate.navigation.logout=Sign out
 playauthenticate.navigation.login=Log in
 playauthenticate.navigation.home=Home
-playauthenticate.navigation.restricted=Restricted page
+playauthenticate.navigation.restricted.observer=Observers' Page
+playauthenticate.navigation.restricted.testdesigner=Test Designers' Page
+playauthenticate.navigation.restricted.testdeveloper=Test Developers' Page
 playauthenticate.navigation.signup=Sign up
 
 # play-authenticate: Handler
@@ -137,14 +143,16 @@ playauthenticate.profile.session_endless=Your user ID is {0} and your session wi
 playauthenticate.profile.password_change=Change/set a password for your account
 
 # play-authenticate - sample: Index page
-playauthenticate.index.title=Welcome to Play Authenticate
-playauthenticate.index.intro=Play Authenticate sample app
-playauthenticate.index.intro_2=This is a template for a simple application with authentication.
-playauthenticate.index.intro_3=Check the main navigation above for simple page examples including supported authentication features.
+playauthenticate.index.title=Minder (Test Bed)
+playauthenticate.index.intro=Minder, the Test Bed
+playauthenticate.index.intro_2=Minder is.... something nice =)
+playauthenticate.index.intro_3=Define me in some sentences
 playauthenticate.index.heading=Heading
 playauthenticate.index.details=View details
 
 # play-authenticate - sample: Restricted page
 playauthenticate.restricted.secrets=Secrets, everywhere!
+
+playauthenticate.roles.signup.error.chooseatleastonerole = You must choose at least one role.
 
 ### --- play-authenticate END

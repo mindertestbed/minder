@@ -1,5 +1,6 @@
 package models;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
@@ -18,6 +19,7 @@ import models.TokenAction.Type;
 import play.data.format.Formats;
 import play.data.validation.Constraints;
 import play.db.ebean.Model;
+import providers.MyUsernamePasswordAuthUser;
 import be.objectify.deadbolt.core.models.Permission;
 import be.objectify.deadbolt.core.models.Role;
 import be.objectify.deadbolt.core.models.Subject;
@@ -139,8 +141,7 @@ public class User extends Model implements Subject {
 
 	public static User create(final AuthUser authUser) {
 		final User user = new User();
-		user.roles = Collections.singletonList(SecurityRole
-				.findByRoleName(controllers.Application.USER_ROLE));
+		
 		// user.permissions = new ArrayList<UserPermission>();
 		// user.permissions.add(UserPermission.findByValue("printers.edit"));
 		user.active = true;
@@ -163,6 +164,22 @@ public class User extends Model implements Subject {
 			if (name != null) {
 				user.name = name;
 			}
+			
+			ArrayList<SecurityRole> roleList = new ArrayList<SecurityRole>();
+			final MyUsernamePasswordAuthUser identity2 = (MyUsernamePasswordAuthUser) authUser;
+			if (identity2.isObserver()){
+				roleList.add(SecurityRole.findByRoleName(controllers.Application.OBSERVER_ROLE));
+			}
+			
+			if (identity2.isTestDesigner()){
+				roleList.add(SecurityRole.findByRoleName(controllers.Application.TEST_DESIGNER_ROLE));
+			}
+			
+			if (identity2.isTestDeveloper()){
+				roleList.add(SecurityRole.findByRoleName(controllers.Application.TEST_DEVELOPER_ROLE));
+			}
+			user.roles = roleList;
+
 		}
 		
 		if (authUser instanceof FirstLastNameIdentity) {
