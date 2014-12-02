@@ -18,7 +18,6 @@ import play.mvc.Result;
 import providers.MyUsernamePasswordAuthProvider;
 import providers.MyUsernamePasswordAuthUser;
 import views.html.account.*;
-
 import static play.data.Form.form;
 
 public class Account extends Controller {
@@ -82,7 +81,7 @@ public class Account extends Controller {
 		return ok(link.render());
 	}
 
-	@Restrict(@Group(Application.USER_ROLE))
+	@Restrict({@Group(Application.OBSERVER_ROLE),@Group(Application.TEST_DESIGNER_ROLE),@Group(Application.TEST_DEVELOPER_ROLE)})
 	public static Result verifyEmail() {
 		com.feth.play.module.pa.controllers.Authenticate.noCache(response());
 		final User user = Application.getLocalUser(session());
@@ -104,7 +103,7 @@ public class Account extends Controller {
 		return redirect(routes.Application.profile());
 	}
 
-	@Restrict(@Group(Application.USER_ROLE))
+	@Restrict({@Group(Application.OBSERVER_ROLE),@Group(Application.TEST_DESIGNER_ROLE),@Group(Application.TEST_DEVELOPER_ROLE)})
 	public static Result changePassword() {
 		com.feth.play.module.pa.controllers.Authenticate.noCache(response());
 		final User u = Application.getLocalUser(session());
@@ -116,7 +115,7 @@ public class Account extends Controller {
 		}
 	}
 
-	@Restrict(@Group(Application.USER_ROLE))
+	@Restrict({@Group(Application.OBSERVER_ROLE),@Group(Application.TEST_DESIGNER_ROLE),@Group(Application.TEST_DEVELOPER_ROLE)})
 	public static Result doChangePassword() {
 		com.feth.play.module.pa.controllers.Authenticate.noCache(response());
 		final Form<Account.PasswordChange> filledForm = PASSWORD_CHANGE_FORM
