@@ -3,6 +3,7 @@ package controllers;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
+import minderengine.XoolaServer;
 import models.User;
 
 import com.feth.play.module.pa.PlayAuthenticate;
@@ -11,6 +12,7 @@ import com.feth.play.module.pa.user.AuthUser;
 
 import play.Logger;
 import play.Routes;
+import play.api.Play;
 import play.api.mvc.RequestHeader;
 import play.data.Form;
 import play.db.ebean.Model;
@@ -33,7 +35,6 @@ public class Application extends Controller {
 	public static final String TEST_DEVELOPER_ROLE = "Test Developer";
 
 	public static Result index() {
-		
 		return ok(index.render());
 	}
 
