@@ -42,7 +42,6 @@ public class XoolaServer {
         properties.load(this.getClass().getResourceAsStream("/application.conf"));
         properties.setProperty(XoolaProperty.MODE, XoolaTierMode.SERVER);
 
-        System.err.println(properties.getProperty((String) XoolaProperty.CLIENT_ACCESS_CONTROLLER_CLASS));
         try {
           PropertyConfigurator.configure(this.getClass().getResource("/logging.properties"));
         } catch (Throwable ex) {
