@@ -16,11 +16,12 @@ class TestEngine {
    * @param tdl The test definition
    */
   def runTest(userEmail: String, tdl: String): Unit = {
-
+		  
     val clsMinderTDL = TdlCompiler.compileTdl(userEmail, tdl)
 
     val minderTDL = clsMinderTDL.newInstance()
     for (rivet <- minderTDL.SlotDefs) {
+      var minderClient = XoolaServer.get().getClient(rivet.slot.wrapperId)
       val args = Array.ofDim[Object](rivet.pipes.length)
 
       for (tuple <- rivet.signalPipeMap.keySet) {
@@ -39,7 +40,7 @@ class TestEngine {
         convertParam(paramPipe.out, paramPipe.converter(null))
       }
 
-      var minderClient = XoolaServer.get().getClient(rivet.slot.wrapperId)
+      
       rivet.result = minderClient.callSlot(userEmail, rivet.slot.signature, args)
 
 
