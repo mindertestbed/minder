@@ -39,17 +39,6 @@
     	}
     </div>
 
-   <div class="col-xs-6 col-sm-4">
-      @Messages("playauthenticate.login.oauth")
-      @* Display list of available providers *@
-      @_providerPartial(skipCurrent=false)
-      @providerAvailable("basic") { available: Boolean =>
-          @if(available) {
-              <br>
-              <a href="@com.feth.play.module.pa.controllers.routes.Authenticate.authenticate("basic")">@Messages("playauthenticate.login.basic")</a>
-          }
-      }
-    </div>
 
   </div>
 

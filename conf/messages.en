@@ -121,10 +121,9 @@ playauthenticate.navigation.profile=Profile
 playauthenticate.navigation.link_more=Link more providers
 playauthenticate.navigation.logout=Sign out
 playauthenticate.navigation.login=Log in
-playauthenticate.navigation.home=Home
-playauthenticate.navigation.restricted.observer=Observers' Page
-playauthenticate.navigation.restricted.testdesigner=Test Designers' Page
-playauthenticate.navigation.restricted.testdeveloper=Test Developers' Page
+playauthenticate.navigation.restricted.observer=Test Observers
+playauthenticate.navigation.restricted.testdesigner=Test Designers
+playauthenticate.navigation.restricted.testdeveloper=Test Developers
 playauthenticate.navigation.signup=Sign up
 
 # play-authenticate: Handler
@@ -144,14 +143,18 @@ playauthenticate.profile.password_change=Change/set a password for your account
 
 # play-authenticate - sample: Index page
 playauthenticate.index.title=Minder (Test Bed)
-playauthenticate.index.intro=Minder, the Test Bed
-playauthenticate.index.intro_2=Minder is.... something nice =)
-playauthenticate.index.intro_3=Define me in some sentences
-playauthenticate.index.heading=Heading
-playauthenticate.index.details=View details
+playauthenticate.index.intro=MiNDER - eSENS Test Bed
+playauthenticate.index.intro_2=Minder performs conformance and interoperability tests of developed modules in WP6.1, WP6.2, WP6.3 and WP5 piloting packages of eSENS.
+playauthenticate.index.intro_3=The name Minder means, „cushion“ in English and inspired from the TestBed.
+playauthenticate.index.heading.to=Test Observers
+playauthenticate.index.heading.ts=Test Designers
+playauthenticate.index.heading.td=Test Developers
+playauthenticate.index.details=Go to page
 
 # play-authenticate - sample: Restricted page
-playauthenticate.restricted.secrets=Secrets, everywhere!
+playauthenticate.restricted.testdesigner= Test Designers are responsible to create test scenarios according to the test assertions, which are supposed to be provided by WP6 and WP5. Test assertion document state the testable logics of a system under test. eSENS test assertion template is compatible with OASIS Test Assertions Guidelines. After creating test scenarios, Test Designers can also run the test cases. Test Designer can communicate with Minder Server via a web interface.
+playauthenticate.restricted.testdeveloper=Test Developers are domain experts who know the system under test. A Test Developer is responsible to implement the wrapper interface provided by Minder. 
+playauthenticate.restricted.testobserver=Test Observer can see the results of test runs and gather test reports.
 
 playauthenticate.roles.signup.error.chooseatleastonerole = You must choose at least one role.
 
