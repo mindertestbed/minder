@@ -5,17 +5,20 @@ import com.feth.play.module.pa.PlayAuthenticate.Resolver;
 import com.feth.play.module.pa.exceptions.AccessDeniedException;
 import com.feth.play.module.pa.exceptions.AuthException;
 import controllers.routes;
+import minderengine.BuiltInWrapperRegistry;
 import minderengine.XoolaServer;
 import models.SecurityRole;
 import play.Application;
 import play.GlobalSettings;
 import play.mvc.Call;
 
+import java.io.IOException;
 import java.util.Arrays;
+import java.util.Properties;
 
 public class Global extends GlobalSettings {
 	public void onStart(Application app) {
-
+		BuiltInWrapperRegistry.get().initiate();
 		XoolaServer.get().start();
 
 		PlayAuthenticate.setResolver(new Resolver() {

@@ -31,7 +31,8 @@ libraryDependencies ++= Seq(
   "be.objectify" %% "deadbolt-java" % "2.3.0-RC1",
   "org.webjars" %% "webjars-play" % "2.3.0",
   "org.webjars" % "bootstrap" % "3.2.0",
-  "org.apache.commons" % "commons-email" % "1.3.1"
+  "org.apache.commons" % "commons-email" % "1.3.1",
+  "net.sf.saxon" % "Saxon-HE" % "9.6.0-3"
 )
 
 resolvers ++= Seq(

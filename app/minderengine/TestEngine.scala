@@ -16,19 +16,25 @@ class TestEngine {
    * @param tdl The test definition
    */
   def runTest(userEmail: String, tdl: String): Unit = {
-		  
+
     val clsMinderTDL = TdlCompiler.compileTdl(userEmail, tdl)
 
     val minderTDL = clsMinderTDL.newInstance()
     for (rivet <- minderTDL.SlotDefs) {
-      var minderClient = XoolaServer.get().getClient(rivet.slot.wrapperId)
+
+      //resolve the minder client id. This might as well be resolved to a local built-in wrapper.
+      val minderClient = if (BuiltInWrapperRegistry.get().contains(rivet.slot.wrapperId)) {
+        BuiltInWrapperRegistry.get().getBuiltInWrapper(rivet.slot.wrapperId)
+      } else {
+        XoolaServer.get().getClient(rivet.slot.wrapperId)
+      }
       val args = Array.ofDim[Object](rivet.pipes.length)
 
       for (tuple <- rivet.signalPipeMap.keySet) {
         val me: MinderSignalRegistry = SessionMap.getObject(userEmail, "minderSignalRegistry")
         if (me == null) throw new IllegalArgumentException("No MinderSignalRegistry object defined for session " + userEmail)
 
-        var signalData = me.dequeueSignal(tuple _1, tuple _2)
+        val signalData = me.dequeueSignal(tuple _1, tuple _2)
         for (paramPipe <- rivet.signalPipeMap(tuple)) {
           args(paramPipe.out) = paramPipe.converter(signalData.args(paramPipe.in))
 
@@ -40,7 +46,7 @@ class TestEngine {
         convertParam(paramPipe.out, paramPipe.converter(null))
       }
 
-      
+
       rivet.result = minderClient.callSlot(userEmail, rivet.slot.signature, args)
 
 

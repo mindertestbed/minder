@@ -48,6 +48,7 @@ public class XoolaServer {
           System.err.println("WARN " + ex.getMessage());
         }
 
+        ServerRegistry.classLoader = Play.classloader(Play.current());
         server = Xoola.init(properties);
         System.out.println(properties.getProperty("PORT"));
         System.out.println("Created xoola server");
