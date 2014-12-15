@@ -18,17 +18,8 @@ public class MinderServer implements IMinderServer{
    * @param methodSet
    */
   @Override
-  public void hello(String uid, Set<MethodContainer> methodSet) {
-    //jpa uzerinden wrapper ile ilgili (uid primarykey) tablolari GUNCELLE
-    //
-    // iki hello arasinda bir degisiklik yoksa, dbye mudahale etmeye gerek yok
-    // ama degisiklik varsa, yeni bir versiyon olusturulur,
-
-    System.out.println(uid);
-    for (MethodContainer mc : methodSet) {
-      //never use mc.method here because it is transient and we didn't receive it.
-      System.out.println("\t" + (mc.isSignal ? "Signal " : "Slot ") + mc.methodKey);
-    }
+  public void hello(String uid, String label, Set<MethodContainer> methodSet) {
+    MinderWrapperRegistry.get().updateWrapper(uid, label, methodSet);
   }
 
   /**
@@ -47,7 +38,8 @@ public class MinderServer implements IMinderServer{
 
   @Override
   public Object signalEmitted(String sessionId, String uid, String signature, SignalData signalData) {
-    MinderSignalRegistry me = SessionMap.getObject(sessionId, "minderSignalRegistry");
+    System.out.println("Signal emitted " + sessionId + " " + uid + " " + signature);
+    MinderSignalRegistry me = SessionMap.getObject(sessionId, "signalRegistry");
     if (me == null)
       throw new IllegalArgumentException("No MinderSignalRegistry object defined for session " + sessionId);
 

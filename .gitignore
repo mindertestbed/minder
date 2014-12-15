@@ -14,3 +14,10 @@ dist
 /RUNNING_PID
 /.settings
 /bin
+.DS_Store
+dlcache
+logs
+bin
+tdlsrc
+tdlcls
+
