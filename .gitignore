@@ -15,3 +15,9 @@ dist
 /.settings
 /bin
 .DS_Store
+dlcache
+logs
+bin
+tdlsrc
+tdlcls
+
