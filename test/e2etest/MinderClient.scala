@@ -55,14 +55,10 @@ class MinderClient(properties: Properties) extends IMinderClient with ISignalHan
    */
   override def callSlot(sId: String, slotName: String, args: Array[Object]): Object = {
     checkSession(sId)
-
-    println(methodMap.get(slotName).method.getName)
-
     methodMap.get(slotName).method.invoke(wrapper, args: _*)
   }
 
   def checkSession(sId: String) {
-    println("sessionId " + sessionId + " sId: " + ": " + sId)
     if (sessionId == null || !(sessionId equals (sId))) {
       throw new MinderException(MinderException.E_INVALID_SESSION)
     }
