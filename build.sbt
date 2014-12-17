@@ -10,6 +10,10 @@ resolvers += "play-easymail (snapshot)" at "http://joscha.github.io/play-easymai
 
 lazy val root = (project in file(".")).enablePlugins(PlayJava)
 
+resolvers += "Eid public repository" at "http://eidrepo:8081/nexus/content/groups/public/"
+
+resolvers += Resolver.mavenLocal
+
 scalaVersion := "2.11.2"
 
 libraryDependencies ++= Seq(
