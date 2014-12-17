@@ -67,6 +67,12 @@ public class Application extends Controller {
 		final User localUser = getLocalUser(session());
 		return ok(profile.render(localUser));
 	}
+	
+	@Restrict(@Group(Application.TEST_DESIGNER_ROLE))
+	public static Result createTestCase() {
+		final User localUser = getLocalUser(session());
+		return ok(createTestCase.render(localUser));
+	}
 
 	public static Result login() {
 		return ok(login.render(MyUsernamePasswordAuthProvider.LOGIN_FORM));
