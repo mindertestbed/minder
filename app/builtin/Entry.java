@@ -5,7 +5,7 @@ import java.util.Map;
 /**
  * Created by yerlibilgin on 12/12/14.
  */
-class Entry implements Map.Entry<String, String> {
+public class Entry implements Map.Entry<String, String> {
 
   private final String key;
   private String value;

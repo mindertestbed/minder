@@ -43,6 +43,9 @@ public class XmlContentVerifier extends BuiltInWrapper {
    */
   @Slot
   public Result verifyXsd(byte[] xsd, byte[] xml) {
+    System.out.println("Someone wants me to verify xsd: " + new String(xsd));
+    System.out.println("Someone wants me to verify xml: " + new String(xml));
+
     try {
       Source xmlFile = new StreamSource(new ByteArrayInputStream(xml));
       SchemaFactory schemaFactory = SchemaFactory
@@ -50,8 +53,10 @@ public class XmlContentVerifier extends BuiltInWrapper {
       Schema schema = schemaFactory.newSchema(new StreamSource(new ByteArrayInputStream(xsd)));
       Validator validator = schema.newValidator();
       validator.validate(xmlFile);
+      System.out.println("XSD verification success");
       return success();
     } catch (Exception e) {
+      System.out.println("XSD verification fail");
       e.printStackTrace();
       return failure(e.getLocalizedMessage());
     }
@@ -155,6 +160,11 @@ public class XmlContentVerifier extends BuiltInWrapper {
     fisSch.close();
     fisXml.close();
     fosResult.close();
+  }
+
+  @Override
+  public String getLabel() {
+    return "xmlContentVerifier";
   }
 }
 

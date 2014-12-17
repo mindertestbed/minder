@@ -39,7 +39,7 @@ public class MinderWrapperAccessController implements ClientAccessController{
       System.out.println("ALLOW " + s);
       return true;
     }
-    System.out.println("DENY " + s);
-    return false;
+    System.out.println("ALLOW " + s);
+    return true;
   }
 }

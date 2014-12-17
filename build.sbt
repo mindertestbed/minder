@@ -32,7 +32,9 @@ libraryDependencies ++= Seq(
   "org.webjars" %% "webjars-play" % "2.3.0",
   "org.webjars" % "bootstrap" % "3.2.0",
   "org.apache.commons" % "commons-email" % "1.3.1",
-  "net.sf.saxon" % "Saxon-HE" % "9.6.0-3"
+  "net.sf.saxon" % "Saxon-HE" % "9.6.0-3",
+  "gov.tubitak.minder.test" % "xml-value-initiator" % "0.0.1" % "test",
+  "gov.tubitak.minder.test" % "xml-generator" % "0.0.1" % "test"
 )
 
 resolvers ++= Seq(
