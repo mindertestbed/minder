@@ -58,14 +58,14 @@ class TestEngine {
 
           val signalData = me.dequeueSignal(MinderWrapperRegistry.get().getUidForLabel(tuple _1), tuple _2)
           for (paramPipe <- rivet.signalPipeMap(tuple)) {
-            args(paramPipe.out) = paramPipe.converter(signalData.args(paramPipe.in)).asInstanceOf[AnyRef]
+            args(paramPipe.out) = paramPipe.execute(signalData.args(paramPipe.in)).asInstanceOf[AnyRef]
 
-            convertParam(paramPipe.out, paramPipe.converter(signalData.args(paramPipe.in)))
+            convertParam(paramPipe.out, paramPipe.execute(signalData.args(paramPipe.in)))
           }
         }
 
         for (paramPipe <- rivet.freeVariablePipes) {
-          convertParam(paramPipe.out, paramPipe.converter(null))
+          convertParam(paramPipe.out, paramPipe.execute(null))
         }
 
         rivet.result = minderClient.callSlot(userEmail, rivet.slot.signature, args)

@@ -4,11 +4,13 @@ import java.io.StringReader
 import java.util.concurrent.TimeUnit
 import javax.xml.bind.DatatypeConverter
 
+import controllers.Application
 import org.junit.runner._
 import org.specs2.mutable._
 import org.specs2.runner._
 import play.api.test.Helpers._
 import play.api.test._
+import play.test
 
 /**
  * This class performs an end-to-end
@@ -24,7 +26,7 @@ class SampleTestAssertionSpec extends Specification {
   TestCase = "XMlGeneratorTest"
 
   val rivet1 = "generateBooksData(int)" of "xmlValueInitiator" shall(
-     map(5 tonto 1)
+     map(5 onto 1)
   )
 
   val rivet2 = "generateXML(byte[])" of "xmlGenerator" shall(
@@ -33,12 +35,13 @@ class SampleTestAssertionSpec extends Specification {
      )
   )
 
+  /////////////////////////////
+  /////////////////////////////
   val rivet3 = "verifyXsd(byte[],byte[])" of "xml-content-verifier" shall(
      use("xmlProduced(byte[])" of "xmlGenerator")(
        mapping(1 onto 2)
      ),
-     map(bookXsd tonto 1)
-  )"""
+     map(bookXsd onto 1))"""
 
   sequential
 
@@ -82,9 +85,7 @@ WRAPPER_CLASS=wrapper.XmlGeneratorWrapper"""
       Thread.sleep(500)
 
       //run test
-
-      val tdlB64 = new sun.misc.BASE64Encoder().encode(tdl.getBytes);
-      var op = route(FakeRequest(GET, "/testme?tdl=" + tdlB64));
+      val op = route(FakeRequest(POST, "/testme").withTextBody(tdl))
       val testPage = op.get
       status(testPage)(akka.util.Timeout(50, TimeUnit.SECONDS)) must equalTo(OK)
     }

@@ -1,39 +1,29 @@
-package controllers;
+package controllers
 
-/*
-public class Tester extends Controller {
-  public static Result test() {
-    Http.RequestBody body = request().body();
+import minderengine.{MinderWrapperRegistry, TestEngine, MinderSignalRegistry, SessionMap}
+import mtdl.SignalSlotInfoProvider
+import play.api.mvc._
+import views.html
+
+object Tester extends Controller {
+  def test() = Action { implicit request =>
+    val tdl = request.body.asText.mkString
+    println("hello")
+
+    SessionMap.registerObject("myildiz83@gmail.com", "signalRegistry", new MinderSignalRegistry());
+    val te = new TestEngine();
     try {
-      String tdlStr = body.asText();
-      System.out.println("start");
-      System.out.println(tdlStr);
-      System.out.println("end");
-      return TesterScala.test(tdlStr);
-    } catch (Exception e) {
-      e.printStackTrace();
-      return internalServerError();
+      SignalSlotInfoProvider.setSignalSlotInfoProvider(MinderWrapperRegistry.get())
+
+      te.runTest("myildiz83@gmail.com", tdl);
+      play.mvc.Results.ok();
+    } catch {
+      case t: Throwable => {
+        t.printStackTrace()
+        play.mvc.Results.internalServerError();
+      }
     }
+    Ok("It works!")
   }
 }
-*/
-object TesterScala extends Controller{
-    def test(tdl:String):Result={
-    //get
-    //register a signal registry for me
 
-    SessionMap.registerObject("myildiz83@gmail.com","signalRegistry",new MinderSignalRegistry());
-    val te=new TestEngine();
-    try{
-    SignalSlotInfoProvider.setSignalSlotInfoProvider(MinderWrapperRegistry.get())
-
-    te.runTest("myildiz83@gmail.com",tdl);
-    play.mvc.Results.ok();
-    }catch{
-    case t:Throwable=>{
-    t.printStackTrace()
-    play.mvc.Results.internalServerError();
-    }
-    }
-    }
-    }
