@@ -1,17 +1,113 @@
 @(localUser: models.User = null)
 
 @main(Messages("playauthenticate.navigation.testdesigner.createtestcase"), "createTestCase") {
-    <br><br>
+    
     <h1>@Messages("playauthenticate.navigation.testdesigner.createtestcase")</h1>
 
-	<table style="width:100%">
-	  <tr>
-	    <td><h3>Wrappers</h3></td>
-	    <td><h3>Template Test Case</h3></td> 
-	  </tr>
-	  <tr>
-	    <td>Wrapper 1</td>
-	    <td>Template</td> 
-	  </tr>
-	</table>
-}
+
+<table>
+<tr>
+	<td>
+	<h2 class="demoHeaders">Wrappers</h2>
+	</td>
+	
+	<td>
+	<h2 class="demoHeaders">Test Case Editor</h2>
+	</td>
+</tr>
+<br>
+<tr>
+	<td>
+	<div id="nav">
+	<div>
+		<div class="accordion" id="section1">Wrapper1<span></span></div>
+			<div class="container">
+		        <div class="content">
+		            <div>Signals</div>
+		            <p>Content here....</p>
+		            <div>Slots</div>
+		            <p>Content here....</p>
+		        </div>
+		    </div>
+		</div>
+		<div class="accordion" id="section2">Wrapper2<span></span></div>
+			<div class="container">
+		        <div class="content">
+		            <div>Signals</div>
+		            <p>Content here....</p>
+		            <div>Slots</div>
+		            <p>Content here....</p>
+		        </div>
+		    </div>
+		</div>
+	</div>
+	</div>
+	</td>
+	
+	<td>
+	<div  id="sectionnav">  
+		<article>
+		    <form><textarea id="code" name="code" rows="50" cols="50" class="CodeMirror">
+					function getCompletions(token, context) {
+					  var found = [], start = token.string;
+					  function maybeAdd(str) {
+					    if (str.indexOf(start) == 0) found.push(str);
+					  }
+					  function gatherCompletions(obj) {
+					    if (typeof obj == "string") forEach(stringProps, maybeAdd);
+					    else if (obj instanceof Array) forEach(arrayProps, maybeAdd);
+					    else if (obj instanceof Function) forEach(funcProps, maybeAdd);
+					    for (var name in obj) maybeAdd(name);
+					  }
+					
+					  if (context) {
+					    // If this is a property, see if it belongs to some object we can
+					    // find in the current environment.
+					    var obj = context.pop(), base;
+					    if (obj.className == "js-variable")
+					      base = window[obj.string];
+					    else if (obj.className == "js-string")
+					      base = "";
+					    else if (obj.className == "js-atom")
+					      base = 1;
+					    while (base != null && context.length)
+					      base = base[context.pop().string];
+					    if (base != null) gatherCompletions(base);
+					  }
+					  else {
+					    // If not, just look in the window object and any local scope
+					    // (reading into JS mode internals to get at the local variables)
+					    for (var v = token.state.localVars; v; v = v.next) maybeAdd(v.name);
+					    gatherCompletions(window);
+					    forEach(keywords, maybeAdd);
+					  }
+					  return found;
+					}
+					</textarea>
+		     </form>
+		
+			<p>Press <strong>ctrl-space</strong> to activate autocompletion.</p>
+		
+		    <script>
+		      var editor = CodeMirror.fromTextArea(document.getElementById("code"), {
+		        lineNumbers: true,
+		        extraKeys: {"Ctrl-Space": "autocomplete"},
+		        mode: {name: "javascript", globalVars: true},
+		        theme: "default"
+		      });
+		      
+		    </script>
+		  </article>
+	</div>
+	<td>
+</tr>
+</table>
+
+
+
+<script>
+$(document).ready(function() {
+    $('.accordion').accordion({defaultOpen: 'some_id'}); //some_id section1 in demo
+});
+</script>
+ }
