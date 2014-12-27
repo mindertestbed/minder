@@ -10,6 +10,7 @@ import org.specs2.mutable._
 import org.specs2.runner._
 import play.api.test.Helpers._
 import play.api.test._
+import play.libs.Json
 import play.test
 
 /**
@@ -85,7 +86,7 @@ WRAPPER_CLASS=wrapper.XmlGeneratorWrapper"""
       Thread.sleep(500)
 
       //run test
-      val op = route(FakeRequest(POST, "/testme").withTextBody(tdl))
+      val op = route(FakeRequest(POST, "/testme").withTextBody(tdl).withSession(("userEmail", "myildiz83@gmail.com")))
       val testPage = op.get
       status(testPage)(akka.util.Timeout(50, TimeUnit.SECONDS)) must equalTo(OK)
     }

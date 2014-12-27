@@ -8,12 +8,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import javax.persistence.CascadeType;
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.ManyToMany;
-import javax.persistence.OneToMany;
-import javax.persistence.Table;
+import javax.persistence.*;
 
 import models.TokenAction.Type;
 import play.data.format.Formats;
@@ -35,11 +30,15 @@ import com.feth.play.module.pa.user.NameIdentity;
 
 @Entity
 @Table(name = "users")
-public class User extends Model implements Subject {
+public class User extends MinderEntity implements Subject {
 	private static final long serialVersionUID = 1L;
 
 	@Id
 	public Long id;
+
+	@OneToMany(cascade = CascadeType.ALL)
+	@Basic(fetch = FetchType.LAZY)
+	public List<TestCaseCategory> testCaseCategories;
 
 	@Constraints.Email
 	// if you make this unique, keep in mind that users *must* merge/link their
@@ -86,6 +85,14 @@ public class User extends Model implements Subject {
 	@Override
 	public List<? extends Permission> getPermissions() {
 		return permissions;
+	}
+
+	public List<TestCaseCategory> getTestCaseCategories() {
+		return testCaseCategories;
+	}
+
+	public void setTestCaseCategories(List<TestCaseCategory> testCaseCategories) {
+		this.testCaseCategories = testCaseCategories;
 	}
 
 	public static boolean existsByAuthUserIdentity(

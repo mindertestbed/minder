@@ -8,14 +8,14 @@ import views.html
 object Tester extends Controller {
   def test() = Action { implicit request =>
     val tdl = request.body.asText.mkString
-    println("hello")
+    val mail = request.session.get("userEmail").mkString
 
-    SessionMap.registerObject("myildiz83@gmail.com", "signalRegistry", new MinderSignalRegistry());
+    SessionMap.registerObject(mail, "signalRegistry", new MinderSignalRegistry());
     val te = new TestEngine();
     try {
       SignalSlotInfoProvider.setSignalSlotInfoProvider(MinderWrapperRegistry.get())
 
-      te.runTest("myildiz83@gmail.com", tdl);
+      te.runTest(mail, tdl);
       play.mvc.Results.ok();
     } catch {
       case t: Throwable => {
