@@ -15,6 +15,7 @@ import java.util.List;
 @Entity
 @Table(name = "TestCaseCategory")
 public class TestCaseCategory extends Model {
+
   @Id
   public Long id;
 
@@ -40,4 +41,6 @@ public class TestCaseCategory extends Model {
     ExpressionList<TestCaseCategory> lst = find.where().eq("owner", user);
     return lst.findList();
   }
+
+  public int dummy = 0;
 }

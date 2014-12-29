@@ -1,20 +1,88 @@
-&id001 !!models.User
-active: true
-email: myildiz83@gmail.com
-emailValidated: true
-firstName: null
-id: 1
-lastLogin: 2014-12-29T07:08:49.850Z
-lastName: null
-linkedAccounts:
-- id: 1
-  providerKey: password
-  providerUserId: $2a$10$QoJy1UgFXMjLMJlQ6hAnhe1Y07yoBH0Eucna1OSag2qKWhS79HQg6
-  user: *id001
-name: Muhammet YILDIZ
-permissions: []
-roles:
-- {id: 1, roleName: observer}
-- {id: 2, roleName: Test Designer}
-- {id: 3, roleName: Test Developer}
-testCaseCategories: null
+#Users
+users:
+  - &user !!models.User
+    active: true
+    email: myildiz83@gmail.com
+    emailValidated: true
+    firstName: null
+    id: 1
+    lastLogin: 2014-12-29T07:08:49.850Z
+    lastName: null
+    linkedAccounts:
+    - id: 1
+      providerKey: password
+      providerUserId: $2a$10$QoJy1UgFXMjLMJlQ6hAnhe1Y07yoBH0Eucna1OSag2qKWhS79HQg6
+      user: *user
+    name: Muhammet YILDIZ
+    permissions: []
+    roles:
+    - {id: 1, roleName: observer}
+    - {id: 2, roleName: Test Designer}
+    - {id: 3, roleName: Test Developer}
+    testCaseCategories: []
+
+#Categories
+categories:
+  - &wp61 !!models.TestCaseCategory
+    description: null
+    id: 1
+    name: WP6.1 Test Cases
+    owner: *user
+    shortDescription: Test cases extracted from WP6.1 Test Assertions
+    testCaseGroups:
+    - &as4 !!models.TestCaseGroup
+        description: null
+        id: 1
+        name: AS4 Tests
+        shortDescription: All test cases related to AS4
+        testCaseCategory: *wp61
+        testCases:
+        - !!models.TestCase
+            id: 1
+            parameters: ''
+            shortDescription: A test case to check the eb code party id
+            tdl: sampletdl/as42.tdl
+            testAssertion: null
+            testCaseGroup: *as4
+            testCaseName: AS41
+        - !!models.TestCase
+            description: null
+            id: 2
+            parameters: ''
+            shortDescription: A test case to check the hede hodo
+            tdl: sampletdl/as42.tdl
+            testAssertion: null
+            testCaseGroup: *as4
+            testCaseName: AS42
+    - &smp !!models.TestCaseGroup
+        description: null
+        id: 2
+        name: SMP Tests
+        shortDescription: All test cases related to SMP
+        testCaseCategory: *wp61
+        testCases:
+        - !!models.TestCase
+            description: null
+            id: 3
+            parameters: ''
+            shortDescription: Check for the public key of BDX
+            tdl: sampletdl/SMP1.tdl
+            testAssertion: null
+            testCaseGroup: *smp
+            testCaseName: SMP1
+    - &bdxl !!models.TestCaseGroup
+        description: null
+        id: 3
+        name: BDXL Tests
+        shortDescription: All test cases related to BDXL
+        testCaseCategory: *wp61
+        testCases:
+        - !!models.TestCase
+            description: null
+            id: 4
+            parameters: ''
+            shortDescription: Check for the BDXL id,address match
+            tdl: sampletdl/BDXL1.tdl
+            testAssertion: null
+            testCaseGroup: *bdxl
+            testCaseName: BDXL1

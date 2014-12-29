@@ -49,6 +49,7 @@ create table TestCaseCategory (
   name                      varchar(255) not null,
   short_description         varchar(50) not null,
   description               varchar(255),
+  dummy                     integer,
   constraint uq_TestCaseCategory_name unique (name),
   constraint pk_TestCaseCategory primary key (id))
 ;

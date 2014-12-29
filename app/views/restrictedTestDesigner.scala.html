@@ -1,8 +1,7 @@
 @(localUser: models.User = null)
 
 @main(Messages("playauthenticate.navigation.restricted.testdesigner"), "restrictedTestDesigner") {
-<br><br>
-<h1>@Messages("playauthenticate.navigation.restricted.testdesigner")</h1>
+<h3>@Messages("playauthenticate.navigation.restricted.testdesigner")</h3>
 <p>
     @Messages("playauthenticate.restricted.testdesigner")
 </p>
@@ -18,15 +17,12 @@
     <ul>
         <li><a href="#tabs-1">Test Editor</a></li>
         <li><a href="#tabs-2">Test Runner</a></li>
-        <li><a href="#tabs-3">JQuery UI stuff</a></li>
     </ul>
-    <div id="tabs-1">
-       <a href="@routes.Application.createTestCase()">@Messages("playauthenticate.navigation.testdesigner.createtestcase")</a>
+    <div id="tabs-1" style="height:100%;">
+        @createTestCase()
     </div>
     <div id="tabs-2" style="height:100%;">
         @testCaseLister()
-    </div>
-    <div id="tabs-3">
     </div>
 </div>
 }
