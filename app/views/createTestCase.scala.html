@@ -47,43 +47,27 @@
 	<td>
 	<div  id="sectionnav">  
 		<article>
-		    <form><textarea id="code" name="code" rows="50" cols="50" class="CodeMirror">
-					function getCompletions(token, context) {
-					  var found = [], start = token.string;
-					  function maybeAdd(str) {
-					    if (str.indexOf(start) == 0) found.push(str);
-					  }
-					  function gatherCompletions(obj) {
-					    if (typeof obj == "string") forEach(stringProps, maybeAdd);
-					    else if (obj instanceof Array) forEach(arrayProps, maybeAdd);
-					    else if (obj instanceof Function) forEach(funcProps, maybeAdd);
-					    for (var name in obj) maybeAdd(name);
-					  }
-					
-					  if (context) {
-					    // If this is a property, see if it belongs to some object we can
-					    // find in the current environment.
-					    var obj = context.pop(), base;
-					    if (obj.className == "js-variable")
-					      base = window[obj.string];
-					    else if (obj.className == "js-string")
-					      base = "";
-					    else if (obj.className == "js-atom")
-					      base = 1;
-					    while (base != null && context.length)
-					      base = base[context.pop().string];
-					    if (base != null) gatherCompletions(base);
-					  }
-					  else {
-					    // If not, just look in the window object and any local scope
-					    // (reading into JS mode internals to get at the local variables)
-					    for (var v = token.state.localVars; v; v = v.next) maybeAdd(v.name);
-					    gatherCompletions(window);
-					    forEach(keywords, maybeAdd);
-					  }
-					  return found;
-					}
-					</textarea>
+		    <form>
+		         <textarea id="code" name="code" rows="50" cols="50" class="CodeMirror">
+						 val rivet4 = "slot2(int, int, java.lang.String, byte [], byte [], java.util.Date)" of "wrapper2" shall(
+						   //connect first two params from signal1 of wrapper2
+						   use("signal1(int, int, java.lang.String)" of "wrapper2")(
+							 mapping(
+							   1 onto 1,
+							   2 onto 2 using converter1)),
+						   use("signal2(byte[], byte[], java.lang.String)" of "wrapper3")(
+							 mapping(
+							   3 onto 3,
+							   1 onto 4 using converter1,
+							   2 onto 5)),
+						   map(val3 onto 6))
+						   
+						     <ul>
+							    <li><a href="../../index.html">Home</a>
+							    <li><a href="../../doc/manual.html">Manual</a>
+							    <li><a href="https://github.com/codemirror/codemirror">Code</a>
+							  </ul>
+			     </textarea>
 		     </form>
 		
 			<p>Press <strong>ctrl-space</strong> to activate autocompletion.</p>
@@ -92,7 +76,7 @@
 		      var editor = CodeMirror.fromTextArea(document.getElementById("code"), {
 		        lineNumbers: true,
 		        extraKeys: {"Ctrl-Space": "autocomplete"},
-		        mode: {name: "javascript", globalVars: true},
+		        mode: {name: "xml", globalVars: true},
 		        theme: "default"
 		      });
 		      
