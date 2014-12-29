@@ -98,93 +98,90 @@ public class Global extends GlobalSettings {
 
     User user = User.find.findUnique();
 
-    try (PrintWriter pw = new PrintWriter(new FileWriter("conf/initial2-data.yml"))) {
+    List<Object> yamlDumpList = new ArrayList<>();
 
-      Yaml yaml = new Yaml();
-      if (user != null) {
-        System.out.println(user);
-        System.out.println(user.email);
-        user.testCaseCategories = new ArrayList<>();
-        yaml.dump(user, pw);
-      } else {
-        System.out.println("User null");
-        user = (User) play.libs.Yaml.load("/initial-data.yml");
-        user.testCaseCategories = new ArrayList<>();
-        user.save();
-      }
+    Yaml yaml = new Yaml();
+    if (user != null) {
+      System.out.println(user);
+      System.out.println(user.email);
+      user.testCaseCategories = new ArrayList<>();
+    } else {
+      System.out.println("User null");
+      user = (User) play.libs.Yaml.load("/initial-data.yml");
+      user.testCaseCategories = new ArrayList<>();
+      user.save();
+    }
+    yamlDumpList.add(user);
 
-      if (TestCaseCategory.find.all().size() == 0) {
-        //we don't have any test categories
-        try {
-          Ebean.beginTransaction();
+    if (TestCaseCategory.find.all().size() == 0) {
+      //we don't have any test categories
+      try {
+        Ebean.beginTransaction();
+        {
+          TestCaseCategory category = createCategory(user, "WP6.1 Test Cases", "Test cases extracted from WP6.1 Test Assertions", null);
           {
-            TestCaseCategory category = createCategory(user, "WP6.1 Test Cases", "Test cases extracted from WP6.1 Test Assertions", null);
+            TestCaseGroup group = createGroup(category, "AS4 Tests", "All test cases related to AS4", null);
             {
-              TestCaseGroup group = createGroup(category, "AS4 Tests", "All test cases related to AS4", null);
-              {
-                TestCase tc = createTestCase(user, group, tdl("as41.tdl"), "A test case to check the eb code party id", null);
-                System.out.println("-------------------");
-                tc.save();
-                group.testCases.add(tc);
-              }
-              {
-                TestCase tc = createTestCase(user, group, tdl("as42.tdl"), "A test case to check the hede hodo", null);
-                System.out.println("-------------------");
-                tc.save();
-                group.testCases.add(tc);
-              }
-              group.save();
-              category.testCaseGroups.add(group);
+              TestCase tc = createTestCase(user, group, tdl("as41.tdl"), "A test case to check the eb code party id", null);
+              System.out.println("-------------------");
+              tc.save();
+              group.testCases.add(tc);
             }
             {
-              TestCaseGroup group = createGroup(category, "SMP Tests", "All test cases related to SMP", null);
-              {
-                TestCase tc = createTestCase(user, group, tdl("SMP1.tdl"), "Check for the public key of BDX", null);
-                System.out.println("-------------------");
-                tc.save();
-                group.testCases.add(tc);
-              }
-              group.save();
-              category.testCaseGroups.add(group);
+              TestCase tc = createTestCase(user, group, tdl("as42.tdl"), "A test case to check the hede hodo", null);
+              System.out.println("-------------------");
+              tc.save();
+              group.testCases.add(tc);
             }
-            {
-              TestCaseGroup group = createGroup(category, "BDXL Tests", "All test cases related to BDXL", null);
-              {
-                TestCase tc = createTestCase(user, group, tdl("BDXL1.tdl"), "Check for the BDXL id,address match", null);
-                System.out.println("-------------------");
-                tc.save();
-                group.testCases.add(tc);
-              }
-              group.save();
-              category.testCaseGroups.add(group);
-            }
-            category.save();
-
-            user.testCaseCategories.add(category);
+            group.save();
+            category.testCaseGroups.add(group);
           }
-          user.save();
+          {
+            TestCaseGroup group = createGroup(category, "SMP Tests", "All test cases related to SMP", null);
+            {
+              TestCase tc = createTestCase(user, group, tdl("SMP1.tdl"), "Check for the public key of BDX", null);
+              System.out.println("-------------------");
+              tc.save();
+              group.testCases.add(tc);
+            }
+            group.save();
+            category.testCaseGroups.add(group);
+          }
+          {
+            TestCaseGroup group = createGroup(category, "BDXL Tests", "All test cases related to BDXL", null);
+            {
+              TestCase tc = createTestCase(user, group, tdl("BDXL1.tdl"), "Check for the BDXL id,address match", null);
+              System.out.println("-------------------");
+              tc.save();
+              group.testCases.add(tc);
+            }
+            group.save();
+            category.testCaseGroups.add(group);
+          }
+          category.save();
 
-          System.out.println("*************");
-          Ebean.commitTransaction();
-          System.out.println("###################");
-        } catch (Exception ex) {
-          ex.printStackTrace();
-          Ebean.endTransaction();
+          user.testCaseCategories.add(category);
         }
-      } else {
-        List<TestCaseCategory> tcc = TestCaseCategory.find.all();
+        user.save();
 
-        for(TestCaseCategory tc : tcc) {
-          yaml.dump(tc, pw);
-        }
+        System.out.println("*************");
+        Ebean.commitTransaction();
+        System.out.println("###################");
+      } catch (Exception ex) {
+        ex.printStackTrace();
+        Ebean.endTransaction();
       }
+    } else {
+      List<TestCaseCategory> tcc = TestCaseCategory.find.all();
+      yamlDumpList.addAll(tcc);
+    }
 
+    try (PrintWriter pw = new PrintWriter(new FileWriter("conf/initial3-data.yml"))) {
+      yaml.dumpAll(yamlDumpList.iterator(), pw);
       pw.close();
-
     } catch (IOException e) {
       e.printStackTrace();
     }
-
 
   }
 
