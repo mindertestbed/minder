@@ -1,0 +1,293 @@
+&id001 !!models.User
+active: true
+email: myildiz83@gmail.com
+emailValidated: true
+firstName: null
+id: 1
+lastLogin: 2014-12-29T12:06:09.118Z
+lastName: null
+linkedAccounts:
+- id: 1
+  providerKey: password
+  providerUserId: $2a$10$QoJy1UgFXMjLMJlQ6hAnhe1Y07yoBH0Eucna1OSag2qKWhS79HQg6
+  user: *id001
+name: Muhammet YILDIZ
+permissions: []
+roles:
+- {id: 1, roleName: observer}
+- {id: 2, roleName: Test Designer}
+- {id: 3, roleName: Test Developer}
+testCaseCategories: []
+&id001 !!models.TestCaseCategory
+description: null
+id: 1
+name: WP6.1 Test Cases
+owner: {active: false, email: null, emailValidated: false, firstName: null, id: 1,
+  lastLogin: null, lastName: null, linkedAccounts: null, name: null, permissions: null,
+  roles: null, testCaseCategories: null}
+shortDescription: Test cases extracted from WP6.1 Test Assertions
+testCaseGroups:
+- &id002
+  description: null
+  id: 3
+  name: BDXL Tests
+  shortDescription: All test cases related to BDXL
+  testCaseCategory: *id001
+  testCases:
+  - description: null
+    id: 4
+    parameters: ''
+    shortDescription: Check for the BDXL id,address match
+    tdl: |+
+      import java.util.Date
+
+      TestCase = "BDXL1"
+
+      //my custom converters
+      def converter1(str: Any): Any = {
+        ""
+      }
+
+      //start the definition of the test case
+
+      //define the variables that will be used throughout the definition
+      //a string value
+      def val1 = {
+        println("git");
+        "Muhammet"
+      }
+
+      //an integer
+      def val2 = {
+        for (a <- 1 to 5)
+          println("otuzdort");
+        34
+      }
+
+      //a date value (java.util.Date)
+      def val3 = new Date //$now is built-in
+
+      //an online zip archive that contains xsds
+      def smallClaimsXsdRepo = JOINUP_CORE % "SmallClaims_10_2013_06_07_13_18_14.zip"
+      def justiceXsd = "SCFormCPartI_BD001007/data/standard/Justice.xsd" under smallClaimsXsdRepo
+
+      //another online file
+
+      //def biiConformanceRepo = "http://www.invinet.org/BII2conformance"
+      //def biiUBLT01 = "/BII2-resources/xslt/BIIRULES-UBL-T01.xsl" under biiConformanceRepo
+
+      //define rivets.
+
+      //a rivet for a slot that does not take parameters and has to be triggered directly by
+      //the engine
+      val rivet1 = "slot0()" of "$wrapper0" asIs
+
+      //a rivet that does not take parameters and will be triggered by a signal
+      val rivet2 = "slot0()" of "$wrapper1" shall use("signal0()" of "wrapper0")(automatically)
+
+      //a rivet connect a signal automatically. (pairwise match parameters)
+      val rivet3 = "slot1(int, int, java.lang.String)" of "$wrapper1" shall
+        use("signal1(int, int, java.lang.String)" of "$wrapper2")(automatically)
+
+      val rivet4 = "slot2(int, int, java.lang.String, byte [], byte [], java.util.Date)" of "$wrapper2" shall(
+        //connect first two params from signal1 of wrapper2
+        use("signal1(int, int, java.lang.String)" of "$wrapper2")(
+          mapping(
+            1 onto 1,
+            2 onto 2 using converter1)),
+        use("signal2(byte[], byte[], java.lang.String)" of "$wrapper3")(
+          mapping(
+            3 onto 3,
+            1 onto 4 using converter1,
+            2 onto 5)),
+        map(val3 onto 6))
+
+      //first parameter is the xml document, second parameter is the shema
+      val rivet5 = "verifyXml(byte[], byte[])" of "xml-content-verifier" shall(
+        map(rivet4 onto 1), //rivet4 generates an xml document
+        map(justiceXsd onto 2) //use the justice asset (which is downloaded)
+        )
+
+    testAssertion: null
+    testCaseGroup: *id002
+    testCaseName: BDXL1
+- &id003
+  description: null
+  id: 2
+  name: SMP Tests
+  shortDescription: All test cases related to SMP
+  testCaseCategory: *id001
+  testCases:
+  - description: null
+    id: 3
+    parameters: ''
+    shortDescription: Check for the public key of BDX
+    tdl: |+
+      import java.util.Date
+
+      TestCase = "SMP1"
+
+      //my custom converters
+      def converter1(str: Any): Any = {
+        ""
+      }
+
+      //start the definition of the test case
+
+      //define the variables that will be used throughout the definition
+      //a string value
+      def val1 = {
+        println("git");
+        "Muhammet"
+      }
+
+      //an integer
+      def val2 = {
+        for (a <- 1 to 5)
+          println("otuzdort");
+        34
+      }
+
+      //a date value (java.util.Date)
+      def val3 = new Date //$now is built-in
+
+      //an online zip archive that contains xsds
+      def smallClaimsXsdRepo = JOINUP_CORE % "SmallClaims_10_2013_06_07_13_18_14.zip"
+      def justiceXsd = "SCFormCPartI_BD001007/data/standard/Justice.xsd" under smallClaimsXsdRepo
+
+      //another online file
+
+      //def biiConformanceRepo = "http://www.invinet.org/BII2conformance"
+      //def biiUBLT01 = "/BII2-resources/xslt/BIIRULES-UBL-T01.xsl" under biiConformanceRepo
+
+      //define rivets.
+
+      //a rivet for a slot that does not take parameters and has to be triggered directly by
+      //the engine
+      val rivet1 = "slot0()" of "$wrapper0" asIs
+
+      //a rivet that does not take parameters and will be triggered by a signal
+      val rivet2 = "slot0()" of "$wrapper1" shall use("signal0()" of "wrapper0")(automatically)
+
+      //a rivet connect a signal automatically. (pairwise match parameters)
+      val rivet3 = "slot1(int, int, java.lang.String)" of "$wrapper1" shall
+        use("signal1(int, int, java.lang.String)" of "$wrapper2")(automatically)
+
+      val rivet4 = "slot2(int, int, java.lang.String, byte [], byte [], java.util.Date)" of "$wrapper2" shall(
+        //connect first two params from signal1 of wrapper2
+        use("signal1(int, int, java.lang.String)" of "$wrapper2")(
+          mapping(
+            1 onto 1,
+            2 onto 2 using converter1)),
+        use("signal2(byte[], byte[], java.lang.String)" of "$wrapper3")(
+          mapping(
+            3 onto 3,
+            1 onto 4 using converter1,
+            2 onto 5)),
+        map(val3 onto 6))
+
+      //first parameter is the xml document, second parameter is the shema
+      val rivet5 = "verifyXml(byte[], byte[])" of "xml-content-verifier" shall(
+        map(rivet4 onto 1), //rivet4 generates an xml document
+        map(justiceXsd onto 2) //use the justice asset (which is downloaded)
+        )
+
+    testAssertion: null
+    testCaseGroup: *id003
+    testCaseName: SMP1
+- &id004
+  description: null
+  id: 1
+  name: AS4 Tests
+  shortDescription: All test cases related to AS4
+  testCaseCategory: *id001
+  testCases:
+  - description: null
+    id: 2
+    parameters: ''
+    shortDescription: A test case to check the hede hodo
+    tdl: |
+      TestCase = "AS42"
+
+      var rivet1 = "rivet3" from "radu@romanya.com.SampleTestCase1"
+      var rivet2 = "rivet4" from "AS41"
+    testAssertion: null
+    testCaseGroup: *id004
+    testCaseName: AS42
+  - description: null
+    id: 1
+    parameters: ''
+    shortDescription: A test case to check the eb code party id
+    tdl: |+
+      import java.util.Date
+
+      TestCase = "AS41"
+
+      //my custom converters
+      def converter1(str: Any): Any = {
+        ""
+      }
+
+      //start the definition of the test case
+
+      //define the variables that will be used throughout the definition
+      //a string value
+      def val1 = {
+        println("git");
+        "Muhammet"
+      }
+
+      //an integer
+      def val2 = {
+        for (a <- 1 to 5)
+          println("otuzdort");
+        34
+      }
+
+      //a date value (java.util.Date)
+      def val3 = new Date //$now is built-in
+
+      //an online zip archive that contains xsds
+      def smallClaimsXsdRepo = JOINUP_CORE % "SmallClaims_10_2013_06_07_13_18_14.zip"
+      def justiceXsd = "SCFormCPartI_BD001007/data/standard/Justice.xsd" under smallClaimsXsdRepo
+
+      //another online file
+
+      //def biiConformanceRepo = "http://www.invinet.org/BII2conformance"
+      //def biiUBLT01 = "/BII2-resources/xslt/BIIRULES-UBL-T01.xsl" under biiConformanceRepo
+
+      //define rivets.
+
+      //a rivet for a slot that does not take parameters and has to be triggered directly by
+      //the engine
+      val rivet1 = "slot0()" of "$wrapper0" asIs
+
+      //a rivet that does not take parameters and will be triggered by a signal
+      val rivet2 = "slot0()" of "$wrapper1" shall use("signal0()" of "wrapper0")(automatically)
+
+      //a rivet connect a signal automatically. (pairwise match parameters)
+      val rivet3 = "slot1(int, int, java.lang.String)" of "$wrapper1" shall
+        use("signal1(int, int, java.lang.String)" of "$wrapper2")(automatically)
+
+      val rivet4 = "slot2(int, int, java.lang.String, byte [], byte [], java.util.Date)" of "$wrapper2" shall(
+        //connect first two params from signal1 of wrapper2
+        use("signal1(int, int, java.lang.String)" of "$wrapper2")(
+          mapping(
+            1 onto 1,
+            2 onto 2 using converter1)),
+        use("signal2(byte[], byte[], java.lang.String)" of "$wrapper3")(
+          mapping(
+            3 onto 3,
+            1 onto 4 using converter1,
+            2 onto 5)),
+        map(val3 onto 6))
+
+      //first parameter is the xml document, second parameter is the shema
+      val rivet5 = "verifyXml(byte[], byte[])" of "xml-content-verifier" shall(
+        map(rivet4 onto 1), //rivet4 generates an xml document
+        map(justiceXsd onto 2) //use the justice asset (which is downloaded)
+        )
+
+    testAssertion: null
+    testCaseGroup: *id004
+    testCaseName: AS41

@@ -66,14 +66,14 @@ public class Signup extends Controller {
 			return badRequest(password_forgot.render(filledForm));
 		} else {
 			// The email address given *BY AN UNKNWON PERSON* to the form - we
-			// should find out if we actually have a user with this email
+			// should find out if we actually have a owner with this email
 			// address and whether password login is enabled for him/her. Also
-			// only send if the email address of the user has been verified.
+			// only send if the email address of the owner has been verified.
 			final String email = filledForm.get().email;
 
 			// We don't want to expose whether a given email address is signed
 			// up, so just say an email has been sent, even though it might not
-			// be true - that's protecting our user privacy.
+			// be true - that's protecting our owner privacy.
 			flash(Application.FLASH_MESSAGE_KEY,
 					Messages.get(
 							"playauthenticate.reset_password.message.instructions_sent",
@@ -81,8 +81,8 @@ public class Signup extends Controller {
 
 			final User user = User.findByEmail(email);
 			if (user != null) {
-				// yep, we have a user with this email that is active - we do
-				// not know if the user owning that account has requested this
+				// yep, we have a owner with this email that is active - we do
+				// not know if the owner owning that account has requested this
 				// reset, though.
 				final MyUsernamePasswordAuthProvider provider = MyUsernamePasswordAuthProvider
 						.getProvider();
@@ -90,14 +90,14 @@ public class Signup extends Controller {
 				if (user.emailValidated) {
 					provider.sendPasswordResetMailing(user, ctx());
 					// In case you actually want to let (the unknown person)
-					// know whether a user was found/an email was sent, use,
+					// know whether a owner was found/an email was sent, use,
 					// change the flash message
 				} else {
-					// We need to change the message here, otherwise the user
+					// We need to change the message here, otherwise the owner
 					// does not understand whats going on - we should not verify
-					// with the password reset, as a "bad" user could then sign
+					// with the password reset, as a "bad" owner could then sign
 					// up with a fake email via OAuth and get it verified by an
-					// a unsuspecting user that clicks the link.
+					// a unsuspecting owner that clicks the link.
 					flash(Application.FLASH_MESSAGE_KEY,
 							Messages.get("playauthenticate.reset_password.message.email_not_verified"));
 
@@ -175,7 +175,7 @@ public class Signup extends Controller {
 				return PlayAuthenticate.loginAndRedirect(ctx(),
 						new MyLoginUsernamePasswordAuthUser(u.email));
 			} else {
-				// send the user to the login page
+				// send the owner to the login page
 				flash(Application.FLASH_MESSAGE_KEY,
 						Messages.get("playauthenticate.reset_password.message.success.manual_login"));
 			}

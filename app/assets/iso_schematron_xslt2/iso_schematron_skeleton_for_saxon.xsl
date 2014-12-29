@@ -413,8 +413,8 @@
       ISO Schematron is designed as a framework with some standard query language
       bindings. If you need to support other features, please do so safely by making
       up your own @queryLanguage name: this makes it clear that your schema requires
-      special features. For example, default ISO Schematron does not support user
-      defined functions; so if you want to use the user defined function feature
+      special features. For example, default ISO Schematron does not support owner
+      defined functions; so if you want to use the owner defined function feature
       in XSLT, you need to have a schema with some queryBinding attribute name like
       "XSLT-with-my-functions" or whatever.
 -->

@@ -29,12 +29,13 @@ import com.feth.play.module.pa.user.FirstLastNameIdentity;
 import com.feth.play.module.pa.user.NameIdentity;
 
 @Entity
-@Table(name = "users")
-public class User extends MinderEntity implements Subject {
-	private static final long serialVersionUID = 1L;
+@Table(name = "Users")
+public class User extends Model implements Subject {
 
 	@Id
 	public Long id;
+
+	private static final long serialVersionUID = 1L;
 
 	@OneToMany(cascade = CascadeType.ALL)
 	@Basic(fetch = FetchType.LAZY)
@@ -141,7 +142,7 @@ public class User extends MinderEntity implements Subject {
 		}
 		// do all other merging stuff here - like resources, etc.
 
-		// deactivate the merged user that got added to this one
+		// deactivate the merged owner that got added to this one
 		otherUser.active = false;
 		Ebean.save(Arrays.asList(new User[] { otherUser, this }));
 	}
@@ -149,8 +150,8 @@ public class User extends MinderEntity implements Subject {
 	public static User create(final AuthUser authUser) {
 		final User user = new User();
 		
-		// user.permissions = new ArrayList<UserPermission>();
-		// user.permissions.add(UserPermission.findByValue("printers.edit"));
+		// owner.permissions = new ArrayList<UserPermission>();
+		// owner.permissions.add(UserPermission.findByValue("printers.edit"));
 		user.active = true;
 		user.lastLogin = new Date();
 		user.linkedAccounts = Collections.singletonList(LinkedAccount
@@ -203,7 +204,7 @@ public class User extends MinderEntity implements Subject {
 
 		user.save();
 		user.saveManyToManyAssociations("roles");
-		// user.saveManyToManyAssociations("permissions");
+		// owner.saveManyToManyAssociations("permissions");
 		return user;
 	}
 
@@ -275,4 +276,6 @@ public class User extends MinderEntity implements Subject {
 		this.changePassword(authUser, create);
 		TokenAction.deleteByUser(this, Type.PASSWORD_RESET);
 	}
+
+
 }

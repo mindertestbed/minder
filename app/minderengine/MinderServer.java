@@ -24,14 +24,14 @@ public class MinderServer implements IMinderServer{
 
   /**
    * Provide information on the Test Designer who has a sessionId
-   * @param sessionId the http session id of the web user.
+   * @param sessionId the http session id of the web owner.
    * @return
    */
   @Override
   public UserDTO getUserInfo(String sessionId) {
-    User user = SessionMap.getObject(sessionId, "user");
+    User user = SessionMap.getObject(sessionId, "owner");
     if (user == null)
-      throw new IllegalArgumentException("No user defined for session " + sessionId);
+      throw new IllegalArgumentException("No owner defined for session " + sessionId);
 
     return new UserDTO(user.name, user.firstName, user.lastName, user.email);
   }

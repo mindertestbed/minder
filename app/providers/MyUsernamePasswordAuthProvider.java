@@ -138,21 +138,21 @@ public class MyUsernamePasswordAuthProvider
 		final User u = User.findByUsernamePasswordIdentity(user);
 		if (u != null) {
 			if (u.emailValidated) {
-				// This user exists, has its email validated and is active
+				// This owner exists, has its email validated and is active
 				return SignupResult.USER_EXISTS;
 			} else {
-				// this user exists, is active but has not yet validated its
+				// this owner exists, is active but has not yet validated its
 				// email
 				return SignupResult.USER_EXISTS_UNVERIFIED;
 			}
 		}
-		// The user either does not exist or is inactive - create a new one
+		// The owner either does not exist or is inactive - create a new one
 		@SuppressWarnings("unused")
 		final User newUser = User.create(user);
 		// Usually the email should be verified before allowing login, however
 		// if you return
 		// return SignupResult.USER_CREATED;
-		// then the user gets logged in directly
+		// then the owner gets logged in directly
 		return SignupResult.USER_CREATED_UNVERIFIED;
 	}
 
@@ -174,7 +174,7 @@ public class MyUsernamePasswordAuthProvider
 							return LoginResult.USER_LOGGED_IN;
 						} else {
 							// if you don't return here,
-							// you would allow the user to have
+							// you would allow the owner to have
 							// multiple passwords defined
 							// usually we don't want this
 							return LoginResult.WRONG_PASSWORD;

@@ -3,85 +3,80 @@
 
 # --- !Ups
 
-create table linked_account (
+create table LinkedAccount (
   id                        bigint not null,
-  user_id                   integer,
+  user_id                   bigint,
   provider_user_id          varchar(255),
   provider_key              varchar(255),
-  constraint pk_linked_account primary key (id))
+  constraint pk_LinkedAccount primary key (id))
 ;
 
-create table minder_entity (
-  id                        integer not null,
-  constraint pk_minder_entity primary key (id))
-;
-
-create table security_role (
+create table SecurityRole (
   id                        bigint not null,
   role_name                 varchar(255),
-  constraint pk_security_role primary key (id))
+  constraint pk_SecurityRole primary key (id))
 ;
 
-create table test_assertion (
-  id                        integer not null,
-  test_assertion_id         integer not null,
+create table TestAssertion (
+  id                        bigint not null,
+  test_assertion_id         bigint not null,
   ta_id                     varchar(255) not null,
   normative_source          varchar(255) not null,
   target                    varchar(255) not null,
   prerequisites             varchar(255),
   predicate                 varchar(255) not null,
   variables                 varchar(255),
-  constraint uq_test_assertion_ta_id unique (ta_id),
-  constraint pk_test_assertion primary key (id))
+  constraint uq_TestAssertion_ta_id unique (ta_id),
+  constraint pk_TestAssertion primary key (id))
 ;
 
-create table test_case (
-  id                        integer not null,
-  test_case_group_id        integer not null,
-  source_id                 integer,
+create table TestCase (
+  id                        bigint not null,
+  test_assertion_id         bigint,
+  test_case_group_id        bigint,
   test_case_name            varchar(255) not null,
   short_description         varchar(50) not null,
   description               varchar(255),
-  tdl                       varchar(255) not null,
+  tdl                       varchar(4096) not null,
   parameters                varchar(255),
-  constraint uq_test_case_test_case_name unique (test_case_name),
-  constraint pk_test_case primary key (id))
+  constraint uq_TestCase_test_case_name unique (test_case_name),
+  constraint pk_TestCase primary key (id))
 ;
 
-create table test_case_category (
-  id                        integer not null,
-  owner_id                  integer,
+create table TestCaseCategory (
+  id                        bigint not null,
+  owner_id                  bigint,
   name                      varchar(255) not null,
   short_description         varchar(50) not null,
   description               varchar(255),
-  constraint uq_test_case_category_name unique (name),
-  constraint pk_test_case_category primary key (id))
+  constraint uq_TestCaseCategory_name unique (name),
+  constraint pk_TestCaseCategory primary key (id))
 ;
 
-create table test_case_group (
-  id                        integer not null,
+create table TestCaseGroup (
+  id                        bigint not null,
   name                      varchar(255) not null,
-  category_id               integer,
+  test_case_category_id     bigint,
   short_description         varchar(50) not null,
   description               varchar(255),
-  constraint uq_test_case_group_name unique (name),
-  constraint pk_test_case_group primary key (id))
+  constraint uq_TestCaseGroup_name unique (name),
+  constraint pk_TestCaseGroup primary key (id))
 ;
 
-create table token_action (
+create table TokenAction (
   id                        bigint not null,
   token                     varchar(255),
-  target_user_id            integer,
+  target_user_id            bigint,
   type                      varchar(2),
   created                   timestamp,
   expires                   timestamp,
-  constraint ck_token_action_type check (type in ('PR','EV')),
-  constraint uq_token_action_token unique (token),
-  constraint pk_token_action primary key (id))
+  constraint ck_TokenAction_type check (type in ('PR','EV')),
+  constraint uq_TokenAction_token unique (token),
+  constraint pk_TokenAction primary key (id))
 ;
 
-create table users (
-  id                        integer not null,
+create table Users (
+  id                        bigint not null,
   email                     varchar(255),
   name                      varchar(255),
   first_name                varchar(255),
@@ -89,115 +84,109 @@ create table users (
   last_login                timestamp,
   active                    boolean,
   email_validated           boolean,
-  constraint pk_users primary key (id))
+  constraint pk_Users primary key (id))
 ;
 
-create table user_permission (
+create table UserPermission (
   id                        bigint not null,
   value                     varchar(255),
-  constraint pk_user_permission primary key (id))
+  constraint pk_UserPermission primary key (id))
 ;
 
 
-create table users_security_role (
-  users_id                       integer not null,
-  security_role_id               bigint not null,
-  constraint pk_users_security_role primary key (users_id, security_role_id))
+create table Users_SecurityRole (
+  Users_id                       bigint not null,
+  SecurityRole_id                bigint not null,
+  constraint pk_Users_SecurityRole primary key (Users_id, SecurityRole_id))
 ;
 
-create table users_user_permission (
-  users_id                       integer not null,
-  user_permission_id             bigint not null,
-  constraint pk_users_user_permission primary key (users_id, user_permission_id))
+create table Users_UserPermission (
+  Users_id                       bigint not null,
+  UserPermission_id              bigint not null,
+  constraint pk_Users_UserPermission primary key (Users_id, UserPermission_id))
 ;
-create sequence linked_account_seq;
+create sequence LinkedAccount_seq;
 
-create sequence minder_entity_seq;
+create sequence SecurityRole_seq;
 
-create sequence security_role_seq;
+create sequence TestAssertion_seq;
 
-create sequence test_assertion_seq;
+create sequence TestCase_seq;
 
-create sequence test_case_seq;
+create sequence TestCaseCategory_seq;
 
-create sequence test_case_category_seq;
+create sequence TestCaseGroup_seq;
 
-create sequence test_case_group_seq;
+create sequence TokenAction_seq;
 
-create sequence token_action_seq;
+create sequence Users_seq;
 
-create sequence users_seq;
+create sequence UserPermission_seq;
 
-create sequence user_permission_seq;
-
-alter table linked_account add constraint fk_linked_account_user_1 foreign key (user_id) references users (id);
-create index ix_linked_account_user_1 on linked_account (user_id);
-alter table test_assertion add constraint fk_test_assertion_test_asserti_2 foreign key (test_assertion_id) references test_assertion (id);
-create index ix_test_assertion_test_asserti_2 on test_assertion (test_assertion_id);
-alter table test_case add constraint fk_test_case_test_case_group_3 foreign key (test_case_group_id) references test_case_group (id);
-create index ix_test_case_test_case_group_3 on test_case (test_case_group_id);
-alter table test_case add constraint fk_test_case_source_4 foreign key (source_id) references test_assertion (id);
-create index ix_test_case_source_4 on test_case (source_id);
-alter table test_case_category add constraint fk_test_case_category_owner_5 foreign key (owner_id) references users (id);
-create index ix_test_case_category_owner_5 on test_case_category (owner_id);
-alter table test_case_group add constraint fk_test_case_group_category_6 foreign key (category_id) references test_case_category (id);
-create index ix_test_case_group_category_6 on test_case_group (category_id);
-alter table token_action add constraint fk_token_action_targetUser_7 foreign key (target_user_id) references users (id);
-create index ix_token_action_targetUser_7 on token_action (target_user_id);
+alter table LinkedAccount add constraint fk_LinkedAccount_user_1 foreign key (user_id) references Users (id);
+create index ix_LinkedAccount_user_1 on LinkedAccount (user_id);
+alter table TestAssertion add constraint fk_TestAssertion_TestAssertion_2 foreign key (test_assertion_id) references TestAssertion (id);
+create index ix_TestAssertion_TestAssertion_2 on TestAssertion (test_assertion_id);
+alter table TestCase add constraint fk_TestCase_testAssertion_3 foreign key (test_assertion_id) references TestAssertion (id);
+create index ix_TestCase_testAssertion_3 on TestCase (test_assertion_id);
+alter table TestCase add constraint fk_TestCase_testCaseGroup_4 foreign key (test_case_group_id) references TestCaseGroup (id);
+create index ix_TestCase_testCaseGroup_4 on TestCase (test_case_group_id);
+alter table TestCaseCategory add constraint fk_TestCaseCategory_owner_5 foreign key (owner_id) references Users (id);
+create index ix_TestCaseCategory_owner_5 on TestCaseCategory (owner_id);
+alter table TestCaseGroup add constraint fk_TestCaseGroup_testCaseCateg_6 foreign key (test_case_category_id) references TestCaseCategory (id);
+create index ix_TestCaseGroup_testCaseCateg_6 on TestCaseGroup (test_case_category_id);
+alter table TokenAction add constraint fk_TokenAction_targetUser_7 foreign key (target_user_id) references Users (id);
+create index ix_TokenAction_targetUser_7 on TokenAction (target_user_id);
 
 
 
-alter table users_security_role add constraint fk_users_security_role_users_01 foreign key (users_id) references users (id);
+alter table Users_SecurityRole add constraint fk_Users_SecurityRole_Users_01 foreign key (Users_id) references Users (id);
 
-alter table users_security_role add constraint fk_users_security_role_securi_02 foreign key (security_role_id) references security_role (id);
+alter table Users_SecurityRole add constraint fk_Users_SecurityRole_Securit_02 foreign key (SecurityRole_id) references SecurityRole (id);
 
-alter table users_user_permission add constraint fk_users_user_permission_user_01 foreign key (users_id) references users (id);
+alter table Users_UserPermission add constraint fk_Users_UserPermission_Users_01 foreign key (Users_id) references Users (id);
 
-alter table users_user_permission add constraint fk_users_user_permission_user_02 foreign key (user_permission_id) references user_permission (id);
+alter table Users_UserPermission add constraint fk_Users_UserPermission_UserP_02 foreign key (UserPermission_id) references UserPermission (id);
 
 # --- !Downs
 
-drop table if exists linked_account cascade;
+drop table if exists LinkedAccount cascade;
 
-drop table if exists minder_entity cascade;
+drop table if exists SecurityRole cascade;
 
-drop table if exists security_role cascade;
+drop table if exists TestAssertion cascade;
 
-drop table if exists test_assertion cascade;
+drop table if exists TestCase cascade;
 
-drop table if exists test_case cascade;
+drop table if exists TestCaseCategory cascade;
 
-drop table if exists test_case_category cascade;
+drop table if exists TestCaseGroup cascade;
 
-drop table if exists test_case_group cascade;
+drop table if exists TokenAction cascade;
 
-drop table if exists token_action cascade;
+drop table if exists Users cascade;
 
-drop table if exists users cascade;
+drop table if exists Users_SecurityRole cascade;
 
-drop table if exists users_security_role cascade;
+drop table if exists Users_UserPermission cascade;
 
-drop table if exists users_user_permission cascade;
+drop table if exists UserPermission cascade;
 
-drop table if exists user_permission cascade;
+drop sequence if exists LinkedAccount_seq;
 
-drop sequence if exists linked_account_seq;
+drop sequence if exists SecurityRole_seq;
 
-drop sequence if exists minder_entity_seq;
+drop sequence if exists TestAssertion_seq;
 
-drop sequence if exists security_role_seq;
+drop sequence if exists TestCase_seq;
 
-drop sequence if exists test_assertion_seq;
+drop sequence if exists TestCaseCategory_seq;
 
-drop sequence if exists test_case_seq;
+drop sequence if exists TestCaseGroup_seq;
 
-drop sequence if exists test_case_category_seq;
+drop sequence if exists TokenAction_seq;
 
-drop sequence if exists test_case_group_seq;
+drop sequence if exists Users_seq;
 
-drop sequence if exists token_action_seq;
-
-drop sequence if exists users_seq;
-
-drop sequence if exists user_permission_seq;
+drop sequence if exists UserPermission_seq;
 

@@ -86,6 +86,8 @@ public class Application extends Controller {
 			// User did not fill everything properly
 			return badRequest(login.render(filledForm));
 		} else {
+			System.out.println("Go down");
+			System.out.println(filledForm);
 			// Everything was filled
 			return UsernamePasswordAuthProvider.handleLogin(ctx());
 		}
@@ -111,7 +113,7 @@ public class Application extends Controller {
 			return badRequest(signup.render(filledForm));
 		} else {
 			// Everything was filled
-			// do something with your part of the form before handling the user
+			// do something with your part of the form before handling the owner
 			// signup
 			return UsernamePasswordAuthProvider.handleSignup(ctx());
 		}

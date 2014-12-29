@@ -2,29 +2,34 @@ package models;
 
 import play.db.ebean.Model;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.ManyToOne;
-import javax.persistence.OneToMany;
+import javax.persistence.*;
 
 /**
  * Created by yerlibilgin on 22/12/14.
  */
 @Entity
-public class TestCase extends MinderEntity{
+@Table(name = "TestCase")
+public class TestCase extends Model{
+  @Id
+  public Long id;
+
   @ManyToOne
-  private TestAssertion source;
+  public TestAssertion testAssertion;
+
+  @ManyToOne
+  public TestCaseGroup testCaseGroup;
 
   @Column(unique = true, nullable = false)
-  private String testCaseName;
+  public String testCaseName;
 
   @Column(nullable = false, length = 50)
-  private String shortDescription;
+  public String shortDescription;
 
-  private String description;
+  public String description;
 
-  @Column(nullable = false)
-  private String tdl;
+  @Column(nullable = false, length = 4096)
+  public String tdl;
 
-  private String parameters;
+  public String parameters;
+
 }

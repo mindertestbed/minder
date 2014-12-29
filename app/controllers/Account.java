@@ -172,17 +172,17 @@ public class Account extends Controller {
 	@SubjectPresent
 	public static Result askMerge() {
 		com.feth.play.module.pa.controllers.Authenticate.noCache(response());
-		// this is the currently logged in user
+		// this is the currently logged in owner
 		final AuthUser aUser = PlayAuthenticate.getUser(session());
 
-		// this is the user that was selected for a login
+		// this is the owner that was selected for a login
 		final AuthUser bUser = PlayAuthenticate.getMergeUser(session());
 		if (bUser == null) {
-			// user to merge with could not be found, silently redirect to login
+			// owner to merge with could not be found, silently redirect to login
 			return redirect(routes.Application.index());
 		}
 
-		// You could also get the local user object here via
+		// You could also get the local owner object here via
 		// User.findByAuthUserIdentity(newUser)
 		return ok(ask_merge.render(ACCEPT_FORM, aUser, bUser));
 	}
@@ -190,13 +190,13 @@ public class Account extends Controller {
 	@SubjectPresent
 	public static Result doMerge() {
 		com.feth.play.module.pa.controllers.Authenticate.noCache(response());
-		// this is the currently logged in user
+		// this is the currently logged in owner
 		final AuthUser aUser = PlayAuthenticate.getUser(session());
 
-		// this is the user that was selected for a login
+		// this is the owner that was selected for a login
 		final AuthUser bUser = PlayAuthenticate.getMergeUser(session());
 		if (bUser == null) {
-			// user to merge with could not be found, silently redirect to login
+			// owner to merge with could not be found, silently redirect to login
 			return redirect(routes.Application.index());
 		}
 

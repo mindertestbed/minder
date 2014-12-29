@@ -12,7 +12,7 @@ class TestEngine {
    * Runs the given test case
    * Created by yerlibilgin on 07/12/14.
    *
-   * @param userEmail the user email if of the TS that is running the test
+   * @param userEmail the owner email if of the TS that is running the test
    * @param tdl The test definition
    */
   def runTest(userEmail: String, tdl: String): Unit = {

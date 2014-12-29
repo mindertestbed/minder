@@ -17,10 +17,12 @@ public class MyUserServicePlugin extends UserServicePlugin {
 	public Object save(final AuthUser authUser) {
 		final boolean isLinked = User.existsByAuthUserIdentity(authUser);
 		if (!isLinked) {
+			System.out.println("Is linked");
 			return User.create(authUser).id;
 		} else {
-			// we have this user already, so return null
-			return null;
+			System.out.println("Null");
+			// we have this owner already, so return null
+			return User.findByAuthUserIdentity(authUser);
 		}
 	}
 
