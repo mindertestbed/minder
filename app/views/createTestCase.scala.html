@@ -62,11 +62,6 @@
 							   2 onto 5)),
 						   map(val3 onto 6))
 						   
-						     <ul>
-							    <li><a href="../../index.html">Home</a>
-							    <li><a href="../../doc/manual.html">Manual</a>
-							    <li><a href="https://github.com/codemirror/codemirror">Code</a>
-							  </ul>
 			     </textarea>
 		     </form>
 		
@@ -76,8 +71,8 @@
 		      var editor = CodeMirror.fromTextArea(document.getElementById("code"), {
 		        lineNumbers: true,
 		        extraKeys: {"Ctrl-Space": "autocomplete"},
-		        mode: {name: "xml", globalVars: true},
-		        theme: "default"
+		        mode: {name: "text/x-scala", globalVars: true},
+		        theme: "ambiance"
 		      });
 		      
 		    </script>
