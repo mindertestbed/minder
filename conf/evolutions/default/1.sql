@@ -11,6 +11,13 @@ create table LinkedAccount (
   constraint pk_LinkedAccount primary key (id))
 ;
 
+create table Log (
+  id                        bigint not null,
+  user_id                   bigint,
+  log                       varchar(10000),
+  constraint pk_Log primary key (id))
+;
+
 create table SecurityRole (
   id                        bigint not null,
   role_name                 varchar(255),
@@ -19,7 +26,7 @@ create table SecurityRole (
 
 create table TestAssertion (
   id                        bigint not null,
-  test_assertion_id         bigint not null,
+  test_group_id             bigint,
   ta_id                     varchar(255) not null,
   normative_source          varchar(255) not null,
   target                    varchar(255) not null,
@@ -33,35 +40,33 @@ create table TestAssertion (
 create table TestCase (
   id                        bigint not null,
   test_assertion_id         bigint,
-  test_case_group_id        bigint,
-  test_case_name            varchar(255) not null,
-  short_description         varchar(50) not null,
-  description               varchar(255),
-  tdl                       varchar(4096) not null,
-  parameters                varchar(255),
-  constraint uq_TestCase_test_case_name unique (test_case_name),
-  constraint pk_TestCase primary key (id))
-;
-
-create table TestCaseCategory (
-  id                        bigint not null,
-  owner_id                  bigint,
   name                      varchar(255) not null,
   short_description         varchar(50) not null,
   description               varchar(255),
-  dummy                     integer,
-  constraint uq_TestCaseCategory_name unique (name),
-  constraint pk_TestCaseCategory primary key (id))
+  tdl                       varchar(10000) not null,
+  parameters                varchar(255),
+  constraint uq_TestCase_name unique (name),
+  constraint pk_TestCase primary key (id))
 ;
 
 create table TestCaseGroup (
   id                        bigint not null,
   name                      varchar(255) not null,
-  test_case_category_id     bigint,
+  owner_id                  bigint,
   short_description         varchar(50) not null,
   description               varchar(255),
+  dummy                     integer,
   constraint uq_TestCaseGroup_name unique (name),
   constraint pk_TestCaseGroup primary key (id))
+;
+
+create table TestRun (
+  id                        bigint not null,
+  test_case_id              bigint,
+  date                      timestamp,
+  runner_id                 bigint,
+  history_id                bigint,
+  constraint pk_TestRun primary key (id))
 ;
 
 create table TokenAction (
@@ -108,15 +113,17 @@ create table Users_UserPermission (
 ;
 create sequence LinkedAccount_seq;
 
+create sequence Log_seq;
+
 create sequence SecurityRole_seq;
 
 create sequence TestAssertion_seq;
 
 create sequence TestCase_seq;
 
-create sequence TestCaseCategory_seq;
-
 create sequence TestCaseGroup_seq;
+
+create sequence TestRun_seq;
 
 create sequence TokenAction_seq;
 
@@ -126,18 +133,22 @@ create sequence UserPermission_seq;
 
 alter table LinkedAccount add constraint fk_LinkedAccount_user_1 foreign key (user_id) references Users (id);
 create index ix_LinkedAccount_user_1 on LinkedAccount (user_id);
-alter table TestAssertion add constraint fk_TestAssertion_TestAssertion_2 foreign key (test_assertion_id) references TestAssertion (id);
-create index ix_TestAssertion_TestAssertion_2 on TestAssertion (test_assertion_id);
-alter table TestCase add constraint fk_TestCase_testAssertion_3 foreign key (test_assertion_id) references TestAssertion (id);
-create index ix_TestCase_testAssertion_3 on TestCase (test_assertion_id);
-alter table TestCase add constraint fk_TestCase_testCaseGroup_4 foreign key (test_case_group_id) references TestCaseGroup (id);
-create index ix_TestCase_testCaseGroup_4 on TestCase (test_case_group_id);
-alter table TestCaseCategory add constraint fk_TestCaseCategory_owner_5 foreign key (owner_id) references Users (id);
-create index ix_TestCaseCategory_owner_5 on TestCaseCategory (owner_id);
-alter table TestCaseGroup add constraint fk_TestCaseGroup_testCaseCateg_6 foreign key (test_case_category_id) references TestCaseCategory (id);
-create index ix_TestCaseGroup_testCaseCateg_6 on TestCaseGroup (test_case_category_id);
-alter table TokenAction add constraint fk_TokenAction_targetUser_7 foreign key (target_user_id) references Users (id);
-create index ix_TokenAction_targetUser_7 on TokenAction (target_user_id);
+alter table Log add constraint fk_Log_user_2 foreign key (user_id) references Users (id);
+create index ix_Log_user_2 on Log (user_id);
+alter table TestAssertion add constraint fk_TestAssertion_testGroup_3 foreign key (test_group_id) references TestCaseGroup (id);
+create index ix_TestAssertion_testGroup_3 on TestAssertion (test_group_id);
+alter table TestCase add constraint fk_TestCase_testAssertion_4 foreign key (test_assertion_id) references TestAssertion (id);
+create index ix_TestCase_testAssertion_4 on TestCase (test_assertion_id);
+alter table TestCaseGroup add constraint fk_TestCaseGroup_owner_5 foreign key (owner_id) references Users (id);
+create index ix_TestCaseGroup_owner_5 on TestCaseGroup (owner_id);
+alter table TestRun add constraint fk_TestRun_testCase_6 foreign key (test_case_id) references TestCase (id);
+create index ix_TestRun_testCase_6 on TestRun (test_case_id);
+alter table TestRun add constraint fk_TestRun_runner_7 foreign key (runner_id) references Users (id);
+create index ix_TestRun_runner_7 on TestRun (runner_id);
+alter table TestRun add constraint fk_TestRun_history_8 foreign key (history_id) references Log (id);
+create index ix_TestRun_history_8 on TestRun (history_id);
+alter table TokenAction add constraint fk_TokenAction_targetUser_9 foreign key (target_user_id) references Users (id);
+create index ix_TokenAction_targetUser_9 on TokenAction (target_user_id);
 
 
 
@@ -153,15 +164,17 @@ alter table Users_UserPermission add constraint fk_Users_UserPermission_UserP_02
 
 drop table if exists LinkedAccount cascade;
 
+drop table if exists Log cascade;
+
 drop table if exists SecurityRole cascade;
 
 drop table if exists TestAssertion cascade;
 
 drop table if exists TestCase cascade;
 
-drop table if exists TestCaseCategory cascade;
-
 drop table if exists TestCaseGroup cascade;
+
+drop table if exists TestRun cascade;
 
 drop table if exists TokenAction cascade;
 
@@ -175,15 +188,17 @@ drop table if exists UserPermission cascade;
 
 drop sequence if exists LinkedAccount_seq;
 
+drop sequence if exists Log_seq;
+
 drop sequence if exists SecurityRole_seq;
 
 drop sequence if exists TestAssertion_seq;
 
 drop sequence if exists TestCase_seq;
 
-drop sequence if exists TestCaseCategory_seq;
-
 drop sequence if exists TestCaseGroup_seq;
+
+drop sequence if exists TestRun_seq;
 
 drop sequence if exists TokenAction_seq;
 

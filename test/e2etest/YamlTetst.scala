@@ -30,7 +30,7 @@ class YamlTetst extends Specification {
       try {
         val yaml: Yaml = new Yaml(new CustomClassLoaderConstructor(this.getClass.getClassLoader))
 
-        val all = yaml.load(new FileInputStream("conf/initial2-data.yml")).asInstanceOf[java.util.LinkedHashMap[String, util.ArrayList[Object]]];
+        val all = yaml.load(new FileInputStream("conf/initial-data.yml")).asInstanceOf[java.util.LinkedHashMap[String, util.ArrayList[Object]]];
 
         val set: java.util.Set[String] = all.keySet()
 

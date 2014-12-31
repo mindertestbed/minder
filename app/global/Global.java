@@ -99,7 +99,6 @@ public class Global extends GlobalSettings {
       }
     }
 
-
     if (User.find.findRowCount() == 0) {
       System.out.println("Adding sample data");
       try {

@@ -14,22 +14,23 @@ public class TestCase extends Model{
   public Long id;
 
   @ManyToOne
+  @Column(nullable = false)
   public TestAssertion testAssertion;
 
-  @ManyToOne
-  public TestCaseGroup testCaseGroup;
-
   @Column(unique = true, nullable = false)
-  public String testCaseName;
+  public String name;
 
   @Column(nullable = false, length = 50)
   public String shortDescription;
 
   public String description;
 
-  @Column(nullable = false, length = 4096)
+  @Column(nullable = false, length = 10000)
   public String tdl;
 
   public String parameters;
+
+  public static final Finder<Long, TestCase> find = new Finder<>(
+      Long.class, TestCase.class);
 
 }

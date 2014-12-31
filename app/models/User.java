@@ -39,7 +39,7 @@ public class User extends Model implements Subject {
 
 	@OneToMany(cascade = CascadeType.ALL)
 	@Basic(fetch = FetchType.LAZY)
-	public List<TestCaseCategory> testCaseCategories;
+	public List<TestGroup> testGroups;
 
 	@Constraints.Email
 	// if you make this unique, keep in mind that users *must* merge/link their
@@ -86,14 +86,6 @@ public class User extends Model implements Subject {
 	@Override
 	public List<? extends Permission> getPermissions() {
 		return permissions;
-	}
-
-	public List<TestCaseCategory> getTestCaseCategories() {
-		return testCaseCategories;
-	}
-
-	public void setTestCaseCategories(List<TestCaseCategory> testCaseCategories) {
-		this.testCaseCategories = testCaseCategories;
 	}
 
 	public static boolean existsByAuthUserIdentity(

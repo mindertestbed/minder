@@ -11,27 +11,28 @@ import java.util.List;
  */
 @Entity
 @Table(name = "TestCaseGroup")
-public class TestCaseGroup extends Model {
+public class TestGroup extends Model {
   @Id
   public Long id;
 
-  @Column(unique=true, nullable = false)
+  @Column(unique = true, nullable = false)
   public String name;
 
   @ManyToOne
   @Column(nullable = false)
-  public TestCaseCategory testCaseCategory;
+  public User owner;
 
   @OneToMany(cascade = CascadeType.ALL)
   @Basic(fetch = FetchType.LAZY)
-  public List<TestCase> testCases;
+  public List<TestAssertion> testAssertions;
 
-  @Column(nullable=false, length = 50)
+  @Column(nullable = false, length = 50)
   public String shortDescription;
 
   public String description;
 
+  public static final Finder<Long, TestGroup> find = new Finder<>(
+      Long.class, TestGroup.class);
 
-  public static final Finder<Long, TestCaseGroup> find = new Finder<Long, TestCaseGroup>(
-      Long.class, TestCaseGroup.class);
+  public int dummy;
 }

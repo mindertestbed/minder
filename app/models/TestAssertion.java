@@ -11,9 +11,12 @@ import java.util.List;
 @Entity
 @Table(name = "TestAssertion")
 public class TestAssertion extends Model{
-
   @Id
   public Long id;
+
+  @ManyToOne
+  @Column(name="group", nullable = false)
+  public TestGroup testGroup;
 
   @Column(nullable=false, unique = true)
   public String taId;
@@ -33,6 +36,8 @@ public class TestAssertion extends Model{
 
   @OneToMany(cascade = CascadeType.ALL)
   @Basic(fetch = FetchType.LAZY)
-  public List<TestAssertion> testAssertions;
+  public List<TestCase> testCases;
 
+  public static final Finder<Long, TestAssertion> find = new Finder<>(
+      Long.class, TestAssertion.class);
 }
