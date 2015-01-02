@@ -1,49 +1,95 @@
 @(localUser: models.User = null)
-@import java.lang.Object; val categories = Array[String]("a","b","c","d", "e", "f", "g", "h")
 
-
-<style>
-    #accordion {
-    height: 100%;
-    }
-
-    .myscroll{
-    overflow:scroll;
-    width:100%;
-
-    background: rgb(200,230,255);
-    }
-
-</style>
+@import helper._
+@implicitFieldConstructor = @{ FieldConstructor(twitterBootstrapBasic.f) }
 
 <script>
-  $(function() {
-       $( "#accordion2" ).accordion({
-          collapsible: true,
-          heightStyle: "content"
-       });
-  });
+$(function() {
+    $( ".testAssertionAccordion" ).accordion({
+      collapsible: true,
+      active: false,
+      heightStyle: "content",
+      header: "h4"
+    });
+
+    createFormDialog("createTestGroup", "/createNewGroupForm", "/doCreateTestGroup", "mainDialog", "Create Group");
+    createFormDialog("editTestGroup", "/createNewGroupForm", "/doCreateTestGroup", "mainDialog", "Create Group");
+
+    minderAccordion("groupAccordion");
+});
+
 
 </script>
 
+
+<div id="mainDialog" title="main dialog">
+  <form method="post">
+  </form>
+</div>
+
 <div id="contentPane" style="height:94%;margin:0;padding:0">
-    <table style="width:100%;height:100%;border:solid 1px gray;">
-        <tr style="height:100%;">
-            <td style="width:30%;height:100%;overflow:auto;">
-                <div id="accordion2" style="overflow:scroll">
-                @for(cat <- categories){
-                <h3><b>@cat</b></h3>
-                    <div style="height:70%">
-                 <div class="myscroll">
-
-                 </div>
-                    </div>
-                }
-                </div>
-            </td>
-            <td  style="width:70%">
-            </td>
+    <div class="thin">
+      <table style="width:100%;">
+        <tr>
+          <td>&nbsp;</td>
+          <td align="center" class="bevel2" style="width:25%;">
+            <div id="createTestGroup"><img src="@routes.Assets.at("/images/create_new-64.png")" height="16px" />
+              @Messages("restrictedTestPage.createTestGroup")
+            </div>
+          </td>
+          <td>&nbsp;</td>
         </tr>
-    </table>
+      </table>
+    </div>
 
+    <div id="groupAccordion" class="bevel" style="height:94%;padding:0px;">
+      @defining(TestGroup.findByUser(localUser)){ testGroups =>
+      @for(group <- testGroups){
+      <div class="title" style="margin:0;">
+        <table style="width:100%;">
+          <tr>
+            <td class="trigger" style="width:15%;">
+              &nbsp;@group.name
+            </td>
+            <td style="width:5px;">&nbsp;</td>
+            <td class="trigger" style="width:20%;"><b>
+              @group.shortDescription</b>
+            </td>
+            <td>&nbsp;</td>
+            <td class="bevel2" style="width:3%;" align="center" valign="middle">
+              <a class="edita">
+                <img src="@routes.Assets.at("/images/edit_property-64.png")" height="16px" alt='@group.id'/>
+              </a>
+            </td>
+            <td style="width:5px;">&nbsp;</td>
+            <td class="bevel2" style="width:3%;" align="center" valign="middle">
+              <a class="deletea">
+                <img src="@routes.Assets.at("/images/trash2-64.png")" height="16px" alt='@group.id'/>
+              </a>
+            </td>
+            <td style="width:10px;">&nbsp;</td>
+          </tr>
+        </table>
+      </div>
+      <div class="content myscroll">
+        @for(testAssertion <- group.testAssertions){
+        <div class="testAssertionAccordion">
+          <h4><b>Test Assertion</b>: @testAssertion.taId</h4>
+
+          <div>
+            <table style="border: 1px solid rgb(10,80,200);width:100%">
+              @for(testCase <- testAssertion.testCases){
+              <tr>
+                <td style="width:20%;">@testCase.name</td>
+                <td>@testCase.shortDescription</td>
+              </tr>
+              }
+            </table>
+          </div>
+        </div>
+        }
+      </div>
+      }
+      }
+    </div>
 </div>

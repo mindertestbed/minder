@@ -6,6 +6,7 @@
 GET     /                           controllers.Application.index
 GET     /restrictedObserver         controllers.Application.restrictedObserver
 GET     /restrictedTestDesigner     controllers.Application.restrictedTestDesigner
+GET     /createNewTest              controllers.Application.createNewTest
 GET     /restrictedTestDeveloper    controllers.Application.restrictedTestDeveloper
 GET     /createTestCase             controllers.Application.createTestCase
 GET     /assets/javascript/routes.js  controllers.Application.jsRoutes
@@ -50,4 +51,6 @@ POST    /login/password/forgot     controllers.Signup.doForgotPassword
 GET     /assets/*file               controllers.Assets.at(path="/public", file)
 GET     /webjars/*file              controllers.WebJarAssets.at(file)
 
-POST     /testme                     controllers.Tester.test
+POST    /testme                     controllers.Tester.test
+POST    /doCreateTestGroup          controllers.InventoryController.doCreateTestGroup
+GET     /createNewGroupForm         controllers.InventoryController.createNewGroupForm

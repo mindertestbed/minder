@@ -1,5 +1,6 @@
 package models;
 
+import junit.framework.Test;
 import play.db.ebean.Model;
 
 import javax.persistence.*;
@@ -34,5 +35,12 @@ public class TestGroup extends Model {
   public static final Finder<Long, TestGroup> find = new Finder<>(
       Long.class, TestGroup.class);
 
+  public static List<TestGroup> findByUser(User user){
+    return find.where().eq("owner", user).setOrderBy("id").findList();
+  }
   public int dummy;
+
+  public static TestGroup findByName(String name) {
+    return find.where().eq("name", name).findUnique();
+  }
 }

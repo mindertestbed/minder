@@ -160,3 +160,8 @@ playauthenticate.restricted.testobserver=Test Observer can see the results of te
 playauthenticate.roles.signup.error.chooseatleastonerole = You must choose at least one role.
 
 ### --- play-authenticate END
+
+
+#restricted test page
+restrictedTestPage.createTestGroup= Create New Test Group
+restrictedTestPage.create= Create
