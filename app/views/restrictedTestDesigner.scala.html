@@ -1,9 +1,39 @@
 @(localUser: models.User = null)
 
 @main(Messages("playauthenticate.navigation.restricted.testdesigner"), "restrictedTestDesigner") {
-    <br><br>
-    <h1>@Messages("playauthenticate.navigation.restricted.testdesigner")</h1>
-    <p>
-        @Messages("playauthenticate.restricted.testdesigner")
-    </p>
+
+<script>
+  $(function() {
+    $( "#tabs" ).tabs();
+  });
+
+</script>
+
+
+<h3 class="explanation"><img src="@routes.Assets.at("/images/about-64.png")" height="24px"/></h3>
+<p>
+  @Messages("playauthenticate.restricted.testdesigner")
+</p>
+
+
+<div class="contentt">
+  <div id="tabs" style="height:100%;">
+    <ul>
+      <li><a href="#tabs-1">Test Groups</a></li>
+    </ul>
+    <div id="tabs-1" style="height:100%;">
+      @defining(session.get("testPageMode")) { mode =>
+      @if(mode == "none"){
+      @testCaseLister(localUser)
+      } else {
+      if (mode == "new") {
+      @createTestCase()
+      } else {
+      @createTestCase();
+      }
+      }
+      }
+    </div>
+  </div>
+</div>
 }

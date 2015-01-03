@@ -35,6 +35,7 @@ public class XoolaServer {
       return;
     }
 
+    started = true;
     synchronized (startLock) {
       try {
         //load the xoola properties from resource "xoola.properties"
@@ -66,7 +67,10 @@ public class XoolaServer {
 
           }
         });
+        System.out.println("Starting server");
         server.start();
+
+        System.out.println("Started server");
         started = true;
       } catch (IOException e) {
         e.printStackTrace();

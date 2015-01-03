@@ -8,12 +8,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import javax.persistence.CascadeType;
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.ManyToMany;
-import javax.persistence.OneToMany;
-import javax.persistence.Table;
+import javax.persistence.*;
 
 import models.TokenAction.Type;
 import play.data.format.Formats;
@@ -34,12 +29,17 @@ import com.feth.play.module.pa.user.FirstLastNameIdentity;
 import com.feth.play.module.pa.user.NameIdentity;
 
 @Entity
-@Table(name = "users")
+@Table(name = "Users")
 public class User extends Model implements Subject {
-	private static final long serialVersionUID = 1L;
 
 	@Id
 	public Long id;
+
+	private static final long serialVersionUID = 1L;
+
+	@OneToMany(cascade = CascadeType.ALL)
+	@Basic(fetch = FetchType.LAZY)
+	public List<TestGroup> testGroups;
 
 	@Constraints.Email
 	// if you make this unique, keep in mind that users *must* merge/link their
@@ -134,7 +134,7 @@ public class User extends Model implements Subject {
 		}
 		// do all other merging stuff here - like resources, etc.
 
-		// deactivate the merged user that got added to this one
+		// deactivate the merged owner that got added to this one
 		otherUser.active = false;
 		Ebean.save(Arrays.asList(new User[] { otherUser, this }));
 	}
@@ -142,8 +142,8 @@ public class User extends Model implements Subject {
 	public static User create(final AuthUser authUser) {
 		final User user = new User();
 		
-		// user.permissions = new ArrayList<UserPermission>();
-		// user.permissions.add(UserPermission.findByValue("printers.edit"));
+		// owner.permissions = new ArrayList<UserPermission>();
+		// owner.permissions.add(UserPermission.findByValue("printers.edit"));
 		user.active = true;
 		user.lastLogin = new Date();
 		user.linkedAccounts = Collections.singletonList(LinkedAccount
@@ -196,7 +196,7 @@ public class User extends Model implements Subject {
 
 		user.save();
 		user.saveManyToManyAssociations("roles");
-		// user.saveManyToManyAssociations("permissions");
+		// owner.saveManyToManyAssociations("permissions");
 		return user;
 	}
 
@@ -268,4 +268,6 @@ public class User extends Model implements Subject {
 		this.changePassword(authUser, create);
 		TokenAction.deleteByUser(this, Type.PASSWORD_RESET);
 	}
+
+
 }

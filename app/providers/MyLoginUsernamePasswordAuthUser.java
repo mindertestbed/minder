@@ -17,7 +17,7 @@ public class MyLoginUsernamePasswordAuthUser extends
 	private long expiration;
 
 	/**
-	 * For logging the user in automatically
+	 * For logging the owner in automatically
 	 * 
 	 * @param email
 	 */

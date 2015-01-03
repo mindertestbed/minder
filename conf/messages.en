@@ -124,6 +124,7 @@ playauthenticate.navigation.login=Log in
 playauthenticate.navigation.restricted.observer=Test Observers
 playauthenticate.navigation.restricted.testdesigner=Test Designers
 playauthenticate.navigation.restricted.testdeveloper=Test Developers
+playauthenticate.navigation.testdesigner.createtestcase=Create a Test Case
 playauthenticate.navigation.signup=Sign up
 
 # play-authenticate: Handler
@@ -159,3 +160,8 @@ playauthenticate.restricted.testobserver=Test Observer can see the results of te
 playauthenticate.roles.signup.error.chooseatleastonerole = You must choose at least one role.
 
 ### --- play-authenticate END
+
+
+#restricted test page
+restrictedTestPage.createTestGroup= Create New Test Group
+restrictedTestPage.create= Create

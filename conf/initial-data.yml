@@ -1,0 +1,105 @@
+#Users
+users:
+  - &user !!models.User
+    active: true
+    email: myildiz83@gmail.com
+    emailValidated: true
+    firstName: null
+    id: 1
+    lastLogin: 2014-12-29T07:08:49.850Z
+    lastName: null
+    linkedAccounts:
+    - id: 1
+      providerKey: password
+      providerUserId: $2a$10$QoJy1UgFXMjLMJlQ6hAnhe1Y07yoBH0Eucna1OSag2qKWhS79HQg6
+      user: *user
+    name: Muhammet YILDIZ
+    permissions: []
+    roles:
+    - {id: 1, roleName: observer}
+    - {id: 2, roleName: Test Designer}
+    - {id: 3, roleName: Test Developer}
+    testGroups: []
+
+#Categories
+groups:
+- &as4 !!models.TestGroup
+    description: null
+    id: 1
+    name: AS4 Tests
+    shortDescription: All test cases related to AS4
+    owner: *user
+    testAssertions:
+    - &taas41 !!models.TestAssertion
+        id: 1
+        testGroup: *as4
+        taId: TAAS41
+        normativeSource: src1
+        target: as4 message
+        prerequisites: be cool
+        predicate: as4 message is terribly valid
+        testCases:
+        - !!models.TestCase
+            id: 1
+            parameters: ''
+            shortDescription: A test case to check the eb code party id
+            tdl: sampletdl/as42.tdl
+            testAssertion: *taas41
+            name: AS41
+        - !!models.TestCase
+            description: null
+            id: 2
+            parameters: ''
+            shortDescription: A test case to check the hede hodo
+            tdl: sampletdl/as42.tdl
+            testAssertion: *taas41
+            name: AS42
+- &smp !!models.TestGroup
+    description: null
+    id: 2
+    name: SMP Tests
+    shortDescription: All test cases related to SMP
+    owner: *user
+    testAssertions:
+    - &tasmp1 !!models.TestAssertion
+        id: 2
+        testGroup: *smp
+        taId: TASMP1
+        normativeSource: src2
+        target: smp message
+        prerequisites: be cool
+        predicate: smp message is terribly valid
+        testCases:
+        - !!models.TestCase
+            description: null
+            id: 3
+            parameters: ''
+            shortDescription: Check for the public key of BDX
+            tdl: sampletdl/SMP1.tdl
+            testAssertion: *tasmp1
+            name: SMP1
+- &bdxl !!models.TestGroup
+    description: null
+    id: 3
+    name: BDXL Tests
+    shortDescription: All test cases related to BDXL
+    owner: *user
+    testAssertions:
+    - &tabdxl1 !!models.TestAssertion
+        id: 3
+        testGroup: *smp
+        taId: TABDXL1
+        normativeSource: src2
+        target: smp message
+        prerequisites: be cool
+        predicate: smp message is terribly valid
+        testCases:
+        testCases:
+        - !!models.TestCase
+            description: null
+            id: 4
+            parameters: ''
+            shortDescription: Check for the BDXL id,address match
+            tdl: sampletdl/BDXL1.tdl
+            testAssertion: *tabdxl1
+            name: BDXL1

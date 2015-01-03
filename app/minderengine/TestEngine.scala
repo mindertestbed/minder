@@ -12,7 +12,7 @@ class TestEngine {
    * Runs the given test case
    * Created by yerlibilgin on 07/12/14.
    *
-   * @param userEmail the user email if of the TS that is running the test
+   * @param userEmail the owner email if of the TS that is running the test
    * @param tdl The test definition
    */
   def runTest(userEmail: String, tdl: String): Unit = {
@@ -58,14 +58,14 @@ class TestEngine {
 
           val signalData = me.dequeueSignal(MinderWrapperRegistry.get().getUidForLabel(tuple _1), tuple _2)
           for (paramPipe <- rivet.signalPipeMap(tuple)) {
-            args(paramPipe.out) = paramPipe.converter(signalData.args(paramPipe.in)).asInstanceOf[AnyRef]
+            args(paramPipe.out) = paramPipe.execute(signalData.args(paramPipe.in)).asInstanceOf[AnyRef]
 
-            convertParam(paramPipe.out, paramPipe.converter(signalData.args(paramPipe.in)))
+            convertParam(paramPipe.out, paramPipe.execute(signalData.args(paramPipe.in)))
           }
         }
 
         for (paramPipe <- rivet.freeVariablePipes) {
-          convertParam(paramPipe.out, paramPipe.converter(null))
+          convertParam(paramPipe.out, paramPipe.execute(null))
         }
 
         rivet.result = minderClient.callSlot(userEmail, rivet.slot.signature, args)

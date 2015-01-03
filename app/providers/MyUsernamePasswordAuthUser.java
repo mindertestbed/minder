@@ -26,7 +26,7 @@ public class MyUsernamePasswordAuthUser extends UsernamePasswordAuthUser
 	}
 
 	/**
-	 * Used for password reset only - do not use this to signup a user!
+	 * Used for password reset only - do not use this to signup a owner!
 	 * @param password
 	 */
 	public MyUsernamePasswordAuthUser(final String password) {

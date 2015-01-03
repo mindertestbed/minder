@@ -46,11 +46,11 @@ public class BuiltInWrapper extends Wrapper implements IMinderClient, ISignalHan
   @Override
   public UserDTO getCurrentTestUserInfo() {
     if (sessionId == null)
-      throw new IllegalArgumentException("No active user session found");
+      throw new IllegalArgumentException("No active owner session found");
 
-    User user = SessionMap.getObject(sessionId, "user");
+    User user = SessionMap.getObject(sessionId, "owner");
     if (user == null) {
-      throw new IllegalArgumentException("No user defined for session " + sessionId);
+      throw new IllegalArgumentException("No owner defined for session " + sessionId);
     }
 
     return new UserDTO(user.name, user.firstName, user.lastName, user.email);

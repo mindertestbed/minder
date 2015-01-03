@@ -16,14 +16,14 @@ public class MyDeadboltHandler extends AbstractDeadboltHandler {
 	@Override
 	public F.Promise<Result> beforeAuthCheck(final Http.Context context) {
 		if (PlayAuthenticate.isLoggedIn(context.session())) {
-			// user is logged in
+			// owner is logged in
 			return F.Promise.pure(null);
 		} else {
-			// user is not logged in
+			// owner is not logged in
 
 			// call this if you want to redirect your visitor to the page that
 			// was requested before sending him to the login page
-			// if you don't call this, the user will get redirected to the page
+			// if you don't call this, the owner will get redirected to the page
 			// defined by your resolver
 			final String originalUrl = PlayAuthenticate
 					.storeOriginalUrl(context);
@@ -57,9 +57,9 @@ public class MyDeadboltHandler extends AbstractDeadboltHandler {
 	@Override
 	public F.Promise<Result> onAuthFailure(final Http.Context context,
 			final String content) {
-		// if the user has a cookie with a valid user and the local user has
+		// if the owner has a cookie with a valid owner and the local owner has
 		// been deactivated/deleted in between, it is possible that this gets
-		// shown. You might want to consider to sign the user out in this case.
+		// shown. You might want to consider to sign the owner out in this case.
         return F.Promise.promise(new F.Function0<Result>()
         {
             @Override

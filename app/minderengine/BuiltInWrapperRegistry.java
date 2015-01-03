@@ -73,7 +73,8 @@ public class BuiltInWrapperRegistry extends HashMap<String, BuiltInWrapper>{
         BuiltInWrapper wrapper = clz.newInstance();
         registerWrapper(name, wrapper);
       } catch (Exception e) {
-        throw new IllegalArgumentException(name + "=" + value + " is an illegal built-in wrapper.");
+        e.printStackTrace();
+        throw new IllegalArgumentException(name + "=" + value + " is an illegal built-in wrapper.", e);
       }
     }
   }

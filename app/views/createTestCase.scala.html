@@ -1,0 +1,177 @@
+@(localUser: models.User = null)
+
+
+<link rel="stylesheet" href="@routes.Assets.at("stylesheets/theme/3024-day.css")" rel="stylesheet">
+<link rel="stylesheet" href="@routes.Assets.at("stylesheets/theme/3024-night.css")" rel="stylesheet">
+<link rel="stylesheet" href="@routes.Assets.at("stylesheets/theme/ambiance.css")" rel="stylesheet">
+<link rel="stylesheet" href="@routes.Assets.at("stylesheets/theme/base16-dark.css")" rel="stylesheet">
+<link rel="stylesheet" href="@routes.Assets.at("stylesheets/theme/base16-light.css")" rel="stylesheet">
+<link rel="stylesheet" href="@routes.Assets.at("stylesheets/theme/blackboard.css")" rel="stylesheet">
+<link rel="stylesheet" href="@routes.Assets.at("stylesheets/theme/cobalt.css")" rel="stylesheet">
+<link rel="stylesheet" href="@routes.Assets.at("stylesheets/theme/eclipse.css")" rel="stylesheet">
+<link rel="stylesheet" href="@routes.Assets.at("stylesheets/theme/elegant.css")" rel="stylesheet">
+<link rel="stylesheet" href="@routes.Assets.at("stylesheets/theme/erlang-dark.css")" rel="stylesheet">
+<link rel="stylesheet" href="@routes.Assets.at("stylesheets/theme/lesser-dark.css")" rel="stylesheet">
+<link rel="stylesheet" href="@routes.Assets.at("stylesheets/theme/mbo.css")" rel="stylesheet">
+<link rel="stylesheet" href="@routes.Assets.at("stylesheets/theme/mdn-like.css")" rel="stylesheet">
+<link rel="stylesheet" href="@routes.Assets.at("stylesheets/theme/midnight.css")" rel="stylesheet">
+<link rel="stylesheet" href="@routes.Assets.at("stylesheets/theme/monokai.css")" rel="stylesheet">
+<link rel="stylesheet" href="@routes.Assets.at("stylesheets/theme/neat.css")" rel="stylesheet">
+<link rel="stylesheet" href="@routes.Assets.at("stylesheets/theme/neo.css")" rel="stylesheet">
+<link rel="stylesheet" href="@routes.Assets.at("stylesheets/theme/night.css")" rel="stylesheet">
+<link rel="stylesheet" href="@routes.Assets.at("stylesheets/theme/paraiso-dark.css")" rel="stylesheet">
+<link rel="stylesheet" href="@routes.Assets.at("stylesheets/theme/paraiso-light.css")" rel="stylesheet">
+<link rel="stylesheet" href="@routes.Assets.at("stylesheets/theme/pastel-on-dark.css")" rel="stylesheet">
+<link rel="stylesheet" href="@routes.Assets.at("stylesheets/theme/rubyblue.css")" rel="stylesheet">
+<link rel="stylesheet" href="@routes.Assets.at("stylesheets/theme/solarized.css")" rel="stylesheet">
+<link rel="stylesheet" href="@routes.Assets.at("stylesheets/theme/the-matrix.css")" rel="stylesheet">
+<link rel="stylesheet" href="@routes.Assets.at("stylesheets/theme/tomorrow-night-bright.css")" rel="stylesheet">
+<link rel="stylesheet" href="@routes.Assets.at("stylesheets/theme/tomorrow-night-eighties.css")" rel="stylesheet">
+<link rel="stylesheet" href="@routes.Assets.at("stylesheets/theme/twilight.css")" rel="stylesheet">
+<link rel="stylesheet" href="@routes.Assets.at("stylesheets/theme/vibrant-ink.css")" rel="stylesheet">
+<link rel="stylesheet" href="@routes.Assets.at("stylesheets/theme/xq-dark.css")" rel="stylesheet">
+<link rel="stylesheet" href="@routes.Assets.at("stylesheets/theme/xq-light.css")" rel="stylesheet">
+<link rel="stylesheet" href="@routes.Assets.at("stylesheets/theme/zenburn.css")" rel="stylesheet">
+
+<style>
+    #accordion1 {
+    height: 100%;
+    overflow:scroll;
+    }
+
+    .myscroll{
+    overflow:scroll;
+    width:100%;
+
+    background: rgb(200,230,255);
+    }
+
+</style>
+
+<script>
+  $(function() {
+    $( "#accordion1" ).accordion({
+      collapsible: true,
+      heightStyle: "content"
+    });
+
+    var editor = CodeMirror.fromTextArea(document.getElementById("code"), {
+        lineNumbers: true,
+        lineWrapping: true,
+        styleActiveLine: true,
+        extraKeys: {"Ctrl-Space": "autocomplete"},
+        mode: {name: "text/x-scala", globalVars: true},
+        theme: "neo"
+    });
+
+    $( "select" ).change(function() {
+        $( "select option:selected" ).each(function() {
+           editor.setOption("theme", $( this ).text());
+        });
+
+    });
+  });
+
+</script>
+
+<div id="contentPane" style="width:100%;height:94%;margin:0;padding:0;">
+    <table style="width:100%;height:100%;">
+        <tr style="height:10%;">
+            <td>
+                <h4 class="demoHeaders">Wrappers</h4>
+            </td>
+
+            <td>
+                <h4 class="demoHeaders">Test Case Editor</h4>
+            </td>
+        </tr>
+        <tr style="width:100%;height:90%;">
+            <td style="width:30%;height:100%;overflow:auto;">
+                <div id="accordion1">
+                    <h3><b>Wrapper1</b></h3>
+
+                    <div style="height:70%">
+                        <div class="myscroll">
+                            <div>Signals</div>
+                            <p>Content here....</p>
+
+                            <div>Slots</div>
+                            <p>Content here....</p>
+                        </div>
+                    </div>
+                    <h3><b>Wrapper2</b></h3>
+
+                    <div style="height:70%">
+                        <div class="myscroll">
+                            <div>Signals</div>
+                            <p>Content here....</p>
+
+                            <div>Slots</div>
+                            <p>Content here....</p>
+                        </div>
+                    </div>
+                </div>
+            </td>
+
+            <td style="width:70%;height:100%;">
+                <div id="sectionnav">
+                    <p>Theme: <select onchange="selectTheme()" id="select">
+                        <option>default</option>
+                        <option>3024-day</option>
+                        <option>3024-night</option>
+                        <option>ambiance</option>
+                        <option>base16-dark</option>
+                        <option>base16-light</option>
+                        <option>blackboard</option>
+                        <option>cobalt</option>
+                        <option>eclipse</option>
+                        <option>elegant</option>
+                        <option>erlang-dark</option>
+                        <option>lesser-dark</option>
+                        <option>mbo</option>
+                        <option>mdn-like</option>
+                        <option>midnight</option>
+                        <option>monokai</option>
+                        <option>neat</option>
+                        <option selected>neo</option>
+                        <option>night</option>
+                        <option>paraiso-dark</option>
+                        <option>paraiso-light</option>
+                        <option>pastel-on-dark</option>
+                        <option>rubyblue</option>
+                        <option>solarized dark</option>
+                        <option>solarized light</option>
+                        <option>the-matrix</option>
+                        <option>tomorrow-night-bright</option>
+                        <option>tomorrow-night-eighties</option>
+                        <option>twilight</option>
+                        <option>vibrant-ink</option>
+                        <option>xq-dark</option>
+                        <option>xq-light</option>
+                        <option>zenburn</option>
+                    </select>
+                    </p>
+                    <article>
+                        <form>
+		         <textarea id="code" name="code" rows="20" cols="40" class="CodeMirror">
+val rivet4 = "slot2(int, int, java.lang.String, byte [], byte [], java.util.Date)" of "wrapper2" shall(
+    //connect first two params from signal1 of wrapper2
+    use("signal1(int, int, java.lang.String)" of "wrapper2")(
+     mapping(
+       1 onto 1,
+       2 onto 2 using converter1)),
+    use("signal2(byte[], byte[], java.lang.String)" of "wrapper3")(
+     mapping(
+       3 onto 3,
+       1 onto 4 using converter1,
+       2 onto 5)),
+    map(val3 onto 6))
+			     </textarea>
+                        </form>
+                        <p>Press <strong>ctrl-space</strong> to activate autocompletion.</p>
+                    </article>
+                </div>
+            </td>
+        </tr>
+    </table>
+</div>
