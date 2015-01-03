@@ -30,15 +30,13 @@ function minderAccordion(id){
   });
 }
 
-
-
-   var frm = $( "#mainForm" );
-
-
 function createFormDialog(id, sourceUrl, action, dialogId, titl, w, h){
+  createFormDialog2($("#" + id), sourceUrl, action, dialogId, titl, w, h);
+}
+
+function createFormDialog2(elm, sourceUrl, action, dialogId, titl, w, h){
   ww = typeof w !== 'undefined' ? w : '50%';
   hh = typeof w !== 'undefined' ? w : '500';
-
   var frm = $( "#" + dialogId + " > form");
   var dialog = $( "#" + dialogId ).dialog({
     autoOpen: false,
@@ -72,9 +70,10 @@ function createFormDialog(id, sourceUrl, action, dialogId, titl, w, h){
   });
 
   frm[0].setAttribute('action', action);
-  var elem = $("#" + id);
-  elem.click(function(){
-     //frm[0].innerHTML = "<div align='center'>Loading..</div>"
+
+  elm.on('click', function(event){
+     alert(elm);
+     event.stopPropagation();
      $.ajax({
           type: 'GET',
           url: sourceUrl,

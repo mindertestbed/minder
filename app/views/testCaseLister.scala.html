@@ -13,7 +13,45 @@ $(function() {
     });
 
     createFormDialog("createTestGroup", "/createNewGroupForm", "/doCreateTestGroup", "mainDialog", "Create Group");
-    createFormDialog("editTestGroup", "/createNewGroupForm", "/doCreateTestGroup", "mainDialog", "Create Group");
+
+    $("div.edita").each(function( index ) {
+      createFormDialog2($(this), $(this).next().val(), "/doEditGroup", "mainDialog", "Edit Group");
+    });
+
+
+    var deleteDialog = $( "#dialog-confirm" ).dialog({
+      resizable: false,
+      height:140,
+      width:"50%",
+      autoOpen: false,
+      modal: true,
+      buttons: {
+        "Delete": function() {
+         $.ajax({
+          type: 'GET',
+          url: deleteUrl,
+          success: function (data) {
+            document.location.reload();
+          },
+          error: function (jqXHR, textStatus, errorMessage) {
+              alert(jqXHR.responseText);
+          }
+       });
+
+        $( this ).dialog( "close" );
+        },
+        Cancel: function() {
+        $( this ).dialog( "close" );
+        }
+      }
+     });
+
+    var deleteUrl;
+    $("div.deleta").on('click', function( ) {
+       $("#dialog-confirm span.groupname")[0].innerHTML = $(this).next().val();
+       deleteUrl = $(this).next().next().val();
+       deleteDialog.dialog( "open" );
+    });
 
     minderAccordion("groupAccordion");
 });
@@ -21,6 +59,10 @@ $(function() {
 
 </script>
 
+<div id="dialog-confirm" title="Delete Group?">
+  <p><span class="ui-icon ui-icon-alert" style="float:left; margin:0 7px 20px 0;"></span>
+  The test group <span class="groupname"></span> is going to be deleted. Are you sure?</p>
+</div>
 
 <div id="mainDialog" title="main dialog">
   <form method="post">
@@ -57,15 +99,18 @@ $(function() {
             </td>
             <td>&nbsp;</td>
             <td class="bevel2" style="width:3%;" align="center" valign="middle">
-              <a class="edita">
+              <div class="edita">
                 <img src="@routes.Assets.at("/images/edit_property-64.png")" height="16px" alt='@group.id'/>
-              </a>
+              </div>
+              <input type="hidden" value="/editGroupForm?id=@group.id" class="uid" />
             </td>
             <td style="width:5px;">&nbsp;</td>
             <td class="bevel2" style="width:3%;" align="center" valign="middle">
-              <a class="deletea">
+              <div class="deleta">
                 <img src="@routes.Assets.at("/images/trash2-64.png")" height="16px" alt='@group.id'/>
-              </a>
+              </div>
+              <input type="hidden" value="@group.name" class="uid" />
+              <input type="hidden" value="/deleteGroup?id=@group.id" class="uid" />
             </td>
             <td style="width:10px;">&nbsp;</td>
           </tr>

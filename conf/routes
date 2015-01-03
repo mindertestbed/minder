@@ -53,4 +53,7 @@ GET     /webjars/*file              controllers.WebJarAssets.at(file)
 
 POST    /testme                     controllers.Tester.test
 POST    /doCreateTestGroup          controllers.InventoryController.doCreateTestGroup
+POST    /doEditGroup                controllers.InventoryController.doEditGroup
 GET     /createNewGroupForm         controllers.InventoryController.createNewGroupForm
+GET     /editGroupForm              controllers.InventoryController.editGroupForm(id: Long)
+GET     /deleteGroup                controllers.InventoryController.deleteGroup(id: Long)
