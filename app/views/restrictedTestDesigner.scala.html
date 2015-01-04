@@ -24,7 +24,7 @@
     <div id="tabs-1" style="height:100%;">
       @defining(session.get("testPageMode")) { mode =>
       @if(mode == "none"){
-      @testCaseLister(localUser)
+      @testManager(localUser)
       } else {
       if (mode == "new") {
       @createTestCase()
