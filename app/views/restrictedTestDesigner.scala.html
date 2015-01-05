@@ -20,19 +20,13 @@
   <div id="tabs" style="height:100%;">
     <ul>
       <li><a href="#tabs-1">Test Groups</a></li>
+      <li><a href="#tabs-2">Test Editor (temporary-will be removed)</a></li>
     </ul>
     <div id="tabs-1" style="height:100%;">
-      @defining(session.get("testPageMode")) { mode =>
-      @if(mode == "none"){
       @testManager(localUser)
-      } else {
-      if (mode == "new") {
-      @createTestCase()
-      } else {
-      @createTestCase();
-      }
-      }
-      }
+    </div>
+    <div id="tabs-2" style="height:100%;">
+      @testCaseEditor(localUser);
     </div>
   </div>
 </div>

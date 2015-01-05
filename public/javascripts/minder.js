@@ -1,5 +1,5 @@
-function minderAccordion(id){
-  var ogl = "#" + id + " > div";
+function minderAccordion(selector, triggerselector){
+  var ogl = selector + " > div";
 
   //hide the contents
   $(ogl + ".content").hide();
@@ -7,15 +7,20 @@ function minderAccordion(id){
   var titles = $(ogl + ".title");
 
   titles.each(function( index ) {
-    $( this ).addClass('thin-' + (index % 2));
+    var ts = $(this)
+    if (ts.hasClass('styledtitle')){
+      ts.addClass('thin-' + (index % 2));
+    }
   });
 
+  var triggers = $(selector + " " + triggerselector);
 
-  var triggers = $("#" + id + " .trigger");
+  triggers.each(function( index ) {
+      $(this).addClass('hand');
+  });
 
   triggers.click(function(){
     //get the parent that has class title.
-
     var parent = $(this).closest('.title');
     if(parent.hasClass("closed")){
       parent.next().slideUp();
@@ -30,11 +35,7 @@ function minderAccordion(id){
   });
 }
 
-function createFormDialog(id, sourceUrl, action, dialogId, titl, w, h){
-  createFormDialog2($("#" + id), sourceUrl, action, dialogId, titl, w, h);
-}
-
-function createFormDialog2(elm, sourceUrl, action, dialogId, titl, w, h){
+function createFormDialog(elm, sourceUrl, action, dialogId, titl, w, h){
   ww = typeof w !== 'undefined' ? w : '50%';
   hh = typeof w !== 'undefined' ? w : '500';
   var frm = $( "#" + dialogId + " > form");

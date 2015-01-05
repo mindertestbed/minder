@@ -79,12 +79,6 @@ public class Application extends Controller {
     return ok(profile.render(localUser));
   }
 
-  @Restrict(@Group(Application.TEST_DESIGNER_ROLE))
-  public static Result createTestCase() {
-    final User localUser = getLocalUser(session());
-    return ok(createTestCase.render(localUser));
-  }
-
   public static Result login() {
     return ok(login.render(MyUsernamePasswordAuthProvider.LOGIN_FORM));
   }
@@ -93,7 +87,12 @@ public class Application extends Controller {
     com.feth.play.module.pa.controllers.Authenticate.noCache(response());
     final Form<MyLogin> filledForm = MyUsernamePasswordAuthProvider.LOGIN_FORM
         .bindFromRequest();
+
+    System.out.println(filledForm.get().getEmail());
+    System.out.println(filledForm.get().getPassword());
     if (filledForm.hasErrors()) {
+
+      System.out.println("There are errors");
       // User did not fill everything properly
       return badRequest(login.render(filledForm));
     } else {
