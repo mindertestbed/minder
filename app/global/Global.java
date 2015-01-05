@@ -108,6 +108,15 @@ public class Global extends GlobalSettings {
 
         for (String key : all.keySet()) {
           for (Model model : all.get(key)) {
+
+            if (model instanceof TestGroup){
+              TestGroup group = (TestGroup) model;
+              for(TestAssertion assertion : group.testAssertions){
+                for (TestCase tcase : assertion.testCases){
+                  tcase.tdl = scala.io.Source.fromFile(tcase.tdl, "utf-8").mkString();
+                }
+              }
+            }
             model.save();
           }
         }

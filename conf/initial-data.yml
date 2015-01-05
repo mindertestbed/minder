@@ -25,13 +25,11 @@ users:
 groups:
 - &as4 !!models.TestGroup
     description: null
-    id: 1
     name: AS4 Tests
     shortDescription: All test cases related to AS4
     owner: *user
     testAssertions:
     - &taas41 !!models.TestAssertion
-        id: 1
         testGroup: *as4
         taId: TAAS41
         normativeSource: src1
@@ -40,7 +38,6 @@ groups:
         predicate: as4 message is terribly valid
         testCases:
         - !!models.TestCase
-            id: 1
             parameters: ''
             shortDescription: A test case to check the eb code party id
             tdl: sampletdl/as42.tdl
@@ -48,7 +45,6 @@ groups:
             name: AS41
         - !!models.TestCase
             description: null
-            id: 2
             parameters: ''
             shortDescription: A test case to check the hede hodo
             tdl: sampletdl/as42.tdl
@@ -56,13 +52,11 @@ groups:
             name: AS42
 - &smp !!models.TestGroup
     description: null
-    id: 2
     name: SMP Tests
     shortDescription: All test cases related to SMP
     owner: *user
     testAssertions:
     - &tasmp1 !!models.TestAssertion
-        id: 2
         testGroup: *smp
         taId: TASMP1
         normativeSource: src2
@@ -72,7 +66,6 @@ groups:
         testCases:
         - !!models.TestCase
             description: null
-            id: 3
             parameters: ''
             shortDescription: Check for the public key of BDX
             tdl: sampletdl/SMP1.tdl
@@ -80,13 +73,11 @@ groups:
             name: SMP1
 - &bdxl !!models.TestGroup
     description: null
-    id: 3
     name: BDXL Tests
     shortDescription: All test cases related to BDXL
     owner: *user
     testAssertions:
     - &tabdxl1 !!models.TestAssertion
-        id: 3
         testGroup: *smp
         taId: TABDXL1
         normativeSource: src2
@@ -97,7 +88,6 @@ groups:
         testCases:
         - !!models.TestCase
             description: null
-            id: 4
             parameters: ''
             shortDescription: Check for the BDXL id,address match
             tdl: sampletdl/BDXL1.tdl

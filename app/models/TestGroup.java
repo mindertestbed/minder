@@ -41,4 +41,6 @@ public class TestGroup extends Model {
   public static TestGroup findByName(String name) {
     return find.where().eq("name", name).findUnique();
   }
+
+  public int dummy;
 }

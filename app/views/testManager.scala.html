@@ -5,19 +5,11 @@
 
 <script>
 $(function() {
-    $( ".testAssertionAccordion" ).accordion({
-      collapsible: true,
-      active: false,
-      heightStyle: "content",
-      header: "h4"
+    createFormDialog($("#createTestGroup"), "/createNewGroupForm", "/doCreateTestGroup", "mainDialog", "Create Group");
+
+    $("div.editgroup").each(function( index ) {
+      createFormDialog($(this), $(this).next().val(), "/doEditGroup", "mainDialog", "Edit Group");
     });
-
-    createFormDialog("createTestGroup", "/createNewGroupForm", "/doCreateTestGroup", "mainDialog", "Create Group");
-
-    $("div.edita").each(function( index ) {
-      createFormDialog2($(this), $(this).next().val(), "/doEditGroup", "mainDialog", "Edit Group");
-    });
-
 
     var deleteDialog = $( "#dialog-confirm" ).dialog({
       resizable: false,
@@ -47,13 +39,19 @@ $(function() {
      });
 
     var deleteUrl;
-    $("div.deleta").on('click', function( ) {
+    $("div.deletegroup").on('click', function( ) {
        $("#dialog-confirm span.groupname")[0].innerHTML = $(this).next().val();
        deleteUrl = $(this).next().next().val();
        deleteDialog.dialog( "open" );
     });
 
-    minderAccordion("groupAccordion");
+    minderAccordion("#groupAccordion",  ".groupAccordionTrigger");
+
+    minderAccordion( ".testAssertionAccordion", ".testAssertionAccordionTrigger" )
+
+    $(".differ").each(function(index){
+       $(this).addClass('vary' + (index % 2));
+    });
 });
 
 
@@ -84,29 +82,29 @@ $(function() {
       </table>
     </div>
 
-    <div id="groupAccordion" class="bevel" style="height:94%;padding:0px;">
+    <div id="groupAccordion" class="bevel fullw" style="height:95%;padding:0px;">
       @defining(TestGroup.findByUser(localUser)){ testGroups =>
       @for(group <- testGroups){
-      <div class="title" style="margin:0;">
+      <div class="title styledtitle" style="margin:0;">
         <table style="width:100%;">
           <tr>
-            <td class="trigger" style="width:15%;">
+            <td class="groupAccordionTrigger" style="width:15%;">
               &nbsp;@group.name
             </td>
             <td style="width:5px;">&nbsp;</td>
-            <td class="trigger" style="width:20%;"><b>
+            <td class="groupAccordionTrigger" style="width:50%;"><b>
               @group.shortDescription</b>
             </td>
-            <td>&nbsp;</td>
+            <td class="groupAccordionTrigger">&nbsp;</td>
             <td class="bevel2" style="width:3%;" align="center" valign="middle">
-              <div class="edita">
+              <div class="editgroup nospace">
                 <img src="@routes.Assets.at("/images/edit_property-64.png")" height="16px" alt='@group.id'/>
               </div>
               <input type="hidden" value="/editGroupForm?id=@group.id" class="uid" />
             </td>
             <td style="width:5px;">&nbsp;</td>
             <td class="bevel2" style="width:3%;" align="center" valign="middle">
-              <div class="deleta">
+              <div class="deletegroup nospace">
                 <img src="@routes.Assets.at("/images/trash2-64.png")" height="16px" alt='@group.id'/>
               </div>
               <input type="hidden" value="@group.name" class="uid" />
@@ -116,20 +114,70 @@ $(function() {
           </tr>
         </table>
       </div>
-      <div class="content myscroll">
+      <div class="content myscroll fullw" style="padding-top: 2px;">
         @for(testAssertion <- group.testAssertions){
         <div class="testAssertionAccordion">
-          <h4><b>Test Assertion</b>: @testAssertion.taId</h4>
-
-          <div>
-            <table style="border: 1px solid rgb(10,80,200);width:100%">
-              @for(testCase <- testAssertion.testCases){
+          <div class="title ui-accordion ui-widget ui-helper-reset fullw">
+            <table cellpadding="2" class="fullw ui-state-default ui-corner-all" height="28px">
               <tr>
+                <td style="width:15px" class="testAssertionAccordionTrigger">&nbsp;</td>
+                <td class="testAssertionAccordionTrigger" style="width:20%;">
+                  <b>Test Assertion</b>: @testAssertion.taId
+                  <!-- ui-accordion-header ui-state-default ui-accordion-icons ui-accordion-header-active ui-state-active ui-corner-top -->
+                </td>
+                <td class="testAssertionAccordionTrigger">&nbsp;</td>
+                <td class="bevel2" style="width:3%;" align="center" valign="middle">
+                  <div class="editAssertion  nospace">
+                    <img src="@routes.Assets.at("/images/edit_property-64.png")" height="16px" alt='@group.id'/>
+                  </div>
+                  <input type="hidden" value="/editAssertionForm?id=@testAssertion.id" class="uid" />
+                </td>
+                <td style="width:5px;">&nbsp;</td>
+                <td class="bevel2" style="width:3%;" align="center" valign="middle">
+                  <div class="deleteAssertion nospace">
+                    <img src="@routes.Assets.at("/images/trash2-64.png")" height="16px" alt='@group.id'/>
+                  </div>
+                  <input type="hidden" value="@testAssertion.taId" class="uid" />
+                  <input type="hidden" value="/deleteAssertion?id=@testAssertion.id" class="uid" />
+                </td>
+                <td style="width:15px">&nbsp;</td>
+              </tr>
+            </table>
+          </div>
+          <div class="content fullw">
+            <table style="width: 100%;">
+              <tr style="height:3px;"><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td></tr>
+              <tr>
+                <td>&nbsp;</td>
+                <td class="bevel" style="width:70%">
+              <table class="fullw" cellpadding="5">
+
+                <tr style="border-bottom: 1px solid gray;height:1px;"><td colspan="8" align="center"><h3>TestCases</h3></td></tr>
+              @for(testCase <- testAssertion.testCases){
+              <tr style="border-bottom: 1px solid gray; height: 30px;" class="differ">
+                <td style="width:25px;">&nbsp;</td>
                 <td style="width:20%;">@testCase.name</td>
                 <td>@testCase.shortDescription</td>
+
+                <td>&nbsp;</td>
+                <td style="width:3%;" align="center" valign="middle">
+                  <div class="editCase">
+                    <img src="@routes.Assets.at("/images/edit_property-64.png")" height="16px" alt='@group.id'/>
+                  </div>
+                  <input type="hidden" value="/editTestCase?id=@testCase.id" class="uid" />
+                </td>
+                <td style="width:5px;">&nbsp;</td>
+                <td style="width:3%;" align="center" valign="middle">
+                  <div class="deleteCase">
+                    <img src="@routes.Assets.at("/images/trash2-64.png")" height="16px" alt='@group.id'/>
+                  </div>
+                  <input type="hidden" value="@testCase.name" class="uid" />
+                  <input type="hidden" value="/deleteTestCase?id=@testCase.id" class="uid" />
+                </td>
+                <td style="width:25px;">&nbsp;</td>
               </tr>
               }
-            </table>
+            </table></td><td>&nbsp;</td></tr></table>
           </div>
         </div>
         }

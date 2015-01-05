@@ -55,6 +55,7 @@ create table TestCaseGroup (
   owner_id                  bigint,
   short_description         varchar(50) not null,
   description               varchar(255),
+  dummy                     integer,
   constraint uq_TestCaseGroup_name unique (name),
   constraint pk_TestCaseGroup primary key (id))
 ;
