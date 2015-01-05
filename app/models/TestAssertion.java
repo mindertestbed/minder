@@ -3,6 +3,7 @@ package models;
 import play.db.ebean.Model;
 
 import javax.persistence.*;
+
 import java.util.List;
 
 /**
@@ -10,29 +11,36 @@ import java.util.List;
  */
 @Entity
 @Table(name = "TestAssertion")
-public class TestAssertion extends Model{
+public class TestAssertion extends Model {
 
-  @Id
-  public Long id;
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 
-  @Column(nullable=false, unique = true)
-  public String taId;
+	@Id
+	public Long id;
 
-  @Column(nullable=false)
-  public String normativeSource;
+	@Column(nullable = false, unique = true)
+	public String taId;
 
-  @Column(nullable=false)
-  public String target;
+	@Column(nullable = false)
+	public String normativeSource;
 
-  public String prerequisites;
+	@Column(nullable = false)
+	public String target;
 
-  @Column(nullable=false)
-  public String predicate;
+	public String prerequisites;
 
-  public String variables;
+	@Column(nullable = false)
+	public String predicate;
 
-  @OneToMany(cascade = CascadeType.ALL)
-  @Basic(fetch = FetchType.LAZY)
-  public List<TestAssertion> testAssertions;
+	public String variables;
 
+	@ManyToOne
+	@JoinColumn(name = "ID")
+	public TestCaseGroup testCaseGroup;
+
+	@OneToMany(mappedBy = "testAssertion", fetch=FetchType.EAGER,cascade = CascadeType.ALL)
+	public List<TestCase> testCases;
 }

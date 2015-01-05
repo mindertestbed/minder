@@ -9,27 +9,30 @@ import javax.persistence.*;
  */
 @Entity
 @Table(name = "TestCase")
-public class TestCase extends Model{
-  @Id
-  public Long id;
+public class TestCase extends Model {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 
-  @ManyToOne
-  public TestAssertion testAssertion;
+	@Id
+	public Long id;
 
-  @ManyToOne
-  public TestCaseGroup testCaseGroup;
+	@ManyToOne
+	@JoinColumn(name = "ID")
+	public TestAssertion testAssertion;
 
-  @Column(unique = true, nullable = false)
-  public String testCaseName;
+	@Column(unique = true, nullable = false)
+	public String testCaseName;
 
-  @Column(nullable = false, length = 50)
-  public String shortDescription;
+	@Column(nullable = false, length = 50)
+	public String shortDescription;
 
-  public String description;
+	public String description;
 
-  @Column(nullable = false, length = 4096)
-  public String tdl;
+	@Column(nullable = false, length = 4096)
+	public String tdl;
 
-  public String parameters;
+	public String parameters;
 
 }

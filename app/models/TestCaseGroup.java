@@ -3,35 +3,39 @@ package models;
 import play.db.ebean.Model;
 
 import javax.persistence.*;
+
 import java.util.List;
 
 /**
- * Represents an entity that might contain multiple test cases
- * Created by yerlibilgin on 22/12/14.
+ * Represents an entity that might contain multiple test cases Created by
+ * yerlibilgin on 22/12/14.
  */
 @Entity
 @Table(name = "TestCaseGroup")
 public class TestCaseGroup extends Model {
-  @Id
-  public Long id;
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 
-  @Column(unique=true, nullable = false)
-  public String name;
+	@Id
+	public Long id;
 
-  @ManyToOne
-  @Column(nullable = false)
-  public TestCaseCategory testCaseCategory;
+	@Column(unique = true, nullable = false)
+	public String name;
+	
+	@ManyToOne
+	@JoinColumn(name = "ID")
+	public User user;
 
-  @OneToMany(cascade = CascadeType.ALL)
-  @Basic(fetch = FetchType.LAZY)
-  public List<TestCase> testCases;
+	@OneToMany(cascade = CascadeType.ALL)
+	public List<TestAssertion> testAssertions;
 
-  @Column(nullable=false, length = 50)
-  public String shortDescription;
+	@Column(nullable = false, length = 50)
+	public String shortDescription;
 
-  public String description;
+	public String description;
 
-
-  public static final Finder<Long, TestCaseGroup> find = new Finder<Long, TestCaseGroup>(
-      Long.class, TestCaseGroup.class);
+	public static final Finder<Long, TestCaseGroup> find = new Finder<Long, TestCaseGroup>(
+			Long.class, TestCaseGroup.class);
 }
