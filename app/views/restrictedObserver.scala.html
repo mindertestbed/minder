@@ -1,8 +1,13 @@
 @(localUser: models.User = null)
 
 @main(Messages("playauthenticate.navigation.restricted.observer"), "restrictedObserver") {
-    <h3>@Messages("playauthenticate.navigation.restricted.observer")</h3>
+    <h3 class="explanation"><img src="@routes.Assets.at("/images/about-64.png")" height="24px"/></h3>
     <p>
         @Messages("playauthenticate.restricted.testobserver")
     </p>
+
+
+<div class="fullh">
+    content goes here
+</div>
 }

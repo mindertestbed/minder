@@ -1,28 +1,33 @@
 @(localUser: models.User = null)
 
 @main(Messages("playauthenticate.navigation.restricted.testdesigner"), "restrictedTestDesigner") {
-<h3>@Messages("playauthenticate.navigation.restricted.testdesigner")</h3>
-<p>
-    @Messages("playauthenticate.restricted.testdesigner")
-</p>
-
 
 <script>
   $(function() {
     $( "#tabs" ).tabs();
   });
-  </script>
 
-<div id="tabs" style="height:100%;">
+</script>
+
+
+<h3 class="explanation"><img src="@routes.Assets.at("/images/about-64.png")" height="24px"/></h3>
+<p>
+  @Messages("playauthenticate.restricted.testdesigner")
+</p>
+
+
+<div class="fullh">
+  <div id="tabs" class="fullh">
     <ul>
-        <li><a href="#tabs-1">Test Editor</a></li>
-        <li><a href="#tabs-2">Test Runner</a></li>
+      <li><a href="#tabs-1">Test Groups</a></li>
+      <li><a href="#tabs-2">Test Editor (temporary-will be removed)</a></li>
     </ul>
-    <div id="tabs-1" style="height:100%;">
-        @createTestCase()
+    <div id="tabs-1" class="fullh">
+      @testManager(localUser)
     </div>
-    <div id="tabs-2" style="height:100%;">
-        @testCaseLister()
+    <div id="tabs-2" class="fullh">
+      @testCaseEditor(localUser);
     </div>
+  </div>
 </div>
 }

@@ -19,70 +19,77 @@ users:
     - {id: 1, roleName: observer}
     - {id: 2, roleName: Test Designer}
     - {id: 3, roleName: Test Developer}
-    testCaseCategories: []
+    testGroups: []
 
 #Categories
-categories:
-  - &wp61 !!models.TestCaseCategory
+groups:
+- &as4 !!models.TestGroup
     description: null
-    id: 1
-    name: WP6.1 Test Cases
+    name: AS4 Tests
+    shortDescription: All test cases related to AS4
     owner: *user
-    shortDescription: Test cases extracted from WP6.1 Test Assertions
-    testCaseGroups:
-    - &as4 !!models.TestCaseGroup
-        description: null
-        id: 1
-        name: AS4 Tests
-        shortDescription: All test cases related to AS4
-        testCaseCategory: *wp61
+    testAssertions:
+    - &taas41 !!models.TestAssertion
+        testGroup: *as4
+        taId: TAAS41
+        normativeSource: src1
+        target: as4 message
+        prerequisites: be cool
+        predicate: as4 message is terribly valid
         testCases:
         - !!models.TestCase
-            id: 1
             parameters: ''
             shortDescription: A test case to check the eb code party id
             tdl: sampletdl/as42.tdl
-            testAssertion: null
-            testCaseGroup: *as4
-            testCaseName: AS41
+            testAssertion: *taas41
+            name: AS41
         - !!models.TestCase
             description: null
-            id: 2
             parameters: ''
             shortDescription: A test case to check the hede hodo
             tdl: sampletdl/as42.tdl
-            testAssertion: null
-            testCaseGroup: *as4
-            testCaseName: AS42
-    - &smp !!models.TestCaseGroup
-        description: null
-        id: 2
-        name: SMP Tests
-        shortDescription: All test cases related to SMP
-        testCaseCategory: *wp61
+            testAssertion: *taas41
+            name: AS42
+- &smp !!models.TestGroup
+    description: null
+    name: SMP Tests
+    shortDescription: All test cases related to SMP
+    owner: *user
+    testAssertions:
+    - &tasmp1 !!models.TestAssertion
+        testGroup: *smp
+        taId: TASMP1
+        normativeSource: src2
+        target: smp message
+        prerequisites: be cool
+        predicate: smp message is terribly valid
         testCases:
         - !!models.TestCase
             description: null
-            id: 3
             parameters: ''
             shortDescription: Check for the public key of BDX
             tdl: sampletdl/SMP1.tdl
-            testAssertion: null
-            testCaseGroup: *smp
-            testCaseName: SMP1
-    - &bdxl !!models.TestCaseGroup
-        description: null
-        id: 3
-        name: BDXL Tests
-        shortDescription: All test cases related to BDXL
-        testCaseCategory: *wp61
+            testAssertion: *tasmp1
+            name: SMP1
+- &bdxl !!models.TestGroup
+    description: null
+    name: BDXL Tests
+    shortDescription: All test cases related to BDXL
+    owner: *user
+    testAssertions:
+    - &tabdxl1 !!models.TestAssertion
+        testGroup: *smp
+        taId: TABDXL1
+        normativeSource: src2
+        target: smp message
+        prerequisites: be cool
+        predicate: smp message is terribly valid
+        testCases:
         testCases:
         - !!models.TestCase
             description: null
-            id: 4
             parameters: ''
             shortDescription: Check for the BDXL id,address match
             tdl: sampletdl/BDXL1.tdl
-            testAssertion: null
-            testCaseGroup: *bdxl
-            testCaseName: BDXL1
+            testAssertion: *tabdxl1
+            name: BDXL1

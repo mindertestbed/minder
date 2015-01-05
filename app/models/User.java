@@ -65,14 +65,14 @@ public class User extends Model implements Subject {
 	@ManyToMany
 	public List<UserPermission> permissions;
 
-	@OneToMany(mappedBy = "user", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+	@OneToMany(mappedBy = "user", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
 	public List<UserHistory> userHistories;
 
-	@OneToMany(mappedBy = "user", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+	@OneToMany(mappedBy = "user", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
 	public List<Wrapper> wrappers;
 
-	@OneToMany(mappedBy = "user", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
-	public List<TestCaseGroup> testCaseGroups;
+	@OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+	public List<TestGroup> testGroups;
 
 	public static final Finder<Long, User> find = new Finder<Long, User>(
 			Long.class, User.class);

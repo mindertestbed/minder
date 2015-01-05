@@ -1,0 +1,188 @@
+@(localUser: models.User = null)
+
+@import helper._
+@implicitFieldConstructor = @{ FieldConstructor(twitterBootstrapBasic.f) }
+
+<script>
+$(function() {
+    createFormDialog($("#createTestGroup"), "/createNewGroupForm", "/doCreateTestGroup", "mainDialog", "Create Group");
+
+    $("div.editgroup").each(function( index ) {
+      createFormDialog($(this), $(this).next().val(), "/doEditGroup", "mainDialog", "Edit Group");
+    });
+
+    var deleteDialog = $( "#dialog-confirm" ).dialog({
+      resizable: false,
+      height:140,
+      width:"50%",
+      autoOpen: false,
+      modal: true,
+      buttons: {
+        "Delete": function() {
+         $.ajax({
+          type: 'GET',
+          url: deleteUrl,
+          success: function (data) {
+            document.location.reload();
+          },
+          error: function (jqXHR, textStatus, errorMessage) {
+              alert(jqXHR.responseText);
+          }
+       });
+
+        $( this ).dialog( "close" );
+        },
+        Cancel: function() {
+        $( this ).dialog( "close" );
+        }
+      }
+     });
+
+    var deleteUrl;
+    $("div.deletegroup").on('click', function( ) {
+       $("#dialog-confirm span.groupname")[0].innerHTML = $(this).next().val();
+       deleteUrl = $(this).next().next().val();
+       deleteDialog.dialog( "open" );
+    });
+
+    minderAccordion("#groupAccordion",  ".groupAccordionTrigger");
+
+    minderAccordion( ".testAssertionAccordion", ".testAssertionAccordionTrigger" )
+
+    $(".differ").each(function(index){
+       $(this).addClass('vary' + (index % 2));
+    });
+});
+
+
+</script>
+
+<div id="dialog-confirm" title="Delete Group?">
+  <p><span class="ui-icon ui-icon-alert" style="float:left; margin:0 7px 20px 0;"></span>
+  The test group <span class="groupname"></span> is going to be deleted. Are you sure?</p>
+</div>
+
+<div id="mainDialog" title="main dialog">
+  <form method="post">
+  </form>
+</div>
+
+<div id="contentPane" style="height:94%;margin:0;padding:0">
+    <div class="thin">
+      <table style="width:100%;">
+        <tr>
+          <td>&nbsp;</td>
+          <td align="center" class="bevel2" style="width:25%;">
+            <div id="createTestGroup"><img src="@routes.Assets.at("/images/create_new-64.png")" height="16px" />
+              @Messages("restrictedTestPage.createTestGroup")
+            </div>
+          </td>
+          <td>&nbsp;</td>
+        </tr>
+      </table>
+    </div>
+
+    <div id="groupAccordion" class="bevel fullw" style="height:95%;padding:0px;">
+      @defining(TestGroup.findByUser(localUser)){ testGroups =>
+      @for(group <- testGroups){
+      <div class="title styledtitle" style="margin:0;">
+        <table style="width:100%;">
+          <tr>
+            <td class="groupAccordionTrigger" style="width:15%;">
+              &nbsp;@group.name
+            </td>
+            <td style="width:5px;">&nbsp;</td>
+            <td class="groupAccordionTrigger" style="width:50%;"><b>
+              @group.shortDescription</b>
+            </td>
+            <td class="groupAccordionTrigger">&nbsp;</td>
+            <td class="bevel2" style="width:3%;" align="center" valign="middle">
+              <div class="editgroup nospace">
+                <img src="@routes.Assets.at("/images/edit_property-64.png")" height="16px" alt='@group.id'/>
+              </div>
+              <input type="hidden" value="/editGroupForm?id=@group.id" class="uid" />
+            </td>
+            <td style="width:5px;">&nbsp;</td>
+            <td class="bevel2" style="width:3%;" align="center" valign="middle">
+              <div class="deletegroup nospace">
+                <img src="@routes.Assets.at("/images/trash2-64.png")" height="16px" alt='@group.id'/>
+              </div>
+              <input type="hidden" value="@group.name" class="uid" />
+              <input type="hidden" value="/deleteGroup?id=@group.id" class="uid" />
+            </td>
+            <td style="width:10px;">&nbsp;</td>
+          </tr>
+        </table>
+      </div>
+      <div class="content myscroll fullw" style="padding-top: 2px;">
+        @for(testAssertion <- group.testAssertions){
+        <div class="testAssertionAccordion">
+          <div class="title ui-accordion ui-widget ui-helper-reset fullw">
+            <table cellpadding="2" class="fullw ui-state-default ui-corner-all" height="28px">
+              <tr>
+                <td style="width:15px" class="testAssertionAccordionTrigger">&nbsp;</td>
+                <td class="testAssertionAccordionTrigger" style="width:20%;">
+                  <b>Test Assertion</b>: @testAssertion.taId
+                  <!-- ui-accordion-header ui-state-default ui-accordion-icons ui-accordion-header-active ui-state-active ui-corner-top -->
+                </td>
+                <td class="testAssertionAccordionTrigger">&nbsp;</td>
+                <td class="bevel2" style="width:3%;" align="center" valign="middle">
+                  <div class="editAssertion  nospace">
+                    <img src="@routes.Assets.at("/images/edit_property-64.png")" height="16px" alt='@group.id'/>
+                  </div>
+                  <input type="hidden" value="/editAssertionForm?id=@testAssertion.id" class="uid" />
+                </td>
+                <td style="width:5px;">&nbsp;</td>
+                <td class="bevel2" style="width:3%;" align="center" valign="middle">
+                  <div class="deleteAssertion nospace">
+                    <img src="@routes.Assets.at("/images/trash2-64.png")" height="16px" alt='@group.id'/>
+                  </div>
+                  <input type="hidden" value="@testAssertion.taId" class="uid" />
+                  <input type="hidden" value="/deleteAssertion?id=@testAssertion.id" class="uid" />
+                </td>
+                <td style="width:15px">&nbsp;</td>
+              </tr>
+            </table>
+          </div>
+          <div class="content fullw">
+            <table style="width: 100%;">
+              <tr style="height:3px;"><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td></tr>
+              <tr>
+                <td>&nbsp;</td>
+                <td class="bevel" style="width:70%">
+              <table class="fullw" cellpadding="5">
+
+                <tr style="border-bottom: 1px solid gray;height:1px;"><td colspan="8" align="center"><h3>TestCases</h3></td></tr>
+              @for(testCase <- testAssertion.testCases){
+              <tr style="border-bottom: 1px solid gray; height: 30px;" class="differ">
+                <td style="width:25px;">&nbsp;</td>
+                <td style="width:20%;">@testCase.name</td>
+                <td>@testCase.shortDescription</td>
+
+                <td>&nbsp;</td>
+                <td style="width:3%;" align="center" valign="middle">
+                  <div class="editCase">
+                    <img src="@routes.Assets.at("/images/edit_property-64.png")" height="16px" alt='@group.id'/>
+                  </div>
+                  <input type="hidden" value="/editTestCase?id=@testCase.id" class="uid" />
+                </td>
+                <td style="width:5px;">&nbsp;</td>
+                <td style="width:3%;" align="center" valign="middle">
+                  <div class="deleteCase">
+                    <img src="@routes.Assets.at("/images/trash2-64.png")" height="16px" alt='@group.id'/>
+                  </div>
+                  <input type="hidden" value="@testCase.name" class="uid" />
+                  <input type="hidden" value="/deleteTestCase?id=@testCase.id" class="uid" />
+                </td>
+                <td style="width:25px;">&nbsp;</td>
+              </tr>
+              }
+            </table></td><td>&nbsp;</td></tr></table>
+          </div>
+        </div>
+        }
+      </div>
+      }
+      }
+    </div>
+</div>

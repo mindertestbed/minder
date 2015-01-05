@@ -20,7 +20,7 @@ public class UserHistory extends Model {
 	@JoinColumn(name="ID")
 	public User user;
 	
-	@OneToOne(mappedBy = "userHistory",fetch=FetchType.LAZY)
+	@OneToOne(fetch=FetchType.EAGER)
 	public TOperationType operationType;
 	
 	@Column(name = "LOG")

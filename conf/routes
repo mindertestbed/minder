@@ -6,8 +6,8 @@
 GET     /                           controllers.Application.index
 GET     /restrictedObserver         controllers.Application.restrictedObserver
 GET     /restrictedTestDesigner     controllers.Application.restrictedTestDesigner
+GET     /createNewTest              controllers.Application.createNewTest
 GET     /restrictedTestDeveloper    controllers.Application.restrictedTestDeveloper
-GET     /createTestCase             controllers.Application.createTestCase
 GET     /assets/javascript/routes.js  controllers.Application.jsRoutes
 
 GET     /profile                    controllers.Application.profile
@@ -50,4 +50,25 @@ POST    /login/password/forgot     controllers.Signup.doForgotPassword
 GET     /assets/*file               controllers.Assets.at(path="/public", file)
 GET     /webjars/*file              controllers.WebJarAssets.at(file)
 
-POST     /testme                     controllers.Tester.test
+POST    /testme                     controllers.Tester.test
+
+#test group management
+GET     /createNewGroupForm         controllers.InventoryController.createNewGroupForm
+POST    /doCreateTestGroup          controllers.InventoryController.doCreateTestGroup
+GET     /editGroupForm              controllers.InventoryController.editGroupForm(id: Long)
+POST    /doEditGroup                controllers.InventoryController.doEditGroup
+GET     /deleteGroup                controllers.InventoryController.deleteGroup(id: Long)
+
+#test assertion management
+GET     /createAssertionForm        controllers.InventoryController.createAssertionForm(groupId: Long)
+POST    /doCreateAssertion          controllers.InventoryController.doCreateAssertion
+GET     /editAssertionForm          controllers.InventoryController.editAssertionForm(id: Long)
+POST    /doEditAssertion            controllers.InventoryController.doEditAssertion
+GET     /deleteAssertion            controllers.InventoryController.deleteAssertion(id: Long)
+
+#test case management
+GET     /createCaseForm             controllers.InventoryController.createCaseForm(assertionId: Long)
+POST    /doCreateCase               controllers.InventoryController.doCreateCase
+GET     /editCaseForm               controllers.InventoryController.editCaseForm(id: Long)
+POST    /doEditCase                 controllers.InventoryController.doEditCase
+GET     /deleteCase                 controllers.InventoryController.deleteCase(id: Long)

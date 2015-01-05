@@ -16,7 +16,7 @@
 
         <script type="text/javascript" src="@routes.Assets.at("javascripts/jquery.js")"></script>
         <script type="text/javascript" src="@routes.WebJarAssets.at(WebJarAssets.locate("bootstrap.min.js"))"></script>
-        <script type="text/javascript" src="@routes.Assets.at("javascripts/jquery-ui.js")"></script>
+        <script type="text/javascript" src="@routes.Assets.at("javascripts/jquery-ui.min.js")"></script>
         <script type="text/javascript" src="@routes.Assets.at("javascripts/codemirror.js")"></script>
         <script type="text/javascript" src="@routes.Assets.at("javascripts/active-line.js")"></script>
         <script type="text/javascript" src="@routes.Assets.at("javascripts/dialog.js")"></script>
@@ -27,14 +27,17 @@
         <script type="text/javascript" src="@routes.Assets.at("javascripts/show-hint.js")"></script>
         <script type="text/javascript" src="@routes.Assets.at("javascripts/clike.js")"></script>
         <script type="text/javascript" src="@routes.Assets.at("javascripts/javascript-hint.js")"></script>
+        <script type="text/javascript" src="@routes.Assets.at("javascripts/minder.js")"></script>
 
         <link rel="stylesheet" href="@routes.WebJarAssets.at(WebJarAssets.locate("css/bootstrap.min.css"))">
-        <link href="@routes.Assets.at("stylesheets/main.css")" rel="stylesheet">
         <link href="@routes.Assets.at("stylesheets/codemirror.css")" rel="stylesheet">
         <link href="@routes.Assets.at("stylesheets/show-hint.css")" rel="stylesheet">
         <link href="@routes.Assets.at("stylesheets/dialog.css")" rel="stylesheet">
         <link href="@routes.Assets.at("stylesheets/matchesonscrollbar.css")" rel="stylesheet">
-        <link href="@routes.Assets.at("stylesheets/jquery-ui.css")" rel="stylesheet">
+        <link href="@routes.Assets.at("stylesheets/jquery-ui.min.css")" rel="stylesheet">
+        <link href="@routes.Assets.at("stylesheets/jquery-ui.structure.min.css")" rel="stylesheet">
+        <link href="@routes.Assets.at("stylesheets/jquery-ui.theme.min.css")" rel="stylesheet">
+        <link href="@routes.Assets.at("stylesheets/main.css")" rel="stylesheet">
 
         <style>
         html, body{
@@ -54,7 +57,56 @@
              padding:5px;
             }
 
+	.demoHeaders {
+		margin-top: 2em;
+	}
+	#dialog-link {
+		padding: .4em 1em .4em 20px;
+		text-decoration: none;
+		position: relative;
+	}
+	#dialog-link span.ui-icon {
+		margin: 0 5px 0 0;
+		position: absolute;
+		left: .2em;
+		top: 50%;
+		margin-top: -8px;
+	}
+	#icons {
+		margin: 0;
+		padding: 0;
+	}
+	#icons li {
+		margin: 2px;
+		position: relative;
+		padding: 4px 0;
+		cursor: pointer;
+		float: left;
+		list-style: none;
+	}
+	#icons span.ui-icon {
+		float: left;
+		margin: 0 4px;
+	}
+	.fakewindowcontain .ui-widget-overlay {
+		position: absolute;
+	}
+	select {
+		width: 200px;
+	}
         </style>
+
+        <script>
+           $(function() {
+               $(".explanation").click(function(){
+                  $(this).next().slideToggle();
+               });
+
+               $(".explanation + p").hide();
+           });
+
+
+        </script>
     </head>
 
     <body>
@@ -108,7 +160,7 @@
         <br/>
         <br/>
 
-        <div class="container" style="height:70%;">
+        <div class="container" style="height:80%;">
             @if(flash.contains(Application.FLASH_ERROR_KEY)) {
             <div class="alert alert-danger" role="alert">
                     <button type="button" class="close" data-dismiss="alert"><span aria-hidden="true">&times;</span><span class="sr-only">
@@ -123,12 +175,13 @@
                     @flash().get(Application.FLASH_MESSAGE_KEY)
                 </div>
             }
+
             @content
 
             <hr>
 
             <footer>
-                <p>&copy; eSENS 2015 </p>
+                <table style="width:100%;"><tr><td>&copy; eSENS 2015</td><td style="width:10%"><a href="http://icons8.com" style="font-size:6px">Icon pack by Icons8</a></td></tr></table>
             </footer>
         </div> <!-- /container -->
 

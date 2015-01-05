@@ -1,4 +1,7 @@
-@(localUser: models.User = null)
+@(localUser: models.User, assertionId: Long = null, frm: Form[_] = null)
+
+@import helper._
+@implicitFieldConstructor = @{ FieldConstructor(twitterBootstrapBasic.f) }
 
 
 <link rel="stylesheet" href="@routes.Assets.at("stylesheets/theme/3024-day.css")" rel="stylesheet">
@@ -55,7 +58,7 @@
       heightStyle: "content"
     });
 
-    var editor = CodeMirror.fromTextArea(document.getElementById("code"), {
+    var editor = CodeMirror.fromTextArea(document.getElementById("tdl"), {
         lineNumbers: true,
         lineWrapping: true,
         styleActiveLine: true,
@@ -274,8 +277,8 @@
                     </select>
                     </p>
                     <article>
-                        <form>
-		         <textarea id="code" name="code" rows="20" cols="40" class="CodeMirror">
+                      <form>
+		         <textarea id="tdl" name="tdl" rows="20" cols="40" class="CodeMirror">
 val rivet4 = "slot2(int, int, java.lang.String, byte [], byte [], java.util.Date)" of "wrapper2" shall(
     //connect first two params from signal1 of wrapper2
     use("signal1(int, int, java.lang.String)" of "wrapper2")(
@@ -289,11 +292,18 @@ val rivet4 = "slot2(int, int, java.lang.String, byte [], byte [], java.util.Date
        2 onto 5)),
     map(val3 onto 6))
 			     </textarea>
-                        </form>
+                          kasdfasd;l
+                      </form>
                         <p>Press <strong>ctrl-space</strong> to activate autocompletion.</p>
                     </article>
                 </div>
             </td>
         </tr>
     </table>
+
 </div>
+
+
+
+
+

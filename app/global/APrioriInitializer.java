@@ -1,24 +1,10 @@
 package global;
 
-import com.avaje.ebean.Ebean;
-import models.TestCase;
-import models.TestCaseCategory;
-import models.TestCaseGroup;
-import models.User;
-import mtdl.MinderTdl;
-import mtdl.TdlCompiler;
-import org.yaml.snakeyaml.Yaml;
-
-import java.io.*;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
 /**
  * Created by yerlibilgin on 29/12/14.
  */
 public class APrioriInitializer {
+  /*
   public static void initialize() {
     User user = User.find.findUnique();
 
@@ -171,5 +157,5 @@ public class APrioriInitializer {
     tgg.testCases = new ArrayList<>();
 
     return tgg;
-  }
+  }*/
 }
