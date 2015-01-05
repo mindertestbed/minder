@@ -44,7 +44,12 @@ public class TestGroup extends Model {
   public static List<TestGroup> findByUser(User user){
     return find.where().eq("owner", user).setOrderBy("id").findList();
   }
+
   public static TestGroup findByName(String name) {
     return find.where().eq("name", name).findUnique();
+  }
+
+  public static TestGroup findById(Long id){
+    return find.byId(id);
   }
 }

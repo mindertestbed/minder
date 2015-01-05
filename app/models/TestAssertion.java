@@ -47,4 +47,12 @@ public class TestAssertion extends Model{
 
   public static final Finder<Long, TestAssertion> find = new Finder<>(
       Long.class, TestAssertion.class);
+
+  public static List<TestAssertion> findByGroup(TestGroup group){
+    return find.where().eq("testGroup", group).setOrderBy("id").findList();
+     }
+
+  public static TestAssertion findByTaId(String taId){
+    return find.where().eq("taId", taId).findUnique();
+  }
 }

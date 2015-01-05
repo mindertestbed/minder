@@ -1,5 +1,6 @@
 package controllers;
 
+import models.TestAssertion;
 import models.TestGroup;
 import models.User;
 import play.data.Form;
@@ -39,30 +40,30 @@ public class InventoryController extends Controller {
     public String description;
   }
 
-  public static class TestAssertionEditorModel{
+  public static class TestAssertionEditorModel {
     public Long id;
 
-    @Constraints.Required
     public Long groupId;
 
     @Constraints.Required
-    public String taId;
+    public String taId = "TAID";
 
     @Constraints.Required
-    public String normativeSource;
+    public String normativeSource = "NS";
 
     @Constraints.Required
-    public String target;
+    public String target = "TARGET";
 
     public String prerequisites;
 
     @Constraints.Required
-    public String predicate;
+    public String predicate = "PREDICATE";
+
     public String variables;
   }
 
 
-  public class TestCaseEditorModel{
+  public class TestCaseEditorModel {
     public Long id;
 
     public Long assertionId;
@@ -95,20 +96,23 @@ public class InventoryController extends Controller {
       return badRequest(testGroupEditor.render(localUser, filledForm));
     } else {
       TestGroupEditorModel model = filledForm.get();
-      TestGroup tg = new TestGroup();
-      tg.owner = localUser;
-      tg.shortDescription = model.shortDescription;
-      tg.description = model.description;
-      tg.name = model.name;
 
-      TestGroup gr2 = TestGroup.findByName(tg.name);
-      if (gr2 == null) {
-        tg.save();
-        return ok(testGroupEditor.render(localUser, filledForm));
-      } else {
-        filledForm.reject("The group with name [" + tg.name + "] already exists");
+      TestGroup group = TestGroup.findByName(model.name);
+      if (group != null) {
+        filledForm.reject("The group with name [" + group.name + "] already exists");
         return badRequest(testGroupEditor.render(localUser, filledForm));
       }
+
+      group = new TestGroup();
+
+      group.owner = localUser;
+      group.shortDescription = model.shortDescription;
+      group.description = model.description;
+      group.name = model.name;
+
+      group.save();
+
+      return ok(testGroupLister.render(localUser));
     }
   }
 
@@ -135,7 +139,7 @@ public class InventoryController extends Controller {
     }
   }
 
-  public static Result deleteGroup(Long id) {
+  public static Result doDeleteGroup(Long id) {
     TestGroup tg = TestGroup.find.byId(id);
     if (tg == null) {
       return badRequest("Test group with id [" + id + "] not found!");
@@ -146,7 +150,7 @@ public class InventoryController extends Controller {
         ex.printStackTrace();
         return badRequest(ex.getMessage());
       }
-      return ok();
+      return ok(testGroupLister.render(Application.getLocalUser(session())));
     }
   }
 
@@ -173,17 +177,59 @@ public class InventoryController extends Controller {
       tg.description = model.description;
       tg.name = model.name;
       tg.update();
-      return ok(testGroupEditor.render(localUser, filledForm));
+      return ok(testGroupLister.render(localUser));
     }
   }
 
 
   public static Result createAssertionForm(Long groupId) {
+    System.out.println("GROUP ID " + groupId);
     return ok(testAssertionEditor.render(Application.getLocalUser(session()), TEST_ASSERTION_FORM, groupId));
   }
 
   public static Result doCreateAssertion() {
-    return ok();
+
+    com.feth.play.module.pa.controllers.Authenticate.noCache(response());
+    final Form<TestAssertionEditorModel> filledForm = TEST_ASSERTION_FORM.bindFromRequest();
+    final User localUser = Application.getLocalUser(session());
+
+    if (filledForm.hasErrors()) {
+      Map<String, List<ValidationError>> errors = filledForm.errors();
+      Set<String> set = errors.keySet();
+      for (String key : set) {
+        System.out.println(key + ":" + errors.get(key));
+      }
+      System.out.println("Hata var");
+      return badRequest(testAssertionEditor.render(localUser, filledForm, 1L));
+    } else {
+
+      TestAssertionEditorModel model = filledForm.get();
+
+      TestAssertion ta = TestAssertion.findByTaId(model.taId);
+      if (ta != null) {
+        filledForm.reject("The test assertion with ID [" + ta.taId + "] already exists");
+        return badRequest(testAssertionEditor.render(localUser, filledForm, model.groupId));
+      }
+
+      TestGroup tg = TestGroup.findById(model.groupId);
+
+      if (tg == null) {
+        filledForm.reject("No group found with id [" + tg.id + "]");
+        return badRequest(testAssertionEditor.render(localUser, filledForm, model.groupId));
+      }
+
+      ta = new TestAssertion();
+      ta.taId = model.taId;
+      ta.normativeSource = model.normativeSource;
+      ta.predicate = model.predicate;
+      ta.prerequisites = model.prerequisites;
+      ta.target = model.target;
+      ta.testGroup = tg;
+
+      ta.save();
+      return ok(testAssertionEditor.render(localUser, filledForm, model.groupId));
+    }
+
   }
 
   public static Result editAssertionForm(Long id) {
@@ -194,7 +240,7 @@ public class InventoryController extends Controller {
     return ok();
   }
 
-  public static Result deleteAssertion(Long id) {
+  public static Result doDeleteAssertion(Long id) {
     return ok();
   }
 
@@ -214,7 +260,7 @@ public class InventoryController extends Controller {
     return ok();
   }
 
-  public static Result deleteCase(Long id) {
+  public static Result doDeleteCase(Long id) {
     return ok();
   }
 }

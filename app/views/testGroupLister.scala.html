@@ -1,0 +1,117 @@
+@(localUser: models.User = null)
+
+<script>
+$(function() {
+
+  //obtain to reference to the div that contains us.
+  var parent = $("#groupAccordion").parent();
+
+  //stylize the group accordion
+  minderAccordion("#groupAccordion");
+
+  //register the event listener and dialog for create new form button.
+  createFormDialog($("#createTestGroup"), "/createNewGroupForm", "/doCreateTestGroup", "mainDialog", "Create Group", parent);
+
+
+  //register event listeners for editor divs.
+  $("#groupAccordion > div.title div.editgroup").each(function( index ) {
+
+    //$(this) refers to the div that is being enumerated.
+    //$(this).next().val() is supposed to read the group id from the HIDDEN input value next to this div.
+    createFormDialog($(this), $(this).next().val(), "/doEditGroup", "mainDialog", "Edit Group", parent);
+  });
+
+ var deleteDialog = $( "#dialog-confirm" ).dialog({
+    resizable: false,
+    height:140,
+    width:"50%",
+    autoOpen: false,
+    modal: true,
+    buttons: {
+      "Delete": function() {
+       $.ajax({
+        type: 'GET',
+        url: deleteUrl,
+        success: function (data) {
+          parent[0].innerHTML = data;
+          executeScripts(parent);
+          $( this ).dialog( "close" );
+        },
+        error: function (jqXHR, textStatus, errorMessage) {
+            alert(jqXHR.responseText);
+        }
+     });
+
+      $( this ).dialog( "close" );
+      },
+      Cancel: function() {
+      $( this ).dialog( "close" );
+      }
+    }
+   });
+
+  var deleteUrl;
+
+  //select all deletegroup divs and register delete event on them.
+  $("#groupAccordion > div.title div.deletegroup").on('click', function( ) {
+     $("#dialog-confirm span.groupname")[0].innerHTML = $(this).next().val();
+     deleteUrl = $(this).next().next().val();
+     deleteDialog.dialog( "open" );
+  });
+
+  $(".differ").each(function(index){
+     $(this).addClass('vary' + (index % 2));
+  });
+});
+
+</script>
+
+<div id="groupAccordion" class="fullw bevel" style="height:100%;padding:0px;">
+@defining(TestGroup.findByUser(localUser)){ testGroups =>
+@for(group <- testGroups){
+<div class="title styledtitle" style="margin:0;">
+  <table style="width:100%;" height="30px">
+    <tr>
+      <td class="groupAccordionTrigger" style="width:30%;">
+        &nbsp;@group.name
+      </td>
+      <td style="width:5px;">&nbsp;</td>
+      <td class="trigger" style="width:50%;">
+        @group.shortDescription
+      </td>
+      <td class="trigger">&nbsp;</td>
+      <td style="width:3%;" align="center">
+        <div class="editgroup nospace">
+          <img src="@routes.Assets.at("/images/edit_property-64.png")" height="16px" alt='@group.id'/>
+        </div>
+        <input type="hidden" value="/editGroupForm?id=@group.id" class="uid" />
+      </td>
+      <td class="trigger" style="width:5px;">&nbsp;</td>
+      <td class="bevel2" style="width:3%;" align="center">
+        <div class="deletegroup nospace">
+          <img src="@routes.Assets.at("/images/trash2-64.png")" height="16px" alt='@group.id'/>
+        </div>
+        <input type="hidden" value="@group.name" class="uid" />
+        <input type="hidden" value="/doDeleteGroup?id=@group.id" class="uid" />
+      </td>
+      <td style="width:10px;" class="trigger">&nbsp;</td>
+    </tr>
+  </table>
+</div>
+<div class="content scroll fullw fullh" style="padding-top: 2px;">
+  insan evladi
+</div>
+}
+  <div class="title styledtitle fullw" style="margin:0;" align="center">
+    <table width="100%">
+      <tr>
+        <td class="fullw" valign="middle">
+          <div id="createTestGroup" class="fullw hand" align="center" >
+            <img src="@routes.Assets.at("/images/create_new-64.png")" height="16px" /> <span style="padding-top:10px;">New Group</span>
+          </div>
+        </td>
+      </tr>
+    </table>
+  </div>
+}
+</div>
