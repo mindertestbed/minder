@@ -37,4 +37,15 @@ public class TestCase extends Model {
 	public static final Finder<Long, TestCase> find = new Finder<>(Long.class,
 			TestCase.class);
 
+	public static TestCase findById(Long id) {
+		return find.byId(id);
+	}
+	public static TestCase findByName(String name) {
+		return find.where().eq("name", name).findUnique();
+	}
+	
+	public static TestCase findByTestAssertionId(Long assertionId) {
+		return find.where().eq("testAssertion.id", assertionId).findUnique();
+	}
+
 }

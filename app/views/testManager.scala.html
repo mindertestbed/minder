@@ -7,6 +7,7 @@
 $(function() {
     createFormDialog($("#createTestGroup"), "/createNewGroupForm", "/doCreateTestGroup", "mainDialog", "Create Group");
 
+    
     $("div.editgroup").each(function( index ) {
       createFormDialog($(this), $(this).next().val(), "/doEditGroup", "mainDialog", "Edit Group");
     });
@@ -152,7 +153,19 @@ $(function() {
                 <td class="bevel" style="width:70%">
               <table class="fullw" cellpadding="5">
 
-                <tr style="border-bottom: 1px solid gray;height:1px;"><td colspan="8" align="center"><h3>TestCases</h3></td></tr>
+              <tr style="border-bottom: 1px solid gray;height:1px;"><td colspan="8" align="center"><h3>TestCases</h3></td></tr>
+              <tr>
+		          <td>&nbsp;</td>
+		          <td align="center" class="bevel2" style="width:25%;">
+		            <div id="createTestCase@testAssertion.id"><img src="@routes.Assets.at("/images/create_new-64.png")" height="16px" />
+		              @Messages("restrictedTestPage.createTestCase")
+		            </div>
+		            <script>
+		            createFormDialog($("#createTestCase@testAssertion.id"), "/createCaseForm?assertionId=@testAssertion.id", "/doCreateCase", "mainDialog", "Create Test Case", 700, 600);
+		            </script>
+		          </td>
+		          <td>&nbsp;</td>
+		        </tr>
               @for(testCase <- testAssertion.testCases){
               <tr style="border-bottom: 1px solid gray; height: 30px;" class="differ">
                 <td style="width:25px;">&nbsp;</td>
