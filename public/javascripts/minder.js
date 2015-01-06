@@ -42,8 +42,6 @@ function createFormDialog(elm, sourceUrl, action, dialogId, titl, target, w, h){
   hh = typeof h !== 'undefined' ? h : '500';
   var frm = $( "#" + dialogId + " > form");
   elm.on('click', function(event){
-
-  alert(w + " " + h)
   
      event.stopPropagation();
 

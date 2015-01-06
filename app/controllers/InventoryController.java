@@ -4,6 +4,7 @@ import models.TestAssertion;
 import models.TestCase;
 import models.TestGroup;
 import models.User;
+import models.Wrapper;
 import play.Logger;
 import play.data.Form;
 import play.data.validation.Constraints;
@@ -322,7 +323,8 @@ public class InventoryController extends Controller {
 
 	public static Result createCaseForm(Long assertionId) {
 		final User localUser = Application.getLocalUser(session());
-		return ok(testCaseEditor.render(localUser, TEST_CASE_FORM,assertionId));
+		final List<Wrapper> allWrappers = Wrapper.getAll();
+		return ok(testCaseEditor.render(localUser, TEST_CASE_FORM,assertionId,allWrappers));
 	}
 
 	public static Result doCreateCase() {
@@ -330,11 +332,11 @@ public class InventoryController extends Controller {
 		final Form<TestCaseEditorModel> filledForm = TEST_CASE_FORM
 				.bindFromRequest();
 		final User localUser = Application.getLocalUser(session());
-
+		
 		if (filledForm.hasErrors()) {
 			printFormErrors(filledForm);
-			return badRequest(testCaseEditor.render(localUser, filledForm, null));
-		} else {
+			return badRequest(testCaseEditor.render(localUser, filledForm, null,null));
+		} else {			
 			TestCaseEditorModel model = filledForm.get();
 			TestCase tc = new TestCase();
 			tc.name = model.name;
@@ -350,7 +352,7 @@ public class InventoryController extends Controller {
 			} else {
 				filledForm.reject("The group with name [" + tc.name
 						+ "] already exists");
-				return badRequest(testCaseEditor.render(localUser, filledForm, model.assertionId));
+				return badRequest(testCaseEditor.render(localUser, filledForm, model.assertionId,null));
 			}
 		}
 	}

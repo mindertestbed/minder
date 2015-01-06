@@ -1,4 +1,4 @@
-@(localUser: models.User, frm: Form[_], assertionId: Long)
+@(localUser: models.User, frm: Form[_], assertionId: Long, allWrappers: List[Wrapper])
 
 @import helper._
 @implicitFieldConstructor = @{ FieldConstructor(twitterBootstrapBasic.f) }
@@ -97,150 +97,22 @@
         <tr style="width:100%;height:90%;">
             <td style="width:30%;height:100%;overflow:auto;border: 1px solid red">
                 <div id="accordion1">
-                    <h3><b>Wrapper1</b></h3>
-
+                @for(currentWrapper <- allWrappers){
+	                <h3><b>@currentWrapper.name</b></h3>
                     <div style="height:70%">
                         <div class="myscroll">
                             <div>Signals</div>
-                            <p>Content here....</p>
-
+                             @for(currentSignal <- currentWrapper.signals){
+                             	<p>@currentSignal.signature</p>
+                             }
+                             
                             <div>Slots</div>
-                            <p>Content here....</p>
+                            @for(currentSlot <- currentWrapper.slots){
+                             	<p>@currentSlot.signature</p>
+                             }
                         </div>
-                    </div>
-                    <h3><b>Wrapper2</b></h3>
-
-                    <div style="height:70%">
-                        <div class="myscroll">
-                            <div>Signals</div>
-                            <p>Content here....</p>
-
-                            <div>Slots</div>
-                            <p>Content here....</p>
-                        </div>
-                    </div>
-                    
-                    <h3><b>Wrapper3</b></h3>
-
-                    <div style="height:70%">
-                        <div class="myscroll">
-                            <div>Signals</div>
-                            <p>Content here....</p>
-
-                            <div>Slots</div>
-                            <p>Content here....</p>
-                        </div>
-                    </div>
-                    <h3><b>Wrapper4</b></h3>
-
-                    <div style="height:70%">
-                        <div class="myscroll">
-                            <div>Signals</div>
-                            <p>Content here....</p>
-
-                            <div>Slots</div>
-                            <p>Content here....</p>
-                        </div>
-                    </div>
-                    <h3><b>Wrapper5</b></h3>
-
-                    <div style="height:70%">
-                        <div class="myscroll">
-                            <div>Signals</div>
-                            <p>Content here....</p>
-
-                            <div>Slots</div>
-                            <p>Content here....</p>
-                        </div>
-                    </div>
-                    <h3><b>Wrapper2</b></h3>
-
-                    <div style="height:70%">
-                        <div class="myscroll">
-                            <div>Signals</div>
-                            <p>Content here....</p>
-
-                            <div>Slots</div>
-                            <p>Content here....</p>
-                        </div>
-                    </div>
-                    <h3><b>Wrapper2</b></h3>
-
-                    <div style="height:70%">
-                        <div class="myscroll">
-                            <div>Signals</div>
-                            <p>Content here....</p>
-
-                            <div>Slots</div>
-                            <p>Content here....</p>
-                        </div>
-                    </div>
-                    <h3><b>Wrapper2</b></h3>
-
-                    <div style="height:70%">
-                        <div class="myscroll">
-                            <div>Signals</div>
-                            <p>Content here....</p>
-
-                            <div>Slots</div>
-                            <p>Content here....</p>
-                        </div>
-                    </div>
-                    <h3><b>Wrapper2</b></h3>
-
-                    <div style="height:70%">
-                        <div class="myscroll">
-                            <div>Signals</div>
-                            <p>Content here....</p>
-
-                            <div>Slots</div>
-                            <p>Content here....</p>
-                        </div>
-                    </div>
-                    <h3><b>Wrapper2</b></h3>
-
-                    <div style="height:70%">
-                        <div class="myscroll">
-                            <div>Signals</div>
-                            <p>Content here....</p>
-
-                            <div>Slots</div>
-                            <p>Content here....</p>
-                        </div>
-                    </div>
-                    <h3><b>Wrapper2</b></h3>
-
-                    <div style="height:70%">
-                        <div class="myscroll">
-                            <div>Signals</div>
-                            <p>Content here....</p>
-
-                            <div>Slots</div>
-                            <p>Content here....</p>
-                        </div>
-                    </div>
-                    <h3><b>Wrapper2</b></h3>
-
-                    <div style="height:70%">
-                        <div class="myscroll">
-                            <div>Signals</div>
-                            <p>Content here....</p>
-
-                            <div>Slots</div>
-                            <p>Content here....</p>
-                        </div>
-                    </div>
-                    <h3><b>Wrapper2</b></h3>
-
-                    <div style="height:70%">
-                        <div class="myscroll">
-                            <div>Signals</div>
-                            <p>Content here....</p>
-
-                            <div>Slots</div>
-                            <p>Content here....</p>
-                        </div>
-                    </div>
+                    </div>  
+                }
                 </div>
             </td>
 

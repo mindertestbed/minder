@@ -31,4 +31,8 @@ public class Wrapper extends Model {
 
 	public static final Finder<Long, Wrapper> find = new Finder<>(Long.class,
 			Wrapper.class);
+	
+	public static List<Wrapper> getAll() {
+		return find.all();
+	}
 }
