@@ -1,8 +1,14 @@
 @(localUser: models.User = null)
 
+<script>
+  $(function(){
+    $("#dialog-confirm").hide();
+    $("#mainDialog").hide();
+  });
+</script>
 <div id="dialog-confirm" title="Delete Group?">
   <p><span class="ui-icon ui-icon-alert" style="float:left; margin:0 7px 20px 0;"></span>
-  The test <span class="category"></span> <b><span class="groupname"></span></b> will be deleted. Are you sure?</p>
+  The <span class="itemtype"></span> <b><span class="itemname"></span></b> will be deleted. Are you sure?</p>
 </div>
 
 <div id="mainDialog" title="main dialog">

@@ -89,7 +89,7 @@ class TestEngine {
           XoolaServer.get().getClient(label)
         }
 
-        try{ minderClient.finishTest()} catch{case _ => {}}
+        try{ minderClient.finishTest()} catch{case _: Throwable => {}}
       }
     }
   }

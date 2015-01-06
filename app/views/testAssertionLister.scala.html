@@ -1,12 +1,11 @@
-@(localUser: models.User, group: models.TestGroup)
+@(group: models.TestGroup, localUser: models.User = null)
 
 <script>
-
-var parent;
 $(function() {
   minderAccordion("#taAccordion@group.id");
 });
 </script>
+
 <div id="taAccordion@group.id">
   @for(assertion <- TestAssertion.findByGroup(group)){
   <div class="title ui-accordion fullw hand">
@@ -29,16 +28,16 @@ $(function() {
         </td>
         <td style="width:5px;">&nbsp;</td>
         <td class="bevel2" style="width:3%;" align="center" valign="middle">
-          <div class="deleteAssertion nospace">
+          <div id="deleteAssertion@assertion.id">
             <img src="@routes.Assets.at("/images/trash2-64.png")" height="16px" alt='@group.id'/>
           </div>
           <input type="hidden" value="@assertion.taId" class="uid"/>
-          <input type="hidden" value="/deleteAssertion?id=@assertion.id" class="uid"/>
+          <input type="hidden" value="/doDeleteAssertion?id=@assertion.id" class="uid"/>
 
           <script>
-              createFormDialog($("#editAssertion@assertion.id"),
-              "/editAssertionForm?id=@assertion.id" ,
-              "/doEditAssertion", "mainDialog", "Edit Test Assertion", $("#taAccordion@group.id").parent())
+            var elm = $("#deleteAssertion@assertion.id");
+            deleteWithDialog(elm, "/doDeleteAssertion?id=@assertion.id", $("#dialog-confirm"),
+            "Delete Test Assertion", "test assertion", "@assertion.taId", $("#taAccordion@group.id").parent())
           </script>
         </td>
         <td style="width:15px">&nbsp;</td>
@@ -46,18 +45,27 @@ $(function() {
     </table>
   </div>
   <div class="content scroll fullw fullh">
-    insan evladi
+    @testCaseLister(assertion)
   </div>
   }
 
-  <div class="title ui-accordion fullw" align="center">
-    <div id="createTa@group.id">
-      <button><img src="@routes.Assets.at("/images/create_new-64.png")" height="16px" /></button>
-    </div>
-    <script>
-        createFormDialog($("#createTa@group.id"),
+  <div class="title styledtitleinverse fullw hand" style="margin:0;" align="center">
+    <table width="100%">
+      <tr>
+        <td id="createTa1@group.id"
+            style="width:50%;height:23px;vertical-align:top; text-align:right;">
+          <img src="@routes.Assets.at("/images/plus-64.png")" height="16px" />
+        </td>
+        <td id="createTa2@group.id" style="height:23px;">
+          New Test Assertion
+        </td>
+      </tr>
+    </table>
+  </div>
+
+  <script>
+      createFormDialog($("#createTa1@group.id, #createTa2@group.id"),
         "/createAssertionForm?groupId=@group.id" ,
         "/doCreateAssertion", "mainDialog", "Create Test Assertion", $("#taAccordion@group.id").parent())
-    </script>
-  </div>
+  </script>
 </div>

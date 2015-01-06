@@ -55,4 +55,8 @@ public class TestAssertion extends Model{
   public static TestAssertion findByTaId(String taId){
     return find.where().eq("taId", taId).findUnique();
   }
+
+  public static TestAssertion findById(Long id) {
+    return find.byId(id);
+  }
 }

@@ -128,9 +128,8 @@ function deleteWithDialog(elm, action, dialog, title, category, item, target){
         }
        });
 
-       alert(elm + " " + item + " " + category)
-       dialog.find("span.groupname")[0].innerHTML = item;
-       dialog.find("span.category")[0].innerHTML = category;
+       dialog.find("span.itemtype")[0].innerHTML = category;
+       dialog.find("span.itemname")[0].innerHTML = item;
        deleteDialog.dialog( "open" );
     });
 }

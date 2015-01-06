@@ -1,10 +1,9 @@
-@(localUser: User, frm: Form[_], groupId: Long)
+@(frm: Form[_], localUser: models.User = null)
 
 @import helper._
 @implicitFieldConstructor = @{ FieldConstructor(twitterBootstrapBasic.f) }
 
 
-@println("Arrived group id" + groupId)
 @if(frm.hasGlobalErrors) {
 <p class="alert alert-danger">
   @frm.globalError.message
@@ -32,4 +31,4 @@ frm("target"),
 @textarea(frm("variables"), 'rows -> 2, '_label -> "Variables")
 
 <input type="hidden" name="id" id="id" value='@frm("id").value' />
-<input type="hidden" name="groupId" id="groupId" value='@groupId' />
+<input type="hidden" name="groupId" id="groupId" value='@frm("groupId").value' />

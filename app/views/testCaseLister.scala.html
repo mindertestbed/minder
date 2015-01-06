@@ -1,5 +1,11 @@
-@(localUser: models.User = null, assertion: TestAssertion)
+@(assertion: TestAssertion, localUser: models.User = null)
 
+
+<script>
+  $(".differ").each(function(index){
+     $(this).addClass('vary' + (index % 2));
+  });
+</script>
 <table style="width: 100%;">
   <tr style="height:3px;">
     <td>&nbsp;</td>
