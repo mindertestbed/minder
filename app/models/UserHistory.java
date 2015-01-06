@@ -17,7 +17,6 @@ public class UserHistory extends Model {
 	public Long id;
 	
 	@ManyToOne
-	@JoinColumn(name="ID")
 	public User user;
 	
 	@OneToOne(fetch=FetchType.EAGER)

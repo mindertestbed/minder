@@ -18,7 +18,6 @@ public class TSlot extends Model {
   public Long id;
 
   @ManyToOne
-	@JoinColumn(name="ID")	
   public Wrapper wrapper;
 
   public String signature;

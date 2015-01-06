@@ -23,10 +23,10 @@ public class Wrapper extends Model {
 	@ManyToOne
 	public User user;
 
-	@OneToMany(mappedBy = "wrapper", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+	@OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
 	public List<TSignal> signals;
 
-	@OneToMany(mappedBy = "wrapper", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+	@OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
 	public List<TSlot> slots;
 
 	public static final Finder<Long, Wrapper> find = new Finder<>(Long.class,

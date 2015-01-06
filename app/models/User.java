@@ -65,10 +65,10 @@ public class User extends Model implements Subject {
 	@ManyToMany
 	public List<UserPermission> permissions;
 
-	@OneToMany(mappedBy = "user", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+	@OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
 	public List<UserHistory> userHistories;
 
-	@OneToMany(mappedBy = "user", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+	@OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
 	public List<Wrapper> wrappers;
 
 	@OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)

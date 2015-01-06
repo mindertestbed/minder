@@ -20,6 +20,26 @@ users:
     - {id: 2, roleName: Test Designer}
     - {id: 3, roleName: Test Developer}
     testGroups: []
+  - &user2 !!models.User
+    active: true
+    email: cetinkayamelis@gmail.com
+    emailValidated: true
+    firstName: null
+    id: 2
+    lastLogin: 2014-12-29T07:08:49.850Z
+    lastName: null
+    linkedAccounts:
+    - id: 2
+      providerKey: password
+      providerUserId: $2a$10$QoJy1UgFXMjLMJlQ6hAnhe1Y07yoBH0Eucna1OSag2qKWhS79HQg6
+      user: *user
+    name: Melis Demir
+    permissions: []
+    roles:
+    - {id: 1, roleName: observer}
+    - {id: 2, roleName: Test Designer}
+    - {id: 3, roleName: Test Developer}
+    testGroups: []
 
 #Categories
 groups:
@@ -37,13 +57,13 @@ groups:
         prerequisites: be cool
         predicate: as4 message is terribly valid
         testCases:
-        - !!models.TestCase
+        - &testCase1 !!models.TestCase
             parameters: ''
             shortDescription: A test case to check the eb code party id
             tdl: sampletdl/as42.tdl
             testAssertion: *taas41
             name: AS41
-        - !!models.TestCase
+        - &testCase2 !!models.TestCase
             description: null
             parameters: ''
             shortDescription: A test case to check the hede hodo
@@ -93,3 +113,29 @@ groups:
             tdl: sampletdl/BDXL1.tdl
             testAssertion: *tabdxl1
             name: BDXL1
+            
+#TestRun
+testruns:
+  - &testrun1 !!models.TestRun
+    testCase: *testCase1
+    runner: *user
+    id: 1
+    wrappers:
+    - &xmlgenerator !!models.Wrapper
+        name: XML Generator Wrapper
+        id: 1
+        user: *user
+        signals:
+        - &xmlProduced !!models.TSignal
+            wrapper: *xmlgenerator
+            signature: public abstract void xmlProduced(byte[] generatedXML)
+        - &xmlProduced2 !!models.TSignal
+            wrapper: *xmlgenerator
+            signature: public abstract void xmlProduced2(byte[] generatedXML)
+        slots:
+        - &generateXML !!models.TSlot
+            wrapper: *xmlgenerator
+            signature: public void generateXML(byte[] inputBooks)
+        - &generateXML2 !!models.TSlot
+            wrapper: *xmlgenerator
+            signature: public void generateXML2(byte[] inputBooks)
