@@ -57,18 +57,18 @@ GET     /createNewGroupForm         controllers.InventoryController.createNewGro
 POST    /doCreateTestGroup          controllers.InventoryController.doCreateTestGroup
 GET     /editGroupForm              controllers.InventoryController.editGroupForm(id: Long)
 POST    /doEditGroup                controllers.InventoryController.doEditGroup
-GET     /deleteGroup                controllers.InventoryController.deleteGroup(id: Long)
+GET     /doDeleteGroup              controllers.InventoryController.doDeleteGroup(id: Long)
 
 #test assertion management
 GET     /createAssertionForm        controllers.InventoryController.createAssertionForm(groupId: Long)
 POST    /doCreateAssertion          controllers.InventoryController.doCreateAssertion
 GET     /editAssertionForm          controllers.InventoryController.editAssertionForm(id: Long)
 POST    /doEditAssertion            controllers.InventoryController.doEditAssertion
-GET     /deleteAssertion            controllers.InventoryController.deleteAssertion(id: Long)
+GET     /doDeleteAssertion          controllers.InventoryController.doDeleteAssertion(id: Long)
 
 #test case management
 GET     /createCaseForm             controllers.InventoryController.createCaseForm(assertionId: Long)
 POST    /doCreateCase               controllers.InventoryController.doCreateCase
 GET     /editCaseForm               controllers.InventoryController.editCaseForm(id: Long)
 POST    /doEditCase                 controllers.InventoryController.doEditCase
-GET     /deleteCase                 controllers.InventoryController.deleteCase(id: Long)
+GET     /doDeleteCase               controllers.InventoryController.doDeleteCase(id: Long)

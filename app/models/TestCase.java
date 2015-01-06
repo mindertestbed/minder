@@ -9,28 +9,43 @@ import javax.persistence.*;
  */
 @Entity
 @Table(name = "TestCase")
-public class TestCase extends Model{
-  @Id
-  public Long id;
+public class TestCase extends Model {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 
-  @ManyToOne
-  @Column(nullable = false)
-  public TestAssertion testAssertion;
+	@Id
+	public Long id;
 
-  @Column(unique = true, nullable = false)
-  public String name;
+	@ManyToOne
+	@Column(nullable = false)
+	public TestAssertion testAssertion;
 
-  @Column(nullable = false, length = 50)
-  public String shortDescription;
+	@Column(unique = true, nullable = false)
+	public String name;
 
-  public String description;
+	@Column(nullable = false, length = 50)
+	public String shortDescription;
 
-  @Column(nullable = false, length = 10000)
-  public String tdl;
+	public String description;
 
-  public String parameters;
+	@Column(nullable = false, length = 10000)
+	public String tdl;
+	public String parameters;
 
-  public static final Finder<Long, TestCase> find = new Finder<>(
-      Long.class, TestCase.class);
+	public static final Finder<Long, TestCase> find = new Finder<>(Long.class,
+			TestCase.class);
+
+	public static TestCase findById(Long id) {
+		return find.byId(id);
+	}
+	public static TestCase findByName(String name) {
+		return find.where().eq("name", name).findUnique();
+	}
+	
+	public static TestCase findByTestAssertionId(Long assertionId) {
+		return find.where().eq("testAssertion.id", assertionId).findUnique();
+	}
 
 }

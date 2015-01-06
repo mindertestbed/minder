@@ -1,0 +1,74 @@
+@(localUser: models.User = null)
+
+<script>
+$(function() {
+  //stylize the group accordion
+  minderAccordion("#groupAccordion");
+});
+
+
+</script>
+
+<div id="groupAccordion" class="fullw bevel" style="height:100%;padding:0px;">
+  @defining(TestGroup.findByUser(localUser)){ testGroups =>
+  @for(group <- testGroups){
+  <div class="title styledtitle hand" style="margin:0;">
+    <table style="width:100%;" height="30px">
+      <tr>
+        <td class="groupAccordionTrigger" style="width:30%;">
+          &nbsp;@group.name
+        </td>
+        <td style="width:5px;">&nbsp;</td>
+        <td class="trigger" style="width:50%;">
+          @group.shortDescription
+        </td>
+        <td class="trigger">&nbsp;</td>
+        <td style="width:3%;" align="center">
+          <div id="editgroup@group.id">
+            <img src="@routes.Assets.at("/images/edit_property-64.png")" height="16px" alt='@group.id'/>
+          </div>
+          <script>
+          createFormDialog($("#editgroup@group.id"),
+          "/editGroupForm?id=@group.id",
+          "/doEditGroup", "mainDialog", "Edit Group",
+          $("#groupAccordion").parent());
+          </script>
+        </td>
+        <td class="trigger" style="width:5px;">&nbsp;</td>
+        <td class="bevel2" style="width:3%;" align="center">
+          <div id="deletegroup@group.id">
+            <img src="@routes.Assets.at("/images/trash2-64.png")" height="16px" alt='@group.id'/>
+          </div>
+          <script>
+            var elm = $("#deletegroup@group.id");
+            deleteWithDialog(elm, "/doDeleteGroup?id=@group.id", $("#dialog-confirm"),
+            "Delete Group", "group", "@group.name", $("#groupAccordion").parent())
+
+          </script>
+        </td>
+        <td style="width:10px;" class="trigger">&nbsp;</td>
+      </tr>
+    </table>
+  </div>
+  <div class="content scroll fullw fullh" style="padding: 5px;">
+    @testAssertionLister(group)
+  </div>
+  }
+  <div class="title styledtitleinverse fullw hand" style="margin:0;" align="center">
+    <table width="100%">
+      <tr>
+        <td id="createTestGroup1"
+            style="width:50%;height:23px;vertical-align:top; text-align:right;">
+          <img src="@routes.Assets.at("/images/plus-64.png")" height="16px" />
+        </td>
+        <td id="createTestGroup2" style="height:23px;">
+          New Group
+        </td>
+      </tr>
+    </table>
+  </div>
+  <script>
+      createFormDialog($("#createTestGroup1, #createTestGroup2"), "/createNewGroupForm", "/doCreateTestGroup", "mainDialog", "Create Group", $("#groupAccordion").parent());
+  </script>
+  }
+</div>

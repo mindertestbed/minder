@@ -37,10 +37,6 @@ public class User extends Model implements Subject {
 
 	private static final long serialVersionUID = 1L;
 
-	@OneToMany(cascade = CascadeType.ALL)
-	@Basic(fetch = FetchType.LAZY)
-	public List<TestGroup> testGroups;
-
 	@Constraints.Email
 	// if you make this unique, keep in mind that users *must* merge/link their
 	// accounts then on signup with additional providers
@@ -48,9 +44,9 @@ public class User extends Model implements Subject {
 	public String email;
 
 	public String name;
-	
+
 	public String firstName;
-	
+
 	public String lastName;
 
 	@Formats.DateTime(pattern = "yyyy-MM-dd HH:mm:ss")
@@ -69,12 +65,20 @@ public class User extends Model implements Subject {
 	@ManyToMany
 	public List<UserPermission> permissions;
 
+	@OneToMany(mappedBy = "user", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+	public List<UserHistory> userHistories;
+
+	@OneToMany(mappedBy = "user", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+	public List<Wrapper> wrappers;
+
+	@OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+	public List<TestGroup> testGroups;
+
 	public static final Finder<Long, User> find = new Finder<Long, User>(
 			Long.class, User.class);
 
 	@Override
-	public String getIdentifier()
-	{
+	public String getIdentifier() {
 		return Long.toString(id);
 	}
 
@@ -141,7 +145,7 @@ public class User extends Model implements Subject {
 
 	public static User create(final AuthUser authUser) {
 		final User user = new User();
-		
+
 		// owner.permissions = new ArrayList<UserPermission>();
 		// owner.permissions.add(UserPermission.findByValue("printers.edit"));
 		user.active = true;
@@ -164,34 +168,37 @@ public class User extends Model implements Subject {
 			if (name != null) {
 				user.name = name;
 			}
-			
+
 			ArrayList<SecurityRole> roleList = new ArrayList<SecurityRole>();
 			final MyUsernamePasswordAuthUser identity2 = (MyUsernamePasswordAuthUser) authUser;
-			if (identity2.isObserver()){
-				roleList.add(SecurityRole.findByRoleName(controllers.Application.OBSERVER_ROLE));
+			if (identity2.isObserver()) {
+				roleList.add(SecurityRole
+						.findByRoleName(controllers.Application.OBSERVER_ROLE));
 			}
-			
-			if (identity2.isTestDesigner()){
-				roleList.add(SecurityRole.findByRoleName(controllers.Application.TEST_DESIGNER_ROLE));
+
+			if (identity2.isTestDesigner()) {
+				roleList.add(SecurityRole
+						.findByRoleName(controllers.Application.TEST_DESIGNER_ROLE));
 			}
-			
-			if (identity2.isTestDeveloper()){
-				roleList.add(SecurityRole.findByRoleName(controllers.Application.TEST_DEVELOPER_ROLE));
+
+			if (identity2.isTestDeveloper()) {
+				roleList.add(SecurityRole
+						.findByRoleName(controllers.Application.TEST_DEVELOPER_ROLE));
 			}
 			user.roles = roleList;
 
 		}
-		
+
 		if (authUser instanceof FirstLastNameIdentity) {
-		  final FirstLastNameIdentity identity = (FirstLastNameIdentity) authUser;
-		  final String firstName = identity.getFirstName();
-		  final String lastName = identity.getLastName();
-		  if (firstName != null) {
-		    user.firstName = firstName;
-		  }
-		  if (lastName != null) {
-		    user.lastName = lastName;
-		  }
+			final FirstLastNameIdentity identity = (FirstLastNameIdentity) authUser;
+			final String firstName = identity.getFirstName();
+			final String lastName = identity.getLastName();
+			if (firstName != null) {
+				user.firstName = firstName;
+			}
+			if (lastName != null) {
+				user.lastName = lastName;
+			}
 		}
 
 		user.save();
@@ -268,6 +275,5 @@ public class User extends Model implements Subject {
 		this.changePassword(authUser, create);
 		TokenAction.deleteByUser(this, Type.PASSWORD_RESET);
 	}
-
 
 }

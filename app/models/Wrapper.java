@@ -1,34 +1,34 @@
 package models;
 
-import play.db.ebean.Model;
-
-import javax.persistence.Column;
-import javax.persistence.Id;
-import javax.persistence.ManyToOne;
-import javax.persistence.OneToMany;
 import java.util.List;
 
-/**
- * Created by yerlibilgin on 31/12/14.
- */
+import javax.persistence.*;
+
+import play.db.ebean.Model;
+
+@Entity
+@Table(name = "Wrapper")
 public class Wrapper extends Model {
-  @Id
-  public Long id;
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 
-  @Column(unique = true)
-  public String name;
+	@Id
+	public Long id;
 
-  @ManyToOne
-  @Column(name = "owner")
-  public User owner;
+	@Column(name = "NAME", unique = true)
+	public String name;
 
+	@ManyToOne
+	public User user;
 
-  @OneToMany
-  public List<TSignal> signals;
+	@OneToMany(mappedBy = "wrapper", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+	public List<TSignal> signals;
 
-  @OneToMany
-  public List<TSlot> slots;
+	@OneToMany(mappedBy = "wrapper", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+	public List<TSlot> slots;
 
-  public static final Finder<Long, Wrapper> find = new Finder<>(
-      Long.class, Wrapper.class);
+	public static final Finder<Long, Wrapper> find = new Finder<>(Long.class,
+			Wrapper.class);
 }

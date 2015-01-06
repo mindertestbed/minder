@@ -1,8 +1,13 @@
-@(localUser: models.User, assertionId: Long = null, frm: Form[_] = null)
+@(localUser: models.User, frm: Form[_], assertionId: Long)
 
 @import helper._
 @implicitFieldConstructor = @{ FieldConstructor(twitterBootstrapBasic.f) }
 
+@if(frm.hasGlobalErrors) {
+<p class="alert alert-danger">
+  @frm.globalError.message
+</p>
+}
 
 <link rel="stylesheet" href="@routes.Assets.at("stylesheets/theme/3024-day.css")" rel="stylesheet">
 <link rel="stylesheet" href="@routes.Assets.at("stylesheets/theme/3024-night.css")" rel="stylesheet">
@@ -78,6 +83,7 @@
 </script>
 
 <div id="contentPane" style="width:100%;height:94%;margin:0;padding:0;">
+
     <table style="width:100%;height:100%;">
         <tr style="height:10%;">
             <td>
@@ -89,9 +95,131 @@
             </td>
         </tr>
         <tr style="width:100%;height:90%;">
-            <td style="width:30%;height:100%;overflow:auto;">
+            <td style="width:30%;height:100%;overflow:auto;border: 1px solid red">
                 <div id="accordion1">
                     <h3><b>Wrapper1</b></h3>
+
+                    <div style="height:70%">
+                        <div class="myscroll">
+                            <div>Signals</div>
+                            <p>Content here....</p>
+
+                            <div>Slots</div>
+                            <p>Content here....</p>
+                        </div>
+                    </div>
+                    <h3><b>Wrapper2</b></h3>
+
+                    <div style="height:70%">
+                        <div class="myscroll">
+                            <div>Signals</div>
+                            <p>Content here....</p>
+
+                            <div>Slots</div>
+                            <p>Content here....</p>
+                        </div>
+                    </div>
+                    
+                    <h3><b>Wrapper3</b></h3>
+
+                    <div style="height:70%">
+                        <div class="myscroll">
+                            <div>Signals</div>
+                            <p>Content here....</p>
+
+                            <div>Slots</div>
+                            <p>Content here....</p>
+                        </div>
+                    </div>
+                    <h3><b>Wrapper4</b></h3>
+
+                    <div style="height:70%">
+                        <div class="myscroll">
+                            <div>Signals</div>
+                            <p>Content here....</p>
+
+                            <div>Slots</div>
+                            <p>Content here....</p>
+                        </div>
+                    </div>
+                    <h3><b>Wrapper5</b></h3>
+
+                    <div style="height:70%">
+                        <div class="myscroll">
+                            <div>Signals</div>
+                            <p>Content here....</p>
+
+                            <div>Slots</div>
+                            <p>Content here....</p>
+                        </div>
+                    </div>
+                    <h3><b>Wrapper2</b></h3>
+
+                    <div style="height:70%">
+                        <div class="myscroll">
+                            <div>Signals</div>
+                            <p>Content here....</p>
+
+                            <div>Slots</div>
+                            <p>Content here....</p>
+                        </div>
+                    </div>
+                    <h3><b>Wrapper2</b></h3>
+
+                    <div style="height:70%">
+                        <div class="myscroll">
+                            <div>Signals</div>
+                            <p>Content here....</p>
+
+                            <div>Slots</div>
+                            <p>Content here....</p>
+                        </div>
+                    </div>
+                    <h3><b>Wrapper2</b></h3>
+
+                    <div style="height:70%">
+                        <div class="myscroll">
+                            <div>Signals</div>
+                            <p>Content here....</p>
+
+                            <div>Slots</div>
+                            <p>Content here....</p>
+                        </div>
+                    </div>
+                    <h3><b>Wrapper2</b></h3>
+
+                    <div style="height:70%">
+                        <div class="myscroll">
+                            <div>Signals</div>
+                            <p>Content here....</p>
+
+                            <div>Slots</div>
+                            <p>Content here....</p>
+                        </div>
+                    </div>
+                    <h3><b>Wrapper2</b></h3>
+
+                    <div style="height:70%">
+                        <div class="myscroll">
+                            <div>Signals</div>
+                            <p>Content here....</p>
+
+                            <div>Slots</div>
+                            <p>Content here....</p>
+                        </div>
+                    </div>
+                    <h3><b>Wrapper2</b></h3>
+
+                    <div style="height:70%">
+                        <div class="myscroll">
+                            <div>Signals</div>
+                            <p>Content here....</p>
+
+                            <div>Slots</div>
+                            <p>Content here....</p>
+                        </div>
+                    </div>
+                    <h3><b>Wrapper2</b></h3>
 
                     <div style="height:70%">
                         <div class="myscroll">
@@ -155,11 +283,11 @@
                     </select>
                     </p>
                     <article>
-                      <form>
+		         
 		         <textarea id="tdl" name="tdl" rows="20" cols="40" class="CodeMirror">
 val rivet4 = "slot2(int, int, java.lang.String, byte [], byte [], java.util.Date)" of "wrapper2" shall(
     //connect first two params from signal1 of wrapper2
-    use("signal1(int, int, java.lang.String)" of "wrapper2")(
+    use("signal1(int, int, java.lang.Stri1ng)" of "wrapper2")(
      mapping(
        1 onto 1,
        2 onto 2 using converter1)),
@@ -169,8 +297,8 @@ val rivet4 = "slot2(int, int, java.lang.String, byte [], byte [], java.util.Date
        1 onto 4 using converter1,
        2 onto 5)),
     map(val3 onto 6))
-			     </textarea></form>
-                        <p>Press <strong>ctrl-space</strong> to activate autocompletion.</p>
+			     </textarea>
+
                     </article>
                 </div>
             </td>
@@ -178,3 +306,7 @@ val rivet4 = "slot2(int, int, java.lang.String, byte [], byte [], java.util.Date
     </table>
 
 </div>
+
+<input type="hidden" name="id" id="id" value='@frm("id").value' />
+<input type="hidden" name="assertionId" id="assertionId" value='@frm("assertionId").value' />
+

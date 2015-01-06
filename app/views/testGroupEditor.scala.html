@@ -1,4 +1,4 @@
-@(localUser: models.User, frm: Form[_])
+@(frm: Form[_], localUser: models.User = null)
 
 @import helper._
 @implicitFieldConstructor = @{ FieldConstructor(twitterBootstrapBasic.f) }

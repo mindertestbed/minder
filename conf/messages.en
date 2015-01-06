@@ -164,4 +164,7 @@ playauthenticate.roles.signup.error.chooseatleastonerole = You must choose at le
 
 #restricted test page
 restrictedTestPage.createTestGroup= Create New Test Group
+restrictedTestPage.createTestAssertion= Create New Test Assertion
+restrictedTestPage.createTestCase= Create New Test Case
 restrictedTestPage.create= Create
+restrictedTestPage.createTestCase= Create New Test Case

@@ -1,17 +1,24 @@
 package models;
 
-import junit.framework.Test;
-import play.db.ebean.Model;
-
-import javax.persistence.*;
 import java.util.List;
+
+import javax.persistence.CascadeType;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.Id;
+import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
+import javax.persistence.Table;
+
+import play.db.ebean.Model;
 
 /**
  * Represents an entity that might contain multiple test cases
  * Created by yerlibilgin on 22/12/14.
  */
 @Entity
-@Table(name = "TestCaseGroup")
+@Table(name = "TestGroup")
 public class TestGroup extends Model {
   @Id
   public Long id;
@@ -23,8 +30,7 @@ public class TestGroup extends Model {
   @Column(nullable = false)
   public User owner;
 
-  @OneToMany(cascade = CascadeType.ALL)
-  @Basic(fetch = FetchType.LAZY)
+  @OneToMany(cascade = CascadeType.ALL,fetch = FetchType.LAZY)
   public List<TestAssertion> testAssertions;
 
   @Column(nullable = false, length = 50)
@@ -38,9 +44,12 @@ public class TestGroup extends Model {
   public static List<TestGroup> findByUser(User user){
     return find.where().eq("owner", user).setOrderBy("id").findList();
   }
+
   public static TestGroup findByName(String name) {
     return find.where().eq("name", name).findUnique();
   }
 
-  public int dummy;
+  public static TestGroup findById(Long id){
+    return find.byId(id);
+  }
 }

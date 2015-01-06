@@ -1,0 +1,67 @@
+@(assertion: TestAssertion, localUser: models.User = null)
+
+
+<script>
+  $(".differ").each(function(index){
+     $(this).addClass('vary' + (index % 2));
+  });
+
+</script>
+<div id="testCaseListerDiv">
+  <table style="width: 100%;">
+    <tr style="height:3px;">
+      <td>&nbsp;</td>
+      <td>&nbsp;</td>
+      <td>&nbsp;</td>
+    </tr>
+    <tr>
+      <td>&nbsp;</td>
+      <td class="bevel" style="width:70%">
+        <table class="fullw" cellpadding="5">
+          <tr>
+            <td>&nbsp;</td>
+            <td align="center" class="bevel2" style="width:25%;">
+              <div id="createTestCase@assertion.id"><img src="@routes.Assets.at("/images/create_new-64.png")"
+                height="16px" />
+                @Messages("restrictedTestPage.createTestCase")
+              </div>
+              <script>
+          createFormDialog($("#createTestCase@assertion.id"), "/createCaseForm?assertionId=@assertion.id", "/doCreateCase", "mainDialog", "Create Test Case", $("#testCaseListerDiv").parent(), '700', '600');
+
+              </script>
+            </td>
+            <td>&nbsp;</td>
+          </tr>
+          <tr style="border-bottom: 1px solid gray;height:1px;">
+            <td colspan="8" align="center"><h3 class="ui-accordion-header">TestCases</h3></td>
+          </tr>
+          @for(testCase <- assertion.testCases){
+          <tr style="border-bottom: 1px solid gray; height: 30px;" class="differ">
+            <td style="width:25px;">&nbsp;</td>
+            <td style="width:20%;">@testCase.name</td>
+            <td>@testCase.shortDescription</td>
+
+            <td>&nbsp;</td>
+            <td style="width:3%;" align="center" valign="middle">
+              <div class="editCase">
+                <img src="@routes.Assets.at("/images/edit_property-64.png")" height="16px" alt='@assertion.id'/>
+              </div>
+              <input type="hidden" value="/editTestCase?id=@testCase.id" class="uid"/>
+            </td>
+            <td style="width:5px;">&nbsp;</td>
+            <td style="width:3%;" align="center" valign="middle">
+              <div class="deleteCase">
+                <img src="@routes.Assets.at("/images/trash2-64.png")" height="16px" alt='@assertion.id'/>
+              </div>
+              <input type="hidden" value="@testCase.name" class="uid"/>
+              <input type="hidden" value="/deleteTestCase?id=@testCase.id" class="uid"/>
+            </td>
+            <td style="width:25px;">&nbsp;</td>
+          </tr>
+          }
+        </table>
+      </td>
+      <td>&nbsp;</td>
+    </tr>
+  </table>
+</div>

@@ -1,0 +1,71 @@
+@(group: models.TestGroup, localUser: models.User = null)
+
+<script>
+$(function() {
+  minderAccordion("#taAccordion@group.id");
+});
+</script>
+
+<div id="taAccordion@group.id">
+  @for(assertion <- TestAssertion.findByGroup(group)){
+  <div class="title ui-accordion fullw hand">
+    <table cellpadding="2" class="fullw ui-state-default ui-corner-all" height="28px">
+      <tr>
+        <td style="width:15px" class="trigger">&nbsp;</td>
+        <td class="trigger" style="width:20%;">
+          Test Assertion: @assertion.taId
+        </td>
+        <td class="trigger">&nbsp;</td>
+        <td class="bevel2" style="width:3%;" align="center" valign="middle">
+          <div id="editAssertion@assertion.id">
+            <img src="@routes.Assets.at("/images/edit_property-64.png")" height="16px" alt='@group.id'/>
+          </div>
+          <script>
+              createFormDialog($("#editAssertion@assertion.id"),
+              "/editAssertionForm?id=@assertion.id" ,
+              "/doEditAssertion", "mainDialog", "Edit Test Assertion", $("#taAccordion@group.id").parent())
+          </script>
+        </td>
+        <td style="width:5px;">&nbsp;</td>
+        <td class="bevel2" style="width:3%;" align="center" valign="middle">
+          <div id="deleteAssertion@assertion.id">
+            <img src="@routes.Assets.at("/images/trash2-64.png")" height="16px" alt='@group.id'/>
+          </div>
+          <input type="hidden" value="@assertion.taId" class="uid"/>
+          <input type="hidden" value="/doDeleteAssertion?id=@assertion.id" class="uid"/>
+
+          <script>
+            var elm = $("#deleteAssertion@assertion.id");
+            deleteWithDialog(elm, "/doDeleteAssertion?id=@assertion.id", $("#dialog-confirm"),
+            "Delete Test Assertion", "test assertion", "@assertion.taId", $("#taAccordion@group.id").parent())
+          </script>
+        </td>
+        <td style="width:15px">&nbsp;</td>
+      </tr>
+    </table>
+  </div>
+  <div class="content scroll fullw fullh">
+    @testCaseLister(assertion)
+  </div>
+  }
+
+  <div class="title styledtitleinverse fullw hand" style="margin:0;" align="center">
+    <table width="100%">
+      <tr>
+        <td id="createTa1@group.id"
+            style="width:50%;height:23px;vertical-align:top; text-align:right;">
+          <img src="@routes.Assets.at("/images/plus-64.png")" height="16px" />
+        </td>
+        <td id="createTa2@group.id" style="height:23px;">
+          New Test Assertion
+        </td>
+      </tr>
+    </table>
+  </div>
+
+  <script>
+      createFormDialog($("#createTa1@group.id, #createTa2@group.id"),
+        "/createAssertionForm?groupId=@group.id" ,
+        "/doCreateAssertion", "mainDialog", "Create Test Assertion", $("#taAccordion@group.id").parent())
+  </script>
+</div>

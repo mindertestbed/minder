@@ -1,7 +1,8 @@
-@(localUser: User, frm: Form[_], groupId: Long)
+@(frm: Form[_], localUser: models.User = null)
 
 @import helper._
 @implicitFieldConstructor = @{ FieldConstructor(twitterBootstrapBasic.f) }
+
 
 @if(frm.hasGlobalErrors) {
 <p class="alert alert-danger">
@@ -23,11 +24,11 @@ frm("target"),
 '_label -> "Target"
 )
 
-@textarea(frm("prerequisites"), 'rows -> 5, '_label -> "Prerequisites")
+@textarea(frm("prerequisites"), 'rows -> 3, '_label -> "Prerequisites")
 
-@textarea(frm("predicate"), 'rows -> 5, '_label -> "Predicate")
+@textarea(frm("predicate"), 'rows -> 3, '_label -> "Predicate")
 
-@textarea(frm("variables"), 'rows -> 5, '_label -> "Variables")
+@textarea(frm("variables"), 'rows -> 2, '_label -> "Variables")
 
 <input type="hidden" name="id" id="id" value='@frm("id").value' />
 <input type="hidden" name="groupId" id="groupId" value='@frm("groupId").value' />
