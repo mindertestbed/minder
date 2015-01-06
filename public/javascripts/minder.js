@@ -37,10 +37,14 @@ function executeScripts(target){
 }
 
 function createFormDialog(elm, sourceUrl, action, dialogId, titl, target, w, h){
+
   ww = typeof w !== 'undefined' ? w : '50%';
-  hh = typeof w !== 'undefined' ? w : '500';
+  hh = typeof h !== 'undefined' ? h : '500';
   var frm = $( "#" + dialogId + " > form");
   elm.on('click', function(event){
+
+  alert(w + " " + h)
+  
      event.stopPropagation();
 
      var dialog = $( "#" + dialogId ).dialog({
@@ -83,6 +87,8 @@ function createFormDialog(elm, sourceUrl, action, dialogId, titl, target, w, h){
           url: sourceUrl,
           success: function (data) {
             frm[0].innerHTML = data;
+
+            executeScripts(frm);
           },
           error: function (jqXHR, textStatus, errorMessage) {
               frm[0].innerHTML = jqXHR.responseText;

@@ -1,6 +1,7 @@
 package controllers;
 
 import models.TestAssertion;
+import models.TestCase;
 import models.TestGroup;
 import models.User;
 import play.Logger;
@@ -64,7 +65,7 @@ public class InventoryController extends Controller {
   }
 
 
-  public class TestCaseEditorModel {
+  public static class TestCaseEditorModel {
     public Long id;
 
     public Long assertionId;
@@ -308,27 +309,6 @@ public class InventoryController extends Controller {
   test case CRUD
    */
 
-  public static Result createCaseForm(Long assertionId) {
-    return ok();
-  }
-
-  public static Result doCreateCase() {
-    return ok();
-  }
-
-  public static Result editCaseForm(Long id) {
-    return ok();
-  }
-
-  public static Result doEditCase() {
-    return ok();
-  }
-
-  public static Result doDeleteCase(Long id) {
-    return ok();
-  }
-
-
   private static void printFormErrors(Form<?> filledForm) {
     Map<String, List<ValidationError>> errors = filledForm.errors();
     Set<String> set = errors.keySet();
@@ -339,4 +319,51 @@ public class InventoryController extends Controller {
       }
     }
   }
+
+	public static Result createCaseForm(Long assertionId) {
+		final User localUser = Application.getLocalUser(session());
+		return ok(testCaseEditor.render(localUser, TEST_CASE_FORM,assertionId));
+	}
+
+	public static Result doCreateCase() {
+		com.feth.play.module.pa.controllers.Authenticate.noCache(response());
+		final Form<TestCaseEditorModel> filledForm = TEST_CASE_FORM
+				.bindFromRequest();
+		final User localUser = Application.getLocalUser(session());
+
+		if (filledForm.hasErrors()) {
+			printFormErrors(filledForm);
+			return badRequest(testCaseEditor.render(localUser, filledForm, null));
+		} else {
+			TestCaseEditorModel model = filledForm.get();
+			TestCase tc = new TestCase();
+			tc.name = model.name;
+			tc.shortDescription = model.shortDescription;
+			tc.description = model.description;
+			tc.tdl = model.tdl;
+			tc.testAssertion = TestAssertion.findById(model.assertionId);
+			
+			TestCase tc2 = TestCase.findByName(model.name);
+			if (tc2 == null) {
+				tc.save();
+				return ok(testCaseLister.render(tc.testAssertion, localUser));
+			} else {
+				filledForm.reject("The group with name [" + tc.name
+						+ "] already exists");
+				return badRequest(testCaseEditor.render(localUser, filledForm, model.assertionId));
+			}
+		}
+	}
+
+	public static Result editCaseForm(Long id) {
+		return ok();
+	}
+
+	public static Result doEditCase() {
+		return ok();
+	}
+
+	public static Result doDeleteCase(Long id) {
+		return ok();
+	}
 }
