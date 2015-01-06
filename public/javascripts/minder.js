@@ -92,4 +92,47 @@ function createFormDialog(elm, sourceUrl, action, dialogId, titl, target, w, h){
   });
 }
 
+function deleteWithDialog(elm, action, dialog, title, category, item, target){
+    var deleteUrl;
+
+    //select all deletegroup divs and register delete event on them.
+    elm.on('click', function( ) {
+      var deleteDialog = dialog.dialog({
+        resizable: false,
+        height:200,
+        width:"50%",
+        title:title,
+        autoOpen: false,
+        modal: true,
+        buttons: {
+          "Delete": function() {
+           $.ajax({
+            type: 'GET',
+            url: action,
+            success: function (data) {
+              target[0].innerHTML = data;
+              executeScripts(target);
+              $( this ).dialog( "close" );
+            },
+            error: function (jqXHR, textStatus, errorMessage) {
+                alert(jqXHR.responseText);
+                $( this ).dialog( "close" );
+            }
+         });
+
+          $( this ).dialog( "close" );
+          },
+          Cancel: function() {
+          $( this ).dialog( "close" );
+          }
+        }
+       });
+
+       alert(elm + " " + item + " " + category)
+       dialog.find("span.groupname")[0].innerHTML = item;
+       dialog.find("span.category")[0].innerHTML = category;
+       deleteDialog.dialog( "open" );
+    });
+}
+
 

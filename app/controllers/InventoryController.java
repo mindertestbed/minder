@@ -3,6 +3,7 @@ package controllers;
 import models.TestAssertion;
 import models.TestGroup;
 import models.User;
+import play.Logger;
 import play.data.Form;
 import play.data.validation.Constraints;
 import play.data.validation.ValidationError;
@@ -227,7 +228,11 @@ public class InventoryController extends Controller {
       ta.testGroup = tg;
 
       ta.save();
-      return ok(testAssertionEditor.render(localUser, filledForm, model.groupId));
+
+      ta = TestAssertion.findByTaId(ta.taId);
+
+      Logger.info("Assertion with id " + ta.id + ":" + ta.taId + " was created");
+      return ok(testAssertionLister.render(localUser, tg));
     }
 
   }

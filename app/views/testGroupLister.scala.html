@@ -3,15 +3,8 @@
 <script>
 $(function() {
 
-  //obtain to reference to the div that contains us.
-  var parent = $("#groupAccordion").parent();
-
   //stylize the group accordion
   minderAccordion("#groupAccordion");
-
-  //register the event listener and dialog for create new form button.
-  createFormDialog($("#createTestGroup"), "/createNewGroupForm", "/doCreateTestGroup", "mainDialog", "Create Group", parent);
-
 
   //register event listeners for editor divs.
   $("#groupAccordion > div.title div.editgroup").each(function( index ) {
@@ -19,44 +12,6 @@ $(function() {
     //$(this) refers to the div that is being enumerated.
     //$(this).next().val() is supposed to read the group id from the HIDDEN input value next to this div.
     createFormDialog($(this), $(this).next().val(), "/doEditGroup", "mainDialog", "Edit Group", parent);
-  });
-
- var deleteDialog = $( "#dialog-confirm" ).dialog({
-    resizable: false,
-    height:140,
-    width:"50%",
-    autoOpen: false,
-    modal: true,
-    buttons: {
-      "Delete": function() {
-       $.ajax({
-        type: 'GET',
-        url: deleteUrl,
-        success: function (data) {
-          parent[0].innerHTML = data;
-          executeScripts(parent);
-          $( this ).dialog( "close" );
-        },
-        error: function (jqXHR, textStatus, errorMessage) {
-            alert(jqXHR.responseText);
-        }
-     });
-
-      $( this ).dialog( "close" );
-      },
-      Cancel: function() {
-      $( this ).dialog( "close" );
-      }
-    }
-   });
-
-  var deleteUrl;
-
-  //select all deletegroup divs and register delete event on them.
-  $("#groupAccordion > div.title div.deletegroup").on('click', function( ) {
-     $("#dialog-confirm span.groupname")[0].innerHTML = $(this).next().val();
-     deleteUrl = $(this).next().next().val();
-     deleteDialog.dialog( "open" );
   });
 
   $(".differ").each(function(index){
@@ -69,7 +24,7 @@ $(function() {
 <div id="groupAccordion" class="fullw bevel" style="height:100%;padding:0px;">
 @defining(TestGroup.findByUser(localUser)){ testGroups =>
 @for(group <- testGroups){
-<div class="title styledtitle" style="margin:0;">
+<div class="title styledtitle hand" style="margin:0;">
   <table style="width:100%;" height="30px">
     <tr>
       <td class="groupAccordionTrigger" style="width:30%;">
@@ -81,25 +36,33 @@ $(function() {
       </td>
       <td class="trigger">&nbsp;</td>
       <td style="width:3%;" align="center">
-        <div class="editgroup nospace">
+        <div id="editgroup@group.id">
           <img src="@routes.Assets.at("/images/edit_property-64.png")" height="16px" alt='@group.id'/>
         </div>
-        <input type="hidden" value="/editGroupForm?id=@group.id" class="uid" />
+        <script>
+          createFormDialog($("#editgroup@group.id"),
+          "/editGroupForm?id=@group.id",
+          "/doEditGroup", "mainDialog", "Edit Group",
+          $("#groupAccordion").parent());
+        </script>
       </td>
       <td class="trigger" style="width:5px;">&nbsp;</td>
       <td class="bevel2" style="width:3%;" align="center">
-        <div class="deletegroup nospace">
+        <div id="deletegroup@group.id">
           <img src="@routes.Assets.at("/images/trash2-64.png")" height="16px" alt='@group.id'/>
         </div>
-        <input type="hidden" value="@group.name" class="uid" />
-        <input type="hidden" value="/doDeleteGroup?id=@group.id" class="uid" />
+        <script>
+            var elm = $("#deletegroup@group.id");
+            deleteWithDialog(elm, "/doDeleteGroup?id=@group.id", $("#dialog-confirm"),
+            "Delete Group", "group", "@group.name", $("#groupAccordion").parent())
+        </script>
       </td>
       <td style="width:10px;" class="trigger">&nbsp;</td>
     </tr>
   </table>
 </div>
 <div class="content scroll fullw fullh" style="padding-top: 2px;">
-  insan evladi
+  @testAssertionLister(localUser, group)
 </div>
 }
   <div class="title styledtitle fullw" style="margin:0;" align="center">
