@@ -19,6 +19,8 @@ import play.GlobalSettings;
 import play.api.Play;
 import play.db.ebean.Model;
 import play.mvc.Call;
+import scala.io.BufferedSource;
+import scala.io.Source;
 
 import java.io.*;
 import java.util.*;
@@ -106,14 +108,25 @@ public class Global extends GlobalSettings {
         for (String key : all.keySet()) {
           for (Model model : all.get(key)) {
 
+            System.out.println("KEY: " + key);
             if (model instanceof TestGroup){
               TestGroup group = (TestGroup) model;
               for(TestAssertion assertion : group.testAssertions){
                 for (TestCase tcase : assertion.testCases){
-                  tcase.setTdl(scala.io.Source.fromFile(tcase.tdl, "utf-8").mkString());
+                  BufferedSource file = Source.fromFile(tcase.tdl, "utf-8");
+                  tcase.tdl = file.mkString();
                 }
               }
             }
+            if (model instanceof  RunConfiguration){
+              RunConfiguration rc = (RunConfiguration) model;
+
+              System.out.println("MappedWrapper");
+              for (MappedWrapper mappedWrapper : rc.mappedWrappers) {
+                System.out.println(mappedWrapper.parameter.name);
+              }
+            }
+
             model.save();
           }
         }

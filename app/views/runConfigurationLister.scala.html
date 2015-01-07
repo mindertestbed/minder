@@ -8,19 +8,19 @@
     <tr>
       <td>
         <table class="fullw" cellpadding="5">
-          @for(configuration <- RunConfiguration.findByTesCase(tesCase)){
+          @for(configuration <- RunConfiguration.findByTestCase(testCase)){
           <tr class="differ">
             <td>@configuration.name</td>
             <td style="width:3%;" align="center" valign="middle">
               <div class="editCase">
-                <img src="@routes.Assets.at("/images/edit_property-64.png")" height="16px" alt='@assertion.id'/>
+                <img src="@routes.Assets.at("/images/edit_property-64.png")" height="16px" alt='@testCase.id'/>
               </div>
               <input type="hidden" value="/editTestCase?id=@testCase.id" class="uid"/>
             </td>
             <td style="width:5px;" class="trigger">&nbsp;</td>
             <td style="width:3%;" align="center" valign="middle">
               <div class="deleteCase">
-                <img src="@routes.Assets.at("/images/trash2-64.png")" height="16px" alt='@assertion.id'/>
+                <img src="@routes.Assets.at("/images/trash2-64.png")" height="16px" alt='@testCase.id'/>
               </div>
               <input type="hidden" value="@testCase.name" class="uid"/>
               <input type="hidden" value="/deleteTestCase?id=@testCase.id" class="uid"/>
@@ -30,11 +30,11 @@
           <div class="title styledtitleinverse fullw hand" style="margin:0;" align="center">
             <table width="100%">
               <tr>
-                <td id="createTestCase1@assertion.id"
+                <td id="createTestCase1@testCase.id"
                     style="width:50%;height:23px;vertical-align:top; text-align:right;">
                   <img src="@routes.Assets.at("/images/plus-64.png")" height="16px" />
                 </td>
-                <td id="createTestCase2@assertion.id" style="height:23px;">
+                <td id="createTestCase2@testCase.id" style="height:23px;">
                   @Messages("restrictedTestPage.createTestCase")
                 </td>
               </tr>

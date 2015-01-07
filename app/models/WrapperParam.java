@@ -8,7 +8,7 @@ import javax.persistence.*;
  * Created by yerlibilgin on 07/01/15.
  */
 @Entity
-@Table(name="WrapperParam", uniqueConstraints = @UniqueConstraint(columnNames = {"name", "testCase"}))
+@Table(name="WrapperParam")
 public class WrapperParam extends Model {
   @Id
   public Long id;

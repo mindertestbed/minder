@@ -26,7 +26,7 @@ public class RunConfiguration extends Model {
 	 * When the tdl changes and the wrappers in the new tdl are not compatible with
 	 * this run configurtion, then this configuration is obsoleted. Hence, not visible in the main UI.
 	 */
-	public boolean isObsolete;
+	public boolean obsolete;
 
 	/**
 	 * When this configuration is obsoleted, the tdl is backed up here.
@@ -37,13 +37,17 @@ public class RunConfiguration extends Model {
 
 	}
 
-	@OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.DETACH)
-	public List<MappedWrapper> wrappers;
+	@OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+	public List<MappedWrapper> mappedWrappers;
 
-	@OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.DETACH)
+	@OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
 	public List<TestRun> testRuns;
-
 
 	public static final Finder<Long, RunConfiguration> find = new Finder<>(Long.class,
 			RunConfiguration.class);
+
+
+	public static List<RunConfiguration> findByTestCase(TestCase testCase){
+		return find.where().eq("testCase", testCase).findList();
+	}
 }

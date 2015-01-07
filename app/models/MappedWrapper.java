@@ -8,18 +8,20 @@ import javax.persistence.*;
  * Created by yerlibilgin on 07/01/15.
  */
 @Entity
-@Table(name = "MappedWrapper", uniqueConstraints = @UniqueConstraint(columnNames = {"parameter", "wrapper", "runConfiguration"}))
+@Table(name = "MappedWrapper")
 public class MappedWrapper extends Model{
   @Id
   public Long id;
 
   @Column(nullable = false)
+  @ManyToOne
   public WrapperParam parameter;
 
   @OneToOne
   public Wrapper wrapper;
 
   @ManyToOne
+  @Column(nullable = false)
   public RunConfiguration runConfiguration;
 
   public static final Finder<Long, MappedWrapper> find = new Finder<>(Long.class,
