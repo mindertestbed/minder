@@ -58,9 +58,7 @@ function createFormDialog(elm, sourceUrl, action, dialogId, titl, target, w, h){
                  data: frm.serialize(),
                  success: function (data) {
                     target[0].innerHTML = data;
-
                     executeScripts(target);
-
                     dialog.dialog( "close" );
                  },
                  error: function (jqXHR, textStatus, errorMessage) {
@@ -84,7 +82,6 @@ function createFormDialog(elm, sourceUrl, action, dialogId, titl, target, w, h){
           url: sourceUrl,
           success: function (data) {
             frm[0].innerHTML = data;
-
             executeScripts(frm);
           },
           error: function (jqXHR, textStatus, errorMessage) {

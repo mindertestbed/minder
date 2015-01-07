@@ -86,7 +86,6 @@ create table TestGroup (
   owner_id                  bigint,
   short_description         varchar(50) not null,
   description               varchar(255),
-  dummy                     integer,
   constraint uq_TestGroup_name unique (name),
   constraint pk_TestGroup primary key (id))
 ;

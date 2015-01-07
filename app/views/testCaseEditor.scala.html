@@ -78,7 +78,11 @@
         });
 
     });
-  });
+
+    // store it
+    $("#tdl").data('CodeMirrorInstance', editor);
+
+    });
 
 </script>
 
@@ -101,17 +105,39 @@
 	                <h3><b>@currentWrapper.name</b></h3>
                     <div style="height:70%">
                         <div class="myscroll">
-                            <div>Signals</div>
-                             @for(currentSignal <- currentWrapper.signals){
-                             	<p>@currentSignal.signature</p>
+                          <div>Signals</div>
+                            @for(currentSignal <- currentWrapper.signals){
+                             	<p id="signal@currentWrapper.id-@currentSignal.id">@currentSignal.signature</p>
+                              <script>
+                                $("#signal@currentWrapper.id-@currentSignal.id").click(function(){
+                                   // get it
+                                   var editor = $("#tdl").data('CodeMirrorInstance');
+                                   // from here on the API functions are available to 'myInstance' again.
+                                   var start_cursor = editor.getCursor();
+                                   var cursorLine = start_cursor.line;
+                                   var cursorCh = start_cursor.ch;
+                                   editor.replaceRange("\"@currentSignal.signature\" of \"@currentWrapper.name\"", start_cursor);
+                                });
+                              </script>
                              }
                              
                             <div>Slots</div>
                             @for(currentSlot <- currentWrapper.slots){
-                             	<p>@currentSlot.signature</p>
+                              <p id="slot@currentWrapper.id-@currentSlot.id">@currentSlot.signature</p>
+                                <script>
+                                  $("#slot@currentWrapper.id-@currentSlot.id").click(function(){
+                                     // get it
+                                     var editor = $("#tdl").data('CodeMirrorInstance');
+                                     // from here on the API functions are available to 'myInstance' again.
+                                     var start_cursor = editor.getCursor();
+                                     var cursorLine = start_cursor.line;
+                                     var cursorCh = start_cursor.ch;
+                                     editor.replaceRange("\"@currentSlot.signature\" of \"@currentWrapper.name\"", start_cursor);
+                                  });
+                               </script>
                              }
                         </div>
-                    </div>  
+                    </div>
                 }
                 </div>
             </td>

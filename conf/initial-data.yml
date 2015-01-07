@@ -124,22 +124,22 @@ groups:
 #wrappers
 wrappers:
 - &xmlgenerator !!models.Wrapper
-  name: XML Generator Wrapper
+  name: XMLGeneratorWrapper
   user: *user
   signals:
   - &xmlProduced !!models.TSignal
       wrapper: *xmlgenerator
-      signature: public abstract void xmlProduced(byte[] generatedXML)
+      signature: xmlProduced(byte[] generatedXML)
   - &xmlProduced2 !!models.TSignal
       wrapper: *xmlgenerator
-      signature: public abstract void xmlProduced2(byte[] generatedXML)
+      signature: xmlProduced2(byte[] generatedXML)
   slots:
   - &generateXML !!models.TSlot
       wrapper: *xmlgenerator
-      signature: public void generateXML(byte[] inputBooks)
+      signature: generateXML(byte[] inputBooks)
   - &generateXML2 !!models.TSlot
       wrapper: *xmlgenerator
-      signature: public void generateXML2(byte[] inputBooks)
+      signature: generateXML2(byte[] inputBooks)
 - &testWrapper0 !!models.Wrapper
   name: testWrapper0
   user: *user
