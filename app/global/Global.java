@@ -21,10 +21,7 @@ import play.db.ebean.Model;
 import play.mvc.Call;
 
 import java.io.*;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -113,7 +110,7 @@ public class Global extends GlobalSettings {
               TestGroup group = (TestGroup) model;
               for(TestAssertion assertion : group.testAssertions){
                 for (TestCase tcase : assertion.testCases){
-                  tcase.tdl = scala.io.Source.fromFile(tcase.tdl, "utf-8").mkString();
+                  tcase.setTdl(scala.io.Source.fromFile(tcase.tdl, "utf-8").mkString());
                 }
               }
             }

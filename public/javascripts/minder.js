@@ -37,18 +37,17 @@ function executeScripts(target){
 }
 
 function createFormDialog(elm, sourceUrl, action, dialogId, titl, target, w, h){
+  if(typeof(w)==='undefined') w = '50%';
+  if(typeof(h)==='undefined') h = '500';
 
-  ww = typeof w !== 'undefined' ? w : '50%';
-  hh = typeof h !== 'undefined' ? h : '500';
   var frm = $( "#" + dialogId + " > form");
   elm.on('click', function(event){
-  
      event.stopPropagation();
 
      var dialog = $( "#" + dialogId ).dialog({
          autoOpen: false,
-         height: hh,
-         width: ww,
+         height: h,
+         width: w,
          title: titl,
          modal: true,
          buttons: {
@@ -92,6 +91,7 @@ function createFormDialog(elm, sourceUrl, action, dialogId, titl, target, w, h){
               frm[0].innerHTML = jqXHR.responseText;
           }
      });
+     frm[0].innerHTML = "..."
      dialog.dialog( "open", titl );
   });
 }

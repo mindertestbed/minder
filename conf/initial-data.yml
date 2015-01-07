@@ -41,7 +41,7 @@ users:
     - {id: 3, roleName: Test Developer}
     testGroups: []
 
-#Categories
+#Groups
 groups:
 - &as4 !!models.TestGroup
     description: null
@@ -57,13 +57,13 @@ groups:
         prerequisites: be cool
         predicate: as4 message is terribly valid
         testCases:
-        - &testCase1 !!models.TestCase
+        - &as4case1 !!models.TestCase
             parameters: ''
             shortDescription: A test case to check the eb code party id
             tdl: sampletdl/as42.tdl
             testAssertion: *taas41
             name: AS41
-        - &testCase2 !!models.TestCase
+        - &as4case2 !!models.TestCase
             description: null
             parameters: ''
             shortDescription: A test case to check the hede hodo
@@ -113,29 +113,89 @@ groups:
             tdl: sampletdl/BDXL1.tdl
             testAssertion: *tabdxl1
             name: BDXL1
-            
 #TestRun
 testruns:
   - &testrun1 !!models.TestRun
-    testCase: *testCase1
+    testCase: *as4Case1
     runner: *user
     id: 1
-    wrappers:
-    - &xmlgenerator !!models.Wrapper
-        name: XML Generator Wrapper
-        id: 1
-        user: *user
-        signals:
-        - &xmlProduced !!models.TSignal
-            wrapper: *xmlgenerator
-            signature: public abstract void xmlProduced(byte[] generatedXML)
-        - &xmlProduced2 !!models.TSignal
-            wrapper: *xmlgenerator
-            signature: public abstract void xmlProduced2(byte[] generatedXML)
-        slots:
-        - &generateXML !!models.TSlot
-            wrapper: *xmlgenerator
-            signature: public void generateXML(byte[] inputBooks)
-        - &generateXML2 !!models.TSlot
-            wrapper: *xmlgenerator
-            signature: public void generateXML2(byte[] inputBooks)
+    wrappers: [*xmlgenerator]
+wrappers:
+- &xmlgenerator !!models.Wrapper
+  name: XML Generator Wrapper
+  id: 1
+  user: *user
+  signals:
+  - &xmlProduced !!models.TSignal
+      wrapper: *xmlgenerator
+      signature: public abstract void xmlProduced(byte[] generatedXML)
+  - &xmlProduced2 !!models.TSignal
+      wrapper: *xmlgenerator
+      signature: public abstract void xmlProduced2(byte[] generatedXML)
+  slots:
+  - &generateXML !!models.TSlot
+      wrapper: *xmlgenerator
+      signature: public void generateXML(byte[] inputBooks)
+  - &generateXML2 !!models.TSlot
+      wrapper: *xmlgenerator
+      signature: public void generateXML2(byte[] inputBooks)
+- &testWrapper0 !!models.Wrapper
+  name: testWrapper0
+	user: *user
+	signals:
+	- !!models.TSignal
+	  wrapper: *testWrapper0
+	  signature: signal0()
+	slots:
+	- !!models.TSlot
+	  wrapper: *testWrapper0
+	  signature: slot0()
+- &testWrapper1 !!models.Wrapper
+  name: testWrapper1
+	user: *user
+	signals:
+	- !!models.TSignal
+	  wrapper: *testWrapper1
+	  signature: signal1(int, int, java.lang.String)
+	slots:
+	- !!models.TSlot
+	  wrapper: *testWrapper1
+	  signature: slot0()
+- &testWrapper2 !!models.Wrapper
+  name: testWrapper2
+	user: *user
+	signals:
+	- !!models.TSignal
+	  wrapper: *testWrapper2
+	  signature: signal1(int, int, java.lang.String)a
+	slots:
+	- !!models.TSlot
+	  wrapper: *testWrapper2
+	  signature: slot1(int, int, java.lang.String)
+- &testWrapper3 !!models.Wrapper
+  name: testWrapper3
+	user: *user
+	signals:
+	- !!models.TSignal
+	  wrapper: *testWrapper3
+	  signature: signal2(byte[], byte[], java.lang.String)
+	slots:
+	- !!models.TSlot
+	  wrapper: *testWrapper3
+	  signature: slot1(int, int, java.lang.String)
+- &testWrapper3 !!models.Wrapper
+  name: testWrapper4
+	user: *user
+	signals: []
+	slots:
+	- !!models.TSlot
+	  wrapper: *testWrapper4
+	  signature: slot2(int, int, java.lang.String, byte [], byte [], java.util.Date)
+
+#Run configurations &as4case1
+runConfigurations:
+- !!models.RunConfiguration
+  name: TAAS41(1);
+  testCase: *as4case1
+  isObsolete = false
+	wrappers:
