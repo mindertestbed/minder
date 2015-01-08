@@ -29,7 +29,7 @@ public class TestRun extends Model {
 	public RunConfiguration runConfiguration;
 
 	public Date date;
-
+	
 	@ManyToOne
 	@Column(nullable = false)
 	public User runner;
