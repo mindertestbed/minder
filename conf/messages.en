@@ -167,4 +167,4 @@ restrictedTestPage.createTestGroup= Create New Test Group
 restrictedTestPage.createTestAssertion= Create New Test Assertion
 restrictedTestPage.createTestCase= Create New Test Case
 restrictedTestPage.create= Create
-restrictedTestPage.createTestCase= Create New Test Case
+restrictedTestPage.createRunConfiguration = Create New Run Configuration

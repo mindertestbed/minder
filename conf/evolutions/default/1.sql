@@ -65,6 +65,10 @@ create table TestAssertion (
   prerequisites             varchar(255),
   predicate                 varchar(255) not null,
   variables                 varchar(255),
+  tag                       varchar(255),
+  description               varchar(1024),
+  prescription_level        integer,
+  constraint ck_TestAssertion_prescription_level check (prescription_level in (0,1,2)),
   constraint uq_TestAssertion_ta_id unique (ta_id),
   constraint pk_TestAssertion primary key (id))
 ;

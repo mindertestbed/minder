@@ -1,0 +1,27 @@
+@(frm: Form[_], localUser: models.User = null)
+
+@import helper._
+@implicitFieldConstructor = @{ FieldConstructor(twitterBootstrapBasic.f) }
+
+
+@if(frm.hasGlobalErrors) {
+<p class="alert alert-danger">
+  @frm.globalError.message
+</p>
+}
+
+@inputText(
+frm("name"),
+'_label -> "Run configuration name"
+)
+
+@repeat(frm("mappedWrappers"), min= 1){ entry =>
+
+  <label for="@entry.name" class="control-label">@entry("key").value</label>:
+  <input type="text" name="@entry.name" id="@entry.id" value="@entry("value").value"/><br />
+}
+
+<input type="hidden" name="id" id="id" value='@frm("id").value' />
+<input type="hidden" name="testCaseId" id="testCaseId" value='@frm("testCaseId").value' />
+<input type="hidden" name="obsolete" id="obsolete" value='@frm("obsolete").value' />
+<input type="hidden" name="tdl" id="tdl" value='@frm("tdl").value' />

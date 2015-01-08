@@ -1,10 +1,7 @@
 package controllers;
 
-import models.TestAssertion;
-import models.TestCase;
-import models.TestGroup;
-import models.User;
-import models.Wrapper;
+import builtin.Entry;
+import models.*;
 import play.Logger;
 import play.data.Form;
 import play.data.validation.Constraints;
@@ -13,10 +10,9 @@ import play.mvc.Controller;
 import play.mvc.Result;
 import views.html.*;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import javax.persistence.*;
+import javax.validation.Valid;
+import java.util.*;
 
 import static play.data.Form.form;
 
@@ -27,6 +23,7 @@ public class InventoryController extends Controller {
   public static final Form<TestGroupEditorModel> TEST_GROUP_FORM = form(TestGroupEditorModel.class);
   public static final Form<TestAssertionEditorModel> TEST_ASSERTION_FORM = form(TestAssertionEditorModel.class);
   public static final Form<TestCaseEditorModel> TEST_CASE_FORM = form(TestCaseEditorModel.class);
+  public static final Form<RunConfigurationEditorModel> RUN_CONFIGURATION_FORM = form(RunConfigurationEditorModel.class);
 
 
   public static class TestGroupEditorModel {
@@ -63,6 +60,12 @@ public class InventoryController extends Controller {
     public String predicate;
 
     public String variables;
+
+    public String tag;
+
+    public String description;
+
+    public String prescriptionLevel;
   }
 
 
@@ -83,6 +86,21 @@ public class InventoryController extends Controller {
     public String tdl;
 
     public String description;
+  }
+
+  public static class RunConfigurationEditorModel{
+    public Long id;
+
+    @Constraints.Required
+    public String name;
+
+    public Long testCaseId;
+
+    public boolean obsolete;
+
+    public String tdl;
+
+    public List<Entry> mappedWrappers;
   }
 
   public static Result doCreateTestGroup() {
@@ -217,7 +235,10 @@ public class InventoryController extends Controller {
       ta.prerequisites = model.prerequisites;
       ta.target = model.target;
       ta.variables = model.variables;
+      ta.tag = model.tag;
+      ta.description = model.description;
       ta.testGroup = tg;
+      ta.prescriptionLevel = PrescriptionLevel.valueOf(model.prescriptionLevel);
 
       ta.save();
 
@@ -241,7 +262,11 @@ public class InventoryController extends Controller {
       taModel.predicate = ta.predicate;
       taModel.prerequisites = ta.prerequisites;
       taModel.variables = ta.variables;
+      taModel.tag = ta.tag;
+      taModel.description = ta.description;
       taModel.groupId = ta.testGroup.id;
+      taModel.prescriptionLevel =ta.prescriptionLevel.name();
+
       Form<TestAssertionEditorModel> bind = TEST_ASSERTION_FORM.fill(taModel);
       return ok(testAssertionEditor.render(bind, null));
     }
@@ -269,6 +294,9 @@ public class InventoryController extends Controller {
       ta.prerequisites = model.prerequisites;
       ta.target = model.target;
       ta.variables = model.variables;
+      ta.tag = model.tag;
+      ta.description = model.description;
+      ta.prescriptionLevel = PrescriptionLevel.valueOf(model.prescriptionLevel);
 
 
       //check if the name is not duplicate
@@ -332,11 +360,11 @@ public class InventoryController extends Controller {
 		final Form<TestCaseEditorModel> filledForm = TEST_CASE_FORM
 				.bindFromRequest();
 		final User localUser = Application.getLocalUser(session());
-		
+
 		if (filledForm.hasErrors()) {
 			printFormErrors(filledForm);
 			return badRequest(testCaseEditor.render(localUser, filledForm, null,null));
-		} else {			
+		} else {
 			TestCaseEditorModel model = filledForm.get();
 			TestCase tc = new TestCase();
 			tc.name = model.name;
@@ -344,7 +372,7 @@ public class InventoryController extends Controller {
 			tc.description = model.description;
 			tc.tdl = model.tdl;
 			tc.testAssertion = TestAssertion.findById(model.assertionId);
-			
+
 			TestCase tc2 = TestCase.findByName(model.name);
 			if (tc2 == null) {
 				tc.save();
@@ -368,4 +396,92 @@ public class InventoryController extends Controller {
 	public static Result doDeleteCase(Long id) {
 		return ok();
 	}
+
+  public static Result doDeleteRunConfiguration(Long id){
+    com.feth.play.module.pa.controllers.Authenticate.noCache(response());
+
+    RunConfiguration rc = RunConfiguration.findById(id);
+    if (rc == null) {
+      //it does not exist. error
+      return badRequest("Test assertion with id " + id + " does not exist.");
+    }
+
+    try {
+      rc.delete();
+    } catch (Exception ex) {
+      ex.printStackTrace();
+      Logger.error(ex.getMessage(), ex);
+      return badRequest(ex.getMessage());
+    }
+
+    TestCase tc = TestCase.findById(rc.testCase.id);
+    return ok(runConfigurationLister.render(tc, null));
+  }
+
+  public static Result editRunConfigurationForm(Long id){
+    RunConfiguration rc = RunConfiguration.findById(id);
+    if (rc == null) {
+      //it does not exist. error
+      return badRequest("RunConfiguration with id " + id + " does not exist.");
+    }
+
+    RunConfigurationEditorModel rome =  new RunConfigurationEditorModel();
+
+    rome.id = rc.id;
+    rome.name = rc.name;
+    rome.tdl = rc.tdl;
+    rome.testCaseId = rc.testCase.id;
+    rome.mappedWrappers = new ArrayList<>();
+
+    for (MappedWrapper mappedWrapper : rc.mappedWrappers) {
+      rome.mappedWrappers.add(new Entry(mappedWrapper.parameter.name, mappedWrapper.wrapper.name));
+    }
+
+    Form<?> fill = RUN_CONFIGURATION_FORM.fill(rome);
+    return ok(runConfigurationEditor.render(fill, null));
+  }
+
+
+  public static Result doEditRunConfiguration(){
+    Form<RunConfigurationEditorModel>  frm = RUN_CONFIGURATION_FORM.bindFromRequest();
+
+
+   //
+
+    Map<String, String> data = frm.data();
+    //for (Entry mappedWrapper : model.mappedWrappers) {
+    //  System.out.println(mappedWrapper.getKey() + ": " + mappedWrapper.getValue());
+    //}
+
+    RunConfigurationEditorModel model = new RunConfigurationEditorModel();
+    model.id = Long.parseLong(data.get("id"));
+    model.testCaseId = Long.parseLong(data.get("testCaseId"));
+    model.tdl  = data.get("tdl");
+    model.mappedWrappers = new ArrayList<>();
+    model.name = data.get("name");
+
+    for (String s : data.keySet()) {
+      System.out.println(s + " " + data.get(s));
+
+      if(s.startsWith("$")){
+        model.mappedWrappers.add(new Entry(s, data.get(s)));
+      }
+    }
+
+    frm.fill(model);
+    return ok(runConfigurationEditor.render(frm, null));
+  }
+
+  public static Result doRunRunconfiguration(Long id){
+    /*if(id not startet){
+      run(id)
+      return ok(runningRIvetLister.render(id))
+    }
+
+    if(id not finished){
+      return ok(runningRIvetLister.render(id))
+    }
+
+   */ return ok("TESTFINISH");
+  }
 }

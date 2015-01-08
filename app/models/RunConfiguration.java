@@ -1,5 +1,6 @@
 package models;
 
+import com.avaje.ebean.ExpressionList;
 import play.db.ebean.Model;
 
 import javax.persistence.*;
@@ -48,6 +49,11 @@ public class RunConfiguration extends Model {
 
 
 	public static List<RunConfiguration> findByTestCase(TestCase testCase){
-		return find.where().eq("testCase", testCase).findList();
+		ExpressionList<RunConfiguration> f = find.where().eq("testCase", testCase);
+		return f.setOrderBy("id").findList();
+	}
+
+	public static RunConfiguration findById(Long id) {
+		return find.byId(id);
 	}
 }

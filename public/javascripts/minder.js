@@ -113,13 +113,11 @@ function deleteWithDialog(elm, action, dialog, title, category, item, target){
             success: function (data) {
               target[0].innerHTML = data;
               executeScripts(target);
-              $( this ).dialog( "close" );
             },
             error: function (jqXHR, textStatus, errorMessage) {
                 alert(jqXHR.responseText);
-                $( this ).dialog( "close" );
             }
-         });
+           });
 
           $( this ).dialog( "close" );
           },
@@ -127,12 +125,27 @@ function deleteWithDialog(elm, action, dialog, title, category, item, target){
           $( this ).dialog( "close" );
           }
         }
-       });
+      });
 
-       dialog.find("span.itemtype")[0].innerHTML = category;
-       dialog.find("span.itemname")[0].innerHTML = item;
-       deleteDialog.dialog( "open" );
+     dialog.find("span.itemtype")[0].innerHTML = category;
+     dialog.find("span.itemname")[0].innerHTML = item;
+     deleteDialog.dialog( "open" );
     });
 }
 
+function showError(data){
+  var dialog = $("#errorDialog").dialog({
+      resizable: false,
+      height:"600",
+      width:"800",
+      autoOpen: true,
+      modal: true,
+      buttons: {
+        'Ok': function() {
+          $( this ).dialog( "close" );
+        }
+      }
+  });
+  dialog[0].innerHTML = data;
+}
 

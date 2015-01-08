@@ -72,3 +72,10 @@ POST    /doCreateCase               controllers.InventoryController.doCreateCase
 GET     /editCaseForm               controllers.InventoryController.editCaseForm(id: Long)
 POST    /doEditCase                 controllers.InventoryController.doEditCase
 GET     /doDeleteCase               controllers.InventoryController.doDeleteCase(id: Long)
+
+#test configuration management
+GET     /doDeleteRunConfiguration   controllers.InventoryController.doDeleteRunConfiguration(id: Long)
+
+GET     /editRunConfigurationForm   controllers.InventoryController.editRunConfigurationForm(id: Long)
+GET     /doRunRunconfiguration      controllers.InventoryController.doRunRunconfiguration(id: Long)
+POST    /doEditRunConfiguration     controllers.InventoryController.doEditRunConfiguration()
