@@ -96,7 +96,7 @@ public class InventoryController extends Controller {
 
     public String tdl;
 
-    public List<Entry> mappedWrappers;
+    public Map<String,String> mappedWrappers;
 	}
 
 	public static Result doCreateTestGroup() {
@@ -463,10 +463,10 @@ public class InventoryController extends Controller {
     rome.name = rc.name;
     rome.tdl = rc.tdl;
     rome.testCaseId = rc.testCase.id;
-    rome.mappedWrappers = new ArrayList<>();
+    rome.mappedWrappers = new HashMap<>();
 
     for (MappedWrapper mappedWrapper : rc.mappedWrappers) {
-      rome.mappedWrappers.add(new Entry(mappedWrapper.parameter.name, mappedWrapper.wrapper.name));
+      rome.mappedWrappers.put(mappedWrapper.parameter.name, mappedWrapper.wrapper.name);
     }
 
     Form<?> fill = RUN_CONFIGURATION_FORM.fill(rome);
@@ -478,7 +478,7 @@ public class InventoryController extends Controller {
     Form<RunConfigurationEditorModel>  frm = RUN_CONFIGURATION_FORM.bindFromRequest();
 
 
-   //
+    //
 
     Map<String, String> data = frm.data();
     //for (Entry mappedWrapper : model.mappedWrappers) {
@@ -489,19 +489,19 @@ public class InventoryController extends Controller {
     model.id = Long.parseLong(data.get("id"));
     model.testCaseId = Long.parseLong(data.get("testCaseId"));
     model.tdl  = data.get("tdl");
-    model.mappedWrappers = new ArrayList<>();
+    model.mappedWrappers = new HashMap<>();
     model.name = data.get("name");
 
     for (String s : data.keySet()) {
-      System.out.println(s + " " + data.get(s));
+      System.out.println(s + " >>> " + data.get(s));
 
-      if(s.startsWith("$")){
-        model.mappedWrappers.add(new Entry(s, data.get(s)));
+      if(s.startsWith("mappedWrappers")){
+        model.mappedWrappers.put(s, data.get(s));
       }
     }
 
     frm.fill(model);
-    return ok(runConfigurationEditor.render(frm, null));
+    return ok(runConfigurationEditor.render(RUN_CONFIGURATION_FORM.fill(model), null));
   }
 
   public static Result doRunRunconfiguration(Long id){

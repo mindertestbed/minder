@@ -110,7 +110,7 @@ create table TokenAction (
   type                      varchar(2),
   created                   timestamp,
   expires                   timestamp,
-  constraint ck_TokenAction_type check (type in ('EV','PR')),
+  constraint ck_TokenAction_type check (type in ('PR','EV')),
   constraint uq_TokenAction_token unique (token),
   constraint pk_TokenAction primary key (id))
 ;

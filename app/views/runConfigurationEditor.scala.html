@@ -16,9 +16,8 @@ frm("name"),
 )
 
 @repeat(frm("mappedWrappers"), min= 1){ entry =>
-
-  <label for="@entry.name" class="control-label">@entry("key").value</label>:
-  <input type="text" name="@entry.name" id="@entry.id" value="@entry("value").value"/><br />
+  @println(frm("mappedWrappers").value)
+  <input type="text" name="@entry.name" id="@entry.id" value="@entry("value")"/><br />
 }
 
 <input type="hidden" name="id" id="id" value='@frm("id").value' />
