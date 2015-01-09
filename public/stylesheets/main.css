@@ -266,7 +266,8 @@ td{
 
 .celldiv {
      display: table-cell;
-     vertical-align: middle
+     vertical-align: middle;
+     text-align: center;
 }
 
 .create {
@@ -287,4 +288,12 @@ td{
 .center{
    text-align: center;
    vertical-align: middle;
+}
+
+.form-control{
+  font-size: 10px;
+}
+
+.control-label{
+  font-size: 10px;
 }

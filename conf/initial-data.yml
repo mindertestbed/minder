@@ -65,22 +65,7 @@ groups:
             tdl: sampletdl/as41.tdl
             testAssertion: *taas41
             name: AS41
-            parameters:
-            - &param0 !!models.WrapperParam
-              name: $wrapper0
-              testCase: *as4case1
-            - &param1 !!models.WrapperParam
-              name: $wrapper1
-              testCase: *as4case1
-            - &param2 !!models.WrapperParam
-              name: $wrapper2
-              testCase: *as4case1
-            - &param3 !!models.WrapperParam
-              name: $wrapper3
-              testCase: *as4case1
-            - &param4 !!models.WrapperParam
-              name: $wrapper4
-              testCase: *as4case1
+            parameters: []
 - &smp !!models.TestGroup
     description: null
     name: SMP Tests
@@ -200,105 +185,7 @@ runConfigurations:
 - &rc1 !!models.RunConfiguration
   name: TAAS41(RC1)
   testCase: *as4case1
-  mappedWrappers:
-  - !!models.MappedWrapper
-    parameter: *param0
-    wrapper: *testWrapper0
-    runConfiguration: *rc1
-  - !!models.MappedWrapper
-    parameter: *param1
-    wrapper: *testWrapper1
-    runConfiguration: *rc1
-  - !!models.MappedWrapper
-    parameter: *param2
-    wrapper: *testWrapper2
-    runConfiguration: *rc1
-  - !!models.MappedWrapper
-    parameter: *param3
-    wrapper: *testWrapper3
-    runConfiguration: *rc1
-  - !!models.MappedWrapper
-    parameter: *param4
-    wrapper: *testWrapper4
-    runConfiguration: *rc1
-  testRuns: []
-
-- &rc2 !!models.RunConfiguration
-  name: Another run configuration
-  testCase: *as4case1
-  mappedWrappers:
-  - !!models.MappedWrapper
-    parameter: *param0
-    wrapper: *testWrapper0
-    runConfiguration: *rc2
-  - !!models.MappedWrapper
-    parameter: *param1
-    wrapper: *testWrapper1
-    runConfiguration: *rc2
-  - !!models.MappedWrapper
-    parameter: *param2
-    wrapper: *testWrapper2
-    runConfiguration: *rc2
-  - !!models.MappedWrapper
-    parameter: *param3
-    wrapper: *testWrapper3
-    runConfiguration: *rc2
-  - !!models.MappedWrapper
-    parameter: *param4
-    wrapper: *testWrapper4
-    runConfiguration: *rc2
-  testRuns: []
-
-- &rc3 !!models.RunConfiguration
-  name: So another run configuration
-  testCase: *as4case1
-  mappedWrappers:
-  - !!models.MappedWrapper
-    parameter: *param0
-    wrapper: *testWrapper0
-    runConfiguration: *rc3
-  - !!models.MappedWrapper
-    parameter: *param1
-    wrapper: *testWrapper1
-    runConfiguration: *rc3
-  - !!models.MappedWrapper
-    parameter: *param2
-    wrapper: *testWrapper2
-    runConfiguration: *rc3
-  - !!models.MappedWrapper
-    parameter: *param3
-    wrapper: *testWrapper3
-    runConfiguration: *rc3
-  - !!models.MappedWrapper
-    parameter: *param4
-    wrapper: *testWrapper4
-    runConfiguration: *rc3
-  testRuns: []
-
-- &rc4 !!models.RunConfiguration
-  name: Geleyim Another run configuration
-  testCase: *as4case1
-  mappedWrappers:
-  - !!models.MappedWrapper
-    parameter: *param0
-    wrapper: *testWrapper0
-    runConfiguration: *rc4
-  - !!models.MappedWrapper
-    parameter: *param1
-    wrapper: *testWrapper1
-    runConfiguration: *rc4
-  - !!models.MappedWrapper
-    parameter: *param2
-    wrapper: *testWrapper2
-    runConfiguration: *rc4
-  - !!models.MappedWrapper
-    parameter: *param3
-    wrapper: *testWrapper3
-    runConfiguration: *rc4
-  - !!models.MappedWrapper
-    parameter: *param4
-    wrapper: *testWrapper4
-    runConfiguration: *rc4
+  mappedWrappers: []
   testRuns: []
 
 #TestRun

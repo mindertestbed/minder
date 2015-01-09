@@ -19,6 +19,13 @@ create table MappedWrapper (
   constraint pk_MappedWrapper primary key (id))
 ;
 
+create table ParamSignature (
+  id                        bigint not null,
+  name                      varchar(255),
+  wrapper_param_id          bigint,
+  constraint pk_ParamSignature primary key (id))
+;
+
 create table RunConfiguration (
   id                        bigint not null,
   name                      varchar(255) not null,
@@ -90,6 +97,7 @@ create table TestGroup (
   owner_id                  bigint,
   short_description         varchar(50) not null,
   description               varchar(255),
+  dummy                     integer,
   constraint uq_TestGroup_name unique (name),
   constraint pk_TestGroup primary key (id))
 ;
@@ -172,6 +180,8 @@ create sequence LinkedAccount_seq;
 
 create sequence MappedWrapper_seq;
 
+create sequence ParamSignature_seq;
+
 create sequence RunConfiguration_seq;
 
 create sequence SecurityRole_seq;
@@ -210,34 +220,36 @@ alter table MappedWrapper add constraint fk_MappedWrapper_wrapper_3 foreign key 
 create index ix_MappedWrapper_wrapper_3 on MappedWrapper (wrapper_id);
 alter table MappedWrapper add constraint fk_MappedWrapper_runConfigurat_4 foreign key (run_configuration_id) references RunConfiguration (id);
 create index ix_MappedWrapper_runConfigurat_4 on MappedWrapper (run_configuration_id);
-alter table RunConfiguration add constraint fk_RunConfiguration_testCase_5 foreign key (test_case_id) references TestCase (id);
-create index ix_RunConfiguration_testCase_5 on RunConfiguration (test_case_id);
-alter table TSignal add constraint fk_TSignal_wrapper_6 foreign key (wrapper_id) references Wrapper (id);
-create index ix_TSignal_wrapper_6 on TSignal (wrapper_id);
-alter table TSlot add constraint fk_TSlot_wrapper_7 foreign key (wrapper_id) references Wrapper (id);
-create index ix_TSlot_wrapper_7 on TSlot (wrapper_id);
-alter table TestAssertion add constraint fk_TestAssertion_testGroup_8 foreign key (test_group_id) references TestGroup (id);
-create index ix_TestAssertion_testGroup_8 on TestAssertion (test_group_id);
-alter table TestCase add constraint fk_TestCase_testAssertion_9 foreign key (test_assertion_id) references TestAssertion (id);
-create index ix_TestCase_testAssertion_9 on TestCase (test_assertion_id);
-alter table TestGroup add constraint fk_TestGroup_owner_10 foreign key (owner_id) references Users (id);
-create index ix_TestGroup_owner_10 on TestGroup (owner_id);
-alter table TestRun add constraint fk_TestRun_runConfiguration_11 foreign key (run_configuration_id) references RunConfiguration (id);
-create index ix_TestRun_runConfiguration_11 on TestRun (run_configuration_id);
-alter table TestRun add constraint fk_TestRun_runner_12 foreign key (runner_id) references Users (id);
-create index ix_TestRun_runner_12 on TestRun (runner_id);
-alter table TestRun add constraint fk_TestRun_history_13 foreign key (history_id) references UserHistory (id);
-create index ix_TestRun_history_13 on TestRun (history_id);
-alter table TokenAction add constraint fk_TokenAction_targetUser_14 foreign key (target_user_id) references Users (id);
-create index ix_TokenAction_targetUser_14 on TokenAction (target_user_id);
-alter table UserHistory add constraint fk_UserHistory_user_15 foreign key (user_id) references Users (id);
-create index ix_UserHistory_user_15 on UserHistory (user_id);
-alter table UserHistory add constraint fk_UserHistory_operationType_16 foreign key (operation_type_id) references OperationType (id);
-create index ix_UserHistory_operationType_16 on UserHistory (operation_type_id);
-alter table Wrapper add constraint fk_Wrapper_user_17 foreign key (user_id) references Users (id);
-create index ix_Wrapper_user_17 on Wrapper (user_id);
-alter table WrapperParam add constraint fk_WrapperParam_testCase_18 foreign key (test_case_id) references TestCase (id);
-create index ix_WrapperParam_testCase_18 on WrapperParam (test_case_id);
+alter table ParamSignature add constraint fk_ParamSignature_wrapperParam_5 foreign key (wrapper_param_id) references WrapperParam (id);
+create index ix_ParamSignature_wrapperParam_5 on ParamSignature (wrapper_param_id);
+alter table RunConfiguration add constraint fk_RunConfiguration_testCase_6 foreign key (test_case_id) references TestCase (id);
+create index ix_RunConfiguration_testCase_6 on RunConfiguration (test_case_id);
+alter table TSignal add constraint fk_TSignal_wrapper_7 foreign key (wrapper_id) references Wrapper (id);
+create index ix_TSignal_wrapper_7 on TSignal (wrapper_id);
+alter table TSlot add constraint fk_TSlot_wrapper_8 foreign key (wrapper_id) references Wrapper (id);
+create index ix_TSlot_wrapper_8 on TSlot (wrapper_id);
+alter table TestAssertion add constraint fk_TestAssertion_testGroup_9 foreign key (test_group_id) references TestGroup (id);
+create index ix_TestAssertion_testGroup_9 on TestAssertion (test_group_id);
+alter table TestCase add constraint fk_TestCase_testAssertion_10 foreign key (test_assertion_id) references TestAssertion (id);
+create index ix_TestCase_testAssertion_10 on TestCase (test_assertion_id);
+alter table TestGroup add constraint fk_TestGroup_owner_11 foreign key (owner_id) references Users (id);
+create index ix_TestGroup_owner_11 on TestGroup (owner_id);
+alter table TestRun add constraint fk_TestRun_runConfiguration_12 foreign key (run_configuration_id) references RunConfiguration (id);
+create index ix_TestRun_runConfiguration_12 on TestRun (run_configuration_id);
+alter table TestRun add constraint fk_TestRun_runner_13 foreign key (runner_id) references Users (id);
+create index ix_TestRun_runner_13 on TestRun (runner_id);
+alter table TestRun add constraint fk_TestRun_history_14 foreign key (history_id) references UserHistory (id);
+create index ix_TestRun_history_14 on TestRun (history_id);
+alter table TokenAction add constraint fk_TokenAction_targetUser_15 foreign key (target_user_id) references Users (id);
+create index ix_TokenAction_targetUser_15 on TokenAction (target_user_id);
+alter table UserHistory add constraint fk_UserHistory_user_16 foreign key (user_id) references Users (id);
+create index ix_UserHistory_user_16 on UserHistory (user_id);
+alter table UserHistory add constraint fk_UserHistory_operationType_17 foreign key (operation_type_id) references OperationType (id);
+create index ix_UserHistory_operationType_17 on UserHistory (operation_type_id);
+alter table Wrapper add constraint fk_Wrapper_user_18 foreign key (user_id) references Users (id);
+create index ix_Wrapper_user_18 on Wrapper (user_id);
+alter table WrapperParam add constraint fk_WrapperParam_testCase_19 foreign key (test_case_id) references TestCase (id);
+create index ix_WrapperParam_testCase_19 on WrapperParam (test_case_id);
 
 
 
@@ -254,6 +266,8 @@ alter table Users_UserPermission add constraint fk_Users_UserPermission_UserP_02
 drop table if exists LinkedAccount cascade;
 
 drop table if exists MappedWrapper cascade;
+
+drop table if exists ParamSignature cascade;
 
 drop table if exists RunConfiguration cascade;
 
@@ -292,6 +306,8 @@ drop table if exists WrapperParam cascade;
 drop sequence if exists LinkedAccount_seq;
 
 drop sequence if exists MappedWrapper_seq;
+
+drop sequence if exists ParamSignature_seq;
 
 drop sequence if exists RunConfiguration_seq;
 

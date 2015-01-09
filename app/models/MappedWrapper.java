@@ -26,4 +26,8 @@ public class MappedWrapper extends Model{
 
   public static final Finder<Long, MappedWrapper> find = new Finder<>(Long.class,
       MappedWrapper.class);
+
+  public static MappedWrapper findById(Long id) {
+    return find.byId(id);
+  }
 }

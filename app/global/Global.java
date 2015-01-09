@@ -107,27 +107,25 @@ public class Global extends GlobalSettings {
 
         for (String key : all.keySet()) {
           for (Model model : all.get(key)) {
+            model.save();
 
-            System.out.println("KEY: " + key);
             if (model instanceof TestGroup){
               TestGroup group = (TestGroup) model;
               for(TestAssertion assertion : group.testAssertions){
                 for (TestCase tcase : assertion.testCases){
                   BufferedSource file = Source.fromFile(tcase.tdl, "utf-8");
-                  tcase.tdl = file.mkString();
+                  System.out.println("TDL: " + tcase.tdl);
+                  tcase.setTdl(file.mkString());
+                  tcase.save();
                 }
               }
             }
             if (model instanceof  RunConfiguration){
               RunConfiguration rc = (RunConfiguration) model;
 
-              System.out.println("MappedWrapper");
               for (MappedWrapper mappedWrapper : rc.mappedWrappers) {
-                System.out.println(mappedWrapper.parameter.name);
               }
             }
-
-            model.save();
           }
         }
       } catch (Throwable th){
