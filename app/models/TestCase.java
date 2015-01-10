@@ -60,7 +60,7 @@ public class TestCase extends Model {
 
     Pattern pattern = Pattern.compile("\"[a-zA-Z0-9_\\.\\[\\]\\(\\),\\s]+\"\\s+of\\s+\"\\$[a-zA-Z0-9\\-_]+\"");
     Matcher matcher = pattern.matcher(tdl);
-
+    System.out.println("detectParameters:tdl\n"+tdl);
     LinkedHashMap<String, WrapperParam> parms = new LinkedHashMap<>();
     while (matcher.find()) {
       String match = tdl.substring(matcher.start(), matcher.end());
@@ -68,8 +68,8 @@ public class TestCase extends Model {
 
       String signature = split[1];
       String wrapperVariable = split[3];
-
-      System.out.println(signature + ":" + wrapperVariable);
+      System.out.println("signature:"+signature);
+      System.out.println("wrapperVariable:"+wrapperVariable);
 
       WrapperParam wrapperParam;
       if (parms.containsKey(wrapperVariable))
@@ -140,6 +140,12 @@ public class TestCase extends Model {
   @Override
   public void save() {
     super.save();
+    detectParameters();
+  }
+  
+  @Override
+  public void update() {
+    super.update();
     detectParameters();
   }
 }
