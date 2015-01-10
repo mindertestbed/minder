@@ -1,200 +1,55 @@
 @(testCase: TestCase, localUser: models.User = null)
 
-
-<script>
-$(function(){
-  $(".differ2").each(function(index){
-    $(this).addClass('vary2' + (index % 2));
-  });
-  $("#runDialog").hide();
-});
-
-
-function getScriptParent(){
-  var scripts = document.getElementsByTagName( 'script' );
-  var thisScriptTag = scripts[ scripts.length - 1 ];
-  return $(thisScriptTag).parent();
-}
-
-function displayRunConfiguration(id, name){
-   //perform ajax to get the run dialog
-   $.ajax({
-      type: 'GET',
-      url: '/editRunConfigurationForm?id='+id,
-      success: function (data) {
-        showRunDialog(id, data, name)
-      },
-      error: function (jqXHR, textStatus, errorMessage) {
-        showError(jqXHR.responseText);
-      }
-   });
-}
-
-var runDialog = $( "#runDialog" );
-var editorForm = $( "#rcEditor" );
-var runnerDiv = $( "#rcRunner" );
-
-function showRunDialog(id, data, title){
-    editorForm[0].innerHTML = data;
-    runnerDiv[0].innerHTML = '...'
-    executeScripts(editorForm);
-
-    var dialog = runDialog.dialog({
-       autoOpen: false,
-       height: 600,
-       width: 1100,
-       title: 'Run Configuration' + title,
-       modal: true,
-       buttons: {
-           "Save": function(){
-             $.ajax({
-               type: editorForm.attr('method'),
-               url: editorForm.attr('action'),
-               data: editorForm.serialize(),
-               success: function (data) {
-                  editorForm[0].innerHTML = data;
-                  executeScripts(editorForm);
-               },
-               error: function (jqXHR, textStatus, errorMessage) {
-                   editorForm[0].innerHTML = jqXHR.responseText;
-                   editorForm[0].reset();
-               }
-             });
-           },
-           "Run": function() {
-              ajaxRunRunConfiguration(id)
-           },
-           Cancel: function() {
-             dialog.dialog( "close" );
-           }
-       },
-       close: function() {
-         editorForm[0].reset();
-       }
-   });
-
-   dialog.dialog( "open", title );
-}
-
-function ajaxRunRunConfiguration(id){
-  $.ajax({
-     type: 'GET',
-     url: '/doRunRunconfiguration?id' + id ,
-     data: editorForm.serialize(),
-     success: function (data) {
-        if(data.indexOf("TESTFINISH") != -1){
-          runnerDiv[0].innerHTML = data;
-          executeScripts(runnerDiv);
-          setTimeout(function(){
-            ajaxRunRunConfiguration(id);
-          }, 500);
-        }
-     },
-     error: function (jqXHR, textStatus, errorMessage) {
-         runnerDiv[0].innerHTML = jqXHR.responseText;
-     }
-   });
-}
-
-function deleteRunConfiguration(idd, name){
-   var targett = $("#root@testCase.id").parent();
-    var deleteDialog = $("#dialog-confirm").dialog({
-      resizable: false,
-      height:200,
-      width:"50%",
-      title:'Delete Run Configuration',
-      autoOpen: false,
-      modal: true,
-      buttons: {
-        "Delete": function() {
-         $.ajax({
-            type: 'GET',
-            url: '/doDeleteRunConfiguration?id=' + idd,
-            success: function (data) {
-              targett[0].innerHTML = data;
-              showError(targett.html())
-              executeScripts(target);
-            },
-            error: function (jqXHR, textStatus, errorMessage) {
-              showError(jqXHR.responseText);
-            }
-         });
-         $( this ).dialog( "close" );
-        },
-        Cancel: function() {
-        $( this ).dialog( "close" );
-        }
-      }
-    });
-
-   deleteDialog.find("span.itemtype")[0].innerHTML = 'run configuration';
-   deleteDialog.find("span.itemname")[0].innerHTML = name;
-   deleteDialog.dialog( "open" );
-}
-
-
-</script>
-<div id="root@testCase.id">
-  <div id="runDialog">
-    <form id="rcEditor" action="/doEditRunConfiguration" method="post">
-
-    </form>
-    <hr/>
-    <div id="rcRunner">
-
-    </div>
-  </div>
-  <div id="runConfDivv@testCase.id">
-    <table style="width: 100%;">
-      <tr style="border-bottom: 1px solid gray;height:1px;">
-        <td align="center" style="width:80%;"><h4 class="ui-accordion-header">Run Configurations</h4></td>
-      </tr>
-      <tr>
-        <td align="left">
-          <table class="fullw" cellpadding="5" align="left">
-            @for(configuration <- RunConfiguration.findByTestCase(testCase)){
-            <tr class="differ2" style="height:25px;">
-              <td style="width:3%;" align="center" valign="middle">
-                <div onclick="displayRunConfiguration(@configuration.id, '@configuration.name')">
-                  <img src="@routes.Assets.at("/images/running-64.png")" height="16px"/>
-                </div>
-              </td>
-              <td onclick="displayRunConfiguration(@configuration.id, '@configuration.name')">@configuration.name</td>
-              <td onclick="deleteRunConfiguration(@configuration.id, '@configuration.name')" style="width:3%;"
-                  align="center" valign="middle">
-                <img src="@routes.Assets.at("/images/trash2-64.png")" height="16px"/>
-              </td>
-            </tr>
-            }
-            <tr>
-              <td colspan="4">&nbsp;</td>
-            </tr>
-            <tr>
-              <td colspan="4">
-                <div class="title styledtitleinverse fullw hand create bevel2" style="margin:0;" align="center">
-                  <table>
-                    <tr>
-                      <td>
-                        <table class="fullw">
-                          <tr>
-                            <td id="createRunConfiguration1@testCase.id"
-                                style="height:23px;vertical-align:top; text-align:right;">
-                              <img src="@routes.Assets.at("/images/plus-64.png")" height="16px" />
-                            </td>
-                            <td id="createRunConfiguration2@testCase.id" style="height:23px;">
-                              @Messages("restrictedTestPage.createRunConfiguration")
-                            </td>
-                          </tr>
-                        </table>
-                      </td>
-                    </tr>
-                  </table>
-                </div>
-              </td>
-            </tr>
-          </table>
-        </td>
-      </tr>
-    </table>
-  </div>
+<div>
+  <table style="width: 100%;">
+    <tr style="border-bottom: 1px solid gray;height:1px;">
+      <td align="center" style="width:80%;"><h5>Run Configurations</h5></td>
+    </tr>
+    <tr>
+      <td align="left">
+        <table class="fullw" cellpadding="5" align="left">
+          @for(configuration <- RunConfiguration.findByTestCase(testCase)){
+          <tr class="differ2" style="height:25px;">
+            <td style="width:3%;" align="center" valign="middle">
+              <div onclick="displayRunConfiguration(@configuration.id, '@configuration.name')">
+                <img src="@routes.Assets.at("/images/running-64.png")" height="16px"/>
+              </div>
+            </td>
+            <td onclick="displayRunConfiguration(@configuration.id, '@configuration.name')">@configuration.name</td>
+            <td onclick="deleteRunConfiguration(@configuration.id, '@configuration.name')" style="width:3%;"
+                align="center" valign="middle">
+              <img src="@routes.Assets.at("/images/trash2-64.png")" height="16px"/>
+            </td>
+          </tr>
+          }
+          <tr>
+            <td colspan="4">&nbsp;</td>
+          </tr>
+          <tr>
+            <td colspan="4">
+              <div class='title styledtitleinverse fullw hand create bevel2' style='margin:0;' align='center'>
+                <table>
+                  <tr>
+                    <td>
+                      <table class="fullw">
+                        <tr>
+                          <td onclick='createRunConfiguration(@testCase.id)'
+                              style='height:23px;vertical-align:top; text-align:right;'>
+                            <img src="@routes.Assets.at("/images/plus-64.png")" height="16px" />
+                          </td>
+                          <td onclick='createRunConfiguration(@testCase.id)' style='height:23px;'>
+                            @Messages("restrictedTestPage.createRunConfiguration")
+                          </td>
+                        </tr>
+                      </table>
+                    </td>
+                  </tr>
+                </table>
+              </div>
+            </td>
+          </tr>
+        </table>
+      </td>
+    </tr>
+  </table>
 </div>

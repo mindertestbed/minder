@@ -64,7 +64,7 @@ groups:
             shortDescription: A test case to check the eb code party id
             tdl: sampletdl/as41.tdl
             testAssertion: *taas41
-            name: AS41
+            name: AS411
             parameters: []
 - &smp !!models.TestGroup
     description: null
@@ -155,7 +155,7 @@ wrappers:
   signals:
   - !!models.TSignal
     wrapper: *testWrapper2
-    signature: signal1(int, int, java.lang.String)a
+    signature: signal1(int, int, java.lang.String)
   slots:
   - !!models.TSlot
     wrapper: *testWrapper2

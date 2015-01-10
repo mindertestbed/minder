@@ -14,29 +14,32 @@ import java.util.Map;
  */
 public class MappedWrapperModel {
   public final Long id;
+  public final Long wrapperParamId;
   public final String name;
   public final String value;
 
-  public MappedWrapperModel(Long id, String name, String value) {
+  public MappedWrapperModel(Long id, Long wrapperParamId, String name, String value) {
     this.id = id;
     this.name = name;
     this.value = value;
+    this.wrapperParamId = wrapperParamId;
   }
 
   public static MappedWrapperModel parse(String jsonString) throws ParseException {
     try {
       JsonNode parse = Json.parse(jsonString);
       Long id = parse.findPath("id").asLong();
+      Long wrapperParamId = parse.findPath("wrapperParamId").asLong();
       String paramName = parse.findPath("name").asText();
       String wrapper = parse.findPath("value").asText();
-      return new MappedWrapperModel(id, paramName, wrapper);
+      return new MappedWrapperModel(id, wrapperParamId, paramName, wrapper);
     } catch (Exception ex) {
       throw new ParseException("Coudln't parse " + jsonString, 0);
     }
   }
 
-  public static String jsonFor(Long id, String name, String value) {
-    return new MappedWrapperModel(id, name, value).toJson();
+  public static String jsonFor(Long id, Long wrapperParamId, String name, String value) {
+    return new MappedWrapperModel(id, wrapperParamId, name, value).toJson();
   }
 
   private String toJson() {
@@ -44,6 +47,7 @@ public class MappedWrapperModel {
     map.put("id", id);
     map.put("name", name);
     map.put("value", value);
+    map.put("wrapperParamId", wrapperParamId);
     JsonNode result = Json.toJson(map);
     return Json.stringify(result);
   }

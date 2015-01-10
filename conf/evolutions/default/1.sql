@@ -31,7 +31,7 @@ create table RunConfiguration (
   name                      varchar(255) not null,
   test_case_id              bigint,
   obsolete                  boolean,
-  tdl                       varchar(255),
+  tdl                       varchar(20000),
   constraint uq_RunConfiguration_name unique (name),
   constraint pk_RunConfiguration primary key (id))
 ;
@@ -97,7 +97,6 @@ create table TestGroup (
   owner_id                  bigint,
   short_description         varchar(50) not null,
   description               varchar(255),
-  dummy                     integer,
   constraint uq_TestGroup_name unique (name),
   constraint pk_TestGroup primary key (id))
 ;

@@ -59,4 +59,8 @@ public class WrapperParam extends Model {
   public static List<WrapperParam> findByTestCase(TestCase testCase) {
     return find.where().eq("testCase", testCase).findList();
   }
+
+  public static WrapperParam findById(Long id) {
+    return find.byId(id);
+  }
 }

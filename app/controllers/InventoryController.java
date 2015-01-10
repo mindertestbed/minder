@@ -1,5 +1,6 @@
 package controllers;
 
+import com.avaje.ebean.Ebean;
 import models.*;
 import mtdl.SignalSlot;
 import mtdl.TdlCompiler;
@@ -429,6 +430,109 @@ public class InventoryController extends Controller {
     return ok();
   }
 
+
+  public static Result createRunConfigurationForm(Long testCaseId) {
+    System.out.println("Request run configuration editor form");
+    TestCase testCase = TestCase.findById(testCaseId);
+
+
+    System.out.println("testCaseNull " + (testCase == null));
+
+    if (testCase == null)
+      return badRequest("Test case with id " + testCaseId + " couldn't be found");
+
+    int max = 0;
+
+    List<RunConfiguration> list = RunConfiguration.findByTestCase(testCase);
+    if (list != null) {
+      for (RunConfiguration runConfiguration : list) {
+        if (runConfiguration.name.matches(testCase.name + "\\(\\d+\\)$")) {
+          int val = Integer.parseInt(runConfiguration.name.substring(runConfiguration.name.lastIndexOf('(') + 1,
+              runConfiguration.name.lastIndexOf(')')));
+
+          if (max < val)
+            max = val;
+        }
+      }
+    }
+
+    RunConfigurationEditorModel model = new RunConfigurationEditorModel();
+    model.testCaseId = testCaseId;
+    model.name = testCase.name + "(" + (max + 1) + ")";
+
+
+    //
+    model.mappedWrappers = new ArrayList<>();
+
+    System.out.println("Test Case Parameters. length " + testCase.parameters.size());
+    for (WrapperParam parameter : testCase.parameters) {
+      System.out.println(parameter.name);
+      model.mappedWrappers.add(new MappedWrapperModel(null, parameter.id, parameter.name, ""));
+    }
+    return ok(runConfigurationEditor.render(RUN_CONFIGURATION_FORM.fill(model), null));
+  }
+
+  public static Result doCreateRunConfiguration() {
+    com.feth.play.module.pa.controllers.Authenticate.noCache(response());
+
+    Form<RunConfigurationEditorModel> form = RUN_CONFIGURATION_FORM.bindFromRequest();
+
+    if (form.hasErrors()) {
+      printFormErrors(form);
+      return badRequest(runConfigurationEditor.render(form, null));
+    }
+
+    RunConfigurationEditorModel model = form.get();
+
+    //check if we have a repetition
+    TestCase testCase = TestCase.findById(model.testCaseId);
+    RunConfiguration existing = RunConfiguration.findByTestCaseAndName(testCase, model.name);
+
+    if (existing != null) {
+      form.reject("A run configuration with the name [" + model.name + "] already exists");
+      return badRequest(runConfigurationEditor.render(form, null));
+    }
+
+    //check the parameters.
+    for (MappedWrapperModel mappedWrapper : model.mappedWrappers) {
+      if (mappedWrapper.value == null || mappedWrapper.value.equals("")) {
+        form.reject("You have to fill all parameters");
+        return badRequest(runConfigurationEditor.render(form, null));
+      }
+    }
+
+    //everything is tip-top. So save
+    RunConfiguration rc = new RunConfiguration();
+    rc.name = model.name;
+    rc.testCase = testCase;
+    rc.obsolete = false;
+    rc.tdl = testCase.tdl;
+
+    try {
+      Ebean.beginTransaction();
+      List<MappedWrapper> mappedWrappers = new ArrayList<>();
+      for (MappedWrapperModel mappedWrapper : model.mappedWrappers) {
+        MappedWrapper mw = new MappedWrapper();
+        mw.parameter = WrapperParam.findByTestCaseAndName(testCase, mappedWrapper.name);
+        mw.runConfiguration = rc;
+        mw.wrapper = Wrapper.findByName(mappedWrapper.value);
+        mw.save();
+      }
+
+      rc.mappedWrappers = mappedWrappers;
+      rc.save();
+      Ebean.commitTransaction();
+    } catch (Exception ex) {
+      ex.printStackTrace();
+      Ebean.endTransaction();
+
+      form.reject(ex.getMessage());
+      return badRequest(runConfigurationEditor.render(form, null));
+    }
+
+    return ok(runConfigurationLister.render(testCase, null));
+  }
+
   public static Result doDeleteRunConfiguration(Long id) {
     com.feth.play.module.pa.controllers.Authenticate.noCache(response());
 
@@ -466,7 +570,7 @@ public class InventoryController extends Controller {
     rome.mappedWrappers = new ArrayList<>();
 
     for (MappedWrapper mappedWrapper : rc.mappedWrappers) {
-      rome.mappedWrappers.add(new MappedWrapperModel(mappedWrapper.id, mappedWrapper.parameter.name, mappedWrapper.wrapper.name));
+      rome.mappedWrappers.add(new MappedWrapperModel(mappedWrapper.id, mappedWrapper.parameter.id, mappedWrapper.parameter.name, mappedWrapper.wrapper.name));
     }
 
     Form<?> fill = RUN_CONFIGURATION_FORM.fill(rome);
@@ -485,7 +589,7 @@ public class InventoryController extends Controller {
     RunConfigurationEditorModel model = frm.get();
 
     RunConfiguration rc = RunConfiguration.findById(model.id);
-    if (rc == null){
+    if (rc == null) {
       return badRequest("The run configuration " + rc.id + " is not found.");
     }
     return ok(runConfigurationEditor.render(frm, null));
@@ -505,11 +609,63 @@ public class InventoryController extends Controller {
     return ok("TESTFINISH");
   }
 
+  private static final HashMap<Long, List<String>> optionCache = new HashMap<>();
+
   public static List<String> listOptions(MappedWrapperModel mappedWrapperModel) {
+
+    //the below query is not beautiful. so we are caching data to be faster.
+    if (optionCache.containsKey(mappedWrapperModel.wrapperParamId)) {
+      System.out.println("Get from cache");
+      return optionCache.get(mappedWrapperModel.wrapperParamId);
+    }
+
+    System.out.println("Read from db for " + mappedWrapperModel.name);
+
     //get MappedParam
-    MappedWrapper byId = MappedWrapper.findById(mappedWrapperModel.id);
-    TestCase testCase = byId.runConfiguration.testCase;
-    //List<SignalSlot> TdlCompiler.getSignatures(testCase.tdl, mappedWrapperModel.name);
-    return Arrays.asList("testWrapper0", "testWrapper1", "testWrapper2", "testWrapper3", "testWrapper4");
+    //get the wrapperparam
+    WrapperParam wp = WrapperParam.findById(mappedWrapperModel.wrapperParamId);
+    //get signatures supported by this wp.
+    List<ParamSignature> psList = ParamSignature.getByWrapperParam(wp);
+
+    //create the return list.
+    List<String> listOptions = new ArrayList<>();
+
+    //we have to list the wrappers that cover all these signatures (might be more but we don't care)
+    //not an optiomal solution for a huuuuge database. But there won't be more than 100 wrappers :-)
+    List<Wrapper> all = Wrapper.getAll();
+    System.out.println("ALL SIZE "+ all.size());
+    out:
+    for (Wrapper wrapper : all) {
+      System.out.println("Wrapper " + wrapper.name);
+      //check if all the signatures are covered by the signals or slots of this wrapper.
+      for (ParamSignature ps : psList) {
+        System.out.print("\t" + ps.signature);
+        boolean included = false;
+        for (TSignal signal : wrapper.signals) {
+          if (ps.signature.equals(signal.signature))
+            included = true;
+          break;
+        }
+
+        if (!included) {
+          for (TSlot slot : wrapper.slots) {
+            if (ps.signature.equals(slot.signature))
+              included = true;
+            break;
+          }
+        }
+
+        if (included) System.out.println(" included");
+        else System.out.println("NOT included");
+        if (!included)
+          continue out;
+      }
+      //if we are here, then this wrapper contains all.
+      //so add it to the list.
+      listOptions.add(wrapper.name);
+    }
+
+    optionCache.put(mappedWrapperModel.wrapperParamId, listOptions);
+    return listOptions;
   }
 }
