@@ -97,6 +97,7 @@ create table TestGroup (
   owner_id                  bigint,
   short_description         varchar(50) not null,
   description               varchar(255),
+  dummyy                    integer,
   constraint uq_TestGroup_name unique (name),
   constraint pk_TestGroup primary key (id))
 ;
@@ -117,7 +118,7 @@ create table TokenAction (
   type                      varchar(2),
   created                   timestamp,
   expires                   timestamp,
-  constraint ck_TokenAction_type check (type in ('EV','PR')),
+  constraint ck_TokenAction_type check (type in ('PR','EV')),
   constraint uq_TokenAction_token unique (token),
   constraint pk_TokenAction primary key (id))
 ;
