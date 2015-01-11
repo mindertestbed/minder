@@ -1,5 +1,7 @@
 package models;
 
+import com.avaje.ebean.Ebean;
+import com.avaje.ebean.SqlUpdate;
 import play.db.ebean.Model;
 
 import javax.persistence.Entity;
@@ -25,4 +27,17 @@ public class TSlot extends Model {
 
   public static final Finder<Long, TSlot> find = new Finder<>(
       Long.class, TSlot.class);
+
+  public static void deleteByWrapper(Wrapper wrapper) {
+    SqlUpdate tangoDown = Ebean.createSqlUpdate("DELETE FROM TSlot WHERE wrapper_id = " + wrapper.id);
+    tangoDown.execute();
+  }
+
+  public static TSlot createNew(Wrapper wrapper, String methodKey) {
+    TSlot ts = new TSlot();
+    ts.wrapper = wrapper;
+    ts.signature = methodKey;
+    ts.save();
+    return ts;
+  }
 }

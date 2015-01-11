@@ -1,6 +1,15 @@
 @(testCase: TestCase, localUser: models.User = null)
 
-<div>
+<script>
+  $(".differ2").each(function(index){
+    $(this).addClass('vary2' + (index % 2));
+  });
+</script>
+
+<div id="runDialog" style="display:none;">
+</div>
+
+<div id="rcRoot@testCase.id">
   <table style="width: 100%;">
     <tr style="border-bottom: 1px solid gray;height:1px;">
       <td align="center" style="width:80%;"><h5>Run Configurations</h5></td>
@@ -11,12 +20,17 @@
           @for(configuration <- RunConfiguration.findByTestCase(testCase)){
           <tr class="differ2" style="height:25px;">
             <td style="width:3%;" align="center" valign="middle">
-              <div onclick="displayRunConfiguration(@configuration.id, '@configuration.name')">
+              <div onclick="displayRunConfiguration(@testCase.id, @configuration.id, '@configuration.name')">
                 <img src="@routes.Assets.at("/images/running-64.png")" height="16px"/>
               </div>
             </td>
-            <td onclick="displayRunConfiguration(@configuration.id, '@configuration.name')">@configuration.name</td>
-            <td onclick="deleteRunConfiguration(@configuration.id, '@configuration.name')" style="width:3%;"
+            <td onclick="displayRunConfiguration(@testCase.id, @configuration.id, '@configuration.name')">@configuration.name</td>
+            <td style="width:3%;" align="center" valign="middle"
+                onclick="editRunConfiguration(@testCase.id, @configuration.id, '@configuration.name')">
+              <img src="@routes.Assets.at("/images/edit_property-64.png")" height="16px"/>
+            </td>
+            <td style="width:5px">&nbsp</td>
+            <td onclick="deleteRunConfiguration(@testCase.id, @configuration.id, '@configuration.name')" style="width:3%;"
                 align="center" valign="middle">
               <img src="@routes.Assets.at("/images/trash2-64.png")" height="16px"/>
             </td>

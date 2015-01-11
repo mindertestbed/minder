@@ -580,33 +580,56 @@ public class InventoryController extends Controller {
 
 
   public static Result doEditRunConfiguration() {
-    Form<RunConfigurationEditorModel> frm = RUN_CONFIGURATION_FORM.bindFromRequest();
+    Form<RunConfigurationEditorModel> form = RUN_CONFIGURATION_FORM.bindFromRequest();
 
-    if (frm.hasErrors()) {
-      return badRequest(runConfigurationEditor.render(frm, null));
+    if (form.hasErrors()) {
+      return badRequest(runConfigurationEditor.render(form, null));
     }
 
-    RunConfigurationEditorModel model = frm.get();
+    RunConfigurationEditorModel model = form.get();
 
     RunConfiguration rc = RunConfiguration.findById(model.id);
     if (rc == null) {
       return badRequest("The run configuration " + rc.id + " is not found.");
     }
-    return ok(runConfigurationEditor.render(frm, null));
+    rc.name = model.name;
+    rc.obsolete = false;
+    rc.tdl = rc.testCase.tdl;
+
+    try {
+      Ebean.beginTransaction();
+      List<MappedWrapper> mappedWrappers = new ArrayList<>();
+      for (MappedWrapperModel mappedWrapper : model.mappedWrappers) {
+        MappedWrapper mw = new MappedWrapper();
+        mw.parameter = WrapperParam.findByTestCaseAndName(rc.testCase, mappedWrapper.name);
+        mw.runConfiguration = rc;
+        mw.wrapper = Wrapper.findByName(mappedWrapper.value);
+        mw.save();
+      }
+
+      rc.mappedWrappers = mappedWrappers;
+      rc.save();
+      Ebean.commitTransaction();
+    } catch (Exception ex) {
+      ex.printStackTrace();
+      Ebean.endTransaction();
+
+      form.reject(ex.getMessage());
+      return badRequest(runConfigurationEditor.render(form, null));
+    }
+
+    return ok(runConfigurationLister.render(rc.testCase, null));
   }
 
-  public static Result doRunRunconfiguration(Long id) {
-    /*if(id not startet){
-      run(id)
-      return ok(runningRIvetLister.render(id))
+
+  public static Result displayRunConfiguration(Long id){
+    RunConfiguration rc = RunConfiguration.findById(id);
+
+    if (rc == null){
+      return badRequest("A run configuration with id [" + id + "] was not found");
     }
 
-    if(id not finished){
-      return ok(runningRIvetLister.render(id))
-    }
-
-   */
-    return ok("TESTFINISH");
+    return ok(runConfigurationDetailView.render(rc));
   }
 
   private static final HashMap<Long, List<String>> optionCache = new HashMap<>();

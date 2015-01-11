@@ -1,5 +1,23 @@
 #Users
 users:
+  - &system !!models.User
+    active: true
+    email: root@minder
+    emailValidated: true
+    firstName: minder
+    lastLogin: 2014-12-29T07:08:49.850Z
+    lastName: null
+    linkedAccounts:
+    - providerKey: password
+      providerUserId: $2a$10$QoJy1UgFXMjLMJlQ6hAnhe1Y07yoBH0Eucna1OSag2qKWhS79HQg6
+      user: *system
+    name: Muhammet YILDIZ
+    permissions: []
+    roles:
+    - {id: 1, roleName: observer}
+    - {id: 2, roleName: Test Designer}
+    - {id: 3, roleName: Test Developer}
+    testGroups: []
   - &user !!models.User
     active: true
     email: myildiz83@gmail.com

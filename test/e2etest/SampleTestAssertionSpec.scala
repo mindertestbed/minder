@@ -59,7 +59,7 @@ class SampleTestAssertionSpec extends Specification {
       //run xml-value-initiator
       val properties = new java.util.Properties();
       var props =
-      """GUID=1
+      """WRAPPER_NAME=1
 HOST=localhost
 PORT=25000
 SERVERID=minderServer
@@ -72,7 +72,7 @@ WRAPPER_CLASS=wrapper.XmlValueInitiatorWrapper"""
 
       //run xml-generator
       props =
-      """GUID=2
+      """WRAPPER_NAME=2
 HOST=localhost
 PORT=25000
 SERVERID=minderServer

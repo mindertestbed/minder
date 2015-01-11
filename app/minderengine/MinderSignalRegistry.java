@@ -17,24 +17,24 @@ public class MinderSignalRegistry {
 
   /**
    * A signal was emitted on the wrapper side. We should put it into the queue until it gets taken by a rivet.
-   * @param wrapperId
+   * @param label
    * @param signature
    * @param signalData
    */
-  public void enqueueSignal(String wrapperId, String signature, SignalData signalData) {
-    PriorityBlockingQueue<SignalData> queue = initMap(wrapperId, signature);
+  public void enqueueSignal(String label, String signature, SignalData signalData) {
+    PriorityBlockingQueue<SignalData> queue = initMap(label, signature);
     queue.offer(signalData);
   }
 
   /**
    * If the signal is not yet emitted, we still have to settle down
    * and wait on a queue. That is why, we have to call init-map method here too
-   * @param wrapperId
+   * @param label
    * @param signature
    * @return
    */
-  public SignalData dequeueSignal(String wrapperId, String signature){
-    PriorityBlockingQueue<SignalData> queue = initMap(wrapperId, signature);
+  public SignalData dequeueSignal(String label, String signature){
+    PriorityBlockingQueue<SignalData> queue = initMap(label, signature);
 
     try {
       return queue.take();
@@ -43,13 +43,13 @@ public class MinderSignalRegistry {
     }
   }
 
-  private PriorityBlockingQueue<SignalData> initMap(String wrapperId, String signature) {
+  private PriorityBlockingQueue<SignalData> initMap(String label, String signature) {
     HashMap<String, PriorityBlockingQueue<SignalData>> signalMap = null;
-    if (!wrapperMap.containsKey(wrapperId)){
+    if (!wrapperMap.containsKey(label)){
       signalMap = new HashMap<String, PriorityBlockingQueue<SignalData>>();
-      wrapperMap.put(wrapperId, signalMap);
+      wrapperMap.put(label, signalMap);
     } else{
-      signalMap = wrapperMap.get(wrapperId);
+      signalMap = wrapperMap.get(label);
     }
 
     PriorityBlockingQueue<SignalData> queue = null;

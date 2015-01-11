@@ -3,6 +3,7 @@ package controllers
 import minderengine.{MinderWrapperRegistry, TestEngine, MinderSignalRegistry, SessionMap}
 import mtdl.SignalSlotInfoProvider
 import play.api.mvc._
+import play.mvc.Http
 import views.html
 
 object Tester extends Controller {
@@ -25,5 +26,15 @@ object Tester extends Controller {
     }
     Ok("It works!")
   }
+
+  def doRunRunconfiguration(id: Long) = Action { implicit request =>
+    //val tdl = request.body.asText.mkString
+
+    val user = Application.getLocalUser(request.session.asInstanceOf[Http.Session])
+    val mail = user.email;
+
+    Ok(mail)
+  }
+
 }
 

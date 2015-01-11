@@ -1,0 +1,21 @@
+@(rc: RunConfiguration)
+
+<div id="details" class="fullw">
+  <h3>Details</h3>
+  <b>Name:</b> @rc.name
+  <table>
+    <tr>
+      @for(mw <- rc.mappedWrappers){
+         <td><b>@mw.parameter.name:</b></td>
+         <td>@mw.wrapper.name:</td>
+      }
+    </tr>
+  </table>
+</div>
+<hr />
+<div id="runStatus">
+  <h3>Rivets</h3>
+  <table>
+
+  </table>
+</div>

@@ -1,8 +1,12 @@
 package minderengine;
 
+import models.*;
+import models.Wrapper;
 import org.interop.xoola.tcpcom.connmanager.server.ClientAccessController;
+import play.Logger;
 
 import java.util.HashSet;
+import java.util.List;
 
 /**
  * This class implements Xoola ClientAccessController and is fed to xoola through application.config file
@@ -12,34 +16,28 @@ import java.util.HashSet;
  * Created by yerlibilgin on 04/12/14.
  */
 public class MinderWrapperAccessController implements ClientAccessController{
-  public static void main(String[] args) {
-    System.out.println(java.util.UUID.randomUUID().toString());
-    System.out.println(java.util.UUID.randomUUID().toString());
-    System.out.println(java.util.UUID.randomUUID().toString());
-    System.out.println(java.util.UUID.randomUUID().toString());
-    System.out.println(java.util.UUID.randomUUID().toString());
-    System.out.println(java.util.UUID.randomUUID().toString());
-    System.out.println(java.util.UUID.randomUUID().toString());
-    System.out.println(java.util.UUID.randomUUID().toString());
-    System.out.println(java.util.UUID.randomUUID().toString());
-    System.out.println(java.util.UUID.randomUUID().toString());
-    System.out.println(java.util.UUID.randomUUID().toString());
-    System.out.println(java.util.UUID.randomUUID().toString());
-  }
-  //dummy solution for now
-  private HashSet<String> allowedGuids = new HashSet<>();
+  private HashSet<String> allowedClients;
 
   public MinderWrapperAccessController(){
-    System.err.println("Create the ACCESS Controller");
+
   }
 
   @Override
-  public boolean clientIsAllowed(String s) {
-    if (s.equals("1d87d345-1ad3-42cc-903a-4a0d400b27cb")){
-      System.out.println("ALLOW " + s);
+  public boolean clientIsAllowed(String label) {
+    if (allowedClients == null){
+      List<Wrapper> all = Wrapper.getAll();
+      allowedClients = new HashSet<>();
+      for (Wrapper wrapper : all) {
+        allowedClients.add(wrapper.name);
+      }
+    }
+
+    Logger.info("A client with name [" + label + "] is trying to connect...");
+    if (allowedClients.contains(label)){
+      Logger.info("ALLOW [" + label + "]");
       return true;
     }
-    System.out.println("ALLOW " + s);
-    return true;
+    Logger.info("DENY [" + label + "]");
+    return false;
   }
 }

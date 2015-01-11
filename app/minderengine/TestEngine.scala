@@ -1,12 +1,26 @@
 package minderengine
 
 import mtdl.{Rivet, MinderTdl, TdlCompiler}
+import play.api.Logger
 import scala.collection.JavaConversions._
 
 /**
  * Created by yerlibilgin on 07/12/14.
  */
 class TestEngine {
+
+
+  private def createMinderInstance(minderClass: Class[MinderTdl], seq: Seq[(String, String)]): MinderTdl = {
+
+    val map = {
+      val map2 = collection.mutable.Map[String, String]()
+      for (e@(k, v) <- seq) {
+        map2 += e
+      }
+      map2.toMap
+    }
+    minderClass.getConstructors()(0).newInstance(map).asInstanceOf[MinderTdl]
+  }
 
   /**
    * Runs the given test case
@@ -15,48 +29,42 @@ class TestEngine {
    * @param userEmail the owner email if of the TS that is running the test
    * @param tdl The test definition
    */
-  def runTest(userEmail: String, tdl: String): Unit = {
-
+  def runTest(userEmail: String, tdl: String, wrapperMapping: (String, String)*): Unit = {
     val clsMinderTDL = TdlCompiler.compileTdl(userEmail, tdl)
 
-    val minderTDL = clsMinderTDL.newInstance()
+    val minderTDL = createMinderInstance(clsMinderTDL, wrapperMapping);
+    //first, call the start methods for all registered wrappers of this test.
 
-    //first start all tests
-    for (rivet <- minderTDL.SlotDefs) {
-      val minderClient = if (BuiltInWrapperRegistry.get().contains(rivet.slot.wrapperId)) {
-        BuiltInWrapperRegistry.get().getWrapper(rivet.slot.wrapperId)
+    for (wrapperName <- minderTDL.wrapperDefs) {
+      val minderClient = if (BuiltInWrapperRegistry.get().contains(wrapperName)) {
+        BuiltInWrapperRegistry.get().getWrapper(wrapperName)
       } else {
-        val label = MinderWrapperRegistry.get().getUidForLabel(rivet.slot.wrapperId)
-        XoolaServer.get().getClient(label)
+        XoolaServer.get().getClient(wrapperName)
       }
-
       minderClient.startTest(userEmail)
     }
 
     try {
       var i = 1;
       for (rivet <- minderTDL.SlotDefs) {
-        println("---- " + "RUN RIVET " + i)
+        Logger.debug("---- " + "RUN RIVET " + i)
         i = i + 1
 
         //resolve the minder client id. This might as well be resolved to a local built-in wrapper.
         val minderClient = if (BuiltInWrapperRegistry.get().containsWrapper(rivet.slot.wrapperId)) {
           BuiltInWrapperRegistry.get().getWrapper(rivet.slot.wrapperId)
         } else {
-          val label = MinderWrapperRegistry.get().getUidForLabel(rivet.slot.wrapperId)
-          XoolaServer.get().getClient(label)
+          XoolaServer.get().getClient(rivet.slot.wrapperId)
         }
         val args = Array.ofDim[Object](rivet.pipes.length)
 
-        for (tuple <- rivet.signalPipeMap.keySet) {
+        for (tuple@(label, signature) <- rivet.signalPipeMap.keySet) {
           val me: MinderSignalRegistry = SessionMap.getObject(userEmail, "signalRegistry")
           if (me == null) throw new IllegalArgumentException("No MinderSignalRegistry object defined for session " + userEmail)
 
-          println("dequeue " + ((tuple _1) + ":" + (tuple _2)))
-          println("dequeue " + ((MinderWrapperRegistry.get().getUidForLabel(tuple _1)) + ":" + (tuple _2)))
+          println("dequeue " + (label + ":" + signature))
 
-
-          val signalData = me.dequeueSignal(MinderWrapperRegistry.get().getUidForLabel(tuple _1), tuple _2)
+          val signalData = me.dequeueSignal(label, signature)
           for (paramPipe <- rivet.signalPipeMap(tuple)) {
             args(paramPipe.out) = paramPipe.execute(signalData.args(paramPipe.in)).asInstanceOf[AnyRef]
 
@@ -79,17 +87,20 @@ class TestEngine {
           }
         }
       }
-    }finally{
+    } finally {
       //make sure that we call finish test for all
-      for (rivet <- minderTDL.SlotDefs) {
-        val minderClient = if (BuiltInWrapperRegistry.get().contains(rivet.slot.wrapperId)) {
-          BuiltInWrapperRegistry.get().getWrapper(rivet.slot.wrapperId)
+      for (wrapperName <- minderTDL.wrapperDefs) {
+        val minderClient = if (BuiltInWrapperRegistry.get().contains(wrapperName)) {
+          BuiltInWrapperRegistry.get().getWrapper(wrapperName)
         } else {
-          val label = MinderWrapperRegistry.get().getUidForLabel(rivet.slot.wrapperId)
-          XoolaServer.get().getClient(label)
+          XoolaServer.get().getClient(wrapperName)
         }
 
-        try{ minderClient.finishTest()} catch{case _: Throwable => {}}
+        try {
+          minderClient.finishTest()
+        } catch {
+          case _: Throwable => {}
+        }
       }
     }
   }
