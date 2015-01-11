@@ -31,22 +31,33 @@
                 <table class="fullw">
                   <tr>
                     <td style="width:3%;" valign="middle">
-                      <div class="deleteCase">
+                      <div class="LabCase">
                         <img src="@routes.Assets.at("/images/test_tube-64.png")" height="16px"/>
                       </div>
                     </td>
-                    <td style="text-align:left;;vertical-align:middle" class="trigger">@testCase.name</td>
-                    <td class="trigger" style="text-align:left;vertical-align:middle">@testCase.shortDescription</td>
+                    <td style="text-align:left;" class="trigger">@testCase.name</td>
+                    <td class="trigger" style="text-align:left;">@testCase.shortDescription</td>
                     <td class="trigger">&nbsp;</td>
-                    <td style="width:3%;" style='vertical-align:middle;text-align:center'>
-                        <img src="@routes.Assets.at("/images/edit_property-64.png")" height="16px" alt='@assertion.id'/>
-                        <input type="hidden" value="/editTestCase?id=@testCase.id" class="uid"/>
+                    <td style="width:3%;" align="center" valign="middle">
+			          <div id="editTestCase@testCase.id" class="celldiv bevel2" style="height:26px;width:26px;">
+			              <img src="@routes.Assets.at("/images/edit_property-64.png")" height="16px" alt='@assertion.id'/>
+			          </div>
+			          <script>
+			              createFormDialog($("#editTestCase@testCase.id"),
+			              "/editCaseForm?id=@testCase.id" ,
+			              "/doEditCase", "mainDialog", "Edit Test Case", $("#testCaseListerDiv@assertion.id").parent(),'1200', '720')
+			          </script> 
                     </td>
                     <td style="width:5px;" class="trigger">&nbsp;</td>
-                    <td style="width:3%;;vertical-align:middle;text-align:center;" align="center" valign="middle">
-                        <img src="@routes.Assets.at("/images/trash2-64.png")" height="16px" alt='@assertion.id'/>
-                      <input type="hidden" value="@testCase.name" class="uid"/>
-                      <input type="hidden" value="/deleteTestCase?id=@testCase.id" class="uid"/>
+                    <td style="width:3%;" align="center" valign="middle">
+   			          <div id="deleteTestCase@testCase.id" class="celldiv bevel2" style="height:26px;width:26px;">
+			              <img src="@routes.Assets.at("/images/trash2-64.png")" height="16px" alt='@assertion.id'/>
+			          </div>
+			          <script>
+			            var elm = $("#deleteTestCase@testCase.id");
+			            deleteWithDialog(elm, "/doDeleteCase?id=@testCase.id", $("#dialog-confirm"),
+			            "Delete Test Case", "test case", "@testCase.name", $("#testCaseListerDiv@assertion.id").parent())
+			          </script>
                     </td>
                     <td style="width:25px;" class="trigger">&nbsp;</td>
                   </tr>
