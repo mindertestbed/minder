@@ -1,13 +1,19 @@
 package minderengine
 
-import mtdl.{Rivet, MinderTdl, TdlCompiler}
+import java.util
+
+import controllers.Application
+import models.TestCase
+import mtdl._
+import play.Play
 import play.api.Logger
+import play.mvc.Http
 import scala.collection.JavaConversions._
 
 /**
  * Created by yerlibilgin on 07/12/14.
  */
-class TestEngine {
+object TestEngine {
 
 
   private def createMinderInstance(minderClass: Class[MinderTdl], seq: Seq[(String, String)]): MinderTdl = {
@@ -19,7 +25,7 @@ class TestEngine {
       }
       map2.toMap
     }
-    minderClass.getConstructors()(0).newInstance(map).asInstanceOf[MinderTdl]
+    minderClass.getConstructors()(0).newInstance(map, java.lang.Boolean.TRUE).asInstanceOf[MinderTdl]
   }
 
   /**
@@ -66,9 +72,10 @@ class TestEngine {
 
           val signalData = me.dequeueSignal(label, signature)
           for (paramPipe <- rivet.signalPipeMap(tuple)) {
-            args(paramPipe.out) = paramPipe.execute(signalData.args(paramPipe.in)).asInstanceOf[AnyRef]
-
-            convertParam(paramPipe.out, paramPipe.execute(signalData.args(paramPipe.in)))
+            //FIX for BUG-1 : added an if for -1 param
+            if (paramPipe.in != -1){
+              convertParam(paramPipe.out, paramPipe.execute(signalData.args(paramPipe.in)))
+            }
           }
         }
 
@@ -77,7 +84,6 @@ class TestEngine {
         }
 
         rivet.result = minderClient.callSlot(userEmail, rivet.slot.signature, args)
-
 
         def convertParam(out: Int, arg: Any) {
           if (arg.isInstanceOf[Rivet]) {
@@ -103,5 +109,50 @@ class TestEngine {
         }
       }
     }
+  }
+
+  /**
+   * Evaluates the whole test case without running it and creates a list of wrappers and their signals-slots.
+   *
+   * @param testCase
+   * @param email the email of the user used for package declaration
+   * @return
+   */
+  def describeTdl(testCase: TestCase, email: String): util.LinkedHashMap[String, util.Set[SignalSlot]] = {
+    Logger.debug("Describing: " + testCase.name + " for user " + email)
+    val minderClass = TdlCompiler.compileTdl(email, tdlStr = testCase.tdl)
+    val minderTdl = minderClass.getConstructors()(0).newInstance(null, java.lang.Boolean.FALSE).asInstanceOf[MinderTdl]
+
+    val slotDefs = minderTdl.SlotDefs
+
+    val hm: util.LinkedHashMap[String, util.Set[SignalSlot]] = new util.LinkedHashMap()
+    val map: collection.mutable.LinkedHashMap[String, util.Set[SignalSlot]] = collection.mutable.LinkedHashMap()
+
+    for (r <- slotDefs) {
+      //check the slot
+      val wrapperName = r.slot.wrapperId
+      val slotSignature = r.slot.signature
+
+      var set = map.getOrElseUpdate(wrapperName, new util.HashSet[SignalSlot]())
+      set.add(new SlotImpl(wrapperId = wrapperName, signature = slotSignature))
+      println(wrapperName + "::" + slotSignature)
+
+      for (e@(k@(wn, ws), v) <- r.signalPipeMap) {
+        println(wn + "::" + ws)
+        set = map.getOrElseUpdate(wn, new util.HashSet[SignalSlot]())
+        set.add(new SignalImpl(wn, ws))
+      }
+    }
+
+    for ((k, v) <- map) {
+      println("---------")
+      println(k)
+      for (ss <- v) {
+        println("\t" + ss.signature)
+      }
+      hm.put(k, v)
+    }
+
+    hm
   }
 }

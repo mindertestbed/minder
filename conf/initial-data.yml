@@ -71,6 +71,12 @@ groups:
         predicate: as4 message is terribly valid
         prescriptionLevel: Mandatory
         testCases:
+        - &as4case1 !!models.TestCase
+            shortDescription: A test case to check the eb code party id
+            tdl: sampletdl/as41.tdl
+            testAssertion: *taas41
+            name: AS41
+            parameters: []
         - &as4case2 !!models.TestCase
             description: null
             shortDescription: A test case to check the hede hodo
@@ -78,12 +84,7 @@ groups:
             testAssertion: *taas41
             name: AS42
             parameters: []
-        - &as4case1 !!models.TestCase
-            shortDescription: A test case to check the eb code party id
-            tdl: sampletdl/as41.tdl
-            testAssertion: *taas41
-            name: AS411
-            parameters: []
+
 - &smp !!models.TestGroup
     description: null
     name: SMP Tests
@@ -128,23 +129,28 @@ groups:
             name: BDXL1
 #wrappers
 wrappers:
-- &xmlgenerator !!models.Wrapper
-  name: XMLGeneratorWrapper
+- &xmlGenerator !!models.Wrapper
+  name: xmlGenerator
   user: *user
   signals:
   - &xmlProduced !!models.TSignal
-      wrapper: *xmlgenerator
+      wrapper: *xmlGenerator
       signature: xmlProduced(byte[] generatedXML)
   - &xmlProduced2 !!models.TSignal
-      wrapper: *xmlgenerator
+      wrapper: *xmlGenerator
       signature: xmlProduced2(byte[] generatedXML)
   slots:
   - &generateXML !!models.TSlot
-      wrapper: *xmlgenerator
+      wrapper: *xmlGenerator
       signature: generateXML(byte[] inputBooks)
   - &generateXML2 !!models.TSlot
-      wrapper: *xmlgenerator
+      wrapper: *xmlGenerator
       signature: generateXML2(byte[] inputBooks)
+- &xmlValueInitiator  !!models.Wrapper
+  name: xmlValueInitiator
+  user: *user
+  signals: []
+  slots: []
 - &testWrapper0 !!models.Wrapper
   name: testWrapper0
   user: *user
@@ -212,4 +218,4 @@ runConfigurations:
 #    testCase: *as4case1
 #    runner: *user
 #    wrappers:
-#    - *xmlgenerator
+#    - *xmlGenerator

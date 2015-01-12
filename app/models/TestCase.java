@@ -2,6 +2,9 @@ package models;
 
 import com.avaje.ebean.Ebean;
 import com.avaje.ebean.bean.EntityBean;
+import minderengine.TestEngine;
+import mtdl.SignalSlot;
+import play.Logger;
 import play.db.ebean.Model;
 
 import javax.persistence.*;
@@ -58,36 +61,31 @@ public class TestCase extends Model {
   private void detectParameters() {
     deleteCurrentWrapperParamsOnDatabase();
 
-    Pattern pattern = Pattern.compile("\"[a-zA-Z0-9_\\.\\[\\]\\(\\),\\s]+\"\\s+of\\s+\"\\$[a-zA-Z0-9\\-_]+\"");
-    Matcher matcher = pattern.matcher(tdl);
-    System.out.println("detectParameters:tdl\n"+tdl);
-    LinkedHashMap<String, WrapperParam> parms = new LinkedHashMap<>();
-    while (matcher.find()) {
-      String match = tdl.substring(matcher.start(), matcher.end());
-      String[] split = match.split("\"");
+    LinkedHashMap<String, Set<SignalSlot>> map = TestEngine.describeTdl(this, this.testAssertion.testGroup.owner.email);
 
-      String signature = split[1];
-      String wrapperVariable = split[3];
-      System.out.println("signature:"+signature);
-      System.out.println("wrapperVariable:"+wrapperVariable);
+    List<WrapperParam> wpList = new ArrayList<>();
+    for (Map.Entry<String, Set<SignalSlot>> entry : map.entrySet()) {
+      Logger.debug("Wrapper Name: " + entry.getKey() + ": " + entry.getKey().startsWith("$") + "");
 
+
+      //make sure that we are looping on variables.
+      if (!entry.getKey().startsWith("$"))
+        continue;
+
+
+      Logger.debug("\t" + entry.getKey() + " is a variable");
       WrapperParam wrapperParam;
-      if (parms.containsKey(wrapperVariable))
-        wrapperParam = parms.get(wrapperVariable);
-      else {
-        wrapperParam = new WrapperParam();
-        wrapperParam.name = wrapperVariable;
-        wrapperParam.signatures = new ArrayList<>();
-        wrapperParam.testCase = this;
-        parms.put(wrapperVariable, wrapperParam);
-      }
+      wrapperParam = new WrapperParam();
+      wrapperParam.name = entry.getKey();
+      wrapperParam.signatures = new ArrayList<>();
+      wrapperParam.testCase = this;
+      wpList.add(wrapperParam);
 
 
-      ParamSignature ps = new ParamSignature();
-      ps.signature = signature;
-      ps.wrapperParam = wrapperParam;
-
-      if (!wrapperParam.signatures.contains(ps)) {
+      for (SignalSlot signalSlot : entry.getValue()) {
+        ParamSignature ps = new ParamSignature();
+        ps.signature = signalSlot.signature().replaceAll("\\s", "");
+        ps.wrapperParam = wrapperParam;
         wrapperParam.signatures.add(ps);
       }
 
@@ -97,12 +95,7 @@ public class TestCase extends Model {
     try {
       Ebean.beginTransaction();
 
-      Object[] set = parms.keySet().toArray();
-
-      System.out.println("SET LENGTH: " + set.length);
-      for(int i = 0; i < set.length; ++i){
-        System.out.println("TO SAVE FOR " + i);
-        WrapperParam str = parms.get(set[i].toString());
+      for (WrapperParam str : wpList) {
         str.save();
         System.out.println("TO SAVE FOR " + str.name);
         for (ParamSignature signature : str.signatures) {
@@ -142,7 +135,7 @@ public class TestCase extends Model {
     super.save();
     detectParameters();
   }
-  
+
   @Override
   public void update() {
     super.update();

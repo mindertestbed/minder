@@ -62,6 +62,7 @@ public class MinderWrapperRegistry implements ISignalSlotInfoProvider {
 
     //update the database for possible changes in the signatures
     Wrapper wrapper = Wrapper.findByName(label);
+    Logger.info(wrapper.name);
     try {
       Ebean.beginTransaction();
       TSignal.deleteByWrapper(wrapper);

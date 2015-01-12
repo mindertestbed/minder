@@ -15,16 +15,16 @@ import java.util.List;
  * able to connect to our server.
  * Created by yerlibilgin on 04/12/14.
  */
-public class MinderWrapperAccessController implements ClientAccessController{
+public class MinderWrapperAccessController implements ClientAccessController {
   private HashSet<String> allowedClients;
 
-  public MinderWrapperAccessController(){
+  public MinderWrapperAccessController() {
 
   }
 
   @Override
   public boolean clientIsAllowed(String label) {
-    if (allowedClients == null){
+    if (allowedClients == null) {
       List<Wrapper> all = Wrapper.getAll();
       allowedClients = new HashSet<>();
       for (Wrapper wrapper : all) {
@@ -32,8 +32,13 @@ public class MinderWrapperAccessController implements ClientAccessController{
       }
     }
 
+    if (label.equals("xmlGenerator") || label.equals("xmlValueInitiator")) {
+      Logger.info("ALLOW " + label);
+      return true;
+    }
+
     Logger.info("A client with name [" + label + "] is trying to connect...");
-    if (allowedClients.contains(label)){
+    if (allowedClients.contains(label)) {
       Logger.info("ALLOW [" + label + "]");
       return true;
     }

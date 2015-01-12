@@ -686,10 +686,10 @@ public class InventoryController extends Controller {
   }
 
 
-  public static Result displayRunConfiguration(Long id){
+  public static Result displayRunConfiguration(Long id) {
     RunConfiguration rc = RunConfiguration.findById(id);
 
-    if (rc == null){
+    if (rc == null) {
       return badRequest("A run configuration with id [" + id + "] was not found");
     }
 
@@ -720,6 +720,7 @@ public class InventoryController extends Controller {
     //we have to list the wrappers that cover all these signatures (might be more but we don't care)
     //not an optiomal solution for a huuuuge database. But there won't be more than 100 wrappers :-)
     List<Wrapper> all = Wrapper.getAll();
+
     System.out.println("ALL SIZE " + all.size());
     out:
     for (Wrapper wrapper : all) {
@@ -729,16 +730,18 @@ public class InventoryController extends Controller {
         System.out.print("\t" + ps.signature);
         boolean included = false;
         for (TSignal signal : wrapper.signals) {
-          if (ps.signature.equals(signal.signature))
+          if (ps.signature.equals(signal.signature.replaceAll("\\s", ""))) {
             included = true;
-          break;
+            break;
+          }
         }
 
         if (!included) {
           for (TSlot slot : wrapper.slots) {
-            if (ps.signature.equals(slot.signature))
+            if (ps.signature.equals(slot.signature.replaceAll("\\s", ""))) {
               included = true;
-            break;
+              break;
+            }
           }
         }
 

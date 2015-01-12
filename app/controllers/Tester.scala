@@ -12,11 +12,10 @@ object Tester extends Controller {
     val mail = request.session.get("userEmail").mkString
 
     SessionMap.registerObject(mail, "signalRegistry", new MinderSignalRegistry());
-    val te = new TestEngine();
     try {
       SignalSlotInfoProvider.setSignalSlotInfoProvider(MinderWrapperRegistry.get())
 
-      te.runTest(mail, tdl);
+      TestEngine.runTest(mail, tdl);
       play.mvc.Results.ok();
     } catch {
       case t: Throwable => {

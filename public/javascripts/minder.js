@@ -273,18 +273,18 @@ function displayRunConfiguration(testCaseId, id, name){
 
 function showRunDialog(testCaseId, id, data, title){
   var runDialog = $( "#runDialog" );
-  runnerDiv[0].innerHTML = '...'
-  executeScripts(editorForm);
+  runDialog[0].innerHTML = data
+  executeScripts(runDialog);
 
     var dialog = runDialog.dialog({
        autoOpen: false,
-       height: 600,
-       width: 1100,
+       height: 650,
+       width: 1200,
        title: 'Run Configuration' + title,
        modal: true,
        buttons: {
          "Run": function() {
-            ajaxRunRunConfiguration(id)
+            ajaxDisplayRunConfiguration(runDialog, id)
          },
          Cancel: function() {
            dialog.dialog( "close" );
@@ -295,17 +295,33 @@ function showRunDialog(testCaseId, id, data, title){
    dialog.dialog( "open", title );
 }
 
-function ajaxRunRunConfiguration(id){
+function ajaxDisplayRunConfiguration(runDialog, id){
   $.ajax({
      type: 'GET',
-     url: '/doRunRunconfiguration?id' + id ,
+     url: '/displayRunConfiguration?id' + id ,
+     data: editorForm.serialize(),
+     success: function (data) {
+        runDialog[0].innerHTML = data;
+        executeScripts(runDialog);
+      },
+     error: function (jqXHR, textStatus, errorMessage) {
+         showError(jqXHR.responseText);
+     }
+   });
+}
+
+
+function runRun(id){
+  $.ajax({
+     type: 'GET',
+     url: '/displayRunConfiguration?id' + id ,
      data: editorForm.serialize(),
      success: function (data) {
         if(data.indexOf("TESTFINISH") != -1){
           runnerDiv[0].innerHTML = data;
           executeScripts(runnerDiv);
           setTimeout(function(){
-            ajaxRunRunConfiguration(id);
+            runRun(id);
           }, 500);
         }
      },

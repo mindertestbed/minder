@@ -1,21 +1,23 @@
 @(rc: RunConfiguration)
 
-<div id="details" class="fullw">
-  <h3>Details</h3>
-  <b>Name:</b> @rc.name
+<div class="fullw fullh">
   <table>
     <tr>
+      <td><b>Name:</b></td>
+      <td>@rc.name</td>
+      <td>&nbsp;</td>
+
       @for(mw <- rc.mappedWrappers){
-         <td><b>@mw.parameter.name:</b></td>
-         <td>@mw.wrapper.name:</td>
+      <td><b>@mw.parameter.name:</b></td>
+      <td>@mw.wrapper.name</td>
+      <td>&nbsp;</td>
       }
     </tr>
   </table>
-</div>
-<hr />
-<div id="runStatus">
-  <h3>Rivets</h3>
-  <table>
+  <div id="runStatus" class="fullw bevel" style="height:94%;overflow:auto">
+    <b>Rivets</b>
+    <table class="fullh">
 
-  </table>
+    </table>
+  </div>
 </div>
