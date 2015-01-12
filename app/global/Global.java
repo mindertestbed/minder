@@ -30,10 +30,6 @@ import java.util.regex.Pattern;
 public class Global extends GlobalSettings {
 
   public void onStart(Application app) {
-    ReflectionUtils.defaultClassLoader = Play.classloader(Play.current());
-    BuiltInWrapperRegistry.get().initiate();
-    XoolaServer.get().start();
-
     PlayAuthenticate.setResolver(new Resolver() {
       @Override
       public Call login() {
@@ -86,6 +82,10 @@ public class Global extends GlobalSettings {
 
     System.out.println("OnStart");
     initialData();
+
+    ReflectionUtils.defaultClassLoader = Play.classloader(Play.current());
+    BuiltInWrapperRegistry.get().initiate();
+    XoolaServer.get().start();
   }
 
   private void initialData() {

@@ -95,7 +95,7 @@ td{
    /*filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#73bbe9', endColorstr='#17567f',GradientType=0 ); IE6-9 */
    filter: none; /*IE6-9 */
    -moz-box-shadow:
-   0px -1px 5px rgba(255,255,255,0.5), /*top external highlight*/
+   0px 0px 5px rgba(0,0,0,0.5), /*top external highlight*/
    2px 3px 5px rgba(0,0,0,0.2), /*bottom external shadow*/
    inset 0 -1px 1px rgba(0,0,0,0.5), /*bottom internal shadow*/
    inset 0 1px 1px rgba(255,255,255,1); /*top internal highlight*/

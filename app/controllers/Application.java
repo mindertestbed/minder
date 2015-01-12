@@ -3,6 +3,8 @@ package controllers;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
+import minderengine.MinderSignalRegistry;
+import minderengine.SessionMap;
 import minderengine.XoolaServer;
 import models.User;
 
@@ -96,8 +98,15 @@ public class Application extends Controller {
       // User did not fill everything properly
       return badRequest(login.render(filledForm));
     } else {
+      MyLogin lgn = filledForm.get();
       // Everything was filled
-      return UsernamePasswordAuthProvider.handleLogin(ctx());
+      Result result = UsernamePasswordAuthProvider.handleLogin(ctx());
+
+      if (result.toScala().header().status() == OK){
+        //if the user successfully logged in, then we have to create a new signal registry for him.
+        SessionMap.registerObject(lgn.getEmail(), "signalRegistry", new MinderSignalRegistry());
+      }
+      return result;
     }
   }
 

@@ -53,5 +53,5 @@ public class TestGroup extends Model {
     return find.byId(id);
   }
 
-  public int dummy;
+  public int pm;
 }

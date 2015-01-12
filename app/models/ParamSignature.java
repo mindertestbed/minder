@@ -43,5 +43,10 @@ public class ParamSignature extends Model {
 	public static List<ParamSignature> getAll() {
 		return find.all();
 	}
+
+	public static List<ParamSignature> getByWrapperParam(WrapperParam wp) {
+		return find.where().eq("wrapperParam", wp).findList();
+
+	}
 }
 

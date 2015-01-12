@@ -3,10 +3,6 @@
 @main(Messages("playauthenticate.navigation.restricted.testdesigner"), "restrictedTestDesigner") {
 
 <script>
-  $(function() {
-    $( "#tabs" ).tabs();
-  });
-
 </script>
 
 
@@ -17,13 +13,10 @@
 
 
 <div class="fullh">
-  <div id="tabs" class="fullh">
-    <ul>
-      <li><a href="#tabs-1">Test Groups</a></li>
-    </ul>
-    <div id="tabs-1" class="fullh">
-      @testManager(localUser)
-    </div>
+  <b>Test Groups</b>
+
+  <div id="tabs-1" class="fullh">
+    @testManager(localUser)
   </div>
 </div>
 }

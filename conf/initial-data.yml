@@ -1,5 +1,23 @@
 #Users
 users:
+  - &system !!models.User
+    active: true
+    email: root@minder
+    emailValidated: true
+    firstName: minder
+    lastLogin: 2014-12-29T07:08:49.850Z
+    lastName: null
+    linkedAccounts:
+    - providerKey: password
+      providerUserId: $2a$10$QoJy1UgFXMjLMJlQ6hAnhe1Y07yoBH0Eucna1OSag2qKWhS79HQg6
+      user: *system
+    name: Muhammet YILDIZ
+    permissions: []
+    roles:
+    - {id: 1, roleName: observer}
+    - {id: 2, roleName: Test Designer}
+    - {id: 3, roleName: Test Developer}
+    testGroups: []
   - &user !!models.User
     active: true
     email: myildiz83@gmail.com
@@ -36,6 +54,25 @@ users:
     - {id: 2, roleName: Test Designer}
     - {id: 3, roleName: Test Developer}
     testGroups: []
+  - &massi !!models.User
+    active: true
+    email: massimiliano.masi@tiani-spirit.com
+    emailValidated: true
+    firstName: Massimiliano
+    lastLogin: 2014-12-29T07:08:49.850Z
+    lastName: Masi
+    linkedAccounts:
+    - providerKey: password
+      providerUserId: $2a$10$QoJy1UgFXMjLMJlQ6hAnhe1Y07yoBH0Eucna1OSag2qKWhS79HQg6
+      user: *user
+    name: Massimiliano Masi
+    permissions: []
+    roles:
+    - {id: 1, roleName: observer}
+    - {id: 2, roleName: Test Designer}
+    - {id: 3, roleName: Test Developer}
+    testGroups: []
+
 #Groups
 groups:
 - &as4 !!models.TestGroup
@@ -53,6 +90,12 @@ groups:
         predicate: as4 message is terribly valid
         prescriptionLevel: Mandatory
         testCases:
+        - &as4case1 !!models.TestCase
+            shortDescription: A test case to check the eb code party id
+            tdl: sampletdl/as41.tdl
+            testAssertion: *taas41
+            name: AS41
+            parameters: []
         - &as4case2 !!models.TestCase
             description: null
             shortDescription: A test case to check the hede hodo
@@ -60,12 +103,7 @@ groups:
             testAssertion: *taas41
             name: AS42
             parameters: []
-        - &as4case1 !!models.TestCase
-            shortDescription: A test case to check the eb code party id
-            tdl: sampletdl/as41.tdl
-            testAssertion: *taas41
-            name: AS41
-            parameters: []
+
 - &smp !!models.TestGroup
     description: null
     name: SMP Tests
@@ -108,25 +146,45 @@ groups:
             tdl: sampletdl/BDXL1.tdl
             testAssertion: *tabdxl1
             name: BDXL1
+- &nonrepudiation !!models.TestGroup
+    description: null
+    name: Non-Repudiation Tests
+    shortDescription: All test cases related to Non-repudiation SAT
+    owner: *massi
+    testAssertions:
+    - &tanonrep1 !!models.TestAssertion
+        testGroup: *nonrepudiation
+        taId: SAMPLE
+        normativeSource: SAMPLE
+        target: SAMPLE
+        prerequisites: be cool
+        predicate: the evidence is awesome
+        prescriptionLevel: Preferred
+        testCases: []
 #wrappers
 wrappers:
-- &xmlgenerator !!models.Wrapper
-  name: XMLGeneratorWrapper
+- &xmlGenerator !!models.Wrapper
+  name: xmlGenerator
   user: *user
   signals:
   - &xmlProduced !!models.TSignal
-      wrapper: *xmlgenerator
+      wrapper: *xmlGenerator
       signature: xmlProduced(byte[] generatedXML)
   - &xmlProduced2 !!models.TSignal
-      wrapper: *xmlgenerator
+      wrapper: *xmlGenerator
       signature: xmlProduced2(byte[] generatedXML)
   slots:
   - &generateXML !!models.TSlot
-      wrapper: *xmlgenerator
+      wrapper: *xmlGenerator
       signature: generateXML(byte[] inputBooks)
   - &generateXML2 !!models.TSlot
-      wrapper: *xmlgenerator
+      wrapper: *xmlGenerator
       signature: generateXML2(byte[] inputBooks)
+- &xmlValueInitiator  !!models.Wrapper
+  name: xmlValueInitiator
+  user: *user
+  signals: []
+  slots: []
 - &testWrapper0 !!models.Wrapper
   name: testWrapper0
   user: *user
@@ -155,7 +213,7 @@ wrappers:
   signals:
   - !!models.TSignal
     wrapper: *testWrapper2
-    signature: signal1(int, int, java.lang.String)a
+    signature: signal1(int, int, java.lang.String)
   slots:
   - !!models.TSlot
     wrapper: *testWrapper2
@@ -217,4 +275,4 @@ runConfigurations:
 #    testCase: *as4case1
 #    runner: *user
 #    wrappers:
-#    - *xmlgenerator
+#    - *xmlGenerator
