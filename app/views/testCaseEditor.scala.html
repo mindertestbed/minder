@@ -1,4 +1,4 @@
-@(localUser: models.User, frm: Form[_], assertionId: Long)
+@(frm: Form[_], localUser: models.User = null)
 
 @import helper._
 @implicitFieldConstructor = @{ FieldConstructor(twitterBootstrapBasic.f) }
@@ -33,13 +33,11 @@
 <link rel="stylesheet" href="@routes.Assets.at("stylesheets/theme/rubyblue.css")" rel="stylesheet">
 <link rel="stylesheet" href="@routes.Assets.at("stylesheets/theme/solarized.css")" rel="stylesheet">
 <link rel="stylesheet" href="@routes.Assets.at("stylesheets/theme/the-matrix.css")" rel="stylesheet">
-<link rel="stylesheet" href="@routes.Assets.at("stylesheets/theme/tomorrow-night-bright.css")" rel="stylesheet">
 <link rel="stylesheet" href="@routes.Assets.at("stylesheets/theme/tomorrow-night-eighties.css")" rel="stylesheet">
 <link rel="stylesheet" href="@routes.Assets.at("stylesheets/theme/twilight.css")" rel="stylesheet">
 <link rel="stylesheet" href="@routes.Assets.at("stylesheets/theme/vibrant-ink.css")" rel="stylesheet">
 <link rel="stylesheet" href="@routes.Assets.at("stylesheets/theme/xq-dark.css")" rel="stylesheet">
 <link rel="stylesheet" href="@routes.Assets.at("stylesheets/theme/xq-light.css")" rel="stylesheet">
-<link rel="stylesheet" href="@routes.Assets.at("stylesheets/theme/zenburn.css")" rel="stylesheet">
 
 <style>
     #accordion1 {
@@ -63,13 +61,21 @@
       heightStyle: "content"
     });
 
-    var editor = CodeMirror.fromTextArea(document.getElementById("tdl"), {
+	var textArea = document.getElementById("tdl");
+    var editor = CodeMirror.fromTextArea(textArea, {
         lineNumbers: true,
         lineWrapping: true,
         styleActiveLine: true,
         extraKeys: {"Ctrl-Space": "autocomplete"},
         mode: {name: "text/x-scala", globalVars: true},
         theme: "neo"
+    });
+    
+    // store it
+    $("#tdl").data('CodeMirrorInstance', editor);
+    
+    editor.on("change", function(cm, change) {
+		textArea.value = editor.getDoc().getValue();
     });
 
     $( "select" ).change(function() {
@@ -78,13 +84,28 @@
         });
 
     });
-  });
 
+   
+  });
 </script>
 
 <div id="contentPane" style="width:100%;height:94%;margin:0;padding:0;">
 
     <table style="width:100%;height:100%;">
+        <tr>
+        	<td>
+        		@inputText(
+					frm("name"),
+					'_label -> "Test Case Name"
+					)
+        	</td>
+        	<td>
+				@inputText(
+				frm("shortDescription"),
+				'_label -> "Short Description"
+				)
+        	</td>
+        </tr>
         <tr style="height:10%;">
             <td>
                 <h4 class="demoHeaders">Wrappers</h4>
@@ -97,150 +118,46 @@
         <tr style="width:100%;height:90%;">
             <td style="width:30%;height:100%;overflow:auto;border: 1px solid red">
                 <div id="accordion1">
-                    <h3><b>Wrapper1</b></h3>
-
-                    <div style="height:70%">
-                        <div class="myscroll">
-                            <div>Signals</div>
-                            <p>Content here....</p>
-
-                            <div>Slots</div>
-                            <p>Content here....</p>
-                        </div>
-                    </div>
-                    <h3><b>Wrapper2</b></h3>
-
-                    <div style="height:70%">
-                        <div class="myscroll">
-                            <div>Signals</div>
-                            <p>Content here....</p>
-
-                            <div>Slots</div>
-                            <p>Content here....</p>
-                        </div>
-                    </div>
-                    
-                    <h3><b>Wrapper3</b></h3>
-
-                    <div style="height:70%">
-                        <div class="myscroll">
-                            <div>Signals</div>
-                            <p>Content here....</p>
-
-                            <div>Slots</div>
-                            <p>Content here....</p>
-                        </div>
-                    </div>
-                    <h3><b>Wrapper4</b></h3>
-
-                    <div style="height:70%">
-                        <div class="myscroll">
-                            <div>Signals</div>
-                            <p>Content here....</p>
-
-                            <div>Slots</div>
-                            <p>Content here....</p>
-                        </div>
-                    </div>
-                    <h3><b>Wrapper5</b></h3>
-
-                    <div style="height:70%">
-                        <div class="myscroll">
-                            <div>Signals</div>
-                            <p>Content here....</p>
-
-                            <div>Slots</div>
-                            <p>Content here....</p>
-                        </div>
-                    </div>
-                    <h3><b>Wrapper2</b></h3>
-
-                    <div style="height:70%">
-                        <div class="myscroll">
-                            <div>Signals</div>
-                            <p>Content here....</p>
-
-                            <div>Slots</div>
-                            <p>Content here....</p>
-                        </div>
-                    </div>
-                    <h3><b>Wrapper2</b></h3>
-
-                    <div style="height:70%">
-                        <div class="myscroll">
-                            <div>Signals</div>
-                            <p>Content here....</p>
-
-                            <div>Slots</div>
-                            <p>Content here....</p>
-                        </div>
-                    </div>
-                    <h3><b>Wrapper2</b></h3>
-
-                    <div style="height:70%">
-                        <div class="myscroll">
-                            <div>Signals</div>
-                            <p>Content here....</p>
-
-                            <div>Slots</div>
-                            <p>Content here....</p>
-                        </div>
-                    </div>
-                    <h3><b>Wrapper2</b></h3>
-
-                    <div style="height:70%">
-                        <div class="myscroll">
-                            <div>Signals</div>
-                            <p>Content here....</p>
-
-                            <div>Slots</div>
-                            <p>Content here....</p>
-                        </div>
-                    </div>
-                    <h3><b>Wrapper2</b></h3>
-
-                    <div style="height:70%">
-                        <div class="myscroll">
-                            <div>Signals</div>
-                            <p>Content here....</p>
-
-                            <div>Slots</div>
-                            <p>Content here....</p>
-                        </div>
-                    </div>
-                    <h3><b>Wrapper2</b></h3>
-
-                    <div style="height:70%">
-                        <div class="myscroll">
-                            <div>Signals</div>
-                            <p>Content here....</p>
-
-                            <div>Slots</div>
-                            <p>Content here....</p>
-                        </div>
-                    </div>
-                    <h3><b>Wrapper2</b></h3>
-
-                    <div style="height:70%">
-                        <div class="myscroll">
-                            <div>Signals</div>
-                            <p>Content here....</p>
-
-                            <div>Slots</div>
-                            <p>Content here....</p>
-                        </div>
-                    </div>
-                    <h3><b>Wrapper2</b></h3>
-
-                    <div style="height:70%">
-                        <div class="myscroll">
-                            <div>Signals</div>
-                            <p>Content here....</p>
-
-                            <div>Slots</div>
-                            <p>Content here....</p>
-                        </div>
-                    </div>
+                @defining(Wrapper.getAll()){ allWrappers =>
+                  @for(currentWrapper <- allWrappers){
+                    <h3><b>@currentWrapper.name</b></h3>
+                      <div style="height:70%">
+                          <div class="myscroll">
+                            <div><b>Signals</b></div>
+                              @for(currentSignal <- currentWrapper.signals){
+                                <p id="signal@currentWrapper.id-@currentSignal.id">- @currentSignal.signature</p>
+                                <script>
+                                  $("#signal@currentWrapper.id-@currentSignal.id").click(function(){
+                                     // get it
+                                     var editor = $("#tdl").data('CodeMirrorInstance');
+                                     // from here on the API functions are available to 'myInstance' again.
+                                     var start_cursor = editor.getCursor();
+                                     var cursorLine = start_cursor.line;
+                                     var cursorCh = start_cursor.ch;
+                                     editor.replaceRange("\"@currentSignal.signature\" of \"@currentWrapper.name\"", start_cursor);
+                                  });
+                                </script>
+                               }
+                               &nbsp;
+                              <div><b>Slots</b></div>
+                              @for(currentSlot <- currentWrapper.slots){
+                                <p id="slot@currentWrapper.id-@currentSlot.id">- @currentSlot.signature</p>
+                                  <script>
+                                    $("#slot@currentWrapper.id-@currentSlot.id").click(function(){
+                                       // get it
+                                       var editor = $("#tdl").data('CodeMirrorInstance');
+                                       // from here on the API functions are available to 'myInstance' again.
+                                       var start_cursor = editor.getCursor();
+                                       var cursorLine = start_cursor.line;
+                                       var cursorCh = start_cursor.ch;
+                                       editor.replaceRange("\"@currentSlot.signature\" of \"@currentWrapper.name\"", start_cursor);
+                                    });
+                                 </script>
+                               }
+                          </div>
+                      </div>
+                  }
+                }
                 </div>
             </td>
 
@@ -273,32 +190,16 @@
                         <option>solarized dark</option>
                         <option>solarized light</option>
                         <option>the-matrix</option>
-                        <option>tomorrow-night-bright</option>
                         <option>tomorrow-night-eighties</option>
                         <option>twilight</option>
                         <option>vibrant-ink</option>
                         <option>xq-dark</option>
                         <option>xq-light</option>
-                        <option>zenburn</option>
                     </select>
                     </p>
                     <article>
-		         
-		         <textarea id="tdl" name="tdl" rows="20" cols="40" class="CodeMirror">
-val rivet4 = "slot2(int, int, java.lang.String, byte [], byte [], java.util.Date)" of "wrapper2" shall(
-    //connect first two params from signal1 of wrapper2
-    use("signal1(int, int, java.lang.Stri1ng)" of "wrapper2")(
-     mapping(
-       1 onto 1,
-       2 onto 2 using converter1)),
-    use("signal2(byte[], byte[], java.lang.String)" of "wrapper3")(
-     mapping(
-       3 onto 3,
-       1 onto 4 using converter1,
-       2 onto 5)),
-    map(val3 onto 6))
-			     </textarea>
-
+                        
+		         	    @textarea(frm("tdl"), 'rows -> 20, 'col -> 40, 'class -> "CodeMirror")
                     </article>
                 </div>
             </td>
@@ -309,4 +210,3 @@ val rivet4 = "slot2(int, int, java.lang.String, byte [], byte [], java.util.Date
 
 <input type="hidden" name="id" id="id" value='@frm("id").value' />
 <input type="hidden" name="assertionId" id="assertionId" value='@frm("assertionId").value' />
-

@@ -1,12 +1,32 @@
 package minderengine
 
-import mtdl.{Rivet, MinderTdl, TdlCompiler}
+import java.util
+
+import controllers.Application
+import models.TestCase
+import mtdl._
+import play.Play
+import play.api.Logger
+import play.mvc.Http
 import scala.collection.JavaConversions._
 
 /**
  * Created by yerlibilgin on 07/12/14.
  */
-class TestEngine {
+object TestEngine {
+
+
+  private def createMinderInstance(minderClass: Class[MinderTdl], seq: Seq[(String, String)]): MinderTdl = {
+
+    val map = {
+      val map2 = collection.mutable.Map[String, String]()
+      for (e@(k, v) <- seq) {
+        map2 += e
+      }
+      map2.toMap
+    }
+    minderClass.getConstructors()(0).newInstance(map, java.lang.Boolean.TRUE).asInstanceOf[MinderTdl]
+  }
 
   /**
    * Runs the given test case
@@ -15,52 +35,47 @@ class TestEngine {
    * @param userEmail the owner email if of the TS that is running the test
    * @param tdl The test definition
    */
-  def runTest(userEmail: String, tdl: String): Unit = {
-
+  def runTest(userEmail: String, tdl: String, wrapperMapping: (String, String)*): Unit = {
     val clsMinderTDL = TdlCompiler.compileTdl(userEmail, tdl)
 
-    val minderTDL = clsMinderTDL.newInstance()
+    val minderTDL = createMinderInstance(clsMinderTDL, wrapperMapping);
+    //first, call the start methods for all registered wrappers of this test.
 
-    //first start all tests
-    for (rivet <- minderTDL.SlotDefs) {
-      val minderClient = if (BuiltInWrapperRegistry.get().contains(rivet.slot.wrapperId)) {
-        BuiltInWrapperRegistry.get().getWrapper(rivet.slot.wrapperId)
+    for (wrapperName <- minderTDL.wrapperDefs) {
+      val minderClient = if (BuiltInWrapperRegistry.get().contains(wrapperName)) {
+        BuiltInWrapperRegistry.get().getWrapper(wrapperName)
       } else {
-        val label = MinderWrapperRegistry.get().getUidForLabel(rivet.slot.wrapperId)
-        XoolaServer.get().getClient(label)
+        XoolaServer.get().getClient(wrapperName)
       }
-
       minderClient.startTest(userEmail)
     }
 
     try {
       var i = 1;
       for (rivet <- minderTDL.SlotDefs) {
-        println("---- " + "RUN RIVET " + i)
+        Logger.debug("---- " + "RUN RIVET " + i)
         i = i + 1
 
         //resolve the minder client id. This might as well be resolved to a local built-in wrapper.
         val minderClient = if (BuiltInWrapperRegistry.get().containsWrapper(rivet.slot.wrapperId)) {
           BuiltInWrapperRegistry.get().getWrapper(rivet.slot.wrapperId)
         } else {
-          val label = MinderWrapperRegistry.get().getUidForLabel(rivet.slot.wrapperId)
-          XoolaServer.get().getClient(label)
+          XoolaServer.get().getClient(rivet.slot.wrapperId)
         }
         val args = Array.ofDim[Object](rivet.pipes.length)
 
-        for (tuple <- rivet.signalPipeMap.keySet) {
+        for (tuple@(label, signature) <- rivet.signalPipeMap.keySet) {
           val me: MinderSignalRegistry = SessionMap.getObject(userEmail, "signalRegistry")
           if (me == null) throw new IllegalArgumentException("No MinderSignalRegistry object defined for session " + userEmail)
 
-          println("dequeue " + ((tuple _1) + ":" + (tuple _2)))
-          println("dequeue " + ((MinderWrapperRegistry.get().getUidForLabel(tuple _1)) + ":" + (tuple _2)))
+          println("dequeue " + (label + ":" + signature))
 
-
-          val signalData = me.dequeueSignal(MinderWrapperRegistry.get().getUidForLabel(tuple _1), tuple _2)
+          val signalData = me.dequeueSignal(label, signature)
           for (paramPipe <- rivet.signalPipeMap(tuple)) {
-            args(paramPipe.out) = paramPipe.execute(signalData.args(paramPipe.in)).asInstanceOf[AnyRef]
-
-            convertParam(paramPipe.out, paramPipe.execute(signalData.args(paramPipe.in)))
+            //FIX for BUG-1 : added an if for -1 param
+            if (paramPipe.in != -1){
+              convertParam(paramPipe.out, paramPipe.execute(signalData.args(paramPipe.in)))
+            }
           }
         }
 
@@ -70,7 +85,6 @@ class TestEngine {
 
         rivet.result = minderClient.callSlot(userEmail, rivet.slot.signature, args)
 
-
         def convertParam(out: Int, arg: Any) {
           if (arg.isInstanceOf[Rivet]) {
             args(out) = arg.asInstanceOf[Rivet].result
@@ -79,18 +93,66 @@ class TestEngine {
           }
         }
       }
-    }finally{
+    } finally {
       //make sure that we call finish test for all
-      for (rivet <- minderTDL.SlotDefs) {
-        val minderClient = if (BuiltInWrapperRegistry.get().contains(rivet.slot.wrapperId)) {
-          BuiltInWrapperRegistry.get().getWrapper(rivet.slot.wrapperId)
+      for (wrapperName <- minderTDL.wrapperDefs) {
+        val minderClient = if (BuiltInWrapperRegistry.get().contains(wrapperName)) {
+          BuiltInWrapperRegistry.get().getWrapper(wrapperName)
         } else {
-          val label = MinderWrapperRegistry.get().getUidForLabel(rivet.slot.wrapperId)
-          XoolaServer.get().getClient(label)
+          XoolaServer.get().getClient(wrapperName)
         }
 
-        try{ minderClient.finishTest()} catch{case _: Throwable => {}}
+        try {
+          minderClient.finishTest()
+        } catch {
+          case _: Throwable => {}
+        }
       }
     }
+  }
+
+  /**
+   * Evaluates the whole test case without running it and creates a list of wrappers and their signals-slots.
+   *
+   * @param testCase
+   * @param email the email of the user used for package declaration
+   * @return
+   */
+  def describeTdl(testCase: TestCase, email: String): util.LinkedHashMap[String, util.Set[SignalSlot]] = {
+    Logger.debug("Describing: " + testCase.name + " for user " + email)
+    val minderClass = TdlCompiler.compileTdl(email, tdlStr = testCase.tdl)
+    val minderTdl = minderClass.getConstructors()(0).newInstance(null, java.lang.Boolean.FALSE).asInstanceOf[MinderTdl]
+
+    val slotDefs = minderTdl.SlotDefs
+
+    val hm: util.LinkedHashMap[String, util.Set[SignalSlot]] = new util.LinkedHashMap()
+    val map: collection.mutable.LinkedHashMap[String, util.Set[SignalSlot]] = collection.mutable.LinkedHashMap()
+
+    for (r <- slotDefs) {
+      //check the slot
+      val wrapperName = r.slot.wrapperId
+      val slotSignature = r.slot.signature
+
+      var set = map.getOrElseUpdate(wrapperName, new util.HashSet[SignalSlot]())
+      set.add(new SlotImpl(wrapperId = wrapperName, signature = slotSignature))
+      println(wrapperName + "::" + slotSignature)
+
+      for (e@(k@(wn, ws), v) <- r.signalPipeMap) {
+        println(wn + "::" + ws)
+        set = map.getOrElseUpdate(wn, new util.HashSet[SignalSlot]())
+        set.add(new SignalImpl(wn, ws))
+      }
+    }
+
+    for ((k, v) <- map) {
+      println("---------")
+      println(k)
+      for (ss <- v) {
+        println("\t" + ss.signature)
+      }
+      hm.put(k, v)
+    }
+
+    hm
   }
 }

@@ -1,16 +1,32 @@
 #Users
 users:
+  - &system !!models.User
+    active: true
+    email: root@minder
+    emailValidated: true
+    firstName: minder
+    lastLogin: 2014-12-29T07:08:49.850Z
+    lastName: null
+    linkedAccounts:
+    - providerKey: password
+      providerUserId: $2a$10$QoJy1UgFXMjLMJlQ6hAnhe1Y07yoBH0Eucna1OSag2qKWhS79HQg6
+      user: *system
+    name: Muhammet YILDIZ
+    permissions: []
+    roles:
+    - {id: 1, roleName: observer}
+    - {id: 2, roleName: Test Designer}
+    - {id: 3, roleName: Test Developer}
+    testGroups: []
   - &user !!models.User
     active: true
     email: myildiz83@gmail.com
     emailValidated: true
     firstName: null
-    id: 1
     lastLogin: 2014-12-29T07:08:49.850Z
     lastName: null
     linkedAccounts:
-    - id: 1
-      providerKey: password
+    - providerKey: password
       providerUserId: $2a$10$QoJy1UgFXMjLMJlQ6hAnhe1Y07yoBH0Eucna1OSag2qKWhS79HQg6
       user: *user
     name: Muhammet YILDIZ
@@ -20,8 +36,25 @@ users:
     - {id: 2, roleName: Test Designer}
     - {id: 3, roleName: Test Developer}
     testGroups: []
-
-#Categories
+  - &user2 !!models.User
+    active: true
+    email: cetinkayamelis@gmail.com
+    emailValidated: true
+    firstName: null
+    lastLogin: 2014-12-29T07:08:49.850Z
+    lastName: null
+    linkedAccounts:
+    - providerKey: password
+      providerUserId: $2a$10$QoJy1UgFXMjLMJlQ6hAnhe1Y07yoBH0Eucna1OSag2qKWhS79HQg6
+      user: *user
+    name: Melis Demir
+    permissions: []
+    roles:
+    - {id: 1, roleName: observer}
+    - {id: 2, roleName: Test Designer}
+    - {id: 3, roleName: Test Developer}
+    testGroups: []
+#Groups
 groups:
 - &as4 !!models.TestGroup
     description: null
@@ -36,20 +69,22 @@ groups:
         target: as4 message
         prerequisites: be cool
         predicate: as4 message is terribly valid
+        prescriptionLevel: Mandatory
         testCases:
-        - !!models.TestCase
-            parameters: ''
+        - &as4case1 !!models.TestCase
             shortDescription: A test case to check the eb code party id
-            tdl: sampletdl/as42.tdl
+            tdl: sampletdl/as41.tdl
             testAssertion: *taas41
             name: AS41
-        - !!models.TestCase
+            parameters: []
+        - &as4case2 !!models.TestCase
             description: null
-            parameters: ''
             shortDescription: A test case to check the hede hodo
             tdl: sampletdl/as42.tdl
             testAssertion: *taas41
             name: AS42
+            parameters: []
+
 - &smp !!models.TestGroup
     description: null
     name: SMP Tests
@@ -63,10 +98,10 @@ groups:
         target: smp message
         prerequisites: be cool
         predicate: smp message is terribly valid
+        prescriptionLevel: Permitted
         testCases:
         - !!models.TestCase
             description: null
-            parameters: ''
             shortDescription: Check for the public key of BDX
             tdl: sampletdl/SMP1.tdl
             testAssertion: *tasmp1
@@ -84,12 +119,103 @@ groups:
         target: smp message
         prerequisites: be cool
         predicate: smp message is terribly valid
-        testCases:
+        prescriptionLevel: Preferred
         testCases:
         - !!models.TestCase
             description: null
-            parameters: ''
             shortDescription: Check for the BDXL id,address match
             tdl: sampletdl/BDXL1.tdl
             testAssertion: *tabdxl1
             name: BDXL1
+#wrappers
+wrappers:
+- &xmlGenerator !!models.Wrapper
+  name: xmlGenerator
+  user: *user
+  signals:
+  - &xmlProduced !!models.TSignal
+      wrapper: *xmlGenerator
+      signature: xmlProduced(byte[] generatedXML)
+  - &xmlProduced2 !!models.TSignal
+      wrapper: *xmlGenerator
+      signature: xmlProduced2(byte[] generatedXML)
+  slots:
+  - &generateXML !!models.TSlot
+      wrapper: *xmlGenerator
+      signature: generateXML(byte[] inputBooks)
+  - &generateXML2 !!models.TSlot
+      wrapper: *xmlGenerator
+      signature: generateXML2(byte[] inputBooks)
+- &xmlValueInitiator  !!models.Wrapper
+  name: xmlValueInitiator
+  user: *user
+  signals: []
+  slots: []
+- &testWrapper0 !!models.Wrapper
+  name: testWrapper0
+  user: *user
+  signals:
+  - !!models.TSignal
+    wrapper: *testWrapper0
+    signature: signal0()
+  slots:
+  - !!models.TSlot
+    wrapper: *testWrapper0
+    signature: slot0()
+- &testWrapper1 !!models.Wrapper
+  name: testWrapper1
+  user: *user
+  signals:
+  - !!models.TSignal
+    wrapper: *testWrapper1
+    signature: signal1(int, int, java.lang.String)
+  slots:
+  - !!models.TSlot
+    wrapper: *testWrapper1
+    signature: slot0()
+- &testWrapper2 !!models.Wrapper
+  name: testWrapper2
+  user: *user
+  signals:
+  - !!models.TSignal
+    wrapper: *testWrapper2
+    signature: signal1(int, int, java.lang.String)
+  slots:
+  - !!models.TSlot
+    wrapper: *testWrapper2
+    signature: slot1(int, int, java.lang.String)
+- &testWrapper3 !!models.Wrapper
+  name: testWrapper3
+  user: *user
+  signals:
+  - !!models.TSignal
+    wrapper: *testWrapper3
+    signature: signal2(byte[], byte[], java.lang.String)
+  slots:
+  - !!models.TSlot
+    wrapper: *testWrapper3
+    signature: slot1(int, int, java.lang.String)
+- &testWrapper4 !!models.Wrapper
+  name: testWrapper4
+  user: *user
+  signals: []
+  slots:
+  - !!models.TSlot
+    wrapper: *testWrapper4
+    signature: slot2(int, int, java.lang.String, byte [], byte [], java.util.Date)
+
+#Run Configurations
+runConfigurations:
+- &rc1 !!models.RunConfiguration
+  name: TAAS41(RC1)
+  testCase: *as4case1
+  mappedWrappers: []
+  testRuns: []
+
+#TestRun
+#testruns:
+#  - &testrun1 !!models.TestRun
+#    testCase: *as4case1
+#    runner: *user
+#    wrappers:
+#    - *xmlGenerator

@@ -1,0 +1,44 @@
+@(frm: Form[_], localUser: models.User = null)
+
+@import helper._
+@implicitFieldConstructor = @{ FieldConstructor(twitterBootstrapBasic.f) }
+
+
+<script>
+  $(function(){
+    $( "#rc1@frm("id").value" ).tabs();
+  });
+</script>
+
+@if(frm.hasGlobalErrors) {
+<p class="alert alert-danger">
+  @frm.globalError.message
+</p>
+}
+
+<div class="fullh" id="rc1@frm("id").value">
+      @inputText(
+      frm("name"),
+      '_label -> "Run configuration name"
+      )
+
+      @repeat(frm("mappedWrappers"), min= 1){ field =>
+        @defining(field.value.get){ str =>
+          @defining(MappedWrapperModel.parse(str)){ entry =>
+          <label for="@field.name" class="control-label">@entry.name</label>:
+          <select id="@entry.id" name="@field.name" class="form-control" style="width:350px;">
+            @options(InventoryController.listOptions(entry)).map { v =>
+            <option value="@MappedWrapperModel.jsonFor(entry.id, entry.wrapperParamId, entry.name, v._1)" @if(entry.value.contains(v._1)){selected="selected" }>@v._2</option>
+            }
+          </select>
+          }
+        }
+      }
+
+    <input type="hidden" name="id" id="id" value='@frm("id").value'/>
+    <input type="hidden" name="testCaseId" id="testCaseId" value='@frm("testCaseId").value'/>
+    <input type="hidden" name="obsolete" id="obsolete" value='@frm("obsolete").value'/>
+    <input type="hidden" name="tdl" id="tdl" value='@frm("tdl").value'/>
+
+    </div>
+</div>

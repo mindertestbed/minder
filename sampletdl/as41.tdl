@@ -24,7 +24,7 @@ def val2 = {
 }
 
 //a date value (java.util.Date)
-def val3 = new Date //$now is built-in
+def val3 = new Date
 
 //an online zip archive that contains xsds
 def smallClaimsXsdRepo = JOINUP_CORE % "SmallClaims_10_2013_06_07_13_18_14.zip"
@@ -42,13 +42,17 @@ def justiceXsd = "SCFormCPartI_BD001007/data/standard/Justice.xsd" under smallCl
 val rivet1 = "slot0()" of "$wrapper0" asIs
 
 //a rivet that does not take parameters and will be triggered by a signal
-val rivet2 = "slot0()" of "$wrapper1" shall use("signal0()" of "wrapper0")(automatically)
+val rivet2 = "slot0()" of "$wrapper1" shall use("signal0()" of "$wrapper0")(automatically)
 
 //a rivet connect a signal automatically. (pairwise match parameters)
-val rivet3 = "slot1(int, int, java.lang.String)" of "$wrapper1" shall
-  use("signal1(int, int, java.lang.String)" of "$wrapper2")(automatically)
+val rivet3 = "slot1(int, int, java.lang.String)" of "$wrapper2" shall
+  use("signal1(int, int, java.lang.String)" of "$wrapper1")(automatically)
 
-val rivet4 = "slot2(int, int, java.lang.String, byte [], byte [], java.util.Date)" of "$wrapper2" shall(
+
+val rivet4 = "slot1(int, int, java.lang.String)" of "$wrapper3" shall
+  use("signal1(int, int, java.lang.String)" of "$wrapper1")(automatically)
+
+val rivet5 = "slot2(int, int, java.lang.String, byte [], byte [], java.util.Date)" of "$wrapper4" shall(
   //connect first two params from signal1 of wrapper2
   use("signal1(int, int, java.lang.String)" of "$wrapper2")(
     mapping(
@@ -62,8 +66,8 @@ val rivet4 = "slot2(int, int, java.lang.String, byte [], byte [], java.util.Date
   map(val3 onto 6))
 
 //first parameter is the xml document, second parameter is the shema
-val rivet5 = "verifyXml(byte[], byte[])" of "xml-content-verifier" shall(
-  map(rivet4 onto 1), //rivet4 generates an xml document
+val rivet6 = "verifyXml(byte[], byte[])" of "xml-content-verifier" shall(
+  map(rivet5 onto 1), //rivet4 generates an xml document
   map(justiceXsd onto 2) //use the justice asset (which is downloaded)
   )
 

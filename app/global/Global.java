@@ -19,22 +19,17 @@ import play.GlobalSettings;
 import play.api.Play;
 import play.db.ebean.Model;
 import play.mvc.Call;
+import scala.io.BufferedSource;
+import scala.io.Source;
 
 import java.io.*;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class Global extends GlobalSettings {
 
   public void onStart(Application app) {
-    ReflectionUtils.defaultClassLoader = Play.classloader(Play.current());
-    BuiltInWrapperRegistry.get().initiate();
-    XoolaServer.get().start();
-
     PlayAuthenticate.setResolver(new Resolver() {
       @Override
       public Call login() {
@@ -86,6 +81,10 @@ public class Global extends GlobalSettings {
     });
 
     initialData();
+
+    ReflectionUtils.defaultClassLoader = Play.classloader(Play.current());
+    BuiltInWrapperRegistry.get().initiate();
+    XoolaServer.get().start();
   }
 
   private void initialData() {
@@ -108,16 +107,25 @@ public class Global extends GlobalSettings {
 
         for (String key : all.keySet()) {
           for (Model model : all.get(key)) {
+            model.save();
 
             if (model instanceof TestGroup){
               TestGroup group = (TestGroup) model;
               for(TestAssertion assertion : group.testAssertions){
                 for (TestCase tcase : assertion.testCases){
-                  tcase.tdl = scala.io.Source.fromFile(tcase.tdl, "utf-8").mkString();
+                  BufferedSource file = Source.fromFile(tcase.tdl, "utf-8");
+                  System.out.println("TDL: " + tcase.tdl);
+                  tcase.setTdl(file.mkString());
+                  tcase.save();
                 }
               }
             }
-            model.save();
+            if (model instanceof  RunConfiguration){
+              RunConfiguration rc = (RunConfiguration) model;
+
+              for (MappedWrapper mappedWrapper : rc.mappedWrappers) {
+              }
+            }
           }
         }
       } catch (Throwable th){

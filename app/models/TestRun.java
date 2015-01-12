@@ -24,12 +24,12 @@ public class TestRun extends Model {
 	@Id
 	public Long id;
 
+	@ManyToOne
 	@Column(nullable = false)
-	@ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-	public TestCase testCase;
+	public RunConfiguration runConfiguration;
 
 	public Date date;
-
+	
 	@ManyToOne
 	@Column(nullable = false)
 	public User runner;
@@ -41,11 +41,8 @@ public class TestRun extends Model {
 
 	}
 
-	@OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
-	public List<Wrapper> wrappers;
-
-	public TestRun(TestCase testCase, User runner) {
-		this.testCase = testCase;
+	public TestRun(RunConfiguration runConfiguration, User runner) {
+		this.runConfiguration = runConfiguration;
 		this.runner = runner;
 		this.date = new Date();
 	}

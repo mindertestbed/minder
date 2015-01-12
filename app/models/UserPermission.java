@@ -14,11 +14,6 @@ public class UserPermission extends Model implements Permission {
   @Id
   public Long id;
 
-  /**
-   *
-   */
-  private static final long serialVersionUID = 1L;
-
   public String value;
 
   public static final Model.Finder<Long, UserPermission> find = new Model.Finder<Long, UserPermission>(

@@ -42,13 +42,20 @@ public class TestAssertion extends Model {
 
 	public String variables;
 
+	public String tag;
+
+	@Column(length = 1024)
+	public String description;
+
+	public PrescriptionLevel prescriptionLevel;
+
 	@OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
 	public List<TestCase> testCases;
 
   public static final Finder<Long, TestAssertion> find = new Finder<>(
       Long.class, TestAssertion.class);
 
-  public static List<TestAssertion> findByGroup(TestGroup group){
+	public static List<TestAssertion> findByGroup(TestGroup group){
     return find.where().eq("testGroup", group).setOrderBy("id").findList();
      }
 

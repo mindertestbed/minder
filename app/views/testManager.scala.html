@@ -1,25 +1,21 @@
 @(localUser: models.User = null)
 
-<script>
-
-  $(function(){
-    $("#dialog-confirm").hide();
-    $("#mainDialog").hide();
-  });
-
-</script>
-<div id="dialog-confirm" title="Delete Group?">
+<div id="dialog-confirm" title="Delete Group?"  style="display:none">
   <p><span class="ui-icon ui-icon-alert" style="float:left; margin:0 7px 20px 0;"></span>
   The <span class="itemtype"></span> <b><span class="itemname"></span></b> will be deleted. Are you sure?</p>
 </div>
 
-<div id="mainDialog" title="main dialog">
-  <form method="post">
+<div id="mainDialog" title="main dialog" style="display:none">
+  <form method="post" id="mainForm">
   </form>
 </div>
 
-<div id="contentPane" style="height:94%;margin:0;padding:0;" class="fullw">
-    <div id="testGroupLister" class="fullw" style="height:95%;padding:0px;">
+
+<div id="errorDialog" title="Error" style="display:none">
+</div>
+
+<div id="contentPane" style="height:100%;margin:0;padding:0;" class="fullw">
+    <div id="testGroupLister" class="fullw" style="height:100%;padding:0px;">
       @testGroupLister(localUser)
     </div>
 </div>

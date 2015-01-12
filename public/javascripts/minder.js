@@ -37,20 +37,17 @@ function executeScripts(target){
 }
 
 function createFormDialog(elm, sourceUrl, action, dialogId, titl, target, w, h){
+  if(typeof(w)==='undefined') w = '50%';
+  if(typeof(h)==='undefined') h = '500';
 
-  ww = typeof w !== 'undefined' ? w : '50%';
-  hh = typeof h !== 'undefined' ? h : '500';
   var frm = $( "#" + dialogId + " > form");
   elm.on('click', function(event){
-
-  alert(w + " " + h)
-  
      event.stopPropagation();
 
      var dialog = $( "#" + dialogId ).dialog({
          autoOpen: false,
-         height: hh,
-         width: ww,
+         height: h,
+         width: w,
          title: titl,
          modal: true,
          buttons: {
@@ -61,9 +58,7 @@ function createFormDialog(elm, sourceUrl, action, dialogId, titl, target, w, h){
                  data: frm.serialize(),
                  success: function (data) {
                     target[0].innerHTML = data;
-
                     executeScripts(target);
-
                     dialog.dialog( "close" );
                  },
                  error: function (jqXHR, textStatus, errorMessage) {
@@ -87,13 +82,13 @@ function createFormDialog(elm, sourceUrl, action, dialogId, titl, target, w, h){
           url: sourceUrl,
           success: function (data) {
             frm[0].innerHTML = data;
-
             executeScripts(frm);
           },
           error: function (jqXHR, textStatus, errorMessage) {
               frm[0].innerHTML = jqXHR.responseText;
           }
      });
+     frm[0].innerHTML = "..."
      dialog.dialog( "open", titl );
   });
 }
@@ -118,13 +113,11 @@ function deleteWithDialog(elm, action, dialog, title, category, item, target){
             success: function (data) {
               target[0].innerHTML = data;
               executeScripts(target);
-              $( this ).dialog( "close" );
             },
             error: function (jqXHR, textStatus, errorMessage) {
                 alert(jqXHR.responseText);
-                $( this ).dialog( "close" );
             }
-         });
+           });
 
           $( this ).dialog( "close" );
           },
@@ -132,12 +125,245 @@ function deleteWithDialog(elm, action, dialog, title, category, item, target){
           $( this ).dialog( "close" );
           }
         }
-       });
+      });
 
-       dialog.find("span.itemtype")[0].innerHTML = category;
-       dialog.find("span.itemname")[0].innerHTML = item;
-       deleteDialog.dialog( "open" );
+     dialog.find("span.itemtype")[0].innerHTML = category;
+     dialog.find("span.itemname")[0].innerHTML = item;
+     deleteDialog.dialog( "open" );
     });
+}
+
+function showError(data){
+  var dialog = $("#errorDialog").dialog({
+      resizable: false,
+      height:"600",
+      width:"800",
+      autoOpen: true,
+      modal: true,
+      buttons: {
+        'Ok': function() {
+          $( this ).dialog( "close" );
+        }
+      }
+  });
+  dialog[0].innerHTML = data;
+}
+
+function createRunConfiguration(testCaseId){
+  $.ajax({
+    type: 'GET',
+    url: '/createRunConfigurationForm?testCaseId='+testCaseId,
+    success: function (data) {
+      showCreateDialog(testCaseId, data)
+    },
+    error: function (jqXHR, textStatus, errorMessage) {
+      showError(jqXHR.responseText);
+    }
+  });
+}
+
+function showCreateDialog(testCaseId, data){
+  var frm = $('#mainForm');
+  frm[0].innerHTML = data;
+  executeScripts(frm);
+  var search = "#rcRoot" + testCaseId;
+  var parr = $(search);
+
+  var dialog = $('#mainDialog').dialog({
+       autoOpen: false,
+       height: 500,
+       width: 800,
+       title: 'Create Run Configuration',
+       modal: true,
+       buttons: {
+           "Create": function(){
+             $.ajax({
+               type: 'post',
+               url: '/doCreateRunConfiguration',
+               data: frm.serialize(),
+               success: function (data) {
+                  parr[0].innerHTML = data;
+                  executeScripts(parr);
+                  dialog.dialog( "close" );
+               },
+               error: function (jqXHR, textStatus, errorMessage) {
+                  frm[0].innerHTML = jqXHR.responseText;
+                  executeScripts(frm);
+               }
+             });
+           },
+           Cancel: function() {
+             dialog.dialog( "close" );
+           }
+       }
+   });
+
+   dialog.dialog( "open", 'Create Run Configuration' );
+}
+
+function editRunConfiguration(testCaseId, id, name){
+  //perform ajax to get the edit form
+   $.ajax({
+      type: 'GET',
+      url: '/editRunConfigurationForm?id='+id,
+      success: function (data) {
+        showEditDialog(testCaseId, id, data, name)
+      },
+      error: function (jqXHR, textStatus, errorMessage) {
+        showError(jqXHR.responseText);
+      }
+   });
+}
+
+function showEditDialog(testCaseId, id, data, title){
+  var form = $( "#mainForm" );
+  form[0].innerHTML = data;
+  executeScripts(form);
+  var parent = $("#rcRoot" + testCaseId).parent();
+
+    var dialog = $( "#mainDialog" ).dialog({
+       autoOpen: false,
+       height: 600,
+       width: 1100,
+       title: 'Run Configuration' + title,
+       modal: true,
+       buttons: {
+           "Save": function(){
+             $.ajax({
+               type: 'post',
+               url: '/doEditRunConfiguration',
+               data: form.serialize(),
+               success: function (data) {
+                  parent[0].innerHTML = data;
+                  executeScripts(parent);
+                  dialog.dialog( "close" );
+               },
+               error: function (jqXHR, textStatus, errorMessage) {
+                   form[0].innerHTML = jqXHR.responseText;
+                   form[0].reset();
+               }
+             });
+           },
+           Cancel: function() {
+             dialog.dialog( "close" );
+           }
+       },
+       close: function() {
+         form[0].reset();
+       }
+   });
+
+   dialog.dialog( "open", title );
+}
+
+
+function displayRunConfiguration(testCaseId, id, name){
+   //perform ajax to get the run dialog
+   $.ajax({
+      type: 'GET',
+      url: '/displayRunConfiguration?id='+id,
+      success: function (data) {
+        showRunDialog(testCaseId, id, data, name)
+      },
+      error: function (jqXHR, textStatus, errorMessage) {
+        showError(jqXHR.responseText);
+      }
+   });
+}
+
+function showRunDialog(testCaseId, id, data, title){
+  var runDialog = $( "#runDialog" );
+  runDialog[0].innerHTML = data
+  executeScripts(runDialog);
+
+    var dialog = runDialog.dialog({
+       autoOpen: false,
+       height: 650,
+       width: 1200,
+       title: 'Run Configuration' + title,
+       modal: true,
+       buttons: {
+         "Run": function() {
+            ajaxDisplayRunConfiguration(runDialog, id)
+         },
+         Cancel: function() {
+           dialog.dialog( "close" );
+         }
+       }
+   });
+
+   dialog.dialog( "open", title );
+}
+
+function ajaxDisplayRunConfiguration(runDialog, id){
+  $.ajax({
+     type: 'GET',
+     url: '/displayRunConfiguration?id' + id ,
+     data: editorForm.serialize(),
+     success: function (data) {
+        runDialog[0].innerHTML = data;
+        executeScripts(runDialog);
+      },
+     error: function (jqXHR, textStatus, errorMessage) {
+         showError(jqXHR.responseText);
+     }
+   });
+}
+
+
+function runRun(id){
+  $.ajax({
+     type: 'GET',
+     url: '/displayRunConfiguration?id' + id ,
+     data: editorForm.serialize(),
+     success: function (data) {
+        if(data.indexOf("TESTFINISH") != -1){
+          runnerDiv[0].innerHTML = data;
+          executeScripts(runnerDiv);
+          setTimeout(function(){
+            runRun(id);
+          }, 500);
+        }
+     },
+     error: function (jqXHR, textStatus, errorMessage) {
+         runnerDiv[0].innerHTML = jqXHR.responseText;
+     }
+   });
+}
+
+function deleteRunConfiguration(testCaseId, idd, name){
+  var parent = $("#rcRoot" + testCaseId).parent();
+    var deleteDialog = $("#dialog-confirm").dialog({
+      resizable: false,
+      height:200,
+      width:"50%",
+      title:'Delete Run Configuration',
+      autoOpen: false,
+      modal: true,
+      buttons: {
+        "Delete": function() {
+         $.ajax({
+            type: 'GET',
+            url: '/doDeleteRunConfiguration?id=' + idd,
+            success: function (data) {
+              parent[0].innerHTML = data;
+              executeScripts(parent);
+            },
+            error: function (jqXHR, textStatus, errorMessage) {
+              showError(jqXHR.responseText);
+            }
+         });
+         $( this ).dialog( "close" );
+        },
+        Cancel: function() {
+        $( this ).dialog( "close" );
+        }
+      }
+    });
+
+   deleteDialog.find("span.itemtype")[0].innerHTML = 'run configuration';
+   deleteDialog.find("span.itemname")[0].innerHTML = name;
+   deleteDialog.dialog( "open" );
 }
 
 

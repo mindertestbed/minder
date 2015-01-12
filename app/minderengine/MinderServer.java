@@ -1,8 +1,8 @@
 package minderengine;
 
 import models.User;
+import play.Logger;
 
-import java.lang.reflect.Method;
 import java.util.Set;
 
 /**
@@ -10,20 +10,21 @@ import java.util.Set;
  * respond to Xoola remote requests.
  * Created by yerlibilgin on 02/12/14.
  */
-public class MinderServer implements IMinderServer{
+public class MinderServer implements IMinderServer {
 
   /**
-   * The client calls this method after a sucessfull handshake. We need to save the
-   * method list into the database.
+   * The client calls this method after a sucessfull handshake.
+   *
    * @param methodSet
    */
   @Override
-  public void hello(String uid, String label, Set<MethodContainer> methodSet) {
-    MinderWrapperRegistry.get().updateWrapper(uid, label, methodSet);
+  public void hello(String label, Set<MethodContainer> methodSet) {
+    MinderWrapperRegistry.get().updateWrapper(label, methodSet);
   }
 
   /**
    * Provide information on the Test Designer who has a sessionId
+   *
    * @param sessionId the http session id of the web owner.
    * @return
    */
@@ -37,13 +38,13 @@ public class MinderServer implements IMinderServer{
   }
 
   @Override
-  public Object signalEmitted(String sessionId, String uid, String signature, SignalData signalData) {
-    System.out.println("Signal emitted " + sessionId + " " + uid + " " + signature);
+  public Object signalEmitted(String sessionId, String label, String signature, SignalData signalData) {
+    Logger.debug("Signal emitted [" + sessionId + "." + label + "." + signature + "]");
     MinderSignalRegistry me = SessionMap.getObject(sessionId, "signalRegistry");
     if (me == null)
       throw new IllegalArgumentException("No MinderSignalRegistry object defined for session " + sessionId);
 
-    me.enqueueSignal(uid, signature, signalData);
+    me.enqueueSignal(label, signature, signalData);
     return null;
   }
 }
