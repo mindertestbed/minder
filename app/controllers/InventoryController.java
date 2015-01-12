@@ -585,4 +585,36 @@ public class InventoryController extends Controller {
 		return Arrays.asList("testWrapper0", "testWrapper1", "testWrapper2",
 				"testWrapper3", "testWrapper4");
 	}
+	
+	public static Result listTestRuns(Long configurationId) {
+		RunConfiguration rc = RunConfiguration.findById(configurationId);
+		if (rc == null) {
+			return badRequest("Run Configuration with id [" + configurationId
+					+ "] not found!");
+		} else {
+
+			return ok(testRunLister.render(configurationId, null));
+		}
+
+	}
+
+	public static Result doListTestRuns() {
+		return ok();
+	}
+
+	public static Result viewUserHistory(Long testRunId) {
+		TestRun tr = TestRun.findById(testRunId);
+		if (tr == null) {
+			return badRequest("Test Run with id [" + testRunId
+					+ "] not found!");
+		} else {
+
+			UserHistory userHistory = tr.history;
+			return ok(userHistoryLister.render(userHistory, null));
+		}
+	}
+	
+	public static Result doViewUserHistory() {
+		return ok();
+	}
 }

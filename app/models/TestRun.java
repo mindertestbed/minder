@@ -29,7 +29,7 @@ public class TestRun extends Model {
 	public RunConfiguration runConfiguration;
 
 	public Date date;
-	
+
 	@ManyToOne
 	@Column(nullable = false)
 	public User runner;
@@ -49,4 +49,8 @@ public class TestRun extends Model {
 
 	public static final Finder<Long, TestRun> find = new Finder<>(Long.class,
 			TestRun.class);
+
+	public static TestRun findById(Long id) {
+		return find.byId(id);
+	}
 }

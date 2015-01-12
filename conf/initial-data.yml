@@ -180,13 +180,36 @@ wrappers:
     wrapper: *testWrapper4
     signature: slot2(int, int, java.lang.String, byte [], byte [], java.util.Date)
 
+#Operation Types
+TOperationTypes:
+- &opType1 !!models.TOperationType
+  name: RUN_TEST_CASE
+
+#User Histories
+histories:
+- &history1 !!models.UserHistory
+  user: *user
+  operationType: *opType1
+  systemOutputLog: Bir loglar bir loglar
+
 #Run Configurations
 runConfigurations:
 - &rc1 !!models.RunConfiguration
   name: TAAS41(RC1)
   testCase: *as4case1
   mappedWrappers: []
+  testRuns:
+  - &rc1TestRun1 !!models.TestRun
+    runConfiguration: *rc1
+    runner: *user
+    date: 2015-01-11T15:30:00+00:00
+    history: *history1
+- &rc2 !!models.RunConfiguration
+  name: TAAS42(RC2)
+  testCase: *as4case1
+  mappedWrappers: []
   testRuns: []
+
 
 #TestRun
 #testruns:

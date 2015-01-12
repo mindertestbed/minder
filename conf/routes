@@ -79,3 +79,11 @@ GET     /doDeleteRunConfiguration   controllers.InventoryController.doDeleteRunC
 GET     /editRunConfigurationForm   controllers.InventoryController.editRunConfigurationForm(id: Long)
 GET     /doRunRunconfiguration      controllers.InventoryController.doRunRunconfiguration(id: Long)
 POST    /doEditRunConfiguration     controllers.InventoryController.doEditRunConfiguration()
+
+#test run listing
+GET     /listTestRunsForm           controllers.InventoryController.listTestRuns(configurationId: Long)
+POST    /doListTestRuns             controllers.InventoryController.doListTestRuns()
+
+#User History listing
+GET     /viewUserHistory           controllers.InventoryController.viewUserHistory(testRunId: Long)
+POST    /doViewUserHistory            controllers.InventoryController.doViewUserHistory()

@@ -56,4 +56,11 @@ public class RunConfiguration extends Model {
 	public static RunConfiguration findById(Long id) {
 		return find.byId(id);
 	}
+	
+	public static List<TestRun> getTestRuns(Long id) {
+		RunConfiguration runConfiguration = findById(id);
+		
+		ExpressionList<TestRun> f = TestRun.find.where().eq("runConfiguration",runConfiguration);
+		return f.findList();
+	}
 }
