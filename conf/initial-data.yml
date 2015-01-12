@@ -54,6 +54,25 @@ users:
     - {id: 2, roleName: Test Designer}
     - {id: 3, roleName: Test Developer}
     testGroups: []
+  - &massi !!models.User
+    active: true
+    email: massimiliano.masi@tiani-spirit.com
+    emailValidated: true
+    firstName: Massimiliano
+    lastLogin: 2014-12-29T07:08:49.850Z
+    lastName: Masi
+    linkedAccounts:
+    - providerKey: password
+      providerUserId: $2a$10$QoJy1UgFXMjLMJlQ6hAnhe1Y07yoBH0Eucna1OSag2qKWhS79HQg6
+      user: *user
+    name: Massimiliano Masi
+    permissions: []
+    roles:
+    - {id: 1, roleName: observer}
+    - {id: 2, roleName: Test Designer}
+    - {id: 3, roleName: Test Developer}
+    testGroups: []
+
 #Groups
 groups:
 - &as4 !!models.TestGroup
@@ -127,6 +146,21 @@ groups:
             tdl: sampletdl/BDXL1.tdl
             testAssertion: *tabdxl1
             name: BDXL1
+- &nonrepudiation !!models.TestGroup
+    description: null
+    name: Non-Repudiation Tests
+    shortDescription: All test cases related to Non-repudiation SAT
+    owner: *massi
+    testAssertions:
+    - &tanonrep1 !!models.TestAssertion
+        testGroup: *nonrepudiation
+        taId: SAMPLE
+        normativeSource: SAMPLE
+        target: SAMPLE
+        prerequisites: be cool
+        predicate: the evidence is awesome
+        prescriptionLevel: Preferred
+        testCases: []
 #wrappers
 wrappers:
 - &xmlGenerator !!models.Wrapper
