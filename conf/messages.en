@@ -168,3 +168,4 @@ restrictedTestPage.createTestAssertion= Create New Test Assertion
 restrictedTestPage.createTestCase= Create New Test Case
 restrictedTestPage.create= Create
 restrictedTestPage.createRunConfiguration = Create New Run Configuration
+restrictedTestPage.createWrapper= Create New Wrapper
