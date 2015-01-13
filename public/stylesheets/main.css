@@ -328,3 +328,17 @@ td{
 .control-label{
   font-size: 10px;
 }
+
+.maxwh{
+  width: auto;
+  height: auto;
+}
+
+.maxw{
+  width: auto;
+}
+
+.maxh{
+  height: auto;
+}
+

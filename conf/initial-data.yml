@@ -75,6 +75,26 @@ users:
 
 #Groups
 groups:
+- &sampleGroup !!models.TestGroup
+    description: A sample test gest assertions and test cases
+    name: Sample Test Group
+    shortDescription:  A sample test group
+    owner: *user
+    testAssertions:
+    - &taSample1 !!models.TestAssertion
+        testGroup: *sampleGroup
+        taId: TASAMPLE1
+        normativeSource: The system must generate valid book entries
+        target: BOOKS XML
+        prerequisites: the sut is connected and ready for testing
+        predicate: the generated books xml conforms to books.xsd
+        prescriptionLevel: Mandatory
+        testCases:
+        - &testCase1 !!models.TestCase
+           shortDescription: A tel against books.xsd
+           tdl: sampletdl/xmltest.tdl
+           testAssertion: *taSample1
+           name: TestCaseSample1
 - &as4 !!models.TestGroup
     description: null
     name: AS4 Tests

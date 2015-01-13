@@ -15,15 +15,14 @@ object Tester extends Controller {
     try {
       SignalSlotInfoProvider.setSignalSlotInfoProvider(MinderWrapperRegistry.get())
 
-      TestEngine.runTest(mail, tdl);
-      play.mvc.Results.ok();
+      TestEngine.runTest(mail, tdl, "$xmlValueInitiator" -> "xmlValueInitiator", "$xmlGenerator" -> "xmlGenerator");
+      Ok
     } catch {
       case t: Throwable => {
         t.printStackTrace()
-        play.mvc.Results.internalServerError();
+        BadRequest(t.getMessage);
       }
     }
-    Ok("It works!")
   }
 
   def doRunRunconfiguration(id: Long) = Action { implicit request =>
@@ -32,7 +31,7 @@ object Tester extends Controller {
     val user = Application.getLocalUser(request.session.asInstanceOf[Http.Session])
     val mail = user.email;
 
-    Ok(mail)
+    BadRequest
   }
 
 }

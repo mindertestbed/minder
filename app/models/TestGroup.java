@@ -36,6 +36,7 @@ public class TestGroup extends Model {
   @Column(nullable = false, length = 50)
   public String shortDescription;
 
+  @Column(length = 10000)
   public String description;
 
   public static final Finder<Long, TestGroup> find = new Finder<>(
@@ -53,5 +54,5 @@ public class TestGroup extends Model {
     return find.byId(id);
   }
 
-  public int pm;
+  public int k;
 }

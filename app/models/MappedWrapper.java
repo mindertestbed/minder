@@ -3,6 +3,7 @@ package models;
 import play.db.ebean.Model;
 
 import javax.persistence.*;
+import java.util.List;
 
 /**
  * Created by yerlibilgin on 07/01/15.
@@ -29,5 +30,9 @@ public class MappedWrapper extends Model{
 
   public static MappedWrapper findById(Long id) {
     return find.byId(id);
+  }
+
+  public static List<MappedWrapper> findByRunConfiguration(RunConfiguration rc){
+    return find.where().eq("runConfiguration", rc).orderBy("id").findList();
   }
 }
