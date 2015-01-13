@@ -1,0 +1,26 @@
+@(frm: Form[_], localUser: models.User = null)
+
+@import helper._
+@implicitFieldConstructor = @{ FieldConstructor(twitterBootstrapBasic.f) }
+
+@if(frm.hasGlobalErrors) {
+<p class="alert alert-danger">
+  @frm.globalError.message
+</p>
+}
+@inputText(
+frm("name"),
+'_label -> "Test Asset Name"
+)
+
+@inputText(
+frm("shortDescription"),
+'_label -> "Short Description"
+)
+
+@textarea(frm("description"), 'rows -> 5, '_label -> "Description")
+
+<label for="asset">Asset File:</label>
+<input type="file" id="asset" name="asset" />
+
+<input type="hidden" name="id" id="id" value='@frm("id").value' />

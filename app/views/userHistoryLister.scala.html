@@ -1,0 +1,17 @@
+@(userHistory: UserHistory, localUser: models.User = null)
+
+<div id="UserHistoryDiv@userHistory.id">
+  <table style="width: 100%;">
+    <tr style="height:10%;">
+        <td>
+            <h4 class="demoHeaders">User History</h4>
+        </td>
+    </tr>
+    <tr>
+    </tr>
+        <td style="text-align:left;" class="trigger">@userHistory.user.email</td>
+        <td class="trigger" style="text-align:left;">@userHistory.operationType.name</td>
+        <td class="trigger" style="text-align:left;">@userHistory.systemOutputLog</td>
+    </tr>
+  </table>
+</div>

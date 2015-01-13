@@ -80,6 +80,7 @@ public class Global extends GlobalSettings {
       }
     });
 
+    System.out.println("OnStart");
     initialData();
 
     ReflectionUtils.defaultClassLoader = Play.classloader(Play.current());
@@ -104,7 +105,8 @@ public class Global extends GlobalSettings {
         Yaml yaml = new Yaml(new CustomClassLoaderConstructor(Play.classloader(Play.current())));
 
         Map<String, List<Model>> all = (Map<String, List<Model>>) yaml.load(new FileInputStream("conf/initial-data.yml"));
-
+        System.out.println("Tablolar:\n");
+        System.out.println(all);
         for (String key : all.keySet()) {
           for (Model model : all.get(key)) {
             model.save();

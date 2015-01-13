@@ -67,26 +67,36 @@ create table TestAssertion (
   id                        bigint not null,
   test_group_id             bigint,
   ta_id                     varchar(255) not null,
-  normative_source          varchar(255) not null,
+  normative_source          varchar(250) not null,
   target                    varchar(255) not null,
-  prerequisites             varchar(255),
+  prerequisites             varchar(250),
   predicate                 varchar(255) not null,
-  variables                 varchar(255),
-  tag                       varchar(255),
+  variables                 varchar(250),
+  tag                       varchar(250),
   description               varchar(1024),
+  short_description         varchar(100) not null,
   prescription_level        integer,
   constraint ck_TestAssertion_prescription_level check (prescription_level in (0,1,2)),
   constraint uq_TestAssertion_ta_id unique (ta_id),
   constraint pk_TestAssertion primary key (id))
 ;
 
+create table TestAsset (
+  id                        bigint not null,
+  owner_id                  bigint,
+  name                      varchar(255) not null,
+  short_description         varchar(100),
+  description               varchar(1024),
+  constraint pk_TestAsset primary key (id))
+;
+
 create table TestCase (
   id                        bigint not null,
   test_assertion_id         bigint,
   name                      varchar(255) not null,
-  short_description         varchar(50) not null,
-  description               varchar(255),
-  tdl                       varchar(20000) not null,
+  short_description         varchar(100) not null,
+  description               varchar(1024),
+  tdl                       varchar(20480) not null,
   constraint uq_TestCase_name unique (name),
   constraint pk_TestCase primary key (id))
 ;
@@ -95,9 +105,8 @@ create table TestGroup (
   id                        bigint not null,
   name                      varchar(255) not null,
   owner_id                  bigint,
-  short_description         varchar(50) not null,
-  description               varchar(255),
-  fm                        integer,
+  description               varchar(1024),
+  short_description         varchar(100) not null,
   constraint uq_TestGroup_name unique (name),
   constraint pk_TestGroup primary key (id))
 ;
@@ -139,7 +148,7 @@ create table UserHistory (
   id                        bigint not null,
   user_id                   bigint,
   operation_type_id         bigint,
-  LOG                       varchar(255),
+  LOG                       varchar(51200),
   constraint pk_UserHistory primary key (id))
 ;
 
@@ -194,6 +203,8 @@ create sequence TSlot_seq;
 
 create sequence TestAssertion_seq;
 
+create sequence TestAsset_seq;
+
 create sequence TestCase_seq;
 
 create sequence TestGroup_seq;
@@ -230,26 +241,28 @@ alter table TSlot add constraint fk_TSlot_wrapper_8 foreign key (wrapper_id) ref
 create index ix_TSlot_wrapper_8 on TSlot (wrapper_id);
 alter table TestAssertion add constraint fk_TestAssertion_testGroup_9 foreign key (test_group_id) references TestGroup (id);
 create index ix_TestAssertion_testGroup_9 on TestAssertion (test_group_id);
-alter table TestCase add constraint fk_TestCase_testAssertion_10 foreign key (test_assertion_id) references TestAssertion (id);
-create index ix_TestCase_testAssertion_10 on TestCase (test_assertion_id);
-alter table TestGroup add constraint fk_TestGroup_owner_11 foreign key (owner_id) references Users (id);
-create index ix_TestGroup_owner_11 on TestGroup (owner_id);
-alter table TestRun add constraint fk_TestRun_runConfiguration_12 foreign key (run_configuration_id) references RunConfiguration (id);
-create index ix_TestRun_runConfiguration_12 on TestRun (run_configuration_id);
-alter table TestRun add constraint fk_TestRun_runner_13 foreign key (runner_id) references Users (id);
-create index ix_TestRun_runner_13 on TestRun (runner_id);
-alter table TestRun add constraint fk_TestRun_history_14 foreign key (history_id) references UserHistory (id);
-create index ix_TestRun_history_14 on TestRun (history_id);
-alter table TokenAction add constraint fk_TokenAction_targetUser_15 foreign key (target_user_id) references Users (id);
-create index ix_TokenAction_targetUser_15 on TokenAction (target_user_id);
-alter table UserHistory add constraint fk_UserHistory_user_16 foreign key (user_id) references Users (id);
-create index ix_UserHistory_user_16 on UserHistory (user_id);
-alter table UserHistory add constraint fk_UserHistory_operationType_17 foreign key (operation_type_id) references OperationType (id);
-create index ix_UserHistory_operationType_17 on UserHistory (operation_type_id);
-alter table Wrapper add constraint fk_Wrapper_user_18 foreign key (user_id) references Users (id);
-create index ix_Wrapper_user_18 on Wrapper (user_id);
-alter table WrapperParam add constraint fk_WrapperParam_testCase_19 foreign key (test_case_id) references TestCase (id);
-create index ix_WrapperParam_testCase_19 on WrapperParam (test_case_id);
+alter table TestAsset add constraint fk_TestAsset_owner_10 foreign key (owner_id) references Users (id);
+create index ix_TestAsset_owner_10 on TestAsset (owner_id);
+alter table TestCase add constraint fk_TestCase_testAssertion_11 foreign key (test_assertion_id) references TestAssertion (id);
+create index ix_TestCase_testAssertion_11 on TestCase (test_assertion_id);
+alter table TestGroup add constraint fk_TestGroup_owner_12 foreign key (owner_id) references Users (id);
+create index ix_TestGroup_owner_12 on TestGroup (owner_id);
+alter table TestRun add constraint fk_TestRun_runConfiguration_13 foreign key (run_configuration_id) references RunConfiguration (id);
+create index ix_TestRun_runConfiguration_13 on TestRun (run_configuration_id);
+alter table TestRun add constraint fk_TestRun_runner_14 foreign key (runner_id) references Users (id);
+create index ix_TestRun_runner_14 on TestRun (runner_id);
+alter table TestRun add constraint fk_TestRun_history_15 foreign key (history_id) references UserHistory (id);
+create index ix_TestRun_history_15 on TestRun (history_id);
+alter table TokenAction add constraint fk_TokenAction_targetUser_16 foreign key (target_user_id) references Users (id);
+create index ix_TokenAction_targetUser_16 on TokenAction (target_user_id);
+alter table UserHistory add constraint fk_UserHistory_user_17 foreign key (user_id) references Users (id);
+create index ix_UserHistory_user_17 on UserHistory (user_id);
+alter table UserHistory add constraint fk_UserHistory_operationType_18 foreign key (operation_type_id) references OperationType (id);
+create index ix_UserHistory_operationType_18 on UserHistory (operation_type_id);
+alter table Wrapper add constraint fk_Wrapper_user_19 foreign key (user_id) references Users (id);
+create index ix_Wrapper_user_19 on Wrapper (user_id);
+alter table WrapperParam add constraint fk_WrapperParam_testCase_20 foreign key (test_case_id) references TestCase (id);
+create index ix_WrapperParam_testCase_20 on WrapperParam (test_case_id);
 
 
 
@@ -280,6 +293,8 @@ drop table if exists TSignal cascade;
 drop table if exists TSlot cascade;
 
 drop table if exists TestAssertion cascade;
+
+drop table if exists TestAsset cascade;
 
 drop table if exists TestCase cascade;
 
@@ -320,6 +335,8 @@ drop sequence if exists TSignal_seq;
 drop sequence if exists TSlot_seq;
 
 drop sequence if exists TestAssertion_seq;
+
+drop sequence if exists TestAsset_seq;
 
 drop sequence if exists TestCase_seq;
 

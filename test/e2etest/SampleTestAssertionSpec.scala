@@ -26,12 +26,12 @@ class SampleTestAssertionSpec extends Specification {
 
   TestCase = "XMlGeneratorTest"
 
-  val rivet1 = "generateBooksData(int)" of "xmlValueInitiator" shall(
+  val rivet1 = "generateBooksData(int)" of "$xmlValueInitiator" shall(
      map(5 onto 1)
   )
 
-  val rivet2 = "generateXML(byte[])" of "xmlGenerator" shall(
-     use("initialDataCreated(byte[])" of "xmlValueInitiator")(
+  val rivet2 = "generateXML(byte[])" of "$xmlGenerator" shall(
+     use("initialDataCreated(byte[])" of "$xmlValueInitiator")(
        mapping(1 onto 1)
      )
   )
@@ -86,7 +86,7 @@ WRAPPER_CLASS=wrapper.XmlGeneratorWrapper"""
       Thread.sleep(500)
 
       //run test
-      val op = route(FakeRequest(POST, "/testme").withTextBody(tdl).withSession(("userEmail", "massimiliano.masi@tiani-spirit.com")))
+      val op = route(FakeRequest(POST, "/testme").withTextBody(tdl).withSession(("userEmail", "myildiz83@gmail.com")))
       val testPage = op.get
       status(testPage)(akka.util.Timeout(50, TimeUnit.SECONDS)) must equalTo(OK)
     }

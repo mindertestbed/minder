@@ -77,6 +77,7 @@ function createFormDialog(elm, sourceUrl, action, dialogId, titl, target, w, h){
        });
 
      frm[0].setAttribute('action', action);
+
      $.ajax({
           type: 'GET',
           url: sourceUrl,
@@ -89,6 +90,74 @@ function createFormDialog(elm, sourceUrl, action, dialogId, titl, target, w, h){
           }
      });
      frm[0].innerHTML = "..."
+     dialog.dialog( "open", titl );
+  });
+}
+
+
+function createMultipartFormDialog(elm, sourceUrl, action, dialogId, titl, target, w, h){
+  if(typeof(w)==='undefined') w = '50%';
+  if(typeof(h)==='undefined') h = '500';
+
+ //
+  var frm = $( "#" + dialogId + " > form");
+     elm.on('click', function(event){
+     event.stopPropagation();
+
+     var dialog = $( "#" + dialogId ).dialog({
+         autoOpen: false,
+         height: h,
+         width: w,
+         title: titl,
+         modal: true,
+         buttons: {
+             "Ok": function(){
+
+               var processedData = new FormData(frm[0]);
+
+
+               frm[0].innerHTML = "<div align='center'><i>Sending Data...</i></div>"
+
+               $.ajax({
+                 type: frm.attr('method'),
+                 url: frm.attr('action'),
+                 data: processedData,
+                 contentType: false,
+                 processData: false,
+                 success: function (data) {
+                    target[0].innerHTML = data;
+                    executeScripts(target);
+                    dialog.dialog( "close" );
+                 },
+                 error: function (jqXHR, textStatus, errorMessage) {
+                     frm[0].innerHTML = jqXHR.responseText;
+                     frm[0].reset();
+                 }
+               });
+             },
+             Cancel: function() {
+               dialog.dialog( "close" );
+             }
+         },
+         close: function() {
+           frm[0].reset();
+         }
+       });
+
+     frm[0].setAttribute('action', action);
+     frm[0].setAttribute('enctype', 'multipart/form-data')
+     $.ajax({
+          type: 'GET',
+          url: sourceUrl,
+          success: function (data) {
+            frm[0].innerHTML = data;
+            executeScripts(frm);
+          },
+          error: function (jqXHR, textStatus, errorMessage) {
+              frm[0].innerHTML = jqXHR.responseText;
+          }
+     });
+     frm[0].innerHTML = "<div align='center'><i>Loading...</i></div>"
      dialog.dialog( "open", titl );
   });
 }

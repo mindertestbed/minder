@@ -33,10 +33,12 @@ public class TestGroup extends Model {
   @OneToMany(cascade = CascadeType.ALL,fetch = FetchType.LAZY)
   public List<TestAssertion> testAssertions;
 
-  @Column(nullable = false, length = 50)
-  public String shortDescription;
 
+  @Column(length = ModelConstants.DESCRIPTION_LENGTH)
   public String description;
+
+  @Column(nullable = false, length = ModelConstants.SHORT_DESC_LENGTH)
+  public String shortDescription;
 
   public static final Finder<Long, TestGroup> find = new Finder<>(
       Long.class, TestGroup.class);
@@ -53,5 +55,4 @@ public class TestGroup extends Model {
     return find.byId(id);
   }
 
-  public int fm;
 }

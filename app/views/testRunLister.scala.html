@@ -1,0 +1,40 @@
+@(configurationId: Long, localUser: models.User = null)
+
+<div id="testRunListerDiv@configurationId">
+  <table style="width: 100%;">
+    <tr style="height:10%;">
+        <td>
+            <h4 class="demoHeaders">Test Runs</h4>
+        </td>
+    </tr>
+    <tr>
+    </tr>
+        <td>
+         @defining(RunConfiguration.getTestRuns(configurationId)){ testRunList =>
+			 @for(testRun <- testRunList){
+              <div class="title hand differ" style="width:100%; border-bottom: 1px solid black; height: 30px;">
+                <table class="fullw">
+                  <tr>
+                    <td style="text-align:left;" class="trigger">@testRun.date</td>
+                    <td class="trigger" style="text-align:left;">@testRun.runner.email</td>
+                    <td style="width:3%;" align="center" valign="middle">
+                    	<div id="viewUserHistory@testRun.id" class="celldiv bevel2" style="height:26px;width:26px;">
+			          		<img src="@routes.Assets.at("/images/receipt-64.png")" height="16px" alt='@testRun.id'/>
+			     		</div>
+			     		<script>
+			              createFormDialog($("#viewUserHistory@testRun.id"),
+			              "/viewUserHistory?testRunId=@testRun.id" ,
+			              "/doViewUserHistory", "mainDialog", "View User History", $("#testRunListerDiv@configurationId").parent(),'1200', '720')
+		                </script> 
+                    </td>
+                    <td class="trigger">&nbsp;</td>
+                    <td style="width:25px;" class="trigger">&nbsp;</td>
+                  </tr>
+                </table>
+              </div>
+             }
+          }
+        </td>
+    </tr>
+  </table>
+</div>

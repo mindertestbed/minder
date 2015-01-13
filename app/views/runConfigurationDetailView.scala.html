@@ -1,23 +1,62 @@
 @(rc: RunConfiguration)
 
+<script>
+  $( "#wmDetails" ).dialog({
+    autoOpen: false,
+    title: 'Wrapper Mapping',
+    show: {
+      effect: "blind",
+      duration: 1000
+    },
+    hide: {
+      effect: "explode",
+      duration: 1000
+    }
+  });
+
+
+  $( document ).tooltip({
+      items: "#showHideMapsClick",
+      content: function() {
+        return "Click to view wrapper mappings."
+      }
+    });
+
+</script>
 <div class="fullw fullh">
   <table>
     <tr>
       <td><b>Name:</b></td>
       <td>@rc.name</td>
       <td>&nbsp;</td>
-
-      @for(mw <- rc.mappedWrappers){
-      <td><b>@mw.parameter.name:</b></td>
-      <td>@mw.wrapper.name</td>
-      <td>&nbsp;</td>
-      }
+      <td>
+        <div style="padding-left:3px; padding-right:3px;" class="bevel2" onclick='$( "#wmDetails" ).dialog( "open" );'
+             id="showHideMapsClick"><img src="@routes.Assets.at("/images/down4-64.png")" height="16px" />
+        </div>
+      </td>
     </tr>
   </table>
-  <div id="runStatus" class="fullw bevel" style="height:94%;overflow:auto">
+  <div id="runStatus" class="fullw" style="height:94%;overflow:auto">
     <b>Rivets</b>
     <table class="fullh">
-
+      
     </table>
   </div>
+</div>
+
+<div id="wmDetails" style="display:none">
+  <table>
+    @defining(rc.mappedWrappers){lst =>
+    <tr>
+      <td><b># mappings:</b></td>
+      <td>@lst.size</td>
+    </tr>
+    @for(mw <- rc.mappedWrappers){
+    <tr>
+      <td><b>@mw.parameter.name:</b></td>
+      <td>@mw.wrapper.name</td>
+    </tr>
+    }
+    }
+  </table>
 </div>

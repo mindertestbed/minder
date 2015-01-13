@@ -120,6 +120,7 @@ object TestEngine {
    */
   def describeTdl(testCase: TestCase, email: String): util.LinkedHashMap[String, util.Set[SignalSlot]] = {
     Logger.debug("Describing: " + testCase.name + " for user " + email)
+    Logger.debug(testCase.tdl)
     val minderClass = TdlCompiler.compileTdl(email, tdlStr = testCase.tdl)
     val minderTdl = minderClass.getConstructors()(0).newInstance(null, java.lang.Boolean.FALSE).asInstanceOf[MinderTdl]
 

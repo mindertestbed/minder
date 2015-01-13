@@ -75,6 +75,27 @@ users:
 
 #Groups
 groups:
+- &sampleGroup !!models.TestGroup
+    description: A sample test gest assertions and test cases
+    name: Sample Test Group
+    shortDescription:  A sample test group
+    owner: *user
+    testAssertions:
+    - &taSample1 !!models.TestAssertion
+        testGroup: *sampleGroup
+        taId: TASAMPLE1
+        normativeSource: The system must generate valid book entries
+        target: BOOKS XML
+        prerequisites: the sut is connected and ready for testing
+        predicate: the generated books xml conforms to books.xsd
+        prescriptionLevel: Mandatory
+        shortDescription:  A sample test assertion
+        testCases:
+        - &testCase1 !!models.TestCase
+           shortDescription: A tel against books.xsd
+           tdl: sampletdl/xmltest.tdl
+           testAssertion: *taSample1
+           name: TestCaseSample1
 - &as4 !!models.TestGroup
     description: null
     name: AS4 Tests
@@ -89,6 +110,7 @@ groups:
         prerequisites: be cool
         predicate: as4 message is terribly valid
         prescriptionLevel: Mandatory
+        shortDescription:  A sample test assertion
         testCases:
         - &as4case1 !!models.TestCase
             shortDescription: A test case to check the eb code party id
@@ -118,6 +140,7 @@ groups:
         prerequisites: be cool
         predicate: smp message is terribly valid
         prescriptionLevel: Permitted
+        shortDescription:  A sample test assertion
         testCases:
         - !!models.TestCase
             description: null
@@ -139,6 +162,7 @@ groups:
         prerequisites: be cool
         predicate: smp message is terribly valid
         prescriptionLevel: Preferred
+        shortDescription:  A sample test assertion
         testCases:
         - !!models.TestCase
             description: null
@@ -160,6 +184,7 @@ groups:
         prerequisites: be cool
         predicate: the evidence is awesome
         prescriptionLevel: Preferred
+        shortDescription:  A sample test assertion
         testCases: []
 #wrappers
 wrappers:
@@ -238,13 +263,36 @@ wrappers:
     wrapper: *testWrapper4
     signature: slot2(int, int, java.lang.String, byte [], byte [], java.util.Date)
 
+#Operation Types
+TOperationTypes:
+- &opType1 !!models.TOperationType
+  name: RUN_TEST_CASE
+
+#User Histories
+histories:
+- &history1 !!models.UserHistory
+  user: *user
+  operationType: *opType1
+  systemOutputLog: Bir loglar bir loglar
+
 #Run Configurations
 runConfigurations:
 - &rc1 !!models.RunConfiguration
   name: TAAS41(RC1)
   testCase: *as4case1
   mappedWrappers: []
+  testRuns:
+  - &rc1TestRun1 !!models.TestRun
+    runConfiguration: *rc1
+    runner: *user
+    date: 2015-01-11T15:30:00+00:00
+    history: *history1
+- &rc2 !!models.RunConfiguration
+  name: TAAS42(RC2)
+  testCase: *as4case1
+  mappedWrappers: []
   testRuns: []
+
 
 #TestRun
 #testruns:

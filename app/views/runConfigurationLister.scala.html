@@ -4,6 +4,8 @@
   $(".differ2").each(function(index){
     $(this).addClass('vary2' + (index % 2));
   });
+
+
 </script>
 
 <div id="runDialog" style="display:none;">
@@ -24,23 +26,39 @@
                 <img src="@routes.Assets.at("/images/running-64.png")" height="16px"/>
               </div>
             </td>
-            <td onclick="displayRunConfiguration(@testCase.id, @configuration.id, '@configuration.name')">@configuration.name</td>
+            <td onclick="displayRunConfiguration(@testCase.id, @configuration.id, '@configuration.name')">
+              @configuration.name
+            </td>
+            <td style="width:3%;" align="center" valign="middle">
+              <div id="listTestRuns@configuration.id" class="celldiv bevel2" style="height:26px;width:26px;">
+                <img src="@routes.Assets.at("/images/rules-64.png")" height="16px" alt='@testCase.id'/>
+              </div>
+              <script>
+		              createFormDialog($("#listTestRuns@configuration.id"),
+		              "/listTestRunsForm?configurationId=@configuration.id" ,
+		              "/doListTestRuns", "mainDialog", "List Test Runs", $("#root@testCase.id").parent(),'1200', '720')
+
+
+              </script>
+            </td>
+            <td style="width:15px">&nbsp</td>
             <td style="width:3%;" align="center" valign="middle"
                 onclick="editRunConfiguration(@testCase.id, @configuration.id, '@configuration.name')">
               <img src="@routes.Assets.at("/images/edit_property-64.png")" height="16px"/>
             </td>
             <td style="width:5px">&nbsp</td>
-            <td onclick="deleteRunConfiguration(@testCase.id, @configuration.id, '@configuration.name')" style="width:3%;"
+            <td onclick="deleteRunConfiguration(@testCase.id, @configuration.id, '@configuration.name')"
+                style="width:3%;"
                 align="center" valign="middle">
               <img src="@routes.Assets.at("/images/trash2-64.png")" height="16px"/>
             </td>
           </tr>
           }
           <tr>
-            <td colspan="4">&nbsp;</td>
+            <td colspan="7">&nbsp;</td>
           </tr>
           <tr>
-            <td colspan="4">
+            <td colspan="7">
               <div class='title styledtitleinverse fullw hand create bevel2' style='margin:0;' align='center'>
                 <table>
                   <tr>

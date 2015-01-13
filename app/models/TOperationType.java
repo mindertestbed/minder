@@ -24,4 +24,5 @@ public class TOperationType extends Model {
 	@Column(name = "OPERATION_TYPE")
 	@Enumerated(EnumType.STRING)
 	public OperationType name;
+	
 }

@@ -29,23 +29,29 @@ public class TestAssertion extends Model {
 	@Column(nullable = false, unique = true)
 	public String taId;
 
-	@Column(nullable = false)
+	@Column(nullable = false, length = 250)
 	public String normativeSource;
 
 	@Column(nullable = false)
 	public String target;
 
+	@Column(length = 250)
 	public String prerequisites;
 
 	@Column(nullable = false)
 	public String predicate;
 
+	@Column(length = 250)
 	public String variables;
 
+	@Column(length = 250)
 	public String tag;
 
-	@Column(length = 1024)
+	@Column(length = ModelConstants.DESCRIPTION_LENGTH)
 	public String description;
+
+	@Column(nullable = false, length = ModelConstants.SHORT_DESC_LENGTH)
+	public String shortDescription;
 
 	public PrescriptionLevel prescriptionLevel;
 
