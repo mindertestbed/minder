@@ -89,6 +89,7 @@ groups:
         prerequisites: the sut is connected and ready for testing
         predicate: the generated books xml conforms to books.xsd
         prescriptionLevel: Mandatory
+        shortDescription:  A sample test assertion
         testCases:
         - &testCase1 !!models.TestCase
            shortDescription: A tel against books.xsd
@@ -109,6 +110,7 @@ groups:
         prerequisites: be cool
         predicate: as4 message is terribly valid
         prescriptionLevel: Mandatory
+        shortDescription:  A sample test assertion
         testCases:
         - &as4case1 !!models.TestCase
             shortDescription: A test case to check the eb code party id
@@ -138,6 +140,7 @@ groups:
         prerequisites: be cool
         predicate: smp message is terribly valid
         prescriptionLevel: Permitted
+        shortDescription:  A sample test assertion
         testCases:
         - !!models.TestCase
             description: null
@@ -159,6 +162,7 @@ groups:
         prerequisites: be cool
         predicate: smp message is terribly valid
         prescriptionLevel: Preferred
+        shortDescription:  A sample test assertion
         testCases:
         - !!models.TestCase
             description: null
@@ -180,6 +184,7 @@ groups:
         prerequisites: be cool
         predicate: the evidence is awesome
         prescriptionLevel: Preferred
+        shortDescription:  A sample test assertion
         testCases: []
 #wrappers
 wrappers:

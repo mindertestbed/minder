@@ -47,8 +47,11 @@ public class TestAssertion extends Model {
 	@Column(length = 250)
 	public String tag;
 
-	@Column(length = 1024)
+	@Column(length = ModelConstants.DESCRIPTION_LENGTH)
 	public String description;
+
+	@Column(nullable = false, length = ModelConstants.SHORT_DESC_LENGTH)
+	public String shortDescription;
 
 	public PrescriptionLevel prescriptionLevel;
 

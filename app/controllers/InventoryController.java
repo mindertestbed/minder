@@ -12,6 +12,7 @@ import play.mvc.Controller;
 import play.mvc.Result;
 import views.html.*;
 
+import javax.validation.Constraint;
 import java.util.*;
 
 import static play.data.Form.form;
@@ -63,6 +64,9 @@ public class InventoryController extends Controller {
 		public String variables;
 
 		public String tag;
+
+		@Constraints.Required
+		public String shortDescription;
 
 		public String description;
 
@@ -363,7 +367,7 @@ public class InventoryController extends Controller {
 	 * test case CRUD
 	 */
 
-	private static void printFormErrors(Form<?> filledForm) {
+	public static void printFormErrors(Form<?> filledForm) {
 		Map<String, List<ValidationError>> errors = filledForm.errors();
 		Set<String> set = errors.keySet();
 		for (String key : set) {

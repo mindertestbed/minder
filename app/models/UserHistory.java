@@ -22,7 +22,7 @@ public class UserHistory extends Model {
 	@OneToOne(fetch=FetchType.EAGER)
 	public TOperationType operationType;
 	
-	@Column(name = "LOG")
+	@Column(name = "LOG", length = ModelConstants.LOG_LENGTH)
 	public String systemOutputLog;
 }
 

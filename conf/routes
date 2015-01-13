@@ -80,6 +80,13 @@ GET     /editRunConfigurationForm       controllers.InventoryController.editRunC
 GET     /displayRunConfiguration        controllers.InventoryController.displayRunConfiguration(id: Long)
 POST    /doEditRunConfiguration         controllers.InventoryController.doEditRunConfiguration()
 
+#test asset management
+POST    /doCreateTestAsset              controllers.TestAssetController.doCreateTestAsset
+GET     /createNewAssetForm             controllers.TestAssetController.createNewAssetForm
+GET     /editAssetForm                  controllers.TestAssetController.editAssetForm(id: Long)
+POST    /doEditAsset                    controllers.TestAssetController.doEditAsset
+GET     /doDeleteAsset                  controllers.TestAssetController.doDeleteAsset(id: Long)
+GET     /downloadAsset                  controllers.TestAssetController.downloadAsset(id: Long)
 
 #TESTING
 POST    /testme                         controllers.Tester.test

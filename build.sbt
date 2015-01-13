@@ -2,7 +2,7 @@ organization := "gov.tubitak.minder"
 
 name := "minder"
 
-version := "0.0.4"
+version := "0.0.5"
 
 resolvers += "play-authenticate (snapshot)" at "http://joscha.github.io/play-authenticate/repo/snapshots/"
 
