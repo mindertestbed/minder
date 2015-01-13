@@ -39,4 +39,8 @@ public class Wrapper extends Model {
 	public static Wrapper findByName(String value) {
 		return find.where().eq("name", value).findUnique();
 	}
+	
+    public static Wrapper findById(Long id) {
+	    return find.byId(id);
+	  }
 }

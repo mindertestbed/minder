@@ -86,9 +86,15 @@ POST    /testme                         controllers.Tester.test
 GET     /doRunRunconfiguration          controllers.Tester.doRunRunconfiguration(id: Long)
 
 #test run listing
-GET     /listTestRunsForm           controllers.InventoryController.listTestRuns(configurationId: Long)
-POST    /doListTestRuns             controllers.InventoryController.doListTestRuns()
+GET     /listTestRunsForm             controllers.InventoryController.listTestRuns(configurationId: Long)
+POST    /doListTestRuns               controllers.InventoryController.doListTestRuns()
 
 #User History listing
-GET     /viewUserHistory           controllers.InventoryController.viewUserHistory(testRunId: Long)
+GET     /viewUserHistory              controllers.InventoryController.viewUserHistory(testRunId: Long)
 POST    /doViewUserHistory            controllers.InventoryController.doViewUserHistory()
+
+
+#Wrappers
+GET     /createNewWrapperForm         controllers.InventoryController.createNewWrapperForm
+POST    /doCreateWrapper              controllers.InventoryController.doCreateWrapper     
+GET     /doDeleteWrapper              controllers.InventoryController.doDeleteWrapper(id: Long)

@@ -1,13 +1,22 @@
 @(localUser: models.User = null)
 
 @main(Messages("playauthenticate.navigation.restricted.testdeveloper"), "restrictedTestDeveloper") {
-    <h3 class="explanation"><img src="@routes.Assets.at("/images/about-64.png")" height="24px"/></h3>
-    <p>
-        @Messages("playauthenticate.restricted.testdeveloper")
-    </p>
+
+<script>
+</script>
+
+
+<h3 class="explanation"><img src="@routes.Assets.at("/images/about-64.png")" height="24px"/></h3>
+<p>
+  @Messages("playauthenticate.restricted.testdeveloper")
+</p>
 
 
 <div class="fullh">
-    content goes here
+  <b>Wrappers</b>
+
+  <div id="tabs-1" class="fullh">
+    @wrapperManager(localUser)
+  </div>
 </div>
 }
