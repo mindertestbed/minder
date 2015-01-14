@@ -29,7 +29,7 @@ public class TestAssetController extends Controller {
     public String name;
 
     @Constraints.Required
-    @Constraints.MinLength(10)
+    @Constraints.MinLength(5)
     @Constraints.MaxLength(50)
     public String shortDescription;
 
@@ -248,8 +248,6 @@ public class TestAssetController extends Controller {
         byte[] bulk = new byte[1024];
 
         while ((r = fis.read(bulk)) != -1) {
-          Thread.sleep(5);
-          System.out.println(r);
           fos.write(bulk, 0, r);
         }
         fis.close();

@@ -90,7 +90,7 @@ GET     /downloadAsset                  controllers.TestAssetController.download
 
 #TESTING
 POST    /testme                         controllers.Tester.test
-GET     /doRunRunconfiguration          controllers.Tester.doRunRunconfiguration(id: Long)
+GET     /runOrSyncTest                  controllers.Tester.runOrSyncTest(id: Long, userId: Long)
 
 #test run listing
 GET     /listTestRunsForm             controllers.InventoryController.listTestRuns(configurationId: Long)

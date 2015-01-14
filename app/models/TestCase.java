@@ -60,9 +60,57 @@ public class TestCase extends Model {
   }
 
   private void detectParameters() {
+    deleteCurrentWrapperParamsOnDatabase();
 
-    System.out.printf("");
+    LinkedHashMap<String, Set<SignalSlot>> map = TestEngine.describeTdl(this, this.testAssertion.testGroup.owner.email);
 
+    List<WrapperParam> wpList = new ArrayList<>();
+    for (Map.Entry<String, Set<SignalSlot>> entry : map.entrySet()) {
+      Logger.debug("Wrapper Name: " + entry.getKey() + ": " + entry.getKey().startsWith("$") + "");
+
+
+      //make sure that we are looping on variables.
+      if (!entry.getKey().startsWith("$"))
+        continue;
+
+
+      Logger.debug("\t" + entry.getKey() + " is a variable");
+      WrapperParam wrapperParam;
+      wrapperParam = new WrapperParam();
+      wrapperParam.name = entry.getKey();
+      wrapperParam.signatures = new ArrayList<>();
+      wrapperParam.testCase = this;
+      wpList.add(wrapperParam);
+
+
+      for (SignalSlot signalSlot : entry.getValue()) {
+        ParamSignature ps = new ParamSignature();
+        ps.signature = signalSlot.signature().replaceAll("\\s", "");
+        ps.wrapperParam = wrapperParam;
+        wrapperParam.signatures.add(ps);
+      }
+
+      this.parameters.add(wrapperParam);
+    }
+
+    try {
+      Ebean.beginTransaction();
+
+      for (WrapperParam str : wpList) {
+        str.save();
+        System.out.println("TO SAVE FOR " + str.name);
+        for (ParamSignature signature : str.signatures) {
+          System.out.println("Param Signature " + signature.signature);
+          signature.save();
+        }
+      }
+      System.out.println("============");
+
+      Ebean.commitTransaction();
+    } catch (Exception ex) {
+      ex.printStackTrace();
+      Ebean.endTransaction();
+    }
   }
 
   private void deleteCurrentWrapperParamsOnDatabase() {

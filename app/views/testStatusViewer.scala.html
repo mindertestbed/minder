@@ -1,0 +1,187 @@
+@(rc: RunConfiguration, user: User)
+
+
+<style>
+  div.slotPending {
+  background-color:orange;
+  border: 1px solid black;
+  height: 50px;
+  width: 50px;
+  display: table-cell;
+  vertical-align: middle;
+  text-align: center;
+  }
+
+  div.slotPending:hover{
+  background-color:lightorange;
+  }
+
+  div.slotBad {
+  background-color:red;
+  border: 1px solid black;
+  height: 50px;
+  width: 50px;
+  display: table-cell;
+  vertical-align: middle;
+  text-align: center;
+  }
+
+  div.slotBad:hover{
+  background-color:lightred;
+  }
+
+  div.slotGood {
+  background-color:green;
+  border: 1px solid black;
+  height: 50px;
+  width: 50px;
+  display: table-cell;
+  vertical-align: middle;
+  text-align: center;
+  }
+
+  div.slotGood:hover{
+  background-color:lightGreen;
+  }
+  div.signalPending {
+  background-color:yellow;
+  border: 1px solid black;
+  height: 50px;
+  width: 50px;
+  display: table-cell;
+  vertical-align: middle;
+  text-align: center;
+  }
+
+  div.signalPending:hover{
+  background-color:lightyellow;
+  }
+
+  div.signalBad {
+  background-color:red;
+  border: 1px solid black;
+  height: 50px;
+  width: 50px;
+  display: table-cell;
+  vertical-align: middle;
+  text-align: center;
+  }
+
+  div.signalBad:hover{
+  background-color:lightred;
+  }
+
+  div.signalGood {
+  background-color:green;
+  border: 1px solid black;
+  height: 50px;
+  width: 50px;
+  display: table-cell;
+  vertical-align: middle;
+  text-align: center;
+  }
+
+  div.signalGood:hover{
+  background-color:lightGreen;
+  }
+
+  div.blank{
+  width: 10px;
+  display: table-cell;
+  vertical-align: middle;
+  text-align: center;
+  }
+
+
+  div.childPending {
+  background-color:yellow;
+  border: 1px solid black;
+  height: 50px;
+  width: 20px;
+  display: table-cell;
+  vertical-align: middle;
+  text-align: center;
+  }
+
+  div.childPending:hover{
+  background-color:lightyellow;
+  }
+
+  div.childBad {
+  background-color:red;
+  border: 1px solid black;
+  height: 50px;
+  width: 20px;
+  display: table-cell;
+  vertical-align: middle;
+  text-align: center;
+  }
+
+  div.childBad:hover{
+  background-color:lightred;
+  }
+
+  div.childGood {
+  background-color:green;
+  border: 1px solid black;
+  height: 50px;
+  width: 20px;
+  display: table-cell;
+  vertical-align: middle;
+  text-align: center;
+  }
+
+  div.childGood:hover{
+  background-color:lightGreen;
+  }
+
+  div.blank{
+  width: 10px;
+  display: table-cell;
+  vertical-align: middle;
+  text-align: center;
+  }
+
+
+</style>
+
+<script>
+
+
+</script>
+
+@defining(user.email){ email =>
+@defining(Tester.getTestRunner(user, rc)){ testRunner =>
+
+
+<table>
+  @defining(1){ index =>
+  @for(rivet <- testRunner.rivets){
+  <tr>
+    <td><b>Rivet #@index</b></td>
+    @index=index+1
+    <td>
+      <div class="@TestStatusDecorator.cssClassForSlot(rivet.slot)">
+        <!-- Decorate the parameters of the slot -->
+        @for(param <- rivet.slot.params){
+        <div class="@TestStatusDecorator.cssClassForParam(param)">@param.parm</div>
+        }
+      </div>
+      <div class="blank">&nbsp;</div>
+      @for(signal <- rivet.signals){
+      <div class="@TestStatusDecorator.cssClassForSignal(signal)">
+        @for(param <- signal.params){
+        <div class="@TestStatusDecorator.cssClassForParam(param)">@param.parm</div>
+        }
+      </div>
+      }
+    </td>
+  </tr>
+  }
+  }
+</table>
+
+<br/>
+<b>Overall Status: </b> @testRunner.status
+
+}}

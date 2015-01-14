@@ -22,7 +22,7 @@
       '_label -> "Run configuration name"
       )
 
-      @repeat(frm("mappedWrappers"), min= 1){ field =>
+      @repeat(frm("mappedWrappers"), min=0){ field =>
         @defining(field.value.get){ str =>
           @defining(MappedWrapperModel.parse(str)){ entry =>
           <label for="@field.name" class="control-label">@entry.name</label>:

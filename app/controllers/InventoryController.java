@@ -35,7 +35,7 @@ public class InventoryController extends Controller {
 		public String name;
 
 		@Constraints.Required
-		@Constraints.MinLength(10)
+		@Constraints.MinLength(5)
 		@Constraints.MaxLength(50)
 		public String shortDescription;
 
@@ -66,6 +66,8 @@ public class InventoryController extends Controller {
 		public String tag;
 
 		@Constraints.Required
+		@Constraints.MinLength(5)
+		@Constraints.MaxLength(50)
 		public String shortDescription;
 
 		public String description;
@@ -82,7 +84,7 @@ public class InventoryController extends Controller {
 		public String name;
 
 		@Constraints.Required
-		@Constraints.MinLength(10)
+		@Constraints.MinLength(5)
 		@Constraints.MaxLength(50)
 		public String shortDescription;
 

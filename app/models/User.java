@@ -77,7 +77,7 @@ public class User extends Model implements Subject {
 	@OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, mappedBy = "owner")
 	public List<TestAsset> testAssets;
 
-	public static final Finder<Long, User> find = new Finder<Long, User>(
+	public static final Model.Finder<Long, User> find = new Model.Finder<Long, User>(
 			Long.class, User.class);
 
 	@Override
