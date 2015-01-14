@@ -114,6 +114,11 @@ public class InventoryController extends Controller {
 
 		@Constraints.Required
 		public String name;
+		
+		//@Constraints.Required
+		@Constraints.MinLength(10)
+		@Constraints.MaxLength(50)
+		public String shortDescription;
 
 	}
 
@@ -855,6 +860,7 @@ public class InventoryController extends Controller {
 
 			wrapper.user = localUser;
 			wrapper.name = model.name;
+			wrapper.shortDescription = model.shortDescription;
 
 			wrapper.save();
 
@@ -888,4 +894,40 @@ public class InventoryController extends Controller {
 		return ok(wrapperLister.render(Application.getLocalUser(session())));
 	}
 
+	public static Result editWrapperForm(Long id) {
+		Wrapper wr = Wrapper.find.byId(id);
+		if (wr == null) {
+			return badRequest("Wrapper with id [" + id + "] not found!");
+		} else {
+			WrapperEditorModel wrModel = new WrapperEditorModel();
+			wrModel.id = id;
+			wrModel.name = wr.name;
+			wrModel.shortDescription = wr.shortDescription;
+			
+			Form<WrapperEditorModel> bind = WRAPPER_FORM
+					.fill(wrModel);
+			return ok(wrapperEditor2.render(bind, null));
+		}
+	}
+	
+	public static Result doEditWrapper() {
+		com.feth.play.module.pa.controllers.Authenticate.noCache(response());
+
+		final Form<WrapperEditorModel> filledForm = WRAPPER_FORM
+				.bindFromRequest();
+
+		if (filledForm.hasErrors()) {
+			printFormErrors(filledForm);
+			return badRequest(wrapperEditor2.render(filledForm, null));
+		} else {
+			WrapperEditorModel model = filledForm.get();
+			Wrapper wr = Wrapper.find.byId(model.id);
+			wr.shortDescription = model.shortDescription;
+			wr.update();
+
+			Logger.info("Done updating wrapper " + model.name );
+			return ok(wrapperLister.render(Application
+					.getLocalUser(session())));
+		}
+	}
 }

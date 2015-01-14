@@ -19,6 +19,9 @@ public class Wrapper extends Model {
 
 	@Column(name = "NAME", unique = true)
 	public String name;
+	
+	@Column(/*nullable = false,*/ length = 50)
+	public String shortDescription;
 
 	@ManyToOne
 	public User user;

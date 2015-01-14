@@ -162,6 +162,7 @@ create table UserPermission (
 create table Wrapper (
   id                        bigint not null,
   NAME                      varchar(255),
+  short_description         varchar(50),
   user_id                   bigint,
   constraint uq_Wrapper_NAME unique (NAME),
   constraint pk_Wrapper primary key (id))
