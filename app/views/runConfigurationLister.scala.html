@@ -22,11 +22,11 @@
           @for(configuration <- RunConfiguration.findByTestCase(testCase)){
           <tr class="differ2" style="height:25px;">
             <td style="width:3%;" align="center" valign="middle">
-              <div onclick="displayRunConfiguration(@testCase.id, @configuration.id, '@configuration.name')">
+              <div onclick="displayRunConfiguration(@configuration.id, '@configuration.name', '@Application.getLocalUser(session()).id')">
                 <img src="@routes.Assets.at("/images/running-64.png")" height="16px"/>
               </div>
             </td>
-            <td onclick="displayRunConfiguration(@testCase.id, @configuration.id, '@configuration.name')">
+            <td onclick="displayRunConfiguration(@configuration.id, '@configuration.name', '@Application.getLocalUser(session()).id')">
               @configuration.name
             </td>
             <td style="width:3%;" align="center" valign="middle">

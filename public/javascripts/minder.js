@@ -326,13 +326,13 @@ function showEditDialog(testCaseId, id, data, title){
 }
 
 
-function displayRunConfiguration(testCaseId, id, name){
+function displayRunConfiguration(id, name, userId){
    //perform ajax to get the run dialog
    $.ajax({
       type: 'GET',
       url: '/displayRunConfiguration?id='+id,
       success: function (data) {
-        showRunDialog(testCaseId, id, data, name)
+        showRunDialog(id, data, name, userId)
       },
       error: function (jqXHR, textStatus, errorMessage) {
         showError(jqXHR.responseText);
@@ -340,65 +340,60 @@ function displayRunConfiguration(testCaseId, id, name){
    });
 }
 
-function showRunDialog(testCaseId, id, data, title){
+function showRunDialog(runConfigurationId, data, title, userId){
   var runDialog = $( "#runDialog" );
   runDialog[0].innerHTML = data
   executeScripts(runDialog);
 
-    var dialog = runDialog.dialog({
-       autoOpen: false,
-       height: 650,
-       width: 1200,
-       title: 'Run Configuration' + title,
-       modal: true,
-       buttons: {
-         "Run": function() {
-            ajaxDisplayRunConfiguration(runDialog, id)
-         },
-         Cancel: function() {
-           dialog.dialog( "close" );
-         }
+  //here we have the handle to the inner table where the test status is shown.
+  //we will update it during the test.
+  //see: runConfigurationDetailView>div #testStatus.
+  var targetStatusDiv = $('#testStatus')
+
+  var dialog = runDialog.dialog({
+     autoOpen: false,
+     height: 650,
+     width: 1200,
+     title: 'Run Configuration' + title,
+     modal: true,
+     buttons: {
+       "Run": function() {
+          runTest(runDialog, runConfigurationId, targetStatusDiv, userId)
+       },
+       Cancel: function() {
+         dialog.dialog( "close" );
        }
+     }
    });
 
    dialog.dialog( "open", title );
 }
 
-function ajaxDisplayRunConfiguration(runDialog, id){
-  $.ajax({
-     type: 'GET',
-     url: '/displayRunConfiguration?id' + id ,
-     data: editorForm.serialize(),
-     success: function (data) {
-        runDialog[0].innerHTML = data;
-        executeScripts(runDialog);
-      },
-     error: function (jqXHR, textStatus, errorMessage) {
-         showError(jqXHR.responseText);
-     }
-   });
-}
+function runTest(runDialog, runConfigurationId, targetStatusDiv, userId){
+   setTimeout(function(){
+      $.ajax({
+        type: 'GET',
+        url: '/runOrSyncTest?id=' + runConfigurationId + '&userId=' + userId ,
+        success: function(data){
 
 
-function runRun(id){
-  $.ajax({
-     type: 'GET',
-     url: '/displayRunConfiguration?id' + id ,
-     data: editorForm.serialize(),
-     success: function (data) {
-        if(data.indexOf("TESTFINISH") != -1){
-          runnerDiv[0].innerHTML = data;
-          executeScripts(runnerDiv);
-          setTimeout(function(){
-            runRun(id);
-          }, 500);
+          if(data.indexOf("TESTFINISHED") != -1){
+            alert(data);
+          }else if (data.indexOf("TESTFAILED") != -1){
+            alert(data)
+          } else{
+             targetStatusDiv[0].innerHTML = data;
+             executeScripts(targetStatusDiv);
+             runTest(runDialog, runConfigurationId, targetStatusDiv, userId);
+          }
+        },
+        error: function (jqXHR, textStatus, errorMessage) {
+          showError(jqXHR.responseText);
         }
-     },
-     error: function (jqXHR, textStatus, errorMessage) {
-         runnerDiv[0].innerHTML = jqXHR.responseText;
-     }
-   });
+      });
+  }, 1000);
 }
+
 
 function deleteRunConfiguration(testCaseId, idd, name){
   var parent = $("#rcRoot" + testCaseId).parent();
