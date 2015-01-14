@@ -16,6 +16,7 @@ import org.yaml.snakeyaml.Yaml;
 import org.yaml.snakeyaml.constructor.CustomClassLoaderConstructor;
 import play.Application;
 import play.GlobalSettings;
+import play.Logger;
 import play.api.Play;
 import play.db.ebean.Model;
 import play.mvc.Call;
@@ -104,9 +105,13 @@ public class Global extends GlobalSettings {
       try {
         Yaml yaml = new Yaml(new CustomClassLoaderConstructor(Play.classloader(Play.current())));
 
-        Map<String, List<Model>> all = (Map<String, List<Model>>) yaml.load(new FileInputStream("conf/initial-data.yml"));
-        System.out.println("Tablolar:\n");
-        System.out.println(all);
+        File currentDir = new File(".");
+        Logger.debug("Current Directory:" + currentDir.getAbsolutePath());
+
+        File yml = new File(currentDir.getAbsoluteFile() + "/conf/initial-data.yml");
+        Logger.debug("Yml file: " + yml.getAbsolutePath() + " exists? " + yml.exists());
+
+        Map<String, List<Model>> all = (Map<String, List<Model>>) yaml.load(new FileInputStream(yml));
         for (String key : all.keySet()) {
           for (Model model : all.get(key)) {
             model.save();
@@ -116,7 +121,6 @@ public class Global extends GlobalSettings {
               for(TestAssertion assertion : group.testAssertions){
                 for (TestCase tcase : assertion.testCases){
                   BufferedSource file = Source.fromFile(tcase.tdl, "utf-8");
-                  System.out.println("TDL: " + tcase.tdl);
                   tcase.setTdl(file.mkString());
                   tcase.save();
                 }
