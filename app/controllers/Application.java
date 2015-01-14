@@ -90,15 +90,15 @@ public class Application extends Controller {
     final Form<MyLogin> filledForm = MyUsernamePasswordAuthProvider.LOGIN_FORM
         .bindFromRequest();
 
-    System.out.println(filledForm.get().getEmail());
-    System.out.println(filledForm.get().getPassword());
     if (filledForm.hasErrors()) {
-
       System.out.println("There are errors");
       // User did not fill everything properly
       return badRequest(login.render(filledForm));
     } else {
       MyLogin lgn = filledForm.get();
+      System.out.println(filledForm.get().getEmail());
+      System.out.println(filledForm.get().getPassword());
+
       // Everything was filled
       Result result = UsernamePasswordAuthProvider.handleLogin(ctx());
 
