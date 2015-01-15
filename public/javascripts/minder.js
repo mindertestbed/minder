@@ -375,8 +375,6 @@ function runTest(runDialog, runConfigurationId, targetStatusDiv, userId){
         type: 'GET',
         url: '/runOrSyncTest?id=' + runConfigurationId + '&userId=' + userId ,
         success: function(data){
-
-
           if(data.indexOf("TESTFINISHED") != -1){
             alert(data);
           }else if (data.indexOf("TESTFAILED") != -1){
