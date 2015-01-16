@@ -1,5 +1,11 @@
 @(localUser: models.User = null)
 
+ <script>
+  $(function() {
+    $( document ).tooltip();
+  });
+  </script>
+
 <div id="assetAccordion" class="fullw bevel" style="height:100%;padding:0px;">
   @defining(TestAsset.findByOwner(localUser)){ testAssets =>
   @for(asset <- testAssets){
@@ -20,7 +26,7 @@
         </td>
         <td class="trigger">&nbsp;</td>
         <td style="width:3%;" align="center">
-          <div id="downloadAsset@asset.id" class="bevel2 celldiv" style="height:30px;width:30px;">
+          <div id="downloadAsset@asset.id" title="Download" class="bevel2 celldiv" style="height:30px;width:30px;">
               <a href="/downloadAsset?id=@asset.id"><img src="@routes.Assets.at("/images/download-64.png")" height="16px" alt="Download"/></a>
           </div>
         </td>

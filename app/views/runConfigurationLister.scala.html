@@ -8,6 +8,12 @@
 
 </script>
 
+ <script>
+  $(function() {
+    $( document ).tooltip();
+  });
+  </script>
+
 <div id="runDialog" style="display:none;">
 </div>
 
@@ -42,12 +48,13 @@
               </script>
             </td>
             <td style="width:15px">&nbsp</td>
-            <td style="width:3%;" align="center" valign="middle"
+            <td style="width:3%;" align="center" valign="middle" title = "Edit"
                 onclick="editRunConfiguration(@testCase.id, @configuration.id, '@configuration.name')">
               <img src="@routes.Assets.at("/images/edit_property-64.png")" height="16px"/>
             </td>
             <td style="width:5px">&nbsp</td>
             <td onclick="deleteRunConfiguration(@testCase.id, @configuration.id, '@configuration.name')"
+            title = "Delete"
                 style="width:3%;"
                 align="center" valign="middle">
               <img src="@routes.Assets.at("/images/trash2-64.png")" height="16px"/>

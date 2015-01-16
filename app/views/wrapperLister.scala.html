@@ -1,5 +1,13 @@
 @(localUser: models.User = null)
 
+ <script>
+  $(function() {
+    $( document ).tooltip();
+  });
+  </script>
+  
+ 
+
 <div id="WrapperListDiv@localUser.id" class="fullw bevel" style="height:100%;padding:0px;">
 	<table style="width: 100%;">
 	    <tr>
@@ -14,7 +22,7 @@
 	                    <td class="trigger" style="width:30%;">@currentWrapper.shortDescription</td>
 	                    <td style="width:3%;" align="center" valign="middle" >
 	                     @if(currentWrapper.user.email == localUser.email) {
-				          <div id="editWrapper@currentWrapper.id" class="celldiv bevel2" style="height:26px;width:26px;">
+				          <div id="editWrapper@currentWrapper.id" title="Edit" class="celldiv bevel2" style="height:26px;width:26px;">
 				              <img src="@routes.Assets.at("/images/edit_property-64.png")" height="16px" alt='@localUser.id'/>
 				          </div>
 				          <script>
@@ -26,7 +34,7 @@
 	                    </td>
 	                    <td style="width:3%;" align="center" valign="middle">
 	   			          @if(currentWrapper.user.email == localUser.email) {
-		   			          <div id="deleteWrapper@currentWrapper.id" class="celldiv bevel2" style="height:26px;width:26px;">
+		   			          <div id="deleteWrapper@currentWrapper.id" title="Delete" class="celldiv bevel2" style="height:26px;width:26px;">
 					              <img src="@routes.Assets.at("/images/trash2-64.png")" height="16px" alt='@localUser.id'/>
 					          </div>
 					          <script>

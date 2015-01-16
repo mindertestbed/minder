@@ -12,6 +12,12 @@
 
 </script>
 
+ <script>
+  $(function() {
+    $( document ).tooltip();
+  });
+  </script>
+
 <div id="testCaseListerDiv@assertion.id">
   <table style="width: 100%;">
     <tr>
@@ -39,7 +45,7 @@
                     <td class="trigger" style="text-align:left;">@testCase.shortDescription</td>
                     <td class="trigger">&nbsp;</td>
                     <td style="width:3%;" align="center" valign="middle">
-			          <div id="editTestCase@testCase.id" class="celldiv bevel2" style="height:26px;width:26px;">
+			          <div id="editTestCase@testCase.id" title="Edit" class="celldiv bevel2" style="height:26px;width:26px;">
 			              <img src="@routes.Assets.at("/images/edit_property-64.png")" height="16px" alt='@assertion.id'/>
 			          </div>
 			          <script>
@@ -50,7 +56,7 @@
                     </td>
                     <td style="width:5px;" class="trigger">&nbsp;</td>
                     <td style="width:3%;" align="center" valign="middle">
-   			          <div id="deleteTestCase@testCase.id" class="celldiv bevel2" style="height:26px;width:26px;">
+   			          <div id="deleteTestCase@testCase.id" title="Delete" class="celldiv bevel2" style="height:26px;width:26px;">
 			              <img src="@routes.Assets.at("/images/trash2-64.png")" height="16px" alt='@assertion.id'/>
 			          </div>
 			          <script>
