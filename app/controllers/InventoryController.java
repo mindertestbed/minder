@@ -116,7 +116,7 @@ public class InventoryController extends Controller {
 		public String name;
 		
 		//@Constraints.Required
-		@Constraints.MinLength(10)
+		@Constraints.MinLength(5)
 		@Constraints.MaxLength(50)
 		public String shortDescription;
 
@@ -265,6 +265,7 @@ public class InventoryController extends Controller {
 			ta.variables = model.variables;
 			ta.tag = model.tag;
 			ta.description = model.description;
+			ta.shortDescription = model.shortDescription;
 			ta.testGroup = tg;
 			ta.prescriptionLevel = PrescriptionLevel
 					.valueOf(model.prescriptionLevel);
@@ -294,6 +295,7 @@ public class InventoryController extends Controller {
 			taModel.variables = ta.variables;
 			taModel.tag = ta.tag;
 			taModel.description = ta.description;
+			taModel.shortDescription = ta.shortDescription;
 			taModel.groupId = ta.testGroup.id;
 			taModel.prescriptionLevel = ta.prescriptionLevel.name();
 
@@ -329,6 +331,7 @@ public class InventoryController extends Controller {
 			ta.variables = model.variables;
 			ta.tag = model.tag;
 			ta.description = model.description;
+			ta.shortDescription = model.shortDescription;
 			ta.prescriptionLevel = PrescriptionLevel
 					.valueOf(model.prescriptionLevel);
 

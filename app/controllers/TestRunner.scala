@@ -34,8 +34,6 @@ class TestRunner(val runConfiguration: RunConfiguration, val user: User) {
     override def run(): Unit = {
       println("USER.email " + user.email)
       println("runConfiguration " + runConfiguration.name)
-      println("runConfiguration " + testCase.id)
-      println("runConfiguration " + testCase.tdl)
       TestEngine.runTest2(user.email, testCase.tdl,
         variableWrapperMapping.toMap, describe, signalEmitted, slotParamSet,
         finished, failed, log)
@@ -69,6 +67,8 @@ class TestRunner(val runConfiguration: RunConfiguration, val user: User) {
   var error = ""
 
   def failed(t: Throwable) {
+
+    Logger.error(t.getMessage, t)
     status = TestStatus.BAD
     error = {
       if (t.getMessage != null) t.getMessage
@@ -91,6 +91,7 @@ class VisualRivet(rivet: Rivet) {
           --> params
    */
 
+  println("RIVET")
   val slot: VisualSS = new VisualSS(rivet.slot.wrapperId, rivet.slot.signature)
 
   val signals: List[VisualSS] = {
@@ -105,6 +106,7 @@ class VisualRivet(rivet: Rivet) {
  * A counterpart of a Signal and/or a Slot that aids drawing
  */
 class VisualSS(val label: String, val signature: String) {
+  println("\t" + label + "." + signature)
   val params: List[VisualParam] = {
     var index = 0
     val sgn = signature.substring(signature.indexOf('(')).replaceAll("\\s|\\(|\\)", "")
@@ -116,7 +118,10 @@ class VisualSS(val label: String, val signature: String) {
           vp
       }.toList
     } else {
-      List()
+      if (sgn.length > 0)
+        List(new VisualParam(label, signature, sgn, index))
+      else
+        List()
     }
   }
 
@@ -129,7 +134,7 @@ class VisualSS(val label: String, val signature: String) {
 class VisualParam(val label: String, val signature: String, val parm: String, val index: Int) {
   var value: Any = null;
   var status: Int = 0;
-
+  println("\t\tparam " + parm + "(index)")
 
   override def toString() = label + "::" + signature + "::" + parm + "::" + index
 }
@@ -139,7 +144,6 @@ object TestStatus {
   val BAD = 1;
   val GOOD = 2
 }
-
 
 object TestStatusDecorator {
   /*

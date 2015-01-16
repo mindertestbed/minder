@@ -2,7 +2,9 @@ organization := "gov.tubitak.minder"
 
 name := "minder"
 
-version := "0.0.6-alpha"
+offline := true
+
+version := "0.0.6"
 
 resolvers += "play-authenticate (snapshot)" at "http://joscha.github.io/play-authenticate/repo/snapshots/"
 
@@ -28,7 +30,7 @@ libraryDependencies ++= Seq(
   "org.scala-lang" % "scala-actors" % "2.11.4",
   "org.scala-lang.modules" % "scala-xml_2.11" % "1.0.2",
   "postgresql" % "postgresql" % "9.1-901-1.jdbc4",
-  "org.beybunproject" % "xoola" % "1.0.0-RC3",
+  "org.beybunproject" % "xoola" % "1.0.0-RC5",
   "gov.tubitak.minder" % "minder-common" % "0.0.5",
   "gov.tubitak.minder" %% "minder-tdl" % "0.0.9",
   "com.feth" %%  "play-authenticate" % "0.6.5-SNAPSHOT",
