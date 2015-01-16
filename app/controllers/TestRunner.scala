@@ -67,6 +67,8 @@ class TestRunner(val runConfiguration: RunConfiguration, val user: User) {
   var error = ""
 
   def failed(t: Throwable) {
+
+    Logger.error(t.getMessage, t)
     status = TestStatus.BAD
     error = {
       if (t.getMessage != null) t.getMessage

@@ -24,21 +24,9 @@ public class MinderWrapperAccessController implements ClientAccessController {
 
   @Override
   public boolean clientIsAllowed(String label) {
-    if (allowedClients == null) {
-      List<Wrapper> all = Wrapper.getAll();
-      allowedClients = new HashSet<>();
-      for (Wrapper wrapper : all) {
-        allowedClients.add(wrapper.name);
-      }
-    }
-
-    if (label.equals("xmlGenerator") || label.equals("xmlValueInitiator")) {
-      Logger.info("ALLOW " + label);
-      return true;
-    }
-
     Logger.info("A client with name [" + label + "] is trying to connect...");
-    if (allowedClients.contains(label)) {
+    Wrapper wrp = Wrapper.findByName(label);
+    if (wrp != null) {
       Logger.info("ALLOW [" + label + "]");
       return true;
     }
