@@ -36,15 +36,13 @@
               @configuration.name
             </td>
             <td style="width:3%;" align="center" valign="middle">
-              <div id="listTestRuns@configuration.id" class="celldiv bevel2" style="height:26px;width:26px;">
+              <div id="listTestRuns@configuration.id" class="celldiv" style="height:26px;width:26px;">
                 <img src="@routes.Assets.at("/images/rules-64.png")" height="16px" alt='@testCase.id'/>
               </div>
               <script>
 		              createFormDialog($("#listTestRuns@configuration.id"),
 		              "/listTestRunsForm?configurationId=@configuration.id" ,
-		              "/doListTestRuns", "mainDialog", "List Test Runs", $("#root@testCase.id").parent(),'1200', '720')
-
-
+		              "/doListTestRuns", "mainDialog2", "List Test Runs", $("#root@testCase.id").parent(),'1200', '720')
               </script>
             </td>
             <td style="width:15px">&nbsp</td>

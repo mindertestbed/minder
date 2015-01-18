@@ -4,7 +4,7 @@ name := "minder"
 
 offline := true
 
-version := "0.0.6"
+version := "0.0.7"
 
 resolvers += "play-authenticate (snapshot)" at "http://joscha.github.io/play-authenticate/repo/snapshots/"
 
@@ -32,13 +32,16 @@ libraryDependencies ++= Seq(
   "postgresql" % "postgresql" % "9.1-901-1.jdbc4",
   "org.beybunproject" % "xoola" % "1.0.0-RC5",
   "gov.tubitak.minder" % "minder-common" % "0.0.5",
-  "gov.tubitak.minder" %% "minder-tdl" % "0.0.9",
+  "gov.tubitak.minder" %% "minder-tdl" % "0.0.91",
   "com.feth" %%  "play-authenticate" % "0.6.5-SNAPSHOT",
   "be.objectify" %% "deadbolt-java" % "2.3.0-RC1",
   "org.webjars" %% "webjars-play" % "2.3.0",
   "org.webjars" % "bootstrap" % "3.2.0",
   "org.apache.commons" % "commons-email" % "1.3.1",
   "net.sf.saxon" % "Saxon-HE" % "9.6.0-3",
+  "net.sf.jasperreports" % "jasperreports" % "6.0.0",
+  "net.sourceforge.barbecue" % "barbecue" % "1.5-beta1",
+  "org.codehaus.groovy" % "groovy" % "2.3.9",
   "gov.tubitak.minder.test" % "xml-value-initiator" % "0.0.1" % "test",
   "gov.tubitak.minder.test" % "xml-generator" % "0.0.1" % "test"
 )
@@ -50,5 +53,6 @@ resolvers ++= Seq(
   "play-easymail (snapshot)" at "http://joscha.github.io/play-easymail/repo/snapshots/",
   Resolver.url("Objectify Play Repository", url("http://schaloner.github.io/releases/"))(Resolver.ivyStylePatterns),
   "play-authenticate (release)" at "http://joscha.github.io/play-authenticate/repo/releases/",
-  "play-authenticate (snapshot)" at "http://joscha.github.io/play-authenticate/repo/snapshots/"
+  "play-authenticate (snapshot)" at "http://joscha.github.io/play-authenticate/repo/snapshots/",
+  "jasper" at "http://jaspersoft.artifactoryonline.com/jaspersoft/third-party-ce-artifacts/"
 )

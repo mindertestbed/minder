@@ -1,17 +1,24 @@
 @(userHistory: UserHistory, localUser: models.User = null)
 
-<div id="UserHistoryDiv@userHistory.id">
-  <table style="width: 100%;">
-    <tr style="height:10%;">
-        <td>
+<div id="UserHistoryDiv@userHistory.id" style="height:100%;">
+  <table style="width:100%;height:100%">
+    <tr>
+        <td colspan="3">
             <h4 class="demoHeaders">User History</h4>
         </td>
     </tr>
     <tr>
+      <td><b>User</b></td><td><b>Operation Type</b></td><td>Log</td></tr>
     </tr>
-        <td style="text-align:left;" class="trigger">@userHistory.user.email</td>
-        <td class="trigger" style="text-align:left;">@userHistory.operationType.name</td>
-        <td class="trigger" style="text-align:left;">@userHistory.systemOutputLog</td>
+    <tr style="height:90%;">
+        <td style="font-family:Monaco;font-size:12px;text-align:left;vertical-align:top" class="trigger">@userHistory.user.email</td>
+        <td class="trigger" style="font-family:Monaco;font-size:12px;text-align:left;vertical-align:top">@userHistory.operationType.name</td>
+        <td class="trigger" style="font-family:Monaco;font-size:12px;text-align:left;vertical-align:top;height:100%;">
+          <div style="font-family:Monaco;font-size:12px;width:auto;height:100%;overflow:scroll;border:1px solid gray;border-radius:2px">
+          <xmp>
+          @userHistory.systemOutputLog
+          </xmp></div>
+        </td>
     </tr>
   </table>
 </div>
