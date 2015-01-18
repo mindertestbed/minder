@@ -4,9 +4,14 @@
 $(function() {
   minderAccordion("#taAccordion@group.id");
 });
-
-
 </script>
+
+ <script>
+  $(function() {
+    $( document ).tooltip();
+  });
+  </script>
+  
 
 <div id="taAccordion@group.id">
   @for(assertion <- TestAssertion.findByGroup(group)){
@@ -27,7 +32,7 @@ $(function() {
         </td>
         <td class="trigger">&nbsp;</td>
         <td style="width:3%;" class="center">
-          <div id="editAssertion@assertion.id" class="celldiv bevel2" style="height:26px;width:26px;">
+          <div id="editAssertion@assertion.id" title= "Edit" class="celldiv bevel2" style="height:26px;width:26px;">
               <img src="@routes.Assets.at("/images/edit_property-64.png")" height="16px" alt='@group.id'/>
           </div>
           <script>
@@ -38,7 +43,7 @@ $(function() {
         </td>
         <td style="width:3px;">&nbsp;</td>
         <td style="width:3%;" align="center" valign="middle">
-          <div id="deleteAssertion@assertion.id" class="celldiv bevel2" style="height:26px;width:26px;">
+          <div id="deleteAssertion@assertion.id" title= "Delete" class="celldiv bevel2" style="height:26px;width:26px;">
               <img src="@routes.Assets.at("/images/trash2-64.png")" height="16px" alt='@group.id'/>
           </div>
           <script>

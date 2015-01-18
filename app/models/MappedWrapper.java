@@ -35,4 +35,10 @@ public class MappedWrapper extends Model{
   public static List<MappedWrapper> findByRunConfiguration(RunConfiguration rc){
     return find.where().eq("runConfiguration", rc).orderBy("id").findList();
   }
+
+  public static void deleteByRunConfiguration(RunConfiguration rc) {
+    for (MappedWrapper mw : find.where().eq("runConfiguration", rc).findList()) {
+      mw.delete();
+    }
+  }
 }

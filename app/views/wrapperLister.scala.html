@@ -1,5 +1,13 @@
 @(localUser: models.User = null)
 
+ <script>
+  $(function() {
+    $( document ).tooltip();
+  });
+  </script>
+  
+ 
+
 <div id="WrapperListDiv@localUser.id" class="fullw bevel" style="height:100%;padding:0px;">
 	<table style="width: 100%;">
 	    <tr>
@@ -9,11 +17,24 @@
 	              <div class="title hand differ" style="width:100%; border-bottom: 1px solid black; height: 30px;">
 	                <table class="fullw">
 	                  <tr>
-	                    <td class="trigger" style="width:40%;">@currentWrapper.name</td>
-	                    <td class="trigger" style="width:50%;">@currentWrapper.user.email</td>
+	                    <td class="trigger" style="width:30%;">@currentWrapper.name</td>
+	                    <td class="trigger" style="width:30%;">@currentWrapper.user.email</td>
+	                    <td class="trigger" style="width:30%;">@currentWrapper.shortDescription</td>
+	                    <td style="width:3%;" align="center" valign="middle" >
+	                     @if(currentWrapper.user.email == localUser.email) {
+				          <div id="editWrapper@currentWrapper.id" title="Edit" class="celldiv bevel2" style="height:26px;width:26px;">
+				              <img src="@routes.Assets.at("/images/edit_property-64.png")" height="16px" alt='@localUser.id'/>
+				          </div>
+				          <script>
+				              createFormDialog($("#editWrapper@currentWrapper.id"),
+				              "/editWrapperForm?id=@currentWrapper.id",
+				              "/doEditWrapper", "mainDialog", "Edit Wrapper", $("#WrapperListDiv@localUser.id").parent())
+				          </script> 
+				          }
+	                    </td>
 	                    <td style="width:3%;" align="center" valign="middle">
 	   			          @if(currentWrapper.user.email == localUser.email) {
-		   			          <div id="deleteWrapper@currentWrapper.id" class="celldiv bevel2" style="height:26px;width:26px;">
+		   			          <div id="deleteWrapper@currentWrapper.id" title="Delete" class="celldiv bevel2" style="height:26px;width:26px;">
 					              <img src="@routes.Assets.at("/images/trash2-64.png")" height="16px" alt='@localUser.id'/>
 					          </div>
 					          <script>
@@ -23,6 +44,7 @@
 					          </script>
 				          }
 	                    </td>
+	                    
 	                    <td class="trigger">&nbsp;</td>
 	                    <td style="width:25px;" class="trigger">&nbsp;</td>
 	                  </tr>

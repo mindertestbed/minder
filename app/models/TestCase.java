@@ -96,6 +96,7 @@ public class TestCase extends Model {
     try {
       Ebean.beginTransaction();
 
+
       for (WrapperParam str : wpList) {
         str.save();
         System.out.println("TO SAVE FOR " + str.name);

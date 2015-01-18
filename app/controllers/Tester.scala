@@ -30,14 +30,16 @@ object Tester extends Controller {
   val testMap: collection.mutable.Map[String, TestRunner] = collection.mutable.Map()
 
   def getTestRunner(user: User, runConfiguration: RunConfiguration): TestRunner = {
-
-
     val rc2 = RunConfiguration.findById(runConfiguration.id)
     val testCase = TestCase.findById(runConfiguration.testCase.id)
-    //if a test is not already running, then create a new one
-    testMap.getOrElseUpdate(user.email, {
-      new TestRunner(runConfiguration, user);
-    });
+    var testRunner = testMap(user.email);
+
+    if (testRunner == null) {
+      //dummy
+      testRunner = new TestRunner(rc2, user)
+    }
+
+    return testRunner;
   }
 
   /**
@@ -46,7 +48,7 @@ object Tester extends Controller {
    * @param id
    * @return
    */
-  def runOrSyncTest(id: Long, userId: Long) = Action { implicit request =>
+  def runTest(id: Long, userId: Long) = Action { implicit request =>
     val user = User.find.byId(userId);
     val mail = user.email;
 
@@ -58,22 +60,22 @@ object Tester extends Controller {
     println("--------------")
     //
     try {
-      //if a test is not already running, then create a new one
-      val testRunner = testMap.getOrElseUpdate(mail, {
+
+      if (testMap.contains(mail)) {
+        val testRunner = testMap(mail);
+        if (testRunner.status == TestStatus.BAD || testRunner.status == TestStatus.GOOD){
+          SessionMap.registerObject(mail, "signalRegistry", new MinderSignalRegistry());
+          SignalSlotInfoProvider.setSignalSlotInfoProvider(MinderWrapperRegistry.get())
+          val testRunner = new TestRunner(rc, user);
+          testMap(mail) = testRunner
+        }
+      } else {
         SessionMap.registerObject(mail, "signalRegistry", new MinderSignalRegistry());
         SignalSlotInfoProvider.setSignalSlotInfoProvider(MinderWrapperRegistry.get())
-        new TestRunner(rc, user);
-      });
-
-
-      if (testRunner.status == TestStatus.GOOD) {
-        testMap.remove(mail);
-        Ok("TESTFINISHED")
-      } else if (testRunner.status == TestStatus.BAD) {
-        testMap.remove(mail);
-        Ok("TESTFAILED | " + testRunner.error)
-      } else
-        Ok(testStatusViewer.render(rc, user))
+        val testRunner = new TestRunner(rc, user);
+        testMap(mail) = testRunner
+      }
+      Ok(testStatusViewer.render(rc, user))
     }
 
     catch {
@@ -85,6 +87,19 @@ object Tester extends Controller {
           BadRequest("Unknown error. Check logs")
       }
     }
+  }
+
+  /**
+   * This method starts a test in its first call,
+   * then provides information about if (in successive calls)
+   * @param id
+   * @return
+   */
+  def syncTest(id: Long, userId: Long) = Action { implicit request =>
+    val user = User.find.byId(userId);
+    val rc = RunConfiguration.findById(id);
+    Logger.debug("SYNC")
+    Ok(testStatusViewer.render(rc, user))
   }
 
 }
