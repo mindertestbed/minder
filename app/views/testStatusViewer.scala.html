@@ -1,106 +1,87 @@
 @(rc: RunConfiguration, user: User)
 
+<script>
+    $( document ).tooltip();
+</script>
 
 <style>
-  div.slotPending {
-  background-color:orange;
+  div.parent{
+  background-color: #E0E0E0;
+  height: 30px;
+  }
+
+  div.statusAll{
   border: 1px solid black;
-  height: 50px;
-  width: 50px;
   display: table-cell;
   vertical-align: middle;
   text-align: center;
+  padding-left: 2px;
+  padding-right: 2px;
+  margin-left: 3px;
+  font-size:11px;
+  font-family: Monaco, Consolas, "Courier New"
   }
 
-  div.slotPending:hover{
-  background-color:lightorange;
+  .code{
+  font-size:11px;
+  font-family: Monaco, Consolas, "Courier New"
+  }
+
+  div.child{
+  height: 20px;
+  border-radius: 2px;
+  margin:3px;
+  padding: 3px;
+  }
+
+  div.pending{
+  background-color: #E0E0E0;
+  }
+
+  div.pending:hover{
+  background-color: #E0E0E0;
   }
 
   div.slotBad {
-  background-color:red;
-  border: 1px solid black;
-  height: 50px;
-  width: 50px;
-  display: table-cell;
-  vertical-align: middle;
-  text-align: center;
+  background-color: #CC3300;
   }
 
   div.slotBad:hover{
-  background-color:lightred;
+  background-color: #EE4400;
   }
 
   div.slotGood {
-  background-color:green;
-  border: 1px solid black;
-  height: 50px;
-  width: 50px;
-  display: table-cell;
-  vertical-align: middle;
-  text-align: center;
+  background-color: #00CC33;
   }
 
   div.slotGood:hover{
-  background-color:lightGreen;
-  }
-  div.signalPending {
-  background-color:yellow;
-  border: 1px solid black;
-  height: 50px;
-  width: 50px;
-  display: table-cell;
-  vertical-align: middle;
-  text-align: center;
-  }
-
-  div.signalPending:hover{
-  background-color:lightyellow;
+  background-color: #00EE44;
   }
 
   div.signalBad {
-  background-color:red;
-  border: 1px solid black;
-  height: 50px;
-  width: 50px;
-  display: table-cell;
-  vertical-align: middle;
-  text-align: center;
+  background-color: #CC3366;
   }
 
   div.signalBad:hover{
-  background-color:lightred;
+  background-color: #EE4477;
   }
 
   div.signalGood {
-  background-color:green;
-  border: 1px solid black;
-  height: 50px;
-  width: 50px;
-  display: table-cell;
-  vertical-align: middle;
-  text-align: center;
+  background-color: #99CC66;
   }
 
   div.signalGood:hover{
-  background-color:lightGreen;
+  background-color: #AAEE77;
   }
 
   div.blank{
   width: 10px;
   display: table-cell;
-  vertical-align: middle;
-  text-align: center;
   }
 
 
   div.childPending {
   background-color:yellow;
-  border: 1px solid black;
-  height: 50px;
-  width: 20px;
-  display: table-cell;
-  vertical-align: middle;
-  text-align: center;
   }
 
   div.childPending:hover{
@@ -109,12 +90,6 @@
 
   div.childBad {
   background-color:red;
-  border: 1px solid black;
-  height: 50px;
-  width: 20px;
-  display: table-cell;
-  vertical-align: middle;
-  text-align: center;
   }
 
   div.childBad:hover{
@@ -123,25 +98,28 @@
 
   div.childGood {
   background-color:green;
-  border: 1px solid black;
-  height: 50px;
-  width: 20px;
-  display: table-cell;
-  vertical-align: middle;
-  text-align: center;
   }
 
   div.childGood:hover{
-  background-color:lightGreen;
+  background-color:lightgreen;
   }
 
-  div.blank{
-  width: 10px;
-  display: table-cell;
-  vertical-align: middle;
-  text-align: center;
+
+  div.testPending{
+  background-color:lightgray;
   }
 
+  div.testRunning{
+  background-color:lightblue;
+  }
+
+  div.testGood{
+  background-color:lightgreen;
+  }
+
+  div.testBad{
+  background-color:lightcoral;
+  }
 
 </style>
 
@@ -154,34 +132,66 @@
 @defining(Tester.getTestRunner(user, rc)){ testRunner =>
 
 
-<table>
-  @defining(1){ index =>
-  @for(rivet <- testRunner.rivets){
-  <tr>
-    <td><b>Rivet #@index</b></td>
-    @index=index+1
-    <td>
-      <div class="@TestStatusDecorator.cssClassForSlot(rivet.slot)">
-        <!-- Decorate the parameters of the slot -->
-        @for(param <- rivet.slot.params){
-        <div class="@TestStatusDecorator.cssClassForParam(param)">@param.parm</div>
-        }
-      </div>
-      <div class="blank">&nbsp;</div>
-      @for(signal <- rivet.signals){
-      <div class="@TestStatusDecorator.cssClassForSignal(signal)">
-        @for(param <- signal.params){
-        <div class="@TestStatusDecorator.cssClassForParam(param)">@param.parm</div>
-        }
-      </div>
-      }
-    </td>
-  </tr>
+@defining(1){ index =>
+@for(rivet <- testRunner.rivets){
+<div class="statusAll parent @TestStatusDecorator.cssClassForRivet(rivet)"><b>Rivet #@rivet.index</b></div>
+<div class="blank">&nbsp;</div>
+<div class="blank">&nbsp;</div>
+<div class="statusAll parent @TestStatusDecorator.cssClassForSlot(rivet.slot)">
+  <!-- Decorate the parameters of the slot -->
+  @rivet.slot <br/>
+  @for(param <- rivet.slot.params){
+  <div class="statusAll child @TestStatusDecorator.cssClassForParam(param)">@param.parm</div>
   }
+</div>
+<div class="blank">&nbsp;</div>
+@for(signal <- rivet.signals){
+<div class="statusAll parent @TestStatusDecorator.cssClassForSignal(signal)">
+  @signal <br/>
+  @for(param <- signal.params){
+  <div class="statusAll child @TestStatusDecorator.cssClassForParam(param)">@param.parm</div>
   }
-</table>
+</div>
+}
+<hr style="margin:1px; padding: 0px;"/>
+}
+}
 
 <br/>
-<b>Overall Status: </b> @testRunner.status
+<b>Overall Status: </b>
+<div class="statusAll child @TestStatusDecorator.cssClassForTest(testRunner)">@TestStatus.valueOf(testRunner.status)
+</div>
+<div>
+  <xmp class="code">@testRunner.error</xmp>
+</div>
 
+<div id="testCatcher" style="display:none">TEST_STATUS:@testRunner.status</div>
+
+
+@if(testRunner.status==TestStatus.GOOD||testRunner.status==TestStatus.BAD){
+@defining(testRunner.testRun){ testRun =>
+<table class="fullw">
+  <tr>
+    <td style="text-align:left;width:auto;">&nbsp;</td>
+    <td style="width:3%;" align="center" title="View Log" valign="middle">
+      <div id="viewUserHistory@testRun.id" class="celldiv bevel2" style="height:26px;width:26px;">
+        <img src="@routes.Assets.at("/images/console-64.png")" height="16px"/>
+      </div>
+      <script>
+			              createFormDialog($("#viewUserHistory@testRun.id"),
+			              "/viewUserHistory?testRunId=@testRun.id" ,
+			              "/doViewUserHistory", "mainDialog3", "View User History", null,'1200', '720')
+
+      </script>
+    </td>
+    <td style="width:10px;" class="trigger">&nbsp;</td>
+    <td style="width:3%;" align="center" valign="middle">
+      <div id="viewReport@testRun.id" title="View Report" class="celldiv bevel2" style="height:26px;width:26px;"
+           onclick='showReportDialog("selectReportType", @testRun.id)'>
+        <img src="@routes.Assets.at("/images/print-64.png")" height="16px" alt='@testRun.id'/>
+      </div>
+    </td>
+  </tr>
+</table>
+}}
 }}

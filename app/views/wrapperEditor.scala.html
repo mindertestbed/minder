@@ -8,9 +8,15 @@
   @frm.globalError.message
 </p>
 }
+
 @inputText(
 frm("name"),
 '_label -> "Wrapper Name"
 )
+
+@inputText(
+        frm("shortDescription"),
+        '_label -> "Short Description"
+        )
 
 <input type="hidden" name="id" id="id" value='@frm("id").value' />

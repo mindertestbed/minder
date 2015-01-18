@@ -6,9 +6,13 @@ $(function() {
   minderAccordion("#groupAccordion");
 });
 
-
-
 </script>
+
+ <script>
+  $(function() {
+    $( document ).tooltip();
+  });
+  </script>
 
 <div id="groupAccordion" class="fullw bevel" style="height:100%;padding:0px;">
   @defining(TestGroup.findByUser(localUser)){ testGroups =>
@@ -30,7 +34,7 @@ $(function() {
         </td>
         <td class="trigger">&nbsp;</td>
         <td style="width:3%;" align="center">
-          <div id="editgroup@group.id" class="bevel2 celldiv" style="height:30px;width:30px;">
+          <div id="editgroup@group.id" title="Edit" class="bevel2 celldiv" style="height:30px;width:30px;">
               <img src="@routes.Assets.at("/images/edit_property-64.png")" height="16px" alt='@group.id'/>
             <script>
           createFormDialog($("#editgroup@group.id"),
@@ -42,7 +46,7 @@ $(function() {
         </td>
         <td class="trigger" style="width:5px;">&nbsp;</td>
         <td style="width:3%;" align="center">
-          <div id="deletegroup@group.id" class="bevel2 celldiv" style="height:30px;width:30px;">
+          <div id="deletegroup@group.id" title="Delete" class="bevel2 celldiv" style="height:30px;width:30px;">
               <img src="@routes.Assets.at("/images/trash2-64.png")" height="16px" alt='@group.id'/>
           </div>
           <script>
