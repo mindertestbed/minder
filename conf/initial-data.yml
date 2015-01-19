@@ -96,11 +96,32 @@ groups:
            tdl: sampletdl/xmltest.tdl
            testAssertion: *taSample1
            name: TestCaseSample1
+- &sampleGroup2 !!models.TestGroup
+    description: A sample test gest assertions and test cases
+    name: Sample Test Group2
+    shortDescription:  A sample test group
+    owner: *massi
+    testAssertions:
+    - &taSample2 !!models.TestAssertion
+        testGroup: *sampleGroup2
+        taId: TASAMPLE2
+        normativeSource: The system must generate valid book entries
+        target: BOOKS XML
+        prerequisites: the sut is connected and ready for testing
+        predicate: the generated books xml conforms to books.xsd
+        prescriptionLevel: Mandatory
+        shortDescription:  A sample test assertion
+        testCases:
+        - !!models.TestCase
+           shortDescription: A tel against books.xsd
+           tdl: sampletdl/xmltest.tdl
+           testAssertion: *taSample2
+           name: TestCaseSample2
 - &as4 !!models.TestGroup
     description: null
     name: AS4 Tests
     shortDescription: All test cases related to AS4
-    owner: *user
+    owner: *massi
     testAssertions:
     - &taas41 !!models.TestAssertion
         testGroup: *as4
@@ -125,12 +146,11 @@ groups:
             testAssertion: *taas41
             name: AS42
             parameters: []
-
 - &smp !!models.TestGroup
     description: null
     name: SMP Tests
     shortDescription: All test cases related to SMP
-    owner: *user
+    owner: *massi
     testAssertions:
     - &tasmp1 !!models.TestAssertion
         testGroup: *smp
@@ -191,28 +211,19 @@ wrappers:
 - &xmlGenerator !!models.Wrapper
   name: xmlGenerator
   user: *user
-  signals:
-  - &xmlProduced !!models.TSignal
-      wrapper: *xmlGenerator
-      signature: xmlProduced(byte[] generatedXML)
-  - &xmlProduced2 !!models.TSignal
-      wrapper: *xmlGenerator
-      signature: xmlProduced2(byte[] generatedXML)
-  slots:
-  - &generateXML !!models.TSlot
-      wrapper: *xmlGenerator
-      signature: generateXML(byte[] inputBooks)
-  - &generateXML2 !!models.TSlot
-      wrapper: *xmlGenerator
-      signature: generateXML2(byte[] inputBooks)
+  shortDescription: XMl Generator Wrapper
+  signals: []
+  slots: []
 - &xmlValueInitiator  !!models.Wrapper
   name: xmlValueInitiator
+  shortDescription: XMl Value Initiator Wrapper
   user: *user
   signals: []
   slots: []
 - &testWrapper0 !!models.Wrapper
   name: testWrapper0
   user: *user
+  shortDescription: Sample Wrapper 0
   signals:
   - !!models.TSignal
     wrapper: *testWrapper0
@@ -224,6 +235,7 @@ wrappers:
 - &testWrapper1 !!models.Wrapper
   name: testWrapper1
   user: *user
+  shortDescription: Sample Wrapper 1
   signals:
   - !!models.TSignal
     wrapper: *testWrapper1
@@ -235,6 +247,7 @@ wrappers:
 - &testWrapper2 !!models.Wrapper
   name: testWrapper2
   user: *user
+  shortDescription: Sample Wrapper 2
   signals:
   - !!models.TSignal
     wrapper: *testWrapper2
@@ -246,6 +259,7 @@ wrappers:
 - &testWrapper3 !!models.Wrapper
   name: testWrapper3
   user: *user
+  shortDescription: Sample Wrapper 3
   signals:
   - !!models.TSignal
     wrapper: *testWrapper3
@@ -257,6 +271,7 @@ wrappers:
 - &testWrapper4 !!models.Wrapper
   name: testWrapper4
   user: *user
+  shortDescription: Sample Wrapper 4
   signals: []
   slots:
   - !!models.TSlot
@@ -274,30 +289,3 @@ histories:
   user: *user
   operationType: *opType1
   systemOutputLog: Bir loglar bir loglar
-
-#Run Configurations
-runConfigurations:
-- &rc1 !!models.RunConfiguration
-  name: TAAS41(RC1)
-  testCase: *as4case1
-  mappedWrappers: []
-  testRuns:
-  - &rc1TestRun1 !!models.TestRun
-    runConfiguration: *rc1
-    runner: *user
-    date: 2015-01-11T15:30:00+00:00
-    history: *history1
-- &rc2 !!models.RunConfiguration
-  name: TAAS42(RC2)
-  testCase: *as4case1
-  mappedWrappers: []
-  testRuns: []
-
-
-#TestRun
-#testruns:
-#  - &testrun1 !!models.TestRun
-#    testCase: *as4case1
-#    runner: *user
-#    wrappers:
-#    - *xmlGenerator

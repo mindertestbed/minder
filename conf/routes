@@ -90,11 +90,13 @@ GET     /downloadAsset                  controllers.TestAssetController.download
 
 #TESTING
 POST    /testme                         controllers.Tester.test
-GET     /runOrSyncTest                  controllers.Tester.runOrSyncTest(id: Long, userId: Long)
+GET     /runTest                        controllers.Tester.runTest(id: Long, userId: Long)
+GET     /syncTest                       controllers.Tester.syncTest(id: Long, userId: Long)
 
 #test run listing
 GET     /listTestRunsForm             controllers.InventoryController.listTestRuns(configurationId: Long)
 POST    /doListTestRuns               controllers.InventoryController.doListTestRuns()
+GET     /viewReport                   controllers.InventoryController.viewReport(testRunId: Long, type: String)
 
 #User History listing
 GET     /viewUserHistory              controllers.InventoryController.viewUserHistory(testRunId: Long)

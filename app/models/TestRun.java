@@ -37,6 +37,15 @@ public class TestRun extends Model {
 	@OneToOne
 	public UserHistory history;
 
+	@Column(length = 10000)
+	public byte[] report;
+
+	@Column(length = 1000)
+	public String wrappers;
+
+	@Column(nullable = false)
+	public boolean success;
+
 	public TestRun() {
 
 	}

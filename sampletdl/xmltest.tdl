@@ -14,7 +14,7 @@ val rivet2 = "generateXML(byte[])" of "$xmlGenerator" shall(
   )
 
 val rivet3 = "verifyXsd(byte[],byte[])" of "xml-content-verifier" shall(
-  use("xmlProduced(byte[])" of "xmlGenerator")(
+  use("xmlProduced(byte[])" of "$xmlGenerator")(
     mapping(1 onto 2)
   ),
   map(bookXsd onto 1))

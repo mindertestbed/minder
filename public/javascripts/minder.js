@@ -52,21 +52,25 @@ function createFormDialog(elm, sourceUrl, action, dialogId, titl, target, w, h){
          modal: true,
          buttons: {
              "Ok": function(){
-               $.ajax({
-                 type: frm.attr('method'),
-                 url: frm.attr('action'),
-                 data: frm.serialize(),
-                 success: function (data) {
-                    target[0].innerHTML = data;
-                    executeScripts(target);
-                    dialog.dialog( "close" );
-                 },
-                 error: function (jqXHR, textStatus, errorMessage) {
-                     frm[0].innerHTML = jqXHR.responseText;
-                     frm[0].reset();
+               if (typeof(target)==='undefined' ||  target == null){
+                 dialog.dialog( "close" );
+               } else{
+                 $.ajax({
+                   type: frm.attr('method'),
+                   url: frm.attr('action'),
+                   data: frm.serialize(),
+                   success: function (data) {
+                      target[0].innerHTML = data;
+                      executeScripts(target);
+                      dialog.dialog( "close" );
+                   },
+                   error: function (jqXHR, textStatus, errorMessage) {
+                       frm[0].innerHTML = jqXHR.responseText;
+                       frm[0].reset();
+                   }
+                 });
                  }
-               });
-             },
+               },
              Cancel: function() {
                dialog.dialog( "close" );
              }
@@ -360,7 +364,7 @@ function showRunDialog(runConfigurationId, data, title, userId){
        "Run": function() {
           runTest(runDialog, runConfigurationId, targetStatusDiv, userId)
        },
-       Cancel: function() {
+       "Close": function() {
          dialog.dialog( "close" );
        }
      }
@@ -370,26 +374,39 @@ function showRunDialog(runConfigurationId, data, title, userId){
 }
 
 function runTest(runDialog, runConfigurationId, targetStatusDiv, userId){
+  $.ajax({
+    type: 'GET',
+    url: '/runTest?id=' + runConfigurationId + '&userId=' + userId ,
+    success: function(data){
+      targetStatusDiv[0].innerHTML = data;
+      executeScripts(targetStatusDiv);
+      if(data.indexOf("TEST_STATUS:1") != -1 || data.indexOf("TEST_STATUS:0") != -1){
+         syncTest(runDialog, runConfigurationId, targetStatusDiv, userId);
+      }
+    },
+    error: function (jqXHR, textStatus, errorMessage) {
+      showError(jqXHR.responseText);
+    }
+  });
+}
+
+function syncTest(runDialog, runConfigurationId, targetStatusDiv, userId){
    setTimeout(function(){
       $.ajax({
         type: 'GET',
-        url: '/runOrSyncTest?id=' + runConfigurationId + '&userId=' + userId ,
+        url: '/syncTest?id=' + runConfigurationId + '&userId=' + userId ,
         success: function(data){
-          if(data.indexOf("TESTFINISHED") != -1){
-            alert(data);
-          }else if (data.indexOf("TESTFAILED") != -1){
-            alert(data)
-          } else{
-             targetStatusDiv[0].innerHTML = data;
-             executeScripts(targetStatusDiv);
-             runTest(runDialog, runConfigurationId, targetStatusDiv, userId);
+          targetStatusDiv[0].innerHTML = data;
+          executeScripts(targetStatusDiv);
+          if(data.indexOf("TEST_STATUS:1") != -1 || data.indexOf("TEST_STATUS:0") != -1){
+             syncTest(runDialog, runConfigurationId, targetStatusDiv, userId);
           }
         },
         error: function (jqXHR, textStatus, errorMessage) {
           showError(jqXHR.responseText);
         }
       });
-  }, 1000);
+  }, 500);
 }
 
 
@@ -428,4 +445,24 @@ function deleteRunConfiguration(testCaseId, idd, name){
    deleteDialog.dialog( "open" );
 }
 
-
+function showReportDialog(dialogId, id){
+  var dialog = $( "#" + dialogId ).dialog({
+    autoOpen: true,
+    title: "Select report type",
+    modal: true,
+    buttons: {
+     "Ok": function(){
+       if($("#isPdf").is(':checked')){
+         window.location.href = "/viewReport?testRunId="+id+"&type=pdf";
+       } else{
+         window.location.href = "/viewReport?testRunId="+id+"&type=xml";
+       }
+     },
+     Cancel: function() {
+       dialog.dialog( "close" );
+     }
+    },
+    close: function() {
+    }
+  });
+}

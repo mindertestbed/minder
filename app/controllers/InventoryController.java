@@ -4,6 +4,9 @@ import com.avaje.ebean.Ebean;
 import models.*;
 import mtdl.SignalSlot;
 import mtdl.TdlCompiler;
+import net.sf.jasperreports.engine.*;
+import net.sf.jasperreports.engine.export.JRPdfExporter;
+import net.sf.jasperreports.engine.export.JRPdfExporterParameter;
 import play.Logger;
 import play.data.Form;
 import play.data.validation.Constraints;
@@ -13,6 +16,8 @@ import play.mvc.Result;
 import views.html.*;
 
 import javax.validation.Constraint;
+import java.io.ByteArrayOutputStream;
+import java.io.File;
 import java.util.*;
 
 import static play.data.Form.form;
@@ -115,7 +120,7 @@ public class InventoryController extends Controller {
 		@Constraints.Required
 		public String name;
 		
-		//@Constraints.Required
+		@Constraints.Required
 		@Constraints.MinLength(5)
 		@Constraints.MaxLength(50)
 		public String shortDescription;
@@ -704,6 +709,7 @@ public class InventoryController extends Controller {
 
 		try {
 			Ebean.beginTransaction();
+			MappedWrapper.deleteByRunConfiguration(rc);
 			List<MappedWrapper> mappedWrappers = new ArrayList<>();
 			for (MappedWrapperModel mappedWrapper : model.mappedWrappers) {
 				MappedWrapper mw = new MappedWrapper();
@@ -909,7 +915,7 @@ public class InventoryController extends Controller {
 			
 			Form<WrapperEditorModel> bind = WRAPPER_FORM
 					.fill(wrModel);
-			return ok(wrapperEditor2.render(bind, null));
+			return ok("");//wrapperEditor2.render(bind, null));
 		}
 	}
 	
@@ -921,7 +927,7 @@ public class InventoryController extends Controller {
 
 		if (filledForm.hasErrors()) {
 			printFormErrors(filledForm);
-			return badRequest(wrapperEditor2.render(filledForm, null));
+			return badRequest("");//wrapperEditor2.render(filledForm, null));
 		} else {
 			WrapperEditorModel model = filledForm.get();
 			Wrapper wr = Wrapper.find.byId(model.id);
@@ -931,6 +937,90 @@ public class InventoryController extends Controller {
 			Logger.info("Done updating wrapper " + model.name );
 			return ok(wrapperLister.render(Application
 					.getLocalUser(session())));
+		}
+	}
+
+
+	public static Result viewReport(Long testRunId, String type){
+		TestRun tr = TestRun.findById(testRunId);
+		if(tr == null)
+			return badRequest("A test run with id " + testRunId	 + " was not found");
+		response().setContentType("application/x-download");
+		String fileName = tr.id + ".report";
+		byte []data = tr.report;
+		if ("pdf".equals(type)){
+			//
+			fileName += ".pdf";
+			data = toPdf(data, tr);
+		} else {
+			fileName += ".xml";
+		}
+		response().setHeader("Content-disposition","attachment; filename=" + fileName);
+		return ok(data);
+	}
+
+	private static byte[] toPdf(byte[] data, TestRun tr) {
+		try {
+			JasperReport report = JasperCompileManager.compileReport(InventoryController.class.getResourceAsStream("/taReport.jrxml"));
+			Map<String, Object> values = new HashMap<String, Object>();
+			values.put("user", tr.history.user.name);
+			values.put("email", tr.history.user.email);
+			values.put("result", tr.success);
+
+			RunConfiguration rc = RunConfiguration.findById(tr.runConfiguration.id);
+			TestCase tc = TestCase.findById(rc.testCase.id);
+			TestAssertion ta = TestAssertion.findById(tc.testAssertion.id);
+			TestGroup tg = TestGroup.findById(ta.testGroup.id);
+
+			values.put("testGroup", tg.name);
+			values.put("testCase", tc.name);
+			values.put("runConfiguration", rc.name);
+
+			values.put("taId", ta.taId);
+			values.put("taNormativeSource", ta.normativeSource);
+			values.put("taDescription",ta.shortDescription);
+			values.put("taTarget",ta.target);
+			values.put("taPredicate",ta.predicate);
+			values.put("taPrerequisite", ta.prerequisites);
+			values.put("taPrescription",ta.prescriptionLevel.toString());
+			values.put("taVariable",ta.variables);
+			values.put("taTag", ta.tag);
+
+			JRDataSource source = new JREmptyDataSource();
+			JasperPrint print1 = JasperFillManager.fillReport(report, values, source);
+			List<JasperPrint> jasperPrintList = new ArrayList<JasperPrint>();
+			jasperPrintList.add(print1);
+
+			if(tr.wrappers != null && tr.wrappers.length() > 0) {
+				JasperReport wrapperReport = JasperCompileManager.compileReport(InventoryController.class.getResourceAsStream("/wrappersReport.jrxml"));
+				values = new HashMap<String, Object>();
+				values.put("wrappers", tr.wrappers);
+				source = new JREmptyDataSource();
+				JasperPrint print2 = JasperFillManager.fillReport(wrapperReport, values, source);
+				jasperPrintList.add(print2);
+			}
+
+			if(tr.history.systemOutputLog != null && tr.history.systemOutputLog.length() > 0) {
+				JasperReport logReport = JasperCompileManager.compileReport(InventoryController.class.getResourceAsStream("/logReport.jrxml"));
+				values = new HashMap<String, Object>();
+				values.put("log", tr.history.systemOutputLog);
+				source = new JREmptyDataSource();
+				JasperPrint print3 = JasperFillManager.fillReport(logReport, values, source);
+				jasperPrintList.add(print3);
+			}
+
+			ByteArrayOutputStream baos = new ByteArrayOutputStream();
+			JRPdfExporter exporter = new JRPdfExporter();
+			//Add the list as a Parameter
+			exporter.setParameter(JRExporterParameter.JASPER_PRINT_LIST, jasperPrintList);
+			//this will make a bookmark in the exported PDF for each of the reports
+			exporter.setParameter(JRPdfExporterParameter.IS_CREATING_BATCH_MODE_BOOKMARKS, Boolean.TRUE);
+			exporter.setParameter(JRExporterParameter.OUTPUT_STREAM, baos);
+			exporter.exportReport();
+			return baos.toByteArray();
+		}catch (Exception ex){
+			ex.printStackTrace();
+			return "Invalid".getBytes();
 		}
 	}
 }

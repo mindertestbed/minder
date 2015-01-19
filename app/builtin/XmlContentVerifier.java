@@ -2,6 +2,7 @@ package builtin;
 
 import assets.iso_schematron_xslt2.SchematronClassResolver;
 import minderengine.Slot;
+import play.Logger;
 
 import javax.xml.XMLConstants;
 import javax.xml.transform.Source;
@@ -42,28 +43,34 @@ public class XmlContentVerifier extends BuiltInWrapper {
    * @return the result of the verification process
    */
   @Slot
-  public Result verifyXsd(byte[] xsd, byte[] xml) {
-    System.out.println("Someone wants me to verify xsd: " + new String(xsd));
-    System.out.println("Someone wants me to verify xml: " + new String(xml));
+  public void verifyXsd(byte[] xsd, byte[] xml) {
+    Logger.debug("VERIFY XSD : " + new String(xsd));
+    Logger.debug("VERIFY XML : " + new String(xml));
+
+    //read schema
+    Schema schema;
+    try {
+      SchemaFactory schemaFactory = SchemaFactory
+          .newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
+      schema = schemaFactory.newSchema(new StreamSource(new ByteArrayInputStream(xsd)));
+    } catch (Exception ex) {
+      throw new RuntimeException("Unable to parse schema", ex);
+    }
 
     try {
       Source xmlFile = new StreamSource(new ByteArrayInputStream(xml));
-      SchemaFactory schemaFactory = SchemaFactory
-          .newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
-      Schema schema = schemaFactory.newSchema(new StreamSource(new ByteArrayInputStream(xsd)));
       Validator validator = schema.newValidator();
       validator.validate(xmlFile);
       System.out.println("XSD verification success");
-      return success();
     } catch (Exception e) {
       System.out.println("XSD verification fail");
       e.printStackTrace();
-      return failure(e.getLocalizedMessage());
+      throw new RuntimeException("XML Verification failed", e);
     }
   }
 
   @Slot
-  public Result verifySchematron(byte[] sch, byte[] xml, Entry... entries) {
+  public void verifySchematron(byte[] sch, byte[] xml, Entry... entries) {
     ByteArrayInputStream bSchematron = new ByteArrayInputStream(sch);
     ByteArrayInputStream bXml = new ByteArrayInputStream(xml);
     ByteArrayOutputStream bOut = new ByteArrayOutputStream();
@@ -72,10 +79,10 @@ public class XmlContentVerifier extends BuiltInWrapper {
     byte[] result = bOut.toByteArray();
     //todo: perform a an actual error handling.
     String str = new String(result);
-    if (str.contains("failed"))
-      return failure("schematron verification failed");
-
-    return success();
+    if (str.contains("failed")) {
+      Logger.debug("Schematron result " + str);
+      throw new RuntimeException("Schematron verification failed");
+    }
   }
 
   /**

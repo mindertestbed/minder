@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="logReport" language="groovy" pageWidth="595" pageHeight="842" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="226bd9b6-0a98-4910-aee8-99513ec5630f">
+	<property name="ireport.zoom" value="1.0"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<parameter name="log" class="java.lang.String"/>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band height="24" splitType="Stretch">
+			<staticText>
+				<reportElement x="0" y="0" width="555" height="20" uuid="b65f276f-e7a2-4bb9-8557-820dbaed3698"/>
+				<textElement textAlignment="Center">
+					<font fontName="Arial" size="16" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Appendix I - Logs]]></text>
+			</staticText>
+		</band>
+	</title>
+	<detail>
+		<band height="500" splitType="Stretch">
+			<textField isBlankWhenNull="true">
+				<reportElement stretchType="RelativeToBandHeight" x="0" y="0" width="555" height="500" isPrintWhenDetailOverflows="true" uuid="eeec9d77-716d-487d-ac10-724e64de8a9f"/>
+				<textElement>
+					<font fontName="Courier New" size="12"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{log}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+</jasperReport>
