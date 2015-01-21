@@ -19,9 +19,16 @@
 		</band>
 	</title>
 	<detail>
-		<band height="500" splitType="Stretch">
-			<textField isBlankWhenNull="true">
-				<reportElement stretchType="RelativeToBandHeight" x="0" y="0" width="555" height="500" isPrintWhenDetailOverflows="true" uuid="eeec9d77-716d-487d-ac10-724e64de8a9f"/>
+		<band height="802" splitType="Stretch">
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement positionType="Float" stretchType="RelativeToBandHeight" x="0" y="0" width="555" height="802" isPrintWhenDetailOverflows="true" uuid="eeec9d77-716d-487d-ac10-724e64de8a9f"/>
+				<box>
+					<pen lineStyle="Dotted"/>
+					<topPen lineStyle="Dotted"/>
+					<leftPen lineStyle="Dotted"/>
+					<bottomPen lineStyle="Dotted"/>
+					<rightPen lineStyle="Dotted"/>
+				</box>
 				<textElement>
 					<font fontName="Courier New" size="12"/>
 				</textElement>

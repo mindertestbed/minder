@@ -915,7 +915,7 @@ public class InventoryController extends Controller {
 			
 			Form<WrapperEditorModel> bind = WRAPPER_FORM
 					.fill(wrModel);
-			return ok("");//wrapperEditor2.render(bind, null));
+			return ok(wrapperEditor2.render(bind, null));
 		}
 	}
 	

@@ -3,12 +3,8 @@
 <script>
     $( document ).tooltip();
 </script>
-<div id="selectReportType" style="display:none">
-  <form>
-    <input id="isPdf" type="radio" name="group1" value="Pdf" checked="checked"> <img src="@routes.Assets.at("/images/pdf-2-64.png")" height="16px"/> PDF </input><br />
-    <input id="isXMl" type="radio" name="group1" value="Xml"> <img src="@routes.Assets.at("/images/xml-64.png")" height="16px"/> XML</input>
-  </form>
-</div>
+
+@reportTypeDialog()
 
 <div id="testRunListerDiv@configurationId">
   <table style="width: 100%;">
@@ -20,7 +16,7 @@
     <tr>
     </tr>
     <td>
-      @defining(RunConfiguration.getTestRuns(configurationId)){ testRunList =>
+      @defining(TestRun.findByRunConfiguration(configurationId)){ testRunList =>
       @for(testRun <- testRunList){
       <div class="title hand differ" style="width:100%; border-bottom: 1px solid black; height: 30px;">
         <table class="fullw">

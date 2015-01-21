@@ -13,6 +13,7 @@ import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
 
+import com.avaje.ebean.ExpressionList;
 import play.db.ebean.Model;
 
 /**
@@ -61,5 +62,14 @@ public class TestRun extends Model {
 
 	public static TestRun findById(Long id) {
 		return find.byId(id);
+	}
+
+	public static List<TestRun> findByRunConfiguration(RunConfiguration rc) {
+		return find.where().eq("runConfiguration", rc).orderBy("date desc").findList();
+	}
+
+
+	public static List<TestRun> findByRunConfiguration(Long id) {
+		return findByRunConfiguration(RunConfiguration.findById(id));
 	}
 }
