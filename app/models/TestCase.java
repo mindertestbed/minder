@@ -4,6 +4,7 @@ import com.avaje.ebean.Ebean;
 import com.avaje.ebean.bean.EntityBean;
 import minderengine.TestEngine;
 import mtdl.SignalSlot;
+import net.sf.jasperreports.engine.util.JRStyledText;
 import play.Logger;
 import play.db.ebean.Model;
 
@@ -61,6 +62,7 @@ public class TestCase extends Model {
 
   private void detectParameters() {
     deleteCurrentWrapperParamsOnDatabase();
+    deleteCurrentRunConfigurationsOnDatabase();
 
     LinkedHashMap<String, Set<SignalSlot>> map = TestEngine.describeTdl(this, this.testAssertion.testGroup.owner.email);
 
@@ -114,12 +116,44 @@ public class TestCase extends Model {
     }
   }
 
+  private void deleteCurrentRunConfigurationsOnDatabase() {
+    try {
+      Ebean.beginTransaction();
+      List<RunConfiguration> all = RunConfiguration.findByTestCase(this);
+
+      for (RunConfiguration rc : all) {
+        System.out.println("Delete " + rc.name);
+        List<MappedWrapper> mwlist = MappedWrapper.findByRunConfiguration(rc);
+        for (MappedWrapper mappedWrapper : mwlist) {
+          mappedWrapper.delete();
+        }
+
+        List<TestRun> twL = TestRun.findByRunConfiguration(rc);
+        for (TestRun testRun : twL) {
+          testRun.runConfiguration=null;
+          testRun.save();
+        }
+
+        rc.delete();
+      }
+      Ebean.commitTransaction();
+    } catch (Exception ex) {
+      ex.printStackTrace();
+      Ebean.endTransaction();
+    }
+  }
+
   private void deleteCurrentWrapperParamsOnDatabase() {
     try {
       Ebean.beginTransaction();
       List<WrapperParam> all = WrapperParam.findByTestCase(this);
 
       for (WrapperParam wrapperParam : all) {
+        System.out.println("Delete " + wrapperParam.name);
+        List<MappedWrapper> mwlist = MappedWrapper.findByWrapperParam(wrapperParam);
+        for (MappedWrapper mappedWrapper : mwlist) {
+          mappedWrapper.delete();
+        }
         wrapperParam.delete();
       }
       Ebean.commitTransaction();

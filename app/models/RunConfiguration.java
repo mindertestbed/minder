@@ -60,11 +60,5 @@ public class RunConfiguration extends Model {
 	public static RunConfiguration findByTestCaseAndName(TestCase testCase, String name) {
 		return find.where().eq("testCase", testCase).eq("name", name).findUnique();
 	}
-	
-	public static List<TestRun> getTestRuns(Long id) {
-		RunConfiguration runConfiguration = findById(id);
-		
-		ExpressionList<TestRun> f = TestRun.find.where().eq("runConfiguration",runConfiguration);
-		return f.findList();
-	}
 }
+

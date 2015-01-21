@@ -41,4 +41,8 @@ public class MappedWrapper extends Model{
       mw.delete();
     }
   }
+
+  public static List<MappedWrapper> findByWrapperParam(WrapperParam wrapperParam) {
+    return find.where().eq("parameter", wrapperParam).orderBy("id").findList();
+  }
 }
