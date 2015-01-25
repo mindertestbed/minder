@@ -2,8 +2,8 @@
 <fontFamilies>
 
     <fontFamily name="Cour">
-        <normal><![CDATA[fonts/COURIER.ttf]]></normal>
-        <pdfEmbedded><![CDATA[true]]></pdfEmbedded>
+        <normal>fonts/courier.ttf</normal>
+        <pdfEmbedded>true</pdfEmbedded>
     </fontFamily>
 
     <fontFamily name="Cantarell">
