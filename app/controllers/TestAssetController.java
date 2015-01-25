@@ -1,5 +1,6 @@
 package controllers;
 
+import models.ModelConstants;
 import models.TestAsset;
 import models.TestGroup;
 import models.User;
@@ -29,8 +30,8 @@ public class TestAssetController extends Controller {
     public String name;
 
     @Constraints.Required
-    @Constraints.MinLength(5)
-    @Constraints.MaxLength(50)
+    @Constraints.MinLength(ModelConstants.MIN_DESC_LENGTH)
+    @Constraints.MaxLength(ModelConstants.SHORT_DESC_LENGTH)
     public String shortDescription;
 
     public String description;

@@ -10,7 +10,7 @@ import java.util.HashMap;
 /**
  * Created by yerlibilgin on 11/12/14.
  */
-public class BuiltInWrapper extends Wrapper implements IMinderClient, ISignalHandler {
+public abstract class BuiltInWrapper extends Wrapper implements IMinderClient, ISignalHandler {
 
   private final HashMap<String, MethodContainer> slots = new HashMap<>();
   private String sessionId;
@@ -31,7 +31,7 @@ public class BuiltInWrapper extends Wrapper implements IMinderClient, ISignalHan
       try {
         return slots.get(slotName).method.invoke(this, args);
       } catch (Exception e) {
-        throw new IllegalStateException(e);
+        throw new IllegalStateException(e.getMessage(), e);
       }
     }
 
@@ -90,4 +90,6 @@ public class BuiltInWrapper extends Wrapper implements IMinderClient, ISignalHan
   public static final Result failure(String message) {
     return new Result(false, message);
   }
+
+  public abstract String getShortDescription();
 }

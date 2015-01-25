@@ -13,7 +13,7 @@ import mtdl.Rivet;
 import java.util.HashMap;
 import java.util.List;
 
-public abstract class ReportGenerator extends Wrapper {
+public class ReportGenerator extends BuiltInWrapper {
 
   private boolean isRunning = false;
   private ReportManager rmg;
@@ -31,6 +31,11 @@ public abstract class ReportGenerator extends Wrapper {
   public void finishTest() {
     isRunning = false;
     currentMap = null;
+  }
+
+  @Override
+  public String getShortDescription() {
+    return "The minder built-in xml report generator wrapper";
   }
 
   @Slot

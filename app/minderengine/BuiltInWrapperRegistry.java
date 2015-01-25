@@ -61,6 +61,7 @@ public class BuiltInWrapperRegistry extends HashMap<String, BuiltInWrapper> {
     models.Wrapper wr = Wrapper.findByName(label);
     if (wr == null) {
       wr = new Wrapper();
+      wr.shortDescription = builtInWrapper.getShortDescription();
       wr.name = label;
       //the user is system
       wr.user = User.findByEmail("root@minder");

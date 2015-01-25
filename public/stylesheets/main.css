@@ -342,3 +342,11 @@ td{
   height: auto;
 }
 
+
+.goodTestRun{
+  background-color: rgb(230,250,240)
+}
+
+.badTestRun{
+  background-color: rgb(250,240,230)
+}

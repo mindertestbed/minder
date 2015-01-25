@@ -49,7 +49,7 @@ class TestRunner(val runConfiguration: RunConfiguration, val user: User) {
     }
   }).start();
 
-  var status:Int = TestStatus.PENDING;
+  var status: Int = TestStatus.PENDING;
 
   /**
    * This callback comes from the engine so that we can create our status data structure and later update it.
@@ -95,7 +95,6 @@ class TestRunner(val runConfiguration: RunConfiguration, val user: User) {
 
   def finished() {
     status = TestStatus.GOOD
-
     createRun()
   }
 
@@ -103,10 +102,17 @@ class TestRunner(val runConfiguration: RunConfiguration, val user: User) {
     Logger.error(t.getMessage, t)
     status = TestStatus.BAD
     error = {
-      if (t.getMessage != null) t.getMessage
-      else {
-        "Unknown error";
+      var cause = t;
+      var err: String = null;
+      while (err == null && cause != null) {
+        err = cause.getMessage;
+        cause = cause.getCause
       }
+
+      if (err == null) {
+        err = "Unknown error";
+      }
+      err
     }
     createRun()
   }
@@ -118,7 +124,7 @@ class TestRunner(val runConfiguration: RunConfiguration, val user: User) {
     this.report = report;
   }
 
-  var testRun:TestRun = null;
+  var testRun: TestRun = null;
 
   def createRun(): Unit = {
     Logger.debug("Create Run")
@@ -136,7 +142,8 @@ class TestRunner(val runConfiguration: RunConfiguration, val user: User) {
     testRun.history = userHistory
     testRun.report = report;
     testRun.runner = user;
-    testRun.success = if(status == TestStatus.GOOD) true else false
+    testRun.errorMessage = error;
+    testRun.success = if (status == TestStatus.GOOD) true else false
     if (wrappers != null) {
       val sb = new StringBuilder()
       var i: Int = 1
@@ -149,7 +156,7 @@ class TestRunner(val runConfiguration: RunConfiguration, val user: User) {
     testRun.save()
   }
 
-  def startTest(): Unit ={
+  def startTest(): Unit = {
     this.status = TestStatus.RUNNING
   }
 }
