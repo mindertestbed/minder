@@ -24,7 +24,6 @@ public class TSlot extends Model {
 
   public String signature;
 
-
   public static final Finder<Long, TSlot> find = new Finder<>(
       Long.class, TSlot.class);
 

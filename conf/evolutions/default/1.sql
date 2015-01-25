@@ -74,7 +74,7 @@ create table TestAssertion (
   variables                 varchar(250),
   tag                       varchar(250),
   description               varchar(1024),
-  short_description         varchar(50) not null,
+  short_description         varchar(100) not null,
   prescription_level        integer,
   constraint ck_TestAssertion_prescription_level check (prescription_level in (0,1,2)),
   constraint uq_TestAssertion_ta_id unique (ta_id),
@@ -85,7 +85,7 @@ create table TestAsset (
   id                        bigint not null,
   owner_id                  bigint,
   name                      varchar(255) not null,
-  short_description         varchar(50),
+  short_description         varchar(100),
   description               varchar(1024),
   constraint pk_TestAsset primary key (id))
 ;
@@ -94,7 +94,7 @@ create table TestCase (
   id                        bigint not null,
   test_assertion_id         bigint,
   name                      varchar(255) not null,
-  short_description         varchar(50) not null,
+  short_description         varchar(100) not null,
   description               varchar(1024),
   tdl                       varchar(20480) not null,
   constraint uq_TestCase_name unique (name),
@@ -106,8 +106,7 @@ create table TestGroup (
   name                      varchar(255) not null,
   owner_id                  bigint,
   description               varchar(1024),
-  short_description         varchar(50) not null,
-  d                         integer,
+  short_description         varchar(100) not null,
   constraint uq_TestGroup_name unique (name),
   constraint pk_TestGroup primary key (id))
 ;
@@ -119,8 +118,9 @@ create table TestRun (
   runner_id                 bigint,
   history_id                bigint,
   report                    bytea,
-  wrappers                  varchar(1000),
+  wrappers                  varchar(51200),
   success                   boolean not null,
+  error_message             varchar(250),
   constraint pk_TestRun primary key (id))
 ;
 
@@ -165,7 +165,8 @@ create table UserPermission (
 create table Wrapper (
   id                        bigint not null,
   NAME                      varchar(255),
-  short_description         varchar(50),
+  short_description         varchar(100) not null,
+  description               varchar(1024),
   user_id                   bigint,
   constraint uq_Wrapper_NAME unique (NAME),
   constraint pk_Wrapper primary key (id))

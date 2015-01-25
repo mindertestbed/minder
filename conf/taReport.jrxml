@@ -2,7 +2,7 @@
 <jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="taReport.jrxml" language="groovy" pageWidth="595" pageHeight="842" columnWidth="535" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="d9ea7966-abfc-452c-84e8-bd691c7bc67f">
 	<property name="ireport.zoom" value="1.0"/>
 	<property name="ireport.x" value="0"/>
-	<property name="ireport.y" value="142"/>
+	<property name="ireport.y" value="169"/>
 	<style name="Title" fontName="Arial" fontSize="26" isBold="true" pdfFontName="Helvetica-Bold"/>
 	<style name="SubTitle" forecolor="#666666" fontName="Arial" fontSize="18"/>
 	<style name="Column header" forecolor="#666666" fontName="Arial" fontSize="12" isBold="true"/>
@@ -24,6 +24,7 @@
 	<parameter name="log" class="java.lang.String"/>
 	<parameter name="result" class="java.lang.Boolean"/>
 	<parameter name="runConfiguration" class="java.lang.String"/>
+	<parameter name="errorMessage" class="java.lang.String"/>
 	<group name="Author">
 		<groupExpression><![CDATA[(int)($V{REPORT_COUNT}/15)]]></groupExpression>
 		<groupHeader>
@@ -112,6 +113,27 @@
 				<line>
 					<reportElement x="0" y="0" width="555" height="1" uuid="dbb46185-ca0d-43b1-b85f-1ac04230a85c"/>
 				</line>
+				<line>
+					<reportElement x="0" y="41" width="553" height="1" uuid="26860e3a-5b00-4d0c-b5eb-799f6fc0653a"/>
+				</line>
+				<line>
+					<reportElement x="1" y="81" width="553" height="1" uuid="0d3446b0-3aa9-43ba-be06-ecc5d61e3f86"/>
+				</line>
+				<line>
+					<reportElement x="0" y="121" width="553" height="1" uuid="ac2b9b16-f77e-47b8-9457-a528ced2b85e"/>
+				</line>
+				<line>
+					<reportElement x="0" y="162" width="553" height="1" uuid="c9f013d3-72b4-4bcc-9112-debeb8038d73"/>
+				</line>
+				<line>
+					<reportElement x="0" y="182" width="553" height="1" uuid="6c4cea75-b4fc-4778-add0-f5d7037b0f88"/>
+				</line>
+				<line>
+					<reportElement x="0" y="222" width="553" height="1" uuid="675c1db2-574b-49ec-b5b4-4e169414b896"/>
+				</line>
+				<line>
+					<reportElement x="0" y="241" width="553" height="1" uuid="5ca42ab0-e951-418f-b30d-179026315cd1"/>
+				</line>
 			</band>
 		</groupHeader>
 		<groupFooter>
@@ -135,6 +157,9 @@
 					<reportElement x="114" y="27" width="170" height="20" uuid="06879b29-f15b-4601-aafb-245e5d5d61ee"/>
 					<textFieldExpression><![CDATA[$P{runConfiguration}]]></textFieldExpression>
 				</textField>
+				<line>
+					<reportElement x="0" y="24" width="553" height="1" uuid="1219f626-c83b-474f-89d9-bc217ceea246"/>
+				</line>
 			</band>
 		</groupFooter>
 	</group>
@@ -187,7 +212,7 @@
 		</band>
 	</columnHeader>
 	<columnFooter>
-		<band height="60" splitType="Stretch">
+		<band height="84" splitType="Stretch">
 			<line>
 				<reportElement positionType="FixRelativeToBottom" x="0" y="3" width="555" height="1" uuid="628bed15-5cf4-40a6-9205-8d10ea478cbb"/>
 				<graphicElement>
@@ -195,22 +220,29 @@
 				</graphicElement>
 			</line>
 			<staticText>
-				<reportElement x="263" y="4" width="99" height="20" forecolor="#666666" uuid="82641e6a-2f39-45f3-87a6-cfaeb8f8b65c"/>
+				<reportElement x="1" y="4" width="99" height="20" forecolor="#666666" uuid="82641e6a-2f39-45f3-87a6-cfaeb8f8b65c"/>
 				<textElement>
 					<font fontName="Arial" size="16" isBold="true"/>
 				</textElement>
 				<text><![CDATA[Test Status]]></text>
 			</staticText>
 			<image>
-				<reportElement x="505" y="3" width="48" height="48" uuid="2e9a5429-710e-434e-9d97-cb8c25fb0678"/>
+				<reportElement x="227" y="4" width="22" height="20" uuid="2e9a5429-710e-434e-9d97-cb8c25fb0678"/>
 				<imageExpression><![CDATA[$P{result} ? "conf/Check-icon.png" : "conf/Delete-icon.png"]]></imageExpression>
 			</image>
 			<textField>
-				<reportElement x="362" y="4" width="127" height="20" uuid="f0dff5dc-2627-4d3f-8986-950b4583ce9d"/>
+				<reportElement x="100" y="4" width="127" height="20" uuid="f0dff5dc-2627-4d3f-8986-950b4583ce9d"/>
 				<textElement>
 					<font fontName="Arial" size="14"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$P{result} ? "Successful" : "Failed"]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="1" y="24" width="552" height="60" forecolor="#CC0033" uuid="86a3a71e-237b-4a91-b09e-dbd90fc694e0"/>
+				<textElement>
+					<font fontName="Cantarell"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{errorMessage}]]></textFieldExpression>
 			</textField>
 		</band>
 	</columnFooter>

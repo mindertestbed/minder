@@ -31,7 +31,6 @@ import com.feth.play.module.pa.user.NameIdentity;
 @Entity
 @Table(name = "Users")
 public class User extends Model implements Subject {
-
 	@Id
 	public Long id;
 

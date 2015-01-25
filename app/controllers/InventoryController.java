@@ -40,8 +40,8 @@ public class InventoryController extends Controller {
 		public String name;
 
 		@Constraints.Required
-		@Constraints.MinLength(5)
-		@Constraints.MaxLength(50)
+		@Constraints.MinLength(ModelConstants.MIN_DESC_LENGTH)
+		@Constraints.MaxLength(ModelConstants.SHORT_DESC_LENGTH)
 		public String shortDescription;
 
 		public String description;
@@ -71,8 +71,8 @@ public class InventoryController extends Controller {
 		public String tag;
 
 		@Constraints.Required
-		@Constraints.MinLength(5)
-		@Constraints.MaxLength(50)
+		@Constraints.MinLength(ModelConstants.MIN_DESC_LENGTH)
+		@Constraints.MaxLength(ModelConstants.SHORT_DESC_LENGTH)
 		public String shortDescription;
 
 		public String description;
@@ -89,8 +89,8 @@ public class InventoryController extends Controller {
 		public String name;
 
 		@Constraints.Required
-		@Constraints.MinLength(5)
-		@Constraints.MaxLength(50)
+		@Constraints.MinLength(ModelConstants.MIN_DESC_LENGTH)
+		@Constraints.MaxLength(ModelConstants.SHORT_DESC_LENGTH)
 		public String shortDescription;
 
 		@Constraints.Required
@@ -121,8 +121,8 @@ public class InventoryController extends Controller {
 		public String name;
 		
 		@Constraints.Required
-		@Constraints.MinLength(5)
-		@Constraints.MaxLength(50)
+		@Constraints.MinLength(ModelConstants.MIN_DESC_LENGTH)
+		@Constraints.MaxLength(ModelConstants.SHORT_DESC_LENGTH)
 		public String shortDescription;
 
 	}
@@ -966,7 +966,10 @@ public class InventoryController extends Controller {
 			values.put("user", tr.history.user.name);
 			values.put("email", tr.history.user.email);
 			values.put("result", tr.success);
+			values.put("date", tr.date);
+			values.put("errorMessage", tr.errorMessage);
 
+			Logger.debug("Error message " + tr.errorMessage);
 			RunConfiguration rc = RunConfiguration.findById(tr.runConfiguration.id);
 			TestCase tc = TestCase.findById(rc.testCase.id);
 			TestAssertion ta = TestAssertion.findById(tc.testAssertion.id);

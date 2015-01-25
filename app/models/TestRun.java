@@ -38,14 +38,17 @@ public class TestRun extends Model {
 	@OneToOne
 	public UserHistory history;
 
-	@Column(length = 10000)
+	@Column(length = ModelConstants.REPORT_LENGTH)
 	public byte[] report;
 
-	@Column(length = 1000)
+	@Column(length = ModelConstants.LOG_LENGTH)
 	public String wrappers;
 
 	@Column(nullable = false)
 	public boolean success;
+
+	@Column(length = ModelConstants.ERROR_MESSAGE_LENGTH)
+	public String errorMessage;
 
 	public TestRun() {
 

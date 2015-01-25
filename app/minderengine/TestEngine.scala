@@ -1,16 +1,15 @@
 package minderengine
 
-import java.io.{PrintWriter, ByteArrayOutputStream, OutputStreamWriter, StringWriter}
-import java.lang.reflect.InvocationTargetException
 import java.util
 
 import builtin.ReportGenerator
-import controllers.{TestRunner, Application}
-import models.{TestGroup, TestAssertion, User, TestCase}
+import controllers.TestRunner
+import models.{TestAssertion, TestCase, TestGroup, User}
 import mtdl._
-import play.Play
+import org.apache.log4j.spi.LoggingEvent
+import org.apache.log4j.{EnhancedPatternLayout, AppenderSkeleton, Appender, PatternLayout}
 import play.api.Logger
-import play.mvc.Http
+
 import scala.collection.JavaConversions._
 import scala.io.Source
 
@@ -24,14 +23,33 @@ object TestEngine {
   }
 
   def describe(clsMinderTDL: Class[MinderTdl]): util.List[Rivet] = {
-    println("Describe")
     val minderTDL = clsMinderTDL.getConstructors()(0).newInstance(null, java.lang.Boolean.FALSE).asInstanceOf[MinderTdl]
     minderTDL.SlotDefs
   }
 
+  class MyAppender(var sb: StringBuilder) extends AppenderSkeleton {
+    override def append(event: LoggingEvent) : Unit = {
+      if(this.getLayout != null) {
+        val formatted = this.getLayout.format(event);
+        sb.append(formatted);
+        Logger.debug(formatted)
+      }
+    }
+
+    def close(){}
+
+    def requiresLayout() : Boolean = {
+      false;
+    }
+  }
   def runTest2(userEmail: String, clsMinderTDL: Class[MinderTdl], map: Map[String, String], testRunner: TestRunner): Unit = {
-    println("Run Test 2")
-    val log = new StringBuilder
+    val logBuilder = new StringBuilder
+    val lgr: org.apache.log4j.Logger = org.apache.log4j.Logger.getLogger("test");
+    val app = new MyAppender(logBuilder);
+    app.setLayout(new EnhancedPatternLayout("%d{ISO8601}: %-5p - %m%n%throwable"));
+    lgr.addAppender(app);
+
+    lgr.info("Start Test")
     val report = ""
     val rg = new ReportGenerator {
       override def getCurrentTestUserInfo: UserDTO = {
@@ -41,7 +59,7 @@ object TestEngine {
     rg.startTest()
     if(testRunner!=null)
       testRunner.startTest()
-    log.append("\nArrange report params")
+    lgr.info("Initialize report params")
     rg.setReportTemplate(Source.fromInputStream(this.getClass.getResourceAsStream("/taReport.xml")).mkString.getBytes())
     val user = User.findByEmail(userEmail)
     rg.setReportAuthor(user.name, userEmail);
@@ -52,7 +70,7 @@ object TestEngine {
     val set = new util.HashSet[String]()
     try {
 
-      log.append("\nInitialize test case")
+      lgr.debug("Initialize test case")
       val minderTDL = clsMinderTDL.getConstructors()(0).newInstance(map, java.lang.Boolean.TRUE).asInstanceOf[MinderTdl]
 
 
@@ -74,8 +92,7 @@ object TestEngine {
       try {
         var rivetIndex = 0;
         for (rivet <- minderTDL.SlotDefs) {
-          Logger.debug("---- " + "RUN RIVET " + rivetIndex)
-          log.append("\n---- " + "RUN RIVET " + rivetIndex)
+          lgr.debug("---- " + "RUN RIVET " + rivetIndex)
 
           //resolve the minder client id. This might as well be resolved to a local built-in wrapper.
           val minderClient = if (BuiltInWrapperRegistry.get().containsWrapper(rivet.slot.wrapperId)) {
@@ -86,21 +103,20 @@ object TestEngine {
           val args = Array.ofDim[Object](rivet.pipes.length)
 
           set.add(rivet.slot.wrapperId)
-          log.append("\nARG LEN:").append(rivet.pipes.length)
+          lgr.debug("ARG LEN:" + rivet.pipes.length)
 
           var signalIndex = 0
           for (tuple@(label, signature) <- rivet.signalPipeMap.keySet) {
             val me: MinderSignalRegistry = SessionMap.getObject(userEmail, "signalRegistry")
             if (me == null) throw new IllegalArgumentException("No MinderSignalRegistry object defined for session " + userEmail)
 
-            println("\ndequeue " + (label + ":" + signature))
-            log.append("\nDequeue Signal:").append(label).append(signature)
+            lgr.debug("Dequeue Signal:" + label + "." + signature)
 
             set.add(label)
 
             val signalData = me.dequeueSignal(label, signature)
 
-            log.append("\nSignal Obtained Signal:").append(label).append(signature)
+            lgr.debug("Signal Obtained Signal: " + label + "." + signature)
 
             if (testRunner != null) {
               testRunner.signalEmitted(rivetIndex, signalIndex, signalData)
@@ -117,7 +133,7 @@ object TestEngine {
             signalIndex += 1
           }
 
-          log.append("\nAssing free vars")
+          lgr.debug("Assign free vars")
 
           for (paramPipe <- rivet.freeVariablePipes) {
             convertParam(paramPipe.out, paramPipe.execute(null))
@@ -136,15 +152,15 @@ object TestEngine {
           }
 
 
-          log.append("\nSlot ready for call " + rivet.slot.wrapperId + "." + rivet.slot.signature)
+          lgr.debug("Slot ready for call " + rivet.slot.wrapperId + "." + rivet.slot.signature)
 
           if (testRunner != null) testRunner.slotSet(rivetIndex);
           rivet.result = minderClient.callSlot(userEmail, rivet.slot.signature, args)
-          log.append("\nSlot call finished sucessfully")
+          lgr.debug("Slot call finished sucessfully")
 
           if (testRunner != null) testRunner.rivetFinished(rivetIndex)
-          log.append("\nRivet finished sucessfully")
-          log.append("\n---------------------\n")
+          lgr.debug("Rivet finished sucessfully")
+          lgr.debug("----------\n")
 
           def convertParam(out: Int, arg: Any) {
             if (arg.isInstanceOf[Rivet]) {
@@ -157,7 +173,7 @@ object TestEngine {
           rivetIndex += 1
         }
       } finally {
-        log.append("\nSend finish message to all wrappers\n")
+        lgr.debug("Send finish message to all wrappers")
         //make sure that we call finish test for all
         for (wrapperName <- minderTDL.wrapperDefs) {
           val minderClient = if (BuiltInWrapperRegistry.get().contains(wrapperName)) {
@@ -176,42 +192,18 @@ object TestEngine {
 
       if (testRunner != null) {
         rg.setTestDetails(testGroup.name, testAssertion, testCase.name, testRunner.runConfiguration,
-          set, log.toString())
-        testRunner.addLog(log.toString(), rg.generateReport())
+          set, logBuilder.toString())
+        testRunner.addLog(logBuilder.toString(), rg.generateReport())
         testRunner.finished()
       }
     } catch {
-      case t: InvocationTargetException => {
-        t.printStackTrace()
-        val stream: ByteArrayOutputStream = new ByteArrayOutputStream()
-        val sw = new PrintWriter(new OutputStreamWriter(stream));
-        t.printStackTrace(sw)
-        sw.flush();
-        sw.close();
-        log.append("\n" + new String(stream.toByteArray))
-        if (t.getCause != null)
-          if (testRunner != null) {
-            rg.setTestDetails(testGroup.name, testAssertion, testCase.name, testRunner.runConfiguration,
-              set, log.toString())
-            testRunner.addLog(log.toString(), rg.generateReport())
-
-            testRunner.failed(t.getCause)
-          } else {
-            throw new RuntimeException(t)
-          }
-      }
       case t: Throwable => {
-        val stream: ByteArrayOutputStream = new ByteArrayOutputStream()
-        val sw = new PrintWriter(new OutputStreamWriter(stream));
-        t.printStackTrace(sw)
-        sw.flush();
-        sw.close();
-        log.append("\n" + new String(stream.toByteArray))
-
+        Logger.error(t.getMessage, t);
+        lgr.error(t.getMessage, t)
         if (testRunner != null) {
           rg.setTestDetails(testGroup.name, testAssertion, testCase.name, testRunner.runConfiguration,
-            set, log.toString())
-          testRunner.addLog(log.toString(), rg.generateReport())
+            set, logBuilder.toString())
+          testRunner.addLog(logBuilder.toString(), rg.generateReport())
 
           testRunner.failed(t)
         } else {

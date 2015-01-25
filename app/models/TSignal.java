@@ -24,7 +24,6 @@ public class TSignal extends Model {
 
   public String signature;
 
-
   public static final Finder<Long, TSignal> find = new Finder<>(
       Long.class, TSignal.class);
 

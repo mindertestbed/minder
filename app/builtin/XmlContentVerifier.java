@@ -35,6 +35,11 @@ public class XmlContentVerifier extends BuiltInWrapper {
     tFactory.setURIResolver(resolver);
   }
 
+  @Override
+  public String getShortDescription() {
+    return "The default minder xml content verifier";
+  }
+
   /**
    * Checks the schema of the xml WRT the given xsd and returns the result
    *

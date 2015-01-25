@@ -1,36 +1,26 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="logReport" language="groovy" pageWidth="595" pageHeight="842" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="226bd9b6-0a98-4910-aee8-99513ec5630f">
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="report2" language="groovy" pageWidth="595" pageHeight="842" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="dc142864-987c-4e26-b75f-b0a1a1bbcf9a">
 	<property name="ireport.zoom" value="1.0"/>
 	<property name="ireport.x" value="0"/>
 	<property name="ireport.y" value="0"/>
 	<parameter name="log" class="java.lang.String"/>
-	<background>
-		<band splitType="Stretch"/>
-	</background>
 	<title>
-		<band height="24" splitType="Stretch">
+		<band height="47" splitType="Stretch">
 			<staticText>
-				<reportElement x="0" y="0" width="555" height="20" uuid="b65f276f-e7a2-4bb9-8557-820dbaed3698"/>
+				<reportElement x="0" y="8" width="555" height="39" uuid="ffcb9ea2-d8b4-4908-beb4-8e031f992bae"/>
 				<textElement textAlignment="Center">
-					<font fontName="Arial" size="16" isBold="true"/>
+					<font fontName="Arial" size="24"/>
 				</textElement>
-				<text><![CDATA[Appendix I - Logs]]></text>
+				<text><![CDATA[Appendix I - LOG]]></text>
 			</staticText>
 		</band>
 	</title>
 	<detail>
-		<band height="802" splitType="Stretch">
+		<band height="125" splitType="Stretch">
 			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
-				<reportElement positionType="Float" stretchType="RelativeToBandHeight" x="0" y="0" width="555" height="802" isPrintWhenDetailOverflows="true" uuid="eeec9d77-716d-487d-ac10-724e64de8a9f"/>
-				<box>
-					<pen lineStyle="Dotted"/>
-					<topPen lineStyle="Dotted"/>
-					<leftPen lineStyle="Dotted"/>
-					<bottomPen lineStyle="Dotted"/>
-					<rightPen lineStyle="Dotted"/>
-				</box>
+				<reportElement x="0" y="0" width="555" height="20" uuid="054e14d8-a530-4e68-a1bd-42f8506ee1e2"/>
 				<textElement>
-					<font fontName="Courier New" size="12"/>
+					<font fontName="Cantarell" size="8"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$P{log}]]></textFieldExpression>
 			</textField>

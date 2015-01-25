@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<fontFamilies>
+
+    <fontFamily name="Cour">
+        <normal><![CDATA[fonts/COURIER.ttf]]></normal>
+        <pdfEmbedded><![CDATA[true]]></pdfEmbedded>
+    </fontFamily>
+
+    <fontFamily name="Cantarell">
+        <normal>fonts/cantarell/Cantarell-Regular.ttf</normal>
+        <bold>fonts/cantarell/Cantarell-Bold.ttf</bold>
+        <italic>fonts/cantarell/Cantarell-Oblique.ttf</italic>
+        <boldItalic>fonts/cantarell/Cantarell-BoldOblique.ttf</boldItalic>
+        <pdfEncoding>Identity-H</pdfEncoding>
+        <pdfEmbedded>true</pdfEmbedded>
+    </fontFamily>
+
+</fontFamilies>
