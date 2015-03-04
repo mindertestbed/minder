@@ -1,6 +1,9 @@
-@(rc: RunConfiguration)
+@(rc: Job, localUser: models.User = null)
+
+@main(Messages("playauthenticate.navigation.restricted.testdesigner"), "restrictedTestDesigner") {
 
 <script>
+  $(function() {
   $( "#wmDetails" ).dialog({
     autoOpen: false,
     title: 'Wrapper Mapping',
@@ -20,9 +23,11 @@
         return "Click to view wrapper mappings."
       }
     });
-
+  });
 </script>
 <div class="fullw fullh">
+  <br />
+  <br />
   <table>
     <tr>
       <td><b>Name:</b></td>
@@ -57,3 +62,4 @@
     }
   </table>
 </div>
+}

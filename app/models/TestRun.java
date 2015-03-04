@@ -3,17 +3,13 @@ package models;
 import java.util.Date;
 import java.util.List;
 
-import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.FetchType;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
-import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
 
-import com.avaje.ebean.ExpressionList;
 import play.db.ebean.Model;
 
 /**
@@ -27,7 +23,7 @@ public class TestRun extends Model {
 
 	@ManyToOne
 	@Column(nullable = false)
-	public RunConfiguration runConfiguration;
+	public Job job;
 
 	public Date date;
 
@@ -54,8 +50,8 @@ public class TestRun extends Model {
 
 	}
 
-	public TestRun(RunConfiguration runConfiguration, User runner) {
-		this.runConfiguration = runConfiguration;
+	public TestRun(Job job, User runner) {
+		this.job = job;
 		this.runner = runner;
 		this.date = new Date();
 	}
@@ -67,12 +63,12 @@ public class TestRun extends Model {
 		return find.byId(id);
 	}
 
-	public static List<TestRun> findByRunConfiguration(RunConfiguration rc) {
-		return find.where().eq("runConfiguration", rc).orderBy("date desc").findList();
+	public static List<TestRun> findByJob(Job rc) {
+		return find.where().eq("job", rc).orderBy("date desc").findList();
 	}
 
 
-	public static List<TestRun> findByRunConfiguration(Long id) {
-		return findByRunConfiguration(RunConfiguration.findById(id));
+	public static List<TestRun> findByJob(Long id) {
+		return findByJob(Job.findById(id));
 	}
 }

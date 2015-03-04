@@ -1,17 +1,13 @@
 package models;
 
 import com.avaje.ebean.Ebean;
-import com.avaje.ebean.bean.EntityBean;
 import minderengine.TestEngine;
 import mtdl.SignalSlot;
-import net.sf.jasperreports.engine.util.JRStyledText;
 import play.Logger;
 import play.db.ebean.Model;
 
 import javax.persistence.*;
 import java.util.*;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 /**
  * Created by yerlibilgin on 22/12/14.
@@ -62,7 +58,7 @@ public class TestCase extends Model {
 
   private void detectParameters() {
     deleteCurrentWrapperParamsOnDatabase();
-    deleteCurrentRunConfigurationsOnDatabase();
+    deleteCurrentJobsOnDatabase();
 
     LinkedHashMap<String, Set<SignalSlot>> map = TestEngine.describeTdl(this, this.testAssertion.testGroup.owner.email);
 
@@ -116,21 +112,21 @@ public class TestCase extends Model {
     }
   }
 
-  private void deleteCurrentRunConfigurationsOnDatabase() {
+  private void deleteCurrentJobsOnDatabase() {
     try {
       Ebean.beginTransaction();
-      List<RunConfiguration> all = RunConfiguration.findByTestCase(this);
+      List<Job> all = Job.findByTestCase(this);
 
-      for (RunConfiguration rc : all) {
+      for (Job rc : all) {
         System.out.println("Delete " + rc.name);
-        List<MappedWrapper> mwlist = MappedWrapper.findByRunConfiguration(rc);
+        List<MappedWrapper> mwlist = MappedWrapper.findByJob(rc);
         for (MappedWrapper mappedWrapper : mwlist) {
           mappedWrapper.delete();
         }
 
-        List<TestRun> twL = TestRun.findByRunConfiguration(rc);
+        List<TestRun> twL = TestRun.findByJob(rc);
         for (TestRun testRun : twL) {
-          testRun.runConfiguration=null;
+          testRun.job =null;
           testRun.save();
         }
 

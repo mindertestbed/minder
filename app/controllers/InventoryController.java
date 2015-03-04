@@ -2,8 +2,6 @@ package controllers;
 
 import com.avaje.ebean.Ebean;
 import models.*;
-import mtdl.SignalSlot;
-import mtdl.TdlCompiler;
 import net.sf.jasperreports.engine.*;
 import net.sf.jasperreports.engine.export.JRPdfExporter;
 import net.sf.jasperreports.engine.export.JRPdfExporterParameter;
@@ -15,9 +13,7 @@ import play.mvc.Controller;
 import play.mvc.Result;
 import views.html.*;
 
-import javax.validation.Constraint;
 import java.io.ByteArrayOutputStream;
-import java.io.File;
 import java.util.*;
 
 import static play.data.Form.form;
@@ -29,7 +25,7 @@ public class InventoryController extends Controller {
 	public static final Form<TestGroupEditorModel> TEST_GROUP_FORM = form(TestGroupEditorModel.class);
 	public static final Form<TestAssertionEditorModel> TEST_ASSERTION_FORM = form(TestAssertionEditorModel.class);
 	public static final Form<TestCaseEditorModel> TEST_CASE_FORM = form(TestCaseEditorModel.class);
-	public static final Form<RunConfigurationEditorModel> RUN_CONFIGURATION_FORM = form(RunConfigurationEditorModel.class);
+	public static final Form<JobEditorModel> JOB_FORM = form(JobEditorModel.class);
 	public static final Form<WrapperEditorModel> WRAPPER_FORM = form(WrapperEditorModel.class);
 
 	
@@ -99,7 +95,7 @@ public class InventoryController extends Controller {
 		public String description;
 	}
 
-	public static class RunConfigurationEditorModel {
+	public static class JobEditorModel {
 		public Long id;
 
 		@Constraints.Required
@@ -529,8 +525,8 @@ public class InventoryController extends Controller {
 		return ok(testCaseLister.render(tc.testAssertion, null));
 	}
 
-	public static Result createRunConfigurationForm(Long testCaseId) {
-		System.out.println("Request run configuration editor form");
+	public static Result createJobForm(Long testCaseId) {
+		System.out.println("Request Job editor form");
 		TestCase testCase = TestCase.findById(testCaseId);
 
 		System.out.println("testCaseNull " + (testCase == null));
@@ -541,14 +537,14 @@ public class InventoryController extends Controller {
 
 		int max = 0;
 
-		List<RunConfiguration> list = RunConfiguration.findByTestCase(testCase);
+		List<Job> list = Job.findByTestCase(testCase);
 		if (list != null) {
-			for (RunConfiguration runConfiguration : list) {
-				if (runConfiguration.name
+			for (Job job : list) {
+				if (job.name
 						.matches(testCase.name + "\\(\\d+\\)$")) {
-					int val = Integer.parseInt(runConfiguration.name.substring(
-							runConfiguration.name.lastIndexOf('(') + 1,
-							runConfiguration.name.lastIndexOf(')')));
+					int val = Integer.parseInt(job.name.substring(
+							job.name.lastIndexOf('(') + 1,
+							job.name.lastIndexOf(')')));
 
 					if (max < val)
 						max = val;
@@ -556,7 +552,7 @@ public class InventoryController extends Controller {
 			}
 		}
 
-		RunConfigurationEditorModel model = new RunConfigurationEditorModel();
+		JobEditorModel model = new JobEditorModel();
 		model.testCaseId = testCaseId;
 		model.name = testCase.name + "(" + (max + 1) + ")";
 
@@ -570,44 +566,44 @@ public class InventoryController extends Controller {
 			model.mappedWrappers.add(new MappedWrapperModel(null, parameter.id,
 					parameter.name, ""));
 		}
-		return ok(runConfigurationEditor.render(
-				RUN_CONFIGURATION_FORM.fill(model), null));
+		return ok(jobEditor.render(
+				JOB_FORM.fill(model), null));
 	}
 
-	public static Result doCreateRunConfiguration() {
+	public static Result doCreateJob() {
 		com.feth.play.module.pa.controllers.Authenticate.noCache(response());
 
-		Form<RunConfigurationEditorModel> form = RUN_CONFIGURATION_FORM
+		Form<JobEditorModel> form = JOB_FORM
 				.bindFromRequest();
 
 		if (form.hasErrors()) {
 			printFormErrors(form);
-			return badRequest(runConfigurationEditor.render(form, null));
+			return badRequest(jobEditor.render(form, null));
 		}
 
-		RunConfigurationEditorModel model = form.get();
+		JobEditorModel model = form.get();
 
 		// check if we have a repetition
 		TestCase testCase = TestCase.findById(model.testCaseId);
-		RunConfiguration existing = RunConfiguration.findByTestCaseAndName(
+		Job existing = Job.findByTestCaseAndName(
 				testCase, model.name);
 
 		if (existing != null) {
-			form.reject("A run configuration with the name [" + model.name
+			form.reject("A Job with the name [" + model.name
 					+ "] already exists");
-			return badRequest(runConfigurationEditor.render(form, null));
+			return badRequest(jobEditor.render(form, null));
 		}
 
 		// check the parameters.
 		for (MappedWrapperModel mappedWrapper : model.mappedWrappers) {
 			if (mappedWrapper.value == null || mappedWrapper.value.equals("")) {
 				form.reject("You have to fill all parameters");
-				return badRequest(runConfigurationEditor.render(form, null));
+				return badRequest(jobEditor.render(form, null));
 			}
 		}
 
 		// everything is tip-top. So save
-		RunConfiguration rc = new RunConfiguration();
+		Job rc = new Job();
 		rc.name = model.name;
 		rc.testCase = testCase;
 		rc.obsolete = false;
@@ -620,7 +616,7 @@ public class InventoryController extends Controller {
 				MappedWrapper mw = new MappedWrapper();
 				mw.parameter = WrapperParam.findByTestCaseAndName(testCase,
 						mappedWrapper.name);
-				mw.runConfiguration = rc;
+				mw.job = rc;
 				mw.wrapper = Wrapper.findByName(mappedWrapper.value);
 				mw.save();
 			}
@@ -633,16 +629,16 @@ public class InventoryController extends Controller {
 			Ebean.endTransaction();
 
 			form.reject(ex.getMessage());
-			return badRequest(runConfigurationEditor.render(form, null));
+			return badRequest(jobEditor.render(form, null));
 		}
 
-		return ok(runConfigurationLister.render(testCase, null));
+		return ok(jobLister.render(testCase, null));
 	}
 
-	public static Result doDeleteRunConfiguration(Long id) {
+	public static Result doDeleteJob(Long id) {
 		com.feth.play.module.pa.controllers.Authenticate.noCache(response());
 
-		RunConfiguration rc = RunConfiguration.findById(id);
+		Job rc = Job.findById(id);
 		if (rc == null) {
 			// it does not exist. error
 			return badRequest("Test assertion with id " + id
@@ -658,18 +654,18 @@ public class InventoryController extends Controller {
 		}
 
 		TestCase tc = TestCase.findById(rc.testCase.id);
-		return ok(runConfigurationLister.render(tc, null));
+		return ok(jobLister.render(tc, null));
 	}
 
-	public static Result editRunConfigurationForm(Long id) {
-		RunConfiguration rc = RunConfiguration.findById(id);
+	public static Result editJobForm(Long id) {
+		Job rc = Job.findById(id);
 		if (rc == null) {
 			// it does not exist. error
-			return badRequest("RunConfiguration with id " + id
+			return badRequest("Job with id " + id
 					+ " does not exist.");
 		}
 
-		RunConfigurationEditorModel rome = new RunConfigurationEditorModel();
+		JobEditorModel rome = new JobEditorModel();
 		rome.id = rc.id;
 		rome.name = rc.name;
 		rome.tdl = rc.tdl;
@@ -683,24 +679,24 @@ public class InventoryController extends Controller {
 					mappedWrapper.wrapper.name));
 		}
 
-		Form<?> fill = RUN_CONFIGURATION_FORM.fill(rome);
+		Form<?> fill = JOB_FORM.fill(rome);
 
-		return ok(runConfigurationEditor.render(fill, null));
+		return ok(jobEditor.render(fill, null));
 	}
 
-	public static Result doEditRunConfiguration() {
-		Form<RunConfigurationEditorModel> form = RUN_CONFIGURATION_FORM
+	public static Result doEditJob() {
+		Form<JobEditorModel> form = JOB_FORM
 				.bindFromRequest();
 
 		if (form.hasErrors()) {
-			return badRequest(runConfigurationEditor.render(form, null));
+			return badRequest(jobEditor.render(form, null));
 		}
 
-		RunConfigurationEditorModel model = form.get();
+		JobEditorModel model = form.get();
 
-		RunConfiguration rc = RunConfiguration.findById(model.id);
+		Job rc = Job.findById(model.id);
 		if (rc == null) {
-			return badRequest("The run configuration " + rc.id
+			return badRequest("The Job " + rc.id
 					+ " is not found.");
 		}
 		rc.name = model.name;
@@ -709,13 +705,13 @@ public class InventoryController extends Controller {
 
 		try {
 			Ebean.beginTransaction();
-			MappedWrapper.deleteByRunConfiguration(rc);
+			MappedWrapper.deleteByJob(rc);
 			List<MappedWrapper> mappedWrappers = new ArrayList<>();
 			for (MappedWrapperModel mappedWrapper : model.mappedWrappers) {
 				MappedWrapper mw = new MappedWrapper();
 				mw.parameter = WrapperParam.findByTestCaseAndName(rc.testCase,
 						mappedWrapper.name);
-				mw.runConfiguration = rc;
+				mw.job = rc;
 				mw.wrapper = Wrapper.findByName(mappedWrapper.value);
 				mw.save();
 			}
@@ -728,20 +724,23 @@ public class InventoryController extends Controller {
 			Ebean.endTransaction();
 
 			form.reject(ex.getMessage());
-			return badRequest(runConfigurationEditor.render(form, null));
+			return badRequest(jobEditor.render(form, null));
 		}
-		return ok(runConfigurationLister.render(rc.testCase, null));
+		return ok(jobLister.render(rc.testCase, null));
 	}
 
-	public static Result displayRunConfiguration(Long id) {
-		RunConfiguration rc = RunConfiguration.findById(id);
+	public static Result displayJob(Long id) {
+		Job rc = Job.findById(id);
+
+
+		final User localUser = Application.getLocalUser(session());
 
 		if (rc == null) {
-			return badRequest("A run configuration with id [" + id
+			return badRequest("A Job with id [" + id
 					+ "] was not found");
 		}
 
-		return ok(runConfigurationDetailView.render(rc));
+		return ok(jobDetailView.render(rc, localUser));
 	}
 
 	private static final HashMap<Long, List<String>> optionCache = new HashMap<>();
@@ -818,9 +817,9 @@ public class InventoryController extends Controller {
 	}
 
 	public static Result listTestRuns(Long configurationId) {
-		RunConfiguration rc = RunConfiguration.findById(configurationId);
+		Job rc = Job.findById(configurationId);
 		if (rc == null) {
-			return badRequest("Run Configuration with id [" + configurationId
+			return badRequest("Job with id [" + configurationId
 					+ "] not found!");
 		} else {
 
@@ -970,14 +969,14 @@ public class InventoryController extends Controller {
 			values.put("errorMessage", tr.errorMessage);
 
 			Logger.debug("Error message " + tr.errorMessage);
-			RunConfiguration rc = RunConfiguration.findById(tr.runConfiguration.id);
+			Job rc = Job.findById(tr.job.id);
 			TestCase tc = TestCase.findById(rc.testCase.id);
 			TestAssertion ta = TestAssertion.findById(tc.testAssertion.id);
 			TestGroup tg = TestGroup.findById(ta.testGroup.id);
 
 			values.put("testGroup", tg.name);
 			values.put("testCase", tc.name);
-			values.put("runConfiguration", rc.name);
+			values.put("job", rc.name);
 
 			values.put("taId", ta.taId);
 			values.put("taNormativeSource", ta.normativeSource);

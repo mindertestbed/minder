@@ -23,7 +23,7 @@ public class MappedWrapper extends Model{
 
   @ManyToOne
   @Column(nullable = false)
-  public RunConfiguration runConfiguration;
+  public Job job;
 
   public static final Finder<Long, MappedWrapper> find = new Finder<>(Long.class,
       MappedWrapper.class);
@@ -32,12 +32,12 @@ public class MappedWrapper extends Model{
     return find.byId(id);
   }
 
-  public static List<MappedWrapper> findByRunConfiguration(RunConfiguration rc){
-    return find.where().eq("runConfiguration", rc).orderBy("id").findList();
+  public static List<MappedWrapper> findByJob(Job rc){
+    return find.where().eq("job", rc).orderBy("id").findList();
   }
 
-  public static void deleteByRunConfiguration(RunConfiguration rc) {
-    for (MappedWrapper mw : find.where().eq("runConfiguration", rc).findList()) {
+  public static void deleteByJob(Job rc) {
+    for (MappedWrapper mw : find.where().eq("job", rc).findList()) {
       mw.delete();
     }
   }

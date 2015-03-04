@@ -16,7 +16,7 @@
     <tr>
     </tr>
     <td>
-      @defining(TestRun.findByRunConfiguration(configurationId)){ testRunList =>
+      @defining(TestRun.findByJob(configurationId)){ testRunList =>
       @for(testRun <- testRunList){
       <div class="title hand differ @if(testRun.success){goodTestRun} else {badTestRun}" style="width:100%; border-bottom: 1px solid black; height: 30px;">
         <table class="fullw">

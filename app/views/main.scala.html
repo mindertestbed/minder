@@ -125,8 +125,8 @@
                 <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
                     <ul class="nav navbar-nav">
                         <li class="@("active".when(nav == "restrictedTestDesigner"))"><a href="@routes.Application.restrictedTestDesigner()">@Messages("playauthenticate.navigation.restricted.testdesigner")</a></li>
-						<li class="@("active".when(nav == "restrictedTestDeveloper"))"><a href="@routes.Application.restrictedTestDeveloper()">@Messages("playauthenticate.navigation.restricted.testdeveloper")</a></li>
-						<li class="@("active".when(nav == "restrictedObserver"))"><a href="@routes.Application.restrictedObserver()">@Messages("playauthenticate.navigation.restricted.observer")</a></li>
+                        <li class="@("active".when(nav == "restrictedTestDeveloper"))"><a href="@routes.Application.restrictedTestDeveloper()">@Messages("playauthenticate.navigation.restricted.testdeveloper")</a></li>
+                        <li class="@("active".when(nav == "restrictedObserver"))"><a href="@routes.Application.restrictedObserver()">@Messages("playauthenticate.navigation.restricted.observer")</a></li>
                         @subjectNotPresent() {
                             <li class="@("active".when(nav == "signup"))"><a href="@routes.Application.signup()">@Messages("playauthenticate.navigation.signup")</a></li>
                         }
@@ -144,6 +144,15 @@
                                     <li><a href="@com.feth.play.module.pa.controllers.routes.Authenticate.logout()"><i class="icon-off"></i> @Messages("playauthenticate.navigation.logout")</a></li>
                                 </ul>
                             </li>
+                  <!--
+                            <span style="color:white"><b>Active Users:</b><span id="activeUsers">0</span></span>
+                            <script type="text/javascript">
+                                var feed = new EventSource ( "activeUsers" )
+                                feed.onmessage =
+                                function ( event ) {
+                                    $ ( "#activeUsers" )[ 0 ].innerHTML = event.data ;
+                                }
+                            </script> -->
                         }
                         </ul>
                     } {
@@ -179,6 +188,5 @@
                 <table style="width:100%;"><tr><td>&copy; eSENS 2015</td><td style="width:10%"><a href="http://icons8.com" style="font-size:6px">Icon pack by Icons8</a></td></tr></table>
             </footer>
         </div> <!-- /container -->
-
     </body>
 </html>

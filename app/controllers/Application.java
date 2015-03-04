@@ -1,6 +1,7 @@
 package controllers;
 
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 
 import minderengine.MinderSignalRegistry;
@@ -84,7 +85,6 @@ public class Application extends Controller {
   public static Result login() {
     return ok(login.render(MyUsernamePasswordAuthProvider.LOGIN_FORM));
   }
-
   public static Result doLogin() {
     com.feth.play.module.pa.controllers.Authenticate.noCache(response());
     final Form<MyLogin> filledForm = MyUsernamePasswordAuthProvider.LOGIN_FORM
@@ -96,15 +96,15 @@ public class Application extends Controller {
       return badRequest(login.render(filledForm));
     } else {
       MyLogin lgn = filledForm.get();
-      System.out.println(filledForm.get().getEmail());
-      System.out.println(filledForm.get().getPassword());
-
       // Everything was filled
       Result result = UsernamePasswordAuthProvider.handleLogin(ctx());
 
-      if (result.toScala().header().status() == OK){
+      if (result.toScala().header().status() == SEE_OTHER) {
         //if the user successfully logged in, then we have to create a new signal registry for him.
         SessionMap.registerObject(lgn.getEmail(), "signalRegistry", new MinderSignalRegistry());
+        UserManager.addUser(lgn.getEmail());
+      } else {
+        Logger.debug("Different status " + result.toScala().header().status());
       }
       return result;
     }
