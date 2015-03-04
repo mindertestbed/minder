@@ -1,0 +1,127 @@
+@(localUser: models.User = null)
+
+<style type="text/css">
+    .Table
+    {
+        display: table;
+        vertical-align: middle;
+    }
+    .Heading
+    {
+        display: table-row;
+        font-weight: bold;
+        text-align: center;
+    }
+    .Row
+    {
+        display: table-row;
+    }
+    .Cell
+    {
+     display: table-cell;
+     vertical-align: left;
+     text-align: left;
+     border: solid;
+     border-width: thin;
+    }
+    
+    .CellAsHeader
+    {
+     display: table-cell;
+     vertical-align: left;
+     text-align: middle;
+     border: solid;
+     border-width: thin;
+    }
+    
+    #accordion2 {
+  		height: 100%;
+  	}
+  	
+  	.myscroll{
+	  overflow:scroll;
+	  width:100%;
+	
+	  background: rgb(200,230,255);
+	 }
+	 
+	 li:hover {
+        opacity: 0.5;
+        cursor: pointer;
+     }
+</style>
+
+<script>
+$(function() {
+	var i = 5;
+	minderAccordion("#accordion2");
+});
+</script>
+
+@getName(text: String) = @{
+  text.split('(')(0);
+}
+
+<div id="guidesign" class="fullw bevel"  data-demo-id="flowchart" data-library="dom" style="height:100%;">
+	<div class="Table" style="width:100%;height:100%;">
+		<div class="Heading">
+			<div class="CellAsHeader" style="width:30%;height:5%;">
+	            <p>Wrappers</p>
+	        </div>
+	        <div class="CellAsHeader" style="width:70%;height:5%;">
+	            <p>Test Case Editor</p>
+	        </div>
+		</div>
+		<div class="Row">
+	        <div id="accordion2" class="Cell" style="width:30%;height:95%;height:auto;overflow:scroll;">
+		          @defining(Wrapper.getAll()){ allWrappers =>
+			           @for(currentWrapper <- allWrappers){
+			              <div class="title bevelsmall"><b class="trigger">@currentWrapper.name</b></div>
+			              <div class="content">
+			                <div class="myscroll" style="overflow:auto;">
+			                  <div><b>Signals</b></div>
+			                  <div style="overflow:scroll"> <ul>
+			                  @for(currentSignal <- currentWrapper.signals){
+			                    <li id="signal@currentWrapper.id-@currentSignal.id">@getName(currentSignal.signature)</li>
+			                    <script>
+			                        $("#signal@currentWrapper.id-@currentSignal.id").click(function(){
+			                            addNewSignal("@getName(currentSignal.signature)");
+			                        });
+			
+			                    </script>
+			                  }
+			                  </ul></div>
+			                  &nbsp;
+			                  <div><b>Slots</b></div>
+			                  <div style="overflow:scroll">
+			                  <ul>
+			                  @for(currentSlot <- currentWrapper.slots){
+			                    <li id="slot@currentWrapper.id-@currentSlot.id">@getName(currentSlot.signature)</li>
+			                    <script>
+			                      $("#slot@currentWrapper.id-@currentSlot.id").click(function(){
+			                        addNewSignal("@getName(currentSlot.signature)"); // Kaldır
+									addNewSlot("@getName(currentSlot.signature)");
+								  });
+			                    </script>
+			                  }
+			                  </ul></div>
+			                </div>
+			              </div>
+			            }
+		          }
+	        </div>
+	        <div class="Cell maxw fullh scroll" style="width:70%;height:95%;">
+			   	<button type="submit" style="border: 0; background: transparent"  onclick=addNewConverter()>
+                     <img src="@routes.Assets.at("/images/plus-64.png")" alt="Add New Converter" height="20" width="20">
+                </button>
+                <button type="submit" style="border: 0; background: transparent"  onclick=removeSelectedElement()>
+                     <img src="@routes.Assets.at("/images/trash2-64.png")" alt="Delete Element" height="20" width="20">
+                </button>
+                <button type="submit" style="border: 0; background: transparent"  onclick=generateXMLofSVG()>
+                     <img src="@routes.Assets.at("/images/save_as-64.png")" alt="Save" height="20" width="20">
+                </button>
+			   <object style="border:1px solid red;" id="SVGCanvas" width="100%" height="100%" type="image/svg+xml" data="@routes.Assets.at("javascripts/fundamentals.svg")"></object>
+        	</div>
+    	</div>
+	</div>
+</div>
