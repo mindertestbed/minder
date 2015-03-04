@@ -289,18 +289,6 @@ td{
   font-weight: bold;
 }
 
-
-.tablediv {
-     display: table;
-     vertical-align: middle
-}
-
-.celldiv {
-     display: table-cell;
-     vertical-align: middle;
-     text-align: center;
-}
-
 .create {
   font-family:  "Lucida Grande", sans-serif;
   color:#3837FD;
