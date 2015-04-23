@@ -599,10 +599,12 @@ public class InventoryController extends Controller {
 		}
 
 		// check the parameters.
-		for (MappedWrapperModel mappedWrapper : model.mappedWrappers) {
-			if (mappedWrapper.value == null || mappedWrapper.value.equals("")) {
-				form.reject("You have to fill all parameters");
-				return badRequest(runConfigurationEditor.render(form, null));
+		if (model.mappedWrappers != null) {
+			for (MappedWrapperModel mappedWrapper : model.mappedWrappers) {
+				if (mappedWrapper.value == null || mappedWrapper.value.equals("")) {
+					form.reject("You have to fill all parameters");
+					return badRequest(runConfigurationEditor.render(form, null));
+				}
 			}
 		}
 
@@ -616,13 +618,15 @@ public class InventoryController extends Controller {
 		try {
 			Ebean.beginTransaction();
 			List<MappedWrapper> mappedWrappers = new ArrayList<>();
-			for (MappedWrapperModel mappedWrapper : model.mappedWrappers) {
-				MappedWrapper mw = new MappedWrapper();
-				mw.parameter = WrapperParam.findByTestCaseAndName(testCase,
-						mappedWrapper.name);
-				mw.runConfiguration = rc;
-				mw.wrapper = Wrapper.findByName(mappedWrapper.value);
-				mw.save();
+			if (model.mappedWrappers != null) {
+				for (MappedWrapperModel mappedWrapper : model.mappedWrappers) {
+					MappedWrapper mw = new MappedWrapper();
+					mw.parameter = WrapperParam.findByTestCaseAndName(testCase,
+							mappedWrapper.name);
+					mw.runConfiguration = rc;
+					mw.wrapper = Wrapper.findByName(mappedWrapper.value);
+					mw.save();
+				}
 			}
 
 			rc.mappedWrappers = mappedWrappers;
