@@ -3,109 +3,112 @@
 # ~~~~
 
 # Home page
-GET     /                           controllers.Application.index
-GET     /restrictedObserver         controllers.Application.restrictedObserver
-GET     /restrictedTestDesigner     controllers.Application.restrictedTestDesigner
-GET     /createNewTest              controllers.Application.createNewTest
-GET     /restrictedTestDeveloper    controllers.Application.restrictedTestDeveloper
-GET     /assets/javascript/routes.js  controllers.Application.jsRoutes
+GET         /                                      controllers.Application.index
+GET         /restrictedObserver                    controllers.Application.restrictedObserver
+GET         /restrictedTestDesigner                controllers.Application.restrictedTestDesigner
+GET         /createNewTest                         controllers.Application.createNewTest
+GET         /restrictedTestDeveloper               controllers.Application.restrictedTestDeveloper
+GET         /assets/javascript/routes.js           controllers.Application.jsRoutes
 
-GET     /profile                    controllers.Application.profile
+GET         /profile                               controllers.Application.profile
 
-GET     /login                      controllers.Application.login
-POST    /login                      controllers.Application.doLogin
+GET         /login                                 controllers.Application.login
+POST        /login                                 controllers.Application.doLogin
 
-GET     /logout                     com.feth.play.module.pa.controllers.Authenticate.logout
-GET     /authenticate/:provider     com.feth.play.module.pa.controllers.Authenticate.authenticate(provider: String)
+GET         /logout                                com.feth.play.module.pa.controllers.Authenticate.logout
+GET         /authenticate/:provider                com.feth.play.module.pa.controllers.Authenticate.authenticate(provider: String)
 
-GET     /signup                     controllers.Application.signup
-POST    /signup                     controllers.Application.doSignup
+GET         /signup                                controllers.Application.signup
+POST        /signup                                controllers.Application.doSignup
 
-GET     /accounts/unverified        controllers.Signup.unverified
-GET     /authenticate/:provider/denied     controllers.Signup.oAuthDenied(provider: String)
+GET         /accounts/unverified                   controllers.Signup.unverified
+GET         /authenticate/:provider/denied         controllers.Signup.oAuthDenied(provider: String)
 
-GET     /accounts/verify/:token     controllers.Signup.verify(token: String)
-GET     /accounts/exists            controllers.Signup.exists
+GET         /accounts/verify/:token                controllers.Signup.verify(token: String)
+GET         /accounts/exists                       controllers.Signup.exists
 
-GET     /accounts/password/reset/:token     controllers.Signup.resetPassword(token: String)
-POST    /accounts/password/reset            controllers.Signup.doResetPassword
+GET         /accounts/password/reset/:token        controllers.Signup.resetPassword(token: String)
+POST        /accounts/password/reset               controllers.Signup.doResetPassword
 
-GET    /accounts/password/change        controllers.Account.changePassword
-POST   /accounts/password/change        controllers.Account.doChangePassword
+GET         /accounts/password/change              controllers.Account.changePassword
+POST        /accounts/password/change              controllers.Account.doChangePassword
 
-GET     /accounts/verify                controllers.Account.verifyEmail
+GET         /accounts/verify                       controllers.Account.verifyEmail
 
-GET     /accounts/add                   controllers.Account.link
+GET         /accounts/add                          controllers.Account.link
 
-GET     /accounts/link                  controllers.Account.askLink
-POST    /accounts/link                  controllers.Account.doLink
+GET         /accounts/link                         controllers.Account.askLink
+POST        /accounts/link                         controllers.Account.doLink
 
-GET     /accounts/merge                 controllers.Account.askMerge
-POST    /accounts/merge                 controllers.Account.doMerge
+GET         /accounts/merge                        controllers.Account.askMerge
+POST        /accounts/merge                        controllers.Account.doMerge
 
-GET     /login/password/forgot          controllers.Signup.forgotPassword(email: String ?= "")
-POST    /login/password/forgot          controllers.Signup.doForgotPassword
+GET         /login/password/forgot                 controllers.Signup.forgotPassword(email: String ?= "")
+POST        /login/password/forgot                 controllers.Signup.doForgotPassword
 
 # Map static resources from the /public folder to the /assets URL path
-GET     /assets/*file                   controllers.Assets.at(path="/public", file)
-GET     /webjars/*file                  controllers.WebJarAssets.at(file)
+GET         /assets/*file                          controllers.Assets.at(path="/public", file)
+GET         /webjars/*file                         controllers.WebJarAssets.at(file)
 
 #test group management
-GET     /createNewGroupForm             controllers.InventoryController.createNewGroupForm
-POST    /doCreateTestGroup              controllers.InventoryController.doCreateTestGroup
-GET     /editGroupForm                  controllers.InventoryController.editGroupForm(id: Long)
-POST    /doEditGroup                    controllers.InventoryController.doEditGroup
-GET     /doDeleteGroup                  controllers.InventoryController.doDeleteGroup(id: Long)
+GET         /createNewGroupForm                    controllers.InventoryController.createNewGroupForm
+POST        /doCreateTestGroup                     controllers.InventoryController.doCreateTestGroup
+GET         /editGroupForm                         controllers.InventoryController.editGroupForm(id: Long)
+POST        /doEditGroup                           controllers.InventoryController.doEditGroup
+GET         /doDeleteGroup                         controllers.InventoryController.doDeleteGroup(id: Long)
 
 #test assertion management
-GET     /createAssertionForm            controllers.InventoryController.createAssertionForm(groupId: Long)
-POST    /doCreateAssertion              controllers.InventoryController.doCreateAssertion
-GET     /editAssertionForm              controllers.InventoryController.editAssertionForm(id: Long)
-POST    /doEditAssertion                controllers.InventoryController.doEditAssertion
-GET     /doDeleteAssertion              controllers.InventoryController.doDeleteAssertion(id: Long)
+GET         /createAssertionForm                   controllers.InventoryController.createAssertionForm(groupId: Long)
+POST        /doCreateAssertion                     controllers.InventoryController.doCreateAssertion
+GET         /editAssertionForm                     controllers.InventoryController.editAssertionForm(id: Long)
+POST        /doEditAssertion                       controllers.InventoryController.doEditAssertion
+GET         /doDeleteAssertion                     controllers.InventoryController.doDeleteAssertion(id: Long)
 
 #test case management
-GET     /createCaseForm                 controllers.InventoryController.createCaseForm(assertionId: Long)
-POST    /doCreateCase                   controllers.InventoryController.doCreateCase
-GET     /editCaseForm                   controllers.InventoryController.editCaseForm(id: Long)
-POST    /doEditCase                     controllers.InventoryController.doEditCase
-GET     /doDeleteCase                   controllers.InventoryController.doDeleteCase(id: Long)
+GET         /createCaseForm                        controllers.InventoryController.createCaseForm(assertionId: Long)
+POST        /doCreateCase                          controllers.InventoryController.doCreateCase
+GET         /editCaseForm                          controllers.InventoryController.editCaseForm(id: Long)
+POST        /doEditCase                            controllers.InventoryController.doEditCase
+GET         /doDeleteCase                          controllers.InventoryController.doDeleteCase(id: Long)
 
 #test configuration management
-GET     /doDeleteRunConfiguration       controllers.InventoryController.doDeleteRunConfiguration(id: Long)
+GET         /doDeleteRunConfiguration              controllers.InventoryController.doDeleteRunConfiguration(id: Long)
 
-GET     /createRunConfigurationForm     controllers.InventoryController.createRunConfigurationForm(testCaseId: Long)
-POST    /doCreateRunConfiguration       controllers.InventoryController.doCreateRunConfiguration()
-GET     /editRunConfigurationForm       controllers.InventoryController.editRunConfigurationForm(id: Long)
-GET     /displayRunConfiguration        controllers.InventoryController.displayRunConfiguration(id: Long)
-POST    /doEditRunConfiguration         controllers.InventoryController.doEditRunConfiguration()
+GET         /createRunConfigurationForm            controllers.InventoryController.createRunConfigurationForm(testCaseId: Long)
+POST        /doCreateRunConfiguration              controllers.InventoryController.doCreateRunConfiguration()
+GET         /editRunConfigurationForm              controllers.InventoryController.editRunConfigurationForm(id: Long)
+GET         /displayRunConfiguration               controllers.InventoryController.displayRunConfiguration(id: Long)
+POST        /doEditRunConfiguration                controllers.InventoryController.doEditRunConfiguration()
 
 #test asset management
-POST    /doCreateTestAsset              controllers.TestAssetController.doCreateTestAsset
-GET     /createNewAssetForm             controllers.TestAssetController.createNewAssetForm
-GET     /editAssetForm                  controllers.TestAssetController.editAssetForm(id: Long)
-POST    /doEditAsset                    controllers.TestAssetController.doEditAsset
-GET     /doDeleteAsset                  controllers.TestAssetController.doDeleteAsset(id: Long)
-GET     /downloadAsset                  controllers.TestAssetController.downloadAsset(id: Long)
+POST        /doCreateTestAsset                     controllers.TestAssetController.doCreateTestAsset
+GET         /createNewAssetForm                    controllers.TestAssetController.createNewAssetForm
+GET         /editAssetForm                         controllers.TestAssetController.editAssetForm(id: Long)
+POST        /doEditAsset                           controllers.TestAssetController.doEditAsset
+GET         /doDeleteAsset                         controllers.TestAssetController.doDeleteAsset(id: Long)
+GET         /downloadAsset                         controllers.TestAssetController.downloadAsset(id: Long)
 
 #TESTING
-POST    /testme                         controllers.Tester.test
-GET     /runTest                        controllers.Tester.runTest(id: Long, userId: Long)
-GET     /syncTest                       controllers.Tester.syncTest(id: Long, userId: Long)
+POST        /testme                                controllers.Tester.test
+GET         /runTest                               controllers.Tester.runTest(id: Long, userId: Long)
+GET         /syncTest                              controllers.Tester.syncTest(id: Long, userId: Long)
 
 #test run listing
-GET     /listTestRunsForm             controllers.InventoryController.listTestRuns(configurationId: Long)
-POST    /doListTestRuns               controllers.InventoryController.doListTestRuns()
-GET     /viewReport                   controllers.InventoryController.viewReport(testRunId: Long, type: String)
+GET         /listTestRunsForm                      controllers.InventoryController.listTestRuns(configurationId: Long)
+POST        /doListTestRuns                        controllers.InventoryController.doListTestRuns()
+GET         /viewReport                            controllers.InventoryController.viewReport(testRunId: Long, type: String)
 
 #User History listing
-GET     /viewUserHistory              controllers.InventoryController.viewUserHistory(testRunId: Long)
-POST    /doViewUserHistory            controllers.InventoryController.doViewUserHistory()
+GET         /viewUserHistory                       controllers.InventoryController.viewUserHistory(testRunId: Long)
+POST        /doViewUserHistory                     controllers.InventoryController.doViewUserHistory()
 
 
 #Wrappers
-GET     /createNewWrapperForm         controllers.InventoryController.createNewWrapperForm
-POST    /doCreateWrapper              controllers.InventoryController.doCreateWrapper     
-GET     /doDeleteWrapper              controllers.InventoryController.doDeleteWrapper(id: Long)
-GET     /editWrapperForm              controllers.InventoryController.editWrapperForm(id: Long)
-POST    /doEditWrapper                controllers.InventoryController.doEditWrapper
+GET         /createNewWrapperForm                  controllers.InventoryController.createNewWrapperForm
+POST        /doCreateWrapper                       controllers.InventoryController.doCreateWrapper
+GET         /doDeleteWrapper                       controllers.InventoryController.doDeleteWrapper(id: Long)
+GET         /editWrapperForm                       controllers.InventoryController.editWrapperForm(id: Long)
+POST        /doEditWrapper                         controllers.InventoryController.doEditWrapper
+
+#SSE Test
+GET         /clock                                 controllers.TimeController.clock
