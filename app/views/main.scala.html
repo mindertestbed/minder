@@ -168,7 +168,7 @@
         <br/>
         <br/>
 
-        <div class="container" style="height:80%;">
+        <div style="height:80%;padding-left: 10px;padding-right:10px;">
             @if(flash.contains(Application.FLASH_ERROR_KEY)) {
                 <div class="alert alert-danger" role="alert">
                     <button type="button" class="close" data-dismiss="alert"><span aria-hidden="true">&times;</span><span class="sr-only">
@@ -186,9 +186,9 @@
             @content
             <hr>
 
-            <footer>
-                <table style="width:100%;"><tr><td>&copy; eSENS 2015</td><td style="width:10%"><a href="http://icons8.com" style="font-size:6px">Icon pack by Icons8</a></td></tr></table>
-            </footer>
         </div> <!-- /container -->
+        <footer>
+        <table style="width:100%;"><tr><td style="text-align: right;font-size:6px">&copy; eSENS 2015, <a href="http://icons8.com">Icon pack by Icons8</a></td></tr></table>
+        </footer>
     </body>
 </html>
