@@ -110,5 +110,5 @@ GET         /doDeleteWrapper                       controllers.InventoryControll
 GET         /editWrapperForm                       controllers.InventoryController.editWrapperForm(id: Long)
 POST        /doEditWrapper                         controllers.InventoryController.doEditWrapper
 
-
-GET         /activeUsers                           controllers.UserManager.activeUsers()
+#SSE Test
+GET         /clock                                 controllers.TimeController.clock
