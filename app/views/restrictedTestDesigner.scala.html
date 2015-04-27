@@ -2,10 +2,6 @@
 
 @main(Messages("playauthenticate.navigation.restricted.testdesigner"), "restrictedTestDesigner") {
 
-<script>
-</script>
-
-
 <h3 class="explanation"><img src="@routes.Assets.at("/images/about-64.png")" height="24px"/></h3>
 <p>
   @Messages("playauthenticate.restricted.testdesigner")
@@ -23,6 +19,7 @@
   <ul>
     <li><a href="#tabs-1">Test Groups</a></li>
     <li><a href="#tabs-2">Test Assets</a></li>
+    <li><a href="#tabs-3">Design with GUI</a></li>
   </ul>
   <div id="tabs-1">
     @testManager(localUser)
@@ -30,7 +27,9 @@
   <div id="tabs-2" style="height:100%;">
     @testAssetLister(localUser)
   </div>
-  <div id="tabs-3">
+  <div id="tabs-3" style="height:100%;">
+    @testDesignWithGUI(localUser)
+  </div>
   </div>
 </div>
 }

@@ -1,12 +1,18 @@
 package controllers
 
 import minderengine.{MinderWrapperRegistry, TestEngine, MinderSignalRegistry, SessionMap}
-import models.{TestCase, User, RunConfiguration}
+import models.{TestCase, User, Job}
 import mtdl.SignalSlotInfoProvider
 import play.Logger
+import play.api.libs.EventSource
+import play.api.libs.iteratee.{Iteratee, Enumerator, Concurrent}
+import play.api.libs.json.JsValue
 import play.api.mvc._
+import play.libs.F.Promise
 import play.mvc.Http
 import views.html._
+
+import scala.concurrent.ExecutionContext
 
 object Tester extends Controller {
   def test() = Action { implicit request =>
@@ -29,9 +35,9 @@ object Tester extends Controller {
 
   val testMap: collection.mutable.Map[String, TestRunner] = collection.mutable.Map()
 
-  def getTestRunner(user: User, runConfiguration: RunConfiguration): TestRunner = {
-    val rc2 = RunConfiguration.findById(runConfiguration.id)
-    val testCase = TestCase.findById(runConfiguration.testCase.id)
+  def getTestRunner(user: User, job: Job): TestRunner = {
+    val rc2 = Job.findById(job.id)
+    val testCase = TestCase.findById(job.testCase.id)
     var testRunner = testMap(user.email);
 
     if (testRunner == null) {
@@ -52,7 +58,7 @@ object Tester extends Controller {
     val user = User.find.byId(userId);
     val mail = user.email;
 
-    val rc = RunConfiguration.findById(id);
+    val rc = Job.findById(id);
 
     println("--------------")
     println("TEST CASE TDL " + rc.testCase.id)
@@ -63,7 +69,7 @@ object Tester extends Controller {
 
       if (testMap.contains(mail)) {
         val testRunner = testMap(mail);
-        if (testRunner.status == TestStatus.BAD || testRunner.status == TestStatus.GOOD){
+        if (testRunner.status == TestStatus.BAD || testRunner.status == TestStatus.GOOD) {
           SessionMap.registerObject(mail, "signalRegistry", new MinderSignalRegistry());
           SignalSlotInfoProvider.setSignalSlotInfoProvider(MinderWrapperRegistry.get())
           val testRunner = new TestRunner(rc, user);
@@ -97,10 +103,11 @@ object Tester extends Controller {
    */
   def syncTest(id: Long, userId: Long) = Action { implicit request =>
     val user = User.find.byId(userId);
-    val rc = RunConfiguration.findById(id);
+    val rc = Job.findById(id);
     Logger.debug("SYNC")
+
+
     Ok(testStatusViewer.render(rc, user))
   }
-
 }
 

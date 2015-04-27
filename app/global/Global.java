@@ -1,17 +1,13 @@
 package global;
 
-import com.avaje.ebean.Ebean;
 import com.feth.play.module.pa.PlayAuthenticate;
 import com.feth.play.module.pa.PlayAuthenticate.Resolver;
 import com.feth.play.module.pa.exceptions.AccessDeniedException;
 import com.feth.play.module.pa.exceptions.AuthException;
-import controllers.routes;
 import minderengine.BuiltInWrapperRegistry;
 import minderengine.ReflectionUtils;
 import minderengine.XoolaServer;
 import models.*;
-import mtdl.MinderTdl;
-import mtdl.TdlCompiler;
 import org.yaml.snakeyaml.Yaml;
 import org.yaml.snakeyaml.constructor.CustomClassLoaderConstructor;
 import play.Application;
@@ -25,11 +21,9 @@ import scala.io.Source;
 
 import java.io.*;
 import java.util.*;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+import controllers.*;
 
 public class Global extends GlobalSettings {
-
   public void onStart(Application app) {
     PlayAuthenticate.setResolver(new Resolver() {
       @Override
@@ -126,8 +120,8 @@ public class Global extends GlobalSettings {
                 }
               }
             }
-            if (model instanceof  RunConfiguration){
-              RunConfiguration rc = (RunConfiguration) model;
+            if (model instanceof Job){
+              Job rc = (Job) model;
 
               for (MappedWrapper mappedWrapper : rc.mappedWrappers) {
               }

@@ -63,7 +63,7 @@ object TestEngine {
     rg.setReportTemplate(Source.fromInputStream(this.getClass.getResourceAsStream("/taReport.xml")).mkString.getBytes())
     val user = User.findByEmail(userEmail)
     rg.setReportAuthor(user.name, userEmail);
-    val testCase: TestCase = testRunner.runConfiguration.testCase
+    val testCase: TestCase = testRunner.job.testCase
     val testAssertion = TestAssertion.findById(testCase.testAssertion.id)
     val testGroup = TestGroup.findById(testAssertion.testGroup.id)
 
@@ -191,7 +191,7 @@ object TestEngine {
       }
 
       if (testRunner != null) {
-        rg.setTestDetails(testGroup.name, testAssertion, testCase.name, testRunner.runConfiguration,
+        rg.setTestDetails(testGroup.name, testAssertion, testCase.name, testRunner.job,
           set, logBuilder.toString())
         testRunner.addLog(logBuilder.toString(), rg.generateReport())
         testRunner.finished()
@@ -201,7 +201,7 @@ object TestEngine {
         Logger.error(t.getMessage, t);
         lgr.error(t.getMessage, t)
         if (testRunner != null) {
-          rg.setTestDetails(testGroup.name, testAssertion, testCase.name, testRunner.runConfiguration,
+          rg.setTestDetails(testGroup.name, testAssertion, testCase.name, testRunner.job,
             set, logBuilder.toString())
           testRunner.addLog(logBuilder.toString(), rg.generateReport())
 

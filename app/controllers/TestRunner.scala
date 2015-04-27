@@ -16,11 +16,11 @@ import scala.collection.JavaConversions._
  * provides information to the main actor (status)
  * Created by yerlibilgin on 13/01/15.
  */
-class TestRunner(val runConfiguration: RunConfiguration, val user: User) {
+class TestRunner(val job: Job, val user: User) {
 
   //prepare a mapping
   val variableWrapperMapping = collection.mutable.Map[String, String]();
-  val mappedWrappers = MappedWrapper.findByRunConfiguration(runConfiguration)
+  val mappedWrappers = MappedWrapper.findByJob(job)
   var log: String = ""
   var report: Array[Byte] = null
   var wrappers: scala.collection.mutable.Set[String] = null;
@@ -35,8 +35,8 @@ class TestRunner(val runConfiguration: RunConfiguration, val user: User) {
     variableWrapperMapping += parm.name -> wrp.name
   }
 
-  val testCase = TestCase.findById(runConfiguration.testCase.id)
-  runConfiguration.testCase = testCase
+  val testCase = TestCase.findById(job.testCase.id)
+  job.testCase = testCase
   val cls = TestEngine.compileTest(user.email, testCase.tdl)
   var rivets: List[VisualRivet] = List();
 
@@ -131,7 +131,7 @@ class TestRunner(val runConfiguration: RunConfiguration, val user: User) {
     Logger.debug(log)
     testRun = new TestRun()
     testRun.date = new Date()
-    testRun.runConfiguration = runConfiguration;
+    testRun.job = job;
     val userHistory = new UserHistory
     userHistory.user = user;
     userHistory.operationType = new TOperationType

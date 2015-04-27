@@ -3,15 +3,10 @@ package builtin;
 import builtin.reportEngine.ReportManager;
 import minderengine.MinderException;
 import minderengine.Slot;
-import minderengine.Wrapper;
-import models.RunConfiguration;
+import models.Job;
 import models.TestAssertion;
-import models.TestCase;
-import models.TestGroup;
-import mtdl.Rivet;
 
 import java.util.HashMap;
-import java.util.List;
 
 public class ReportGenerator extends BuiltInWrapper {
 
@@ -57,13 +52,13 @@ public class ReportGenerator extends BuiltInWrapper {
 
 
   @Slot
-  public void setTestDetails(String groupName, TestAssertion ta, String testCaseName, RunConfiguration rc, java.util.Set<String> wrappers, String log) {
+  public void setTestDetails(String groupName, TestAssertion ta, String testCaseName, Job rc, java.util.Set<String> wrappers, String log) {
     if (!isRunning)
       throw new MinderException(MinderException.E_SUT_NOT_RUNNING);
     rmg.report.getReportModel().getHeader().put("Test Group Name:", groupName);
     rmg.report.getReportModel().getHeader().put("Test Assertion Id", ta.taId);
     rmg.report.getReportModel().getHeader().put("Test Case Name", testCaseName);
-    rmg.report.getReportModel().getHeader().put("Run Configuration", rc.name);
+    rmg.report.getReportModel().getHeader().put("Job", rc.name);
 
 
     updateField("Normative Source", ta.normativeSource);

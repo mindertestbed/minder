@@ -4,15 +4,14 @@ import com.avaje.ebean.ExpressionList;
 import play.db.ebean.Model;
 
 import javax.persistence.*;
-import java.util.Date;
 import java.util.List;
 
 /**
  * Created by yerlibilgin on 30/12/14.
  */
 @Entity
-@Table(name = "RunConfiguration")
-public class RunConfiguration extends Model {
+@Table(name = "Job")
+public class Job extends Model {
 	@Id
 	public Long id;
 
@@ -35,7 +34,7 @@ public class RunConfiguration extends Model {
 	@Column(length = 20000)
 	public String tdl;
 
-	public RunConfiguration() {
+	public Job() {
 
 	}
 
@@ -45,19 +44,19 @@ public class RunConfiguration extends Model {
 	@OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
 	public List<TestRun> testRuns;
 
-	public static final Finder<Long, RunConfiguration> find = new Finder<>(Long.class,
-			RunConfiguration.class);
+	public static final Finder<Long, Job> find = new Finder<>(Long.class,
+			Job.class);
 
 
-	public static List<RunConfiguration> findByTestCase(TestCase testCase){
-		ExpressionList<RunConfiguration> f = find.where().eq("testCase", testCase);
+	public static List<Job> findByTestCase(TestCase testCase){
+		ExpressionList<Job> f = find.where().eq("testCase", testCase);
 		return f.setOrderBy("id").findList();
 	}
 
-	public static RunConfiguration findById(Long id) {
+	public static Job findById(Long id) {
 		return find.byId(id);
 	}
-	public static RunConfiguration findByTestCaseAndName(TestCase testCase, String name) {
+	public static Job findByTestCaseAndName(TestCase testCase, String name) {
 		return find.where().eq("testCase", testCase).eq("name", name).findUnique();
 	}
 }

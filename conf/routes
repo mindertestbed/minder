@@ -72,13 +72,13 @@ POST        /doEditCase                            controllers.InventoryControll
 GET         /doDeleteCase                          controllers.InventoryController.doDeleteCase(id: Long)
 
 #test configuration management
-GET         /doDeleteRunConfiguration              controllers.InventoryController.doDeleteRunConfiguration(id: Long)
+GET         /doDeleteJob                           controllers.InventoryController.doDeleteJob(id: Long)
 
-GET         /createRunConfigurationForm            controllers.InventoryController.createRunConfigurationForm(testCaseId: Long)
-POST        /doCreateRunConfiguration              controllers.InventoryController.doCreateRunConfiguration()
-GET         /editRunConfigurationForm              controllers.InventoryController.editRunConfigurationForm(id: Long)
-GET         /displayRunConfiguration               controllers.InventoryController.displayRunConfiguration(id: Long)
-POST        /doEditRunConfiguration                controllers.InventoryController.doEditRunConfiguration()
+GET         /createJobForm                         controllers.InventoryController.createJobForm(testCaseId: Long)
+POST        /doCreateJob                           controllers.InventoryController.doCreateJob()
+GET         /editJobForm                           controllers.InventoryController.editJobForm(id: Long)
+GET         /displayJob                            controllers.InventoryController.displayJob(id: Long)
+POST        /doEditJob                             controllers.InventoryController.doEditJob()
 
 #test asset management
 POST        /doCreateTestAsset                     controllers.TestAssetController.doCreateTestAsset
