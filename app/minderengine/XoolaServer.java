@@ -60,11 +60,13 @@ public class XoolaServer {
           @Override
           public void connected(XoolaInvocationHandler xoolaInvocationHandler, XoolaChannelState xoolaChannelState) {
             System.out.println("CLIENT: " + xoolaChannelState.remoteId + " connected");
+            MinderWrapperRegistry.get().setWrapperAvailable(xoolaChannelState.remoteId, true);
           }
 
           @Override
           public void disconnected(XoolaInvocationHandler xoolaInvocationHandler, XoolaChannelState xoolaChannelState) {
-
+            System.out.println("CLIENT: " + xoolaChannelState.remoteId + " connected");
+            MinderWrapperRegistry.get().setWrapperAvailable(xoolaChannelState.remoteId, false);
           }
         });
         System.out.println("Starting server");

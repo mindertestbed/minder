@@ -28,20 +28,21 @@ object TestEngine {
   }
 
   class MyAppender(var sb: StringBuilder) extends AppenderSkeleton {
-    override def append(event: LoggingEvent) : Unit = {
-      if(this.getLayout != null) {
+    override def append(event: LoggingEvent): Unit = {
+      if (this.getLayout != null) {
         val formatted = this.getLayout.format(event);
         sb.append(formatted);
         Logger.debug(formatted)
       }
     }
 
-    def close(){}
+    def close() {}
 
-    def requiresLayout() : Boolean = {
+    def requiresLayout(): Boolean = {
       false;
     }
   }
+
   def runTest2(userEmail: String, clsMinderTDL: Class[MinderTdl], map: Map[String, String], testRunner: TestRunner): Unit = {
     val logBuilder = new StringBuilder
     val lgr: org.apache.log4j.Logger = org.apache.log4j.Logger.getLogger("test");
@@ -57,7 +58,7 @@ object TestEngine {
       }
     }
     rg.startTest()
-    if(testRunner!=null)
+    if (testRunner != null)
       testRunner.startTest()
     lgr.info("Initialize report params")
     rg.setReportTemplate(Source.fromInputStream(this.getClass.getResourceAsStream("/taReport.xml")).mkString.getBytes())
@@ -74,7 +75,7 @@ object TestEngine {
       val minderTDL = clsMinderTDL.getConstructors()(0).newInstance(map, java.lang.Boolean.TRUE).asInstanceOf[MinderTdl]
 
 
-      if(testRunner != null){
+      if (testRunner != null) {
         testRunner.wrappers = minderTDL.wrapperDefs
       }
 
@@ -94,12 +95,25 @@ object TestEngine {
         for (rivet <- minderTDL.SlotDefs) {
           lgr.debug("---- " + "RUN RIVET " + rivetIndex)
 
-          //resolve the minder client id. This might as well be resolved to a local built-in wrapper.
-          val minderClient = if (BuiltInWrapperRegistry.get().containsWrapper(rivet.slot.wrapperId)) {
-            BuiltInWrapperRegistry.get().getWrapper(rivet.slot.wrapperId)
-          } else {
-            XoolaServer.get().getClient(rivet.slot.wrapperId)
-          }
+          //resolve the minder client id. This might as well be resolved to a local built-in wrapper or the null slot.
+          val minderClient =
+            if (rivet.slot.wrapperId == "NULLWRAPPER") {
+              new IMinderClient {
+                override def callSlot(s: String, s1: String, objects: Array[AnyRef]): AnyRef = {
+                  null
+                }
+
+                override def finishTest(): Unit = {}
+
+                override def startTest(s: String): Unit = {}
+              }
+
+            } else if (BuiltInWrapperRegistry.get().containsWrapper(rivet.slot.wrapperId)) {
+              BuiltInWrapperRegistry.get().getWrapper(rivet.slot.wrapperId)
+            } else {
+              XoolaServer.get().getClient(rivet.slot.wrapperId)
+            }
+
           val args = Array.ofDim[Object](rivet.pipes.length)
 
           set.add(rivet.slot.wrapperId)

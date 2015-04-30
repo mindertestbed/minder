@@ -1,65 +1,111 @@
 @(rc: Job, localUser: models.User = null)
 
-@main(Messages("playauthenticate.navigation.restricted.testdesigner"), "restrictedTestDesigner") {
+    @main(Messages("playauthenticate.navigation.restricted.testdesigner"), "restrictedTestDesigner") {
+        <style xmlns="http://www.w3.org/1999/html">
+            table.shaded{
+                    border: 1px solid gray;
+            }
+            table.shaded th {
+                background-color: #e7e7e7 ;
+                padding: 10px;
+                border: 1px solid gray;
+            }
 
-<script>
-  $(function() {
-  $( "#wmDetails" ).dialog({
-    autoOpen: false,
-    title: 'Wrapper Mapping',
-    show: {
-      effect: "blind",
-      duration: 1000
-    },
-    hide: {
-      effect: "explode",
-      duration: 1000
-    }
-  });
+            table.shaded td{
+                padding: 10px;
+                border: 1px solid gray;
+            }
 
-  $( document ).tooltip({
-      items: "#showHideMapsClick",
-      content: function() {
-        return "Click to view wrapper mappings."
-      }
-    });
-  });
-</script>
-<div class="fullw fullh">
-  <br />
-  <br />
-  <table>
-    <tr>
-      <td><b>Name:</b></td>
-      <td>@rc.name</td>
-      <td>&nbsp;</td>
-      <td>
-        <div style="padding-left:3px; padding-right:3px;" class="bevel2" onclick='$( "#wmDetails" ).dialog( "open" );'
-             id="showHideMapsClick"><img src="@routes.Assets.at("/images/down4-64.png")" height="16px" />
+            table.section td,th{
+                padding-left: 14px;
+                padding-right: 14px;
+                vertical-align: text-top;
+            }
+
+
+
+        </style>
+        <script>
+        //this variable will be used for locking the RUN button. When its value is 0, then
+        //we can run the job
+        var buttonLatch = @rc.mappedWrappers.size()
+        </script>
+        <div class="fullw fullh" style="margin-left:20px ;">
+
+            <h2>Job <span class="hl">@{rc.name}</span></h2>
+            <div class="indent">
+                <br />
+                <table class="section"><tr><td>
+                <h3>Test Case Details</h3>
+                    <table class="shaded">
+                        <tr>
+                            <th>Test Group:</th>
+                            <td>
+                                <a href="/testGroupViewer?id=@{rc.testCase.testAssertion.testGroup.id}">
+                                @rc.testCase.testAssertion.testGroup.name
+                                </a>
+                            </td>
+                        </tr>
+                        <tr>
+                            <th>Test Assertion:</th>
+                            <td>
+                                <a href="/testAssertionViewer?id=@{rc.testCase.testAssertion.id}">
+                                @rc.testCase.testAssertion.taId
+                                </a>
+                            </td>
+                        </tr>
+                        <tr><th>Test Case:</th>
+                            <td>
+                                <a href="/testAssertionViewer?id=@{
+                                    rc.testCase.id
+                                }">
+                                @rc.testCase.name
+                                </a>
+                            </td>
+                        </tr>
+                    </table>
+                    </td><td>
+                <h3>Wrapper Mappings</h3>
+                    <table class="shaded">
+                        <tr><th>Variable</th><th>Actual Wrapper</th><th>Status</th></tr>
+                        @defining(rc.mappedWrappers) { lst =>
+                            @for(mw <- rc.mappedWrappers) {
+                                <tr>
+                                    <td>@mw.parameter.name</td><td>@mw.wrapper.name</td>
+                                    <td>
+                                    <span id="onStatus@{mw.wrapper.id}" style="display: none" class="bignobold online"> <img src="@routes.Assets.at("/images/Pc_Online.png")"/></span>
+                                    <span id="offStatus@{mw.wrapper.id}" style="display: none" class="bignobold offline"> <img src="@routes.Assets.at("/images/Pc_Offline.png")"/></span>
+                                    <script>
+                                        new EventSource ( "/wrapperStatusFeed?label=@{mw.wrapper.name}").onmessage =
+                                        function ( event ) {
+                                            var kk = event.data
+                                            if (kk.indexOf("true") >= 0){
+                                                $( "#onStatus@{mw.wrapper.id}" ).show()
+                                                $( "#offStatus@{mw.wrapper.id}" ).hide()
+                                            } else {
+                                                $( "#onStatus@{mw.wrapper.id}" ).hide()
+                                                $( "#offStatus@{mw.wrapper.id}" ).show()
+                                            }
+                                        }
+
+                                        if(0 == 0){
+                                            $("#runbutton" ).enable()
+                                        } else {
+                                            $("#runbutton" ).disable()
+                                        }
+                                    </script>
+                                </td></tr>
+                            }
+                        }
+                    </table>
+                    </td></tr></table>
+                <hr/>
+                <input id="runbutton" type="button" value="Run" disabled="disabled"/>
+
+                <div id="runStatus" class="fullw" style="height:94%;overflow:auto">
+                    <div class="fullh fullw" id="testStatus">
+                    </div>
+                </div>
+            </div>
         </div>
-      </td>
-    </tr>
-  </table>
-  <div id="runStatus" class="fullw" style="height:94%;overflow:auto">
-    <div class="fullh fullw" id="testStatus">
-    </div>
-  </div>
-</div>
-
-<div id="wmDetails" style="display:none">
-  <table>
-    @defining(rc.mappedWrappers){lst =>
-    <tr>
-      <td><b># mappings:</b></td>
-      <td>@lst.size</td>
-    </tr>
-    @for(mw <- rc.mappedWrappers){
-    <tr>
-      <td><b>@mw.parameter.name:</b></td>
-      <td>@mw.wrapper.name</td>
-    </tr>
     }
-    }
-  </table>
-</div>
-}

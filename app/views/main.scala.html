@@ -1,194 +1,194 @@
 @(title: String, nav: String = "")(content: Html)
 
-@import be.objectify.deadbolt.java.views.html._
-@import be.objectify.deadbolt.core.utils.TemplateUtils._
+    @import be.objectify.deadbolt.java.views.html._
+    @import be.objectify.deadbolt.core.utils.TemplateUtils._
 
 <!DOCTYPE html>
 
-<html lang="@lang().code()">
-    <head>
-        <title>@title</title>
+    <html lang="@lang().code()">
+        <head>
+            <title>@title</title>
 
-        <meta charset="utf-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1">
-        <meta name="description" content="Play Authenticate - an authentication module for the Play! Framework 2.0">
-        <meta name="author" content="The Play Authenticate Team">
+            <meta charset="utf-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1">
+            <meta name="description" content="Play Authenticate - an authentication module for the Play! Framework 2.0">
+            <meta name="author" content="The Play Authenticate Team">
 
-        <script type="text/javascript" src="@routes.Assets.at("javascripts/jquery.js")"></script>
-        <script type="text/javascript" src="@routes.WebJarAssets.at(WebJarAssets.locate("bootstrap.min.js"))"></script>
-        <script type="text/javascript" src="@routes.Assets.at("javascripts/jquery-ui.min.js")"></script>
-        <script type="text/javascript" src="@routes.Assets.at("javascripts/codemirror.js")"></script>
-        <script type="text/javascript" src="@routes.Assets.at("javascripts/active-line.js")"></script>
-        <script type="text/javascript" src="@routes.Assets.at("javascripts/dialog.js")"></script>
-        <script type="text/javascript" src="@routes.Assets.at("javascripts/searchcursor.js")"></script>
-        <script type="text/javascript" src="@routes.Assets.at("javascripts/search.js")"></script>
-        <script type="text/javascript" src="@routes.Assets.at("javascripts/annotatescrollbar.js")"></script>
-        <script type="text/javascript" src="@routes.Assets.at("javascripts/matchesonscrollbar.js")"></script>
-        <script type="text/javascript" src="@routes.Assets.at("javascripts/show-hint.js")"></script>
-        <script type="text/javascript" src="@routes.Assets.at("javascripts/clike.js")"></script>
-        <script type="text/javascript" src="@routes.Assets.at("javascripts/javascript-hint.js")"></script>
-        <script type="text/javascript" src="@routes.Assets.at("javascripts/minder.js")"></script>
-        
-        <script type="text/javascript" src="@routes.Assets.at("javascripts/SVGDrawingUtils.js")"></script>
+            <script type="text/javascript" src="@routes.Assets.at("javascripts/jquery.js")"></script>
+            <script type="text/javascript" src="@routes.WebJarAssets.at(WebJarAssets.locate("bootstrap.min.js"))"></script>
+            <script type="text/javascript" src="@routes.Assets.at("javascripts/jquery-ui.min.js")"></script>
+            <script type="text/javascript" src="@routes.Assets.at("javascripts/codemirror.js")"></script>
+            <script type="text/javascript" src="@routes.Assets.at("javascripts/active-line.js")"></script>
+            <script type="text/javascript" src="@routes.Assets.at("javascripts/dialog.js")"></script>
+            <script type="text/javascript" src="@routes.Assets.at("javascripts/searchcursor.js")"></script>
+            <script type="text/javascript" src="@routes.Assets.at("javascripts/search.js")"></script>
+            <script type="text/javascript" src="@routes.Assets.at("javascripts/annotatescrollbar.js")"></script>
+            <script type="text/javascript" src="@routes.Assets.at("javascripts/matchesonscrollbar.js")"></script>
+            <script type="text/javascript" src="@routes.Assets.at("javascripts/show-hint.js")"></script>
+            <script type="text/javascript" src="@routes.Assets.at("javascripts/clike.js")"></script>
+            <script type="text/javascript" src="@routes.Assets.at("javascripts/javascript-hint.js")"></script>
+            <script type="text/javascript" src="@routes.Assets.at("javascripts/minder.js")"></script>
 
-        <link rel="stylesheet" href="@routes.WebJarAssets.at(WebJarAssets.locate("css/bootstrap.min.css"))">
-        <link href="@routes.Assets.at("stylesheets/codemirror.css")" rel="stylesheet">
-        <link href="@routes.Assets.at("stylesheets/show-hint.css")" rel="stylesheet">
-        <link href="@routes.Assets.at("stylesheets/dialog.css")" rel="stylesheet">
-        <link href="@routes.Assets.at("stylesheets/matchesonscrollbar.css")" rel="stylesheet">
-        <link href="@routes.Assets.at("stylesheets/jquery-ui.min.css")" rel="stylesheet">
-        <link href="@routes.Assets.at("stylesheets/jquery-ui.structure.min.css")" rel="stylesheet">
-        <link href="@routes.Assets.at("stylesheets/jquery-ui.theme.min.css")" rel="stylesheet">
-        <link href="@routes.Assets.at("stylesheets/main.css")" rel="stylesheet">
+            <script type="text/javascript" src="@routes.Assets.at("javascripts/SVGDrawingUtils.js")"></script>
 
-		
-        <style>
-        html, body {
-        height : 100 % ;
-        padding : 0 px ;
-        margin : 0 px ;
-        }
+            <link rel="stylesheet" href="@routes.WebJarAssets.at(WebJarAssets.locate("css/bootstrap.min.css"))">
+            <link href="@routes.Assets.at("stylesheets/codemirror.css")" rel="stylesheet">
+            <link href="@routes.Assets.at("stylesheets/show-hint.css")" rel="stylesheet">
+            <link href="@routes.Assets.at("stylesheets/dialog.css")" rel="stylesheet">
+            <link href="@routes.Assets.at("stylesheets/matchesonscrollbar.css")" rel="stylesheet">
+            <link href="@routes.Assets.at("stylesheets/jquery-ui.min.css")" rel="stylesheet">
+            <link href="@routes.Assets.at("stylesheets/jquery-ui.structure.min.css")" rel="stylesheet">
+            <link href="@routes.Assets.at("stylesheets/jquery-ui.theme.min.css")" rel="stylesheet">
+            <link href="@routes.Assets.at("stylesheets/main.css")" rel="stylesheet">
 
-        .ui-accordion.ui-accordion-content {
-        padding : 10 px ;
-        }
 
-        .ui-tabs-panel.ui-tabs {
-        padding : 5 px ;
-        }
+            <style>
+            html, body {
+            height : 100 % ;
+            padding : 0 px ;
+            margin : 0 px ;
+            }
 
-        .ui-tabs.ui-tabs-panel {
-        padding : 5 px ;
-        }
+            .ui-accordion.ui-accordion-content {
+            padding : 10 px ;
+            }
 
-        .demoHeaders {
-        margin-top : 2 em ;
-        }
-        #dialog-link {
-        padding :.4 em 1 em.4 em 20 px ;
-        text-decoration : none ;
-        position : relative ;
-        }
-        #dialog-link span.ui-icon {
-        margin : 0 5 px 0 0 ;
-        position : absolute ;
-        left :.2 em ;
-        top : 50 % ;
-        margin-top : - 8 px ;
-        }
-        #icons {
-        margin : 0 ;
-        padding : 0 ;
-        }
-        #icons li {
-        margin : 2 px ;
-        position : relative ;
-        padding : 4 px 0 ;
-        cursor : pointer ;
-        float : left ;
-        list-style : none ;
-        }
-        #icons span.ui-icon {
-        float : left ;
-        margin : 0 4 px ;
-        }
-        .fakewindowcontain.ui-widget-overlay {
-        position : absolute ;
-        }
-        select {
-        width : 200 px ;
-        }
-        </style>
+            .ui-tabs-panel.ui-tabs {
+            padding : 5 px ;
+            }
 
-        <script>
-        $ ( function ( ) {
-        $ ( ".explanation" ).click ( function ( ) {
-        $ ( this ).next ( ).slideToggle ( ) ;
-        } ) ;
-        $ ( ".explanation + p" ).hide ( ) ;
-        } ) ;
-        </script>
-    </head>
+            .ui-tabs.ui-tabs-panel {
+            padding : 5 px ;
+            }
 
-    <body>
-        <nav class="navbar navbar-default navbar-fixed-top navbar-inverse" role="navigation">
-            <div class="container-fluid">
-                    <!-- Brand and toggle get grouped for better mobile display -->
-                <div class="navbar-header">
-                    <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
-                        <span class="sr-only">Toggle navigation</span>
-                        <span class="icon-bar"></span>
-                        <span class="icon-bar"></span>
-                        <span class="icon-bar"></span>
-                    </button>
-                    <a class="navbar-brand" href="@routes.Application.index()">MiNDER</a>
-                </div>
+            .demoHeaders {
+            margin-top : 2 em ;
+            }
+            #dialog-link {
+            padding :.4 em 1 em.4 em 20 px ;
+            text-decoration : none ;
+            position : relative ;
+            }
+            #dialog-link span.ui-icon {
+            margin : 0 5 px 0 0 ;
+            position : absolute ;
+            left :.2 em ;
+            top : 50 % ;
+            margin-top : - 8 px ;
+            }
+            #icons {
+            margin : 0 ;
+            padding : 0 ;
+            }
+            #icons li {
+            margin : 2 px ;
+            position : relative ;
+            padding : 4 px 0 ;
+            cursor : pointer ;
+            float : left ;
+            list-style : none ;
+            }
+            #icons span.ui-icon {
+            float : left ;
+            margin : 0 4 px ;
+            }
+            .fakewindowcontain.ui-widget-overlay {
+            position : absolute ;
+            }
+            select {
+            width : 200 px ;
+            }
+            </style>
 
-                    <!-- Collect the nav links, forms, and other content for toggling -->
-                <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
-                    <ul class="nav navbar-nav">
-                        <li class="@("active".when(nav == "restrictedTestDesigner"))"><a href="@routes.Application.restrictedTestDesigner()">@Messages("playauthenticate.navigation.restricted.testdesigner")</a></li>
-                        <li class="@("active".when(nav == "restrictedTestDeveloper"))"><a href="@routes.Application.restrictedTestDeveloper()">@Messages("playauthenticate.navigation.restricted.testdeveloper")</a></li>
-                        <li class="@("active".when(nav == "restrictedObserver"))"><a href="@routes.Application.restrictedObserver()">@Messages("playauthenticate.navigation.restricted.observer")</a></li>
-                        @subjectNotPresent() {
-                            <li class="@("active".when(nav == "signup"))"><a href="@routes.Application.signup()">@Messages("playauthenticate.navigation.signup")</a></li>
-                        }
-                    </ul>
+            <script>
+            $ ( function ( ) {
+            $ ( ".explanation" ).click ( function ( ) {
+            $ ( this ).next ( ).slideToggle ( ) ;
+            } ) ;
+            $ ( ".explanation + p" ).hide ( ) ;
+            } ) ;
+            </script>
+        </head>
 
-                    @subjectPresentOr() {
-                        <ul class="nav navbar-nav navbar-right">
-                        @defining(Application.getLocalUser(session())) { user =>
-                            <li class="dropdown">
-                                <a href="#" class="dropdown-toggle" data-toggle="dropdown">
-                                    <span id="clock"></span><i class="glyphicon glyphicon-user"></i> @user.name <span class="caret"></span></a>
-                                <ul class="dropdown-menu" role="menu">
-                                    <li class="@("active".when(nav == "profile"))"><a href="@routes.Application.profile()">@Messages("playauthenticate.navigation.profile")</a></li>
-                                    <li><a href="@routes.Account.link()">@Messages("playauthenticate.navigation.link_more")</a></li>
-                                    <li class="divider"></li>
-                                    <li><a href="@com.feth.play.module.pa.controllers.routes.Authenticate.logout()"><i class="icon-off"></i> @Messages("playauthenticate.navigation.logout")</a></li>
-                                </ul>
-                            </li>
+        <body>
+            <nav class="navbar navbar-default navbar-fixed-top navbar-inverse" role="navigation">
+                <div class="container-fluid">
+                        <!-- Brand and toggle get grouped for better mobile display -->
+                    <div class="navbar-header">
+                        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
+                            <span class="sr-only">Toggle navigation</span>
+                            <span class="icon-bar"></span>
+                            <span class="icon-bar"></span>
+                            <span class="icon-bar"></span>
+                        </button>
+                        <a class="navbar-brand" href="@routes.Application.index()">MiNDER</a>
+                    </div>
 
-                            <script>
-                            var source = new EventSource ( "/clock" ) ;
-                            source.onmessage = function ( event ) {
-                            $ ( "#clock" )[ 0 ].innerHTML = event.data;
+                        <!-- Collect the nav links, forms, and other content for toggling -->
+                    <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+                        <ul class="nav navbar-nav">
+                            <li class="@("active".when(nav == "restrictedTestDesigner"))"><a href="@routes.Application.restrictedTestDesigner()">@Messages("playauthenticate.navigation.restricted.testdesigner")</a></li>
+                            <li class="@("active".when(nav == "restrictedTestDeveloper"))"><a href="@routes.Application.restrictedTestDeveloper()">@Messages("playauthenticate.navigation.restricted.testdeveloper")</a></li>
+                            <li class="@("active".when(nav == "restrictedObserver"))"><a href="@routes.Application.restrictedObserver()">@Messages("playauthenticate.navigation.restricted.observer")</a></li>
+                            @subjectNotPresent() {
+                                <li class="@("active".when(nav == "signup"))"><a href="@routes.Application.signup()">@Messages("playauthenticate.navigation.signup")</a></li>
                             }
-                            </script>
-                        }
                         </ul>
-                    } {
-                        <a href="@routes.Application.login()" class=" navbar-right btn btn-default navbar-btn @("disabled".when(nav == "login"))">@Messages("playauthenticate.navigation.login")</a>
-                    }
 
-                </div><!-- /.navbar-collapse -->
-            </div><!-- /.container-fluid -->
-        </nav>
+                        @subjectPresentOr() {
+                            <ul class="nav navbar-nav navbar-right">
+                            @defining(Application.getLocalUser(session())) { user =>
+                                <li class="dropdown">
+                                    <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+                                        <span id="clock"></span><i class="glyphicon glyphicon-user"></i> @user.name <span class="caret"></span></a>
+                                    <ul class="dropdown-menu" role="menu">
+                                        <li class="@("active".when(nav == "profile"))"><a href="@routes.Application.profile()">@Messages("playauthenticate.navigation.profile")</a></li>
+                                        <li><a href="@routes.Account.link()">@Messages("playauthenticate.navigation.link_more")</a></li>
+                                        <li class="divider"></li>
+                                        <li><a href="@com.feth.play.module.pa.controllers.routes.Authenticate.logout()"><i class="icon-off"></i> @Messages("playauthenticate.navigation.logout")</a></li>
+                                    </ul>
+                                </li>
 
-        <br/>
-        <br/>
+                                <script>
+                                var source = new EventSource ( "/clockFeed" ) ;
+                                source.onmessage = function ( event ) {
+                                $ ( "#clock" )[ 0 ].innerHTML = event.data ;
+                                }
+                                </script>
+                            }
+                            </ul>
+                        } {
+                            <a href="@routes.Application.login()" class=" navbar-right btn btn-default navbar-btn @("disabled".when(nav == "login"))">@Messages("playauthenticate.navigation.login")</a>
+                        }
 
-        <div style="height:80%;padding-left: 10px;padding-right:10px;">
-            @if(flash.contains(Application.FLASH_ERROR_KEY)) {
-                <div class="alert alert-danger" role="alert">
-                    <button type="button" class="close" data-dismiss="alert"><span aria-hidden="true">&times;</span><span class="sr-only">
-                        Close</span></button>
-                    @flash().get(Application.FLASH_ERROR_KEY)
-                </div>
-            }
-            @if(flash.contains(Application.FLASH_MESSAGE_KEY)) {
-                <div class="alert alert-success" role="alert">
-                    <button type="button" class="close" data-dismiss="alert"><span aria-hidden="true">&times;</span><span class="sr-only">
-                        Close</span></button>
-                    @flash().get(Application.FLASH_MESSAGE_KEY)
-                </div>
-            }
-            @content
+                    </div> <!-- /.navbar-collapse -->
+                </div> <!-- /.container-fluid -->
+            </nav>
+
+            <div style="height : 80 % ; padding-left : 10 px ; padding-right : 10 px ;">
+                @if(flash.contains(Application.FLASH_ERROR_KEY)) {
+                    <div class="alert alert-danger" role="alert">
+                        <button type="button" class="close" data-dismiss="alert"><span aria-hidden="true">&times;</span><span class="sr-only">
+                            Close</span></button>
+                        @flash().get(Application.FLASH_ERROR_KEY)
+                    </div>
+                }
+                @if(flash.contains(Application.FLASH_MESSAGE_KEY)) {
+                    <div class="alert alert-success" role="alert">
+                        <button type="button" class="close" data-dismiss="alert"><span aria-hidden="true">&times;</span><span class="sr-only">
+                            Close</span></button>
+                        @flash().get(Application.FLASH_MESSAGE_KEY)
+                    </div>
+                }
+                @content
             <hr>
 
-        </div> <!-- /container -->
-        <footer>
-        <table style="width:100%;"><tr><td style="text-align: right;font-size:6px">&copy; eSENS 2015, <a href="http://icons8.com">Icon pack by Icons8</a></td></tr></table>
-        </footer>
-    </body>
-</html>
+            </div> <!-- /container -->
+            <footer style="position:absolute;top:95%;left:0;width:100%;height:5px;">
+                <table style="width:97%;"><tr><td style="text-align:right; font-size:8px;">&copy;
+                    eSENS 2015, <a href="http://icons8.com">Icon pack by Icons8</a></td>
+                </tr>
+                </table>
+            </footer>
+        </body>
+    </html>

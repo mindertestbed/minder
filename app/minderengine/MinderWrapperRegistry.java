@@ -11,19 +11,19 @@ import scala.actors.threadpool.Arrays;
 import java.util.*;
 
 /**
- *
  * This class holds the active state of the wrappers. When a wrapper connects to Minder,
  * this wrapper keeps a DB mirror for two reasons:
  * <br>
- *   <ol>
- *  <li>fast access</li>
- *   <li>determining whether a wrapper is online or not.</li>
+ * <ol>
+ * <li>fast access</li>
+ * <li>determining whether a wrapper is online or not.</li>
  * </ol>
  * Created by yerlibilgin on 13/12/14.
  */
-public class MinderWrapperRegistry implements ISignalSlotInfoProvider {
+public class MinderWrapperRegistry extends Observable implements ISignalSlotInfoProvider {
   private static MinderWrapperRegistry instance;
   private HashMap<String, HashMap<String, SignalSlot>> wrapperMap;
+  private HashSet<String> onlineStatus;
 
   public static MinderWrapperRegistry get() {
     if (instance == null) {
@@ -34,6 +34,7 @@ public class MinderWrapperRegistry implements ISignalSlotInfoProvider {
 
   private MinderWrapperRegistry() {
     wrapperMap = new HashMap<>();
+    onlineStatus = new HashSet<>();
   }
 
 
@@ -59,6 +60,7 @@ public class MinderWrapperRegistry implements ISignalSlotInfoProvider {
     }
 
     wrapperMap.put(label, methodMap);
+    onlineStatus.add(label);
 
     //update the database for possible changes in the signatures
     Wrapper wrapper = Wrapper.findByName(label);
@@ -71,9 +73,9 @@ public class MinderWrapperRegistry implements ISignalSlotInfoProvider {
       for (MethodContainer mc : methodSet) {
         Logger.debug("\t" + (mc.isSignal ? "Signal " : "Slot ") + mc.methodKey);
 
-        if (mc.isSignal){
+        if (mc.isSignal) {
           TSignal.createNew(wrapper, mc.methodKey);
-        } else{
+        } else {
           TSlot.createNew(wrapper, mc.methodKey);
         }
       }
@@ -89,7 +91,8 @@ public class MinderWrapperRegistry implements ISignalSlotInfoProvider {
   }
 
   public Collection<SignalSlot> getAllMethods(String label) {
-    if (!wrapperMap.containsKey(label)) throw new IllegalArgumentException("A wrapper with label " + label + " is not available.");
+    if (!wrapperMap.containsKey(label))
+      throw new IllegalArgumentException("A wrapper with label " + label + " is not available.");
     return wrapperMap.get(label).values();
   }
 
@@ -109,8 +112,16 @@ public class MinderWrapperRegistry implements ISignalSlotInfoProvider {
     return ss;
   }
 
-  public boolean isWrapperAvailable(String label){
-    return wrapperMap.containsKey(label);
+  public boolean isWrapperAvailable(String label) {
+    return onlineStatus.contains(label);
   }
 
+  public void setWrapperAvailable(String remoteId, boolean available) {
+    if (available)
+      onlineStatus.add(remoteId);
+    else
+      onlineStatus.remove(remoteId);
+    setChanged();
+    notifyObservers(remoteId);
+  }
 }

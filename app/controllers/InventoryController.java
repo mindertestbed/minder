@@ -1,6 +1,8 @@
 package controllers;
 
 import com.avaje.ebean.Ebean;
+import minderengine.MinderWrapperAccessController;
+import minderengine.MinderWrapperRegistry;
 import models.*;
 import net.sf.jasperreports.engine.*;
 import net.sf.jasperreports.engine.export.JRPdfExporter;
@@ -28,7 +30,6 @@ public class InventoryController extends Controller {
 	public static final Form<JobEditorModel> JOB_FORM = form(JobEditorModel.class);
 	public static final Form<WrapperEditorModel> WRAPPER_FORM = form(WrapperEditorModel.class);
 
-	
 	public static class TestGroupEditorModel {
 		public Long id;
 
@@ -52,18 +53,24 @@ public class InventoryController extends Controller {
 		public String taId;
 
 		@Constraints.Required
+		@Constraints.MaxLength(ModelConstants.DESCRIPTION_LENGTH)
 		public String normativeSource;
 
 		@Constraints.Required
 		public String target;
 
+		@Constraints.MaxLength(ModelConstants.DESCRIPTION_LENGTH)
 		public String prerequisites;
 
 		@Constraints.Required
+		@Constraints.MaxLength(ModelConstants.DESCRIPTION_LENGTH)
 		public String predicate;
 
+		@Constraints.MaxLength(ModelConstants.K)
 		public String variables;
 
+
+		@Constraints.MaxLength(ModelConstants.K)
 		public String tag;
 
 		@Constraints.Required
@@ -71,6 +78,8 @@ public class InventoryController extends Controller {
 		@Constraints.MaxLength(ModelConstants.SHORT_DESC_LENGTH)
 		public String shortDescription;
 
+
+		@Constraints.MaxLength(ModelConstants.DESCRIPTION_LENGTH)
 		public String description;
 
 		public String prescriptionLevel;
@@ -559,13 +568,18 @@ public class InventoryController extends Controller {
 		//
 		model.mappedWrappers = new ArrayList<>();
 
-		System.out.println("Test Case Parameters. length "
-				+ testCase.parameters.size());
 		for (WrapperParam parameter : testCase.parameters) {
-			System.out.println(parameter.name);
 			model.mappedWrappers.add(new MappedWrapperModel(null, parameter.id,
 					parameter.name, ""));
 		}
+
+		Collections.sort(model.mappedWrappers, new Comparator<MappedWrapperModel>() {
+			@Override
+			public int compare(MappedWrapperModel o1, MappedWrapperModel o2) {
+				return o1.name.compareTo(o2.name);
+			}
+		});
+
 		return ok(jobEditor.render(
 				JOB_FORM.fill(model), null));
 	}
@@ -736,7 +750,6 @@ public class InventoryController extends Controller {
 	public static Result displayJob(Long id) {
 		Job rc = Job.findById(id);
 
-
 		final User localUser = Application.getLocalUser(session());
 
 		if (rc == null) {
@@ -747,19 +760,14 @@ public class InventoryController extends Controller {
 		return ok(jobDetailView.render(rc, localUser));
 	}
 
-	private static final HashMap<Long, List<String>> optionCache = new HashMap<>();
-
+	/**
+	 * List the actual registered wrappers that provide the same
+	 * signal and slots with the parametric wrappers provided in the model
+	 *
+	 * @param mappedWrapperModel
+	 * @return
+	 */
 	public static List<String> listOptions(MappedWrapperModel mappedWrapperModel) {
-
-		// the below query is not beautiful. so we are caching data to be
-		// faster.
-		if (optionCache.containsKey(mappedWrapperModel.wrapperParamId)) {
-			System.out.println("Get from cache");
-			return optionCache.get(mappedWrapperModel.wrapperParamId);
-		}
-
-		System.out.println("Read from db for " + mappedWrapperModel.name);
-
 		// get MappedParam
 		// get the wrapperparam
 		WrapperParam wp = WrapperParam
@@ -777,7 +785,6 @@ public class InventoryController extends Controller {
 		// more than 100 wrappers :-)
 		List<Wrapper> all = Wrapper.getAll();
 
-		System.out.println("ALL SIZE " + all.size());
 		out: for (Wrapper wrapper : all) {
 			System.out.println("Wrapper " + wrapper.name);
 			// check if all the signatures are covered by the signals or slots
@@ -816,7 +823,6 @@ public class InventoryController extends Controller {
 			listOptions.add(wrapper.name);
 		}
 
-		optionCache.put(mappedWrapperModel.wrapperParamId, listOptions);
 		return listOptions;
 	}
 

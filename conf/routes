@@ -111,4 +111,5 @@ GET         /editWrapperForm                       controllers.InventoryControll
 POST        /doEditWrapper                         controllers.InventoryController.doEditWrapper
 
 #SSE Test
-GET         /clock                                 controllers.TimeController.clock
+GET         /clockFeed                             controllers.SSEHandler.clockFeed
+GET         /wrapperStatusFeed                     controllers.SSEHandler.wrapperStatusFeed(label: String)

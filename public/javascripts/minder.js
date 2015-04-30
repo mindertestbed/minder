@@ -45,8 +45,8 @@ function createFormDialog(elm, sourceUrl, action, dialogId, titl, target, w, h) 
 
     var dialog = $("#" + dialogId).dialog({
       autoOpen: false,
-      height: h,
-      width: w,
+      height: "100%",
+      width: "100%",
       title: titl,
       modal: true,
       buttons: {
