@@ -1,37 +1,52 @@
-@(localUser: models.User = null)
+@(localUser: models.User = null, display: String = "testGroups")
+
+  @getClas(value: String, expected: String) = @{
+    if(value == expected) "activetab"
+    else "passivetab"
+  }
 
 @main(Messages("playauthenticate.navigation.restricted.testdesigner"), "restrictedTestDesigner") {
 
+  @dialogs()
   <!--
-<h3 class="explanation"><img src="@routes.Assets.at("/images/about-64.png")" height="24px"/></h3>
-<p>
+<h3 class="explanation"><img src=" @routes.Assets.at("/images/about-64.png")
+  " height="24px"/></h3>
+  <p>
   @Messages("playauthenticate.restricted.testdesigner")
-</p>
--->
+  </p>
+  -->
 
+  <table>
+    <tr>
+      <td class='@getClas(display, "testGroups")'>
+        <h4>
+          <a href="/restrictedTestDesigner?display=testGroups">Test Groups</a>
+        </h4>
+      </td>
+      <td class="@getClas(display, "testAssets")">
+        <h4>
+          <a href="/restrictedTestDesigner?display=testAssets">Test Assets</a>
+        </h4>
+      </td>
+      <td class="@getClas(display, "designWithGui")">
+        <h4>
+          <a href="/restrictedTestDesigner?display=designWithGui">Design With GUI</a></h4>
+      </td>
+    </tr>
+  </table>
 
-<script>
-  $(function() {
-    $( "#tabs" ).tabs();
-  });
-  </script>
+  <div class="fullw" style="border-top: 1px solid gray; padding: 10px;">
+  @display match {
+    case "testGroups" => {
+      @testManager(localUser)
+    }
+    case "testAssets" => {
+      @testAssetLister(localUser)
+    }
+    case _ => {
+      @testDesignWithGUI(localUser)
+    }
+  }
+  </div>
 
-  <br />
-<div id="tabs" style="height:100%;">
-  <ul>
-    <li><a href="#tabs-1">Test Groups</a></li>
-    <li><a href="#tabs-2">Test Assets</a></li>
-    <li><a href="#tabs-3">Design with GUI</a></li>
-  </ul>
-  <div id="tabs-1">
-    @testManager(localUser)
-  </div>
-  <div id="tabs-2" style="height:100%;">
-    @testAssetLister(localUser)
-  </div>
-  <div id="tabs-3" style="height:100%;">
-    @testDesignWithGUI(localUser)
-  </div>
-  </div>
-</div>
 }

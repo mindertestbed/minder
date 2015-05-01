@@ -4,6 +4,8 @@
 
 @main(Messages("playauthenticate.navigation.restricted.testdesigner"), "restrictedTestDesigner") {
 
+    @dialogs()
+
     <h2>Test Group <span class="hl">@{
         tg.name
     }</span></h2>
@@ -27,20 +29,34 @@
         }
         <hr />
         <h3>Test Assertions</h3>
+        @if(tg.testAssertions.size() == 0){
+            <p>No Test assertions yet</p>
+            @createButton("/createAssertionForm?groupId="+tg.id, Messages("restrictedTestPage.createTestAssertion"))
+        } else {
         <table class="shaded">
-            <tr>
-                <th style="border-top: 1px solid white;border-left: 1px solid white;background-color: #ffffff;">&nbsp;</th>
+            @createFirstRow {
                 <th>Test Assertion Id</th>
                 <th>Short Description</th>
-            </tr>
+            }
             @defining(new AtomicInteger(1)) {index =>
                 @for(ta <- tg.testAssertions) {
                     <tr>
                         <td>@index.getAndIncrement()</td><td><a href="/viewTestAssertion?id=@ta.id">@ta.taId</a></td> <td>@ta.shortDescription</td>
+                        <td>
+                            <div title="Delete" class="bevel2 celldiv" style="height:30px;width:30px;cursor:hand;"
+                            onclick='deleteWithDialog2("/doDeleteAssertion?id=@ta.id", $("#dialog-confirm"), "Delete Test Assertion", "test assertion", "@ta.taId")'>
+                                <img src="@routes.Assets.at("/images/trash2-64.png")" height="16px" alt='@ta.id'/>
+                            </div>
+                        </td>
                     </tr>
                 }
             }
+
+            @createLastRow {
+                @createButton("/createAssertionForm?groupId="+tg.id, Messages("restrictedTestPage.createTestAssertion"))
+            }
         </table>
+        }
     </div>
 
 }

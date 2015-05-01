@@ -5,7 +5,7 @@
 # Home page
 GET         /                                      controllers.Application.index
 GET         /restrictedObserver                    controllers.Application.restrictedObserver
-GET         /restrictedTestDesigner                controllers.Application.restrictedTestDesigner
+GET         /restrictedTestDesigner                controllers.Application.restrictedTestDesigner(display: String ?= "testGroups")
 GET         /createNewTest                         controllers.Application.createNewTest
 GET         /restrictedTestDeveloper               controllers.Application.restrictedTestDeveloper
 GET         /assets/javascript/routes.js           controllers.Application.jsRoutes
@@ -51,7 +51,7 @@ GET         /assets/*file                          controllers.Assets.at(path="/
 GET         /webjars/*file                         controllers.WebJarAssets.at(file)
 
 #test group management
-GET         /createNewGroupForm                    controllers.InventoryController.createNewGroupForm
+GET         /createNewGroup                        controllers.InventoryController.createNewGroup
 POST        /doCreateTestGroup                     controllers.InventoryController.doCreateTestGroup
 GET         /editGroupForm                         controllers.InventoryController.editGroupForm(id: Long)
 POST        /doEditGroup                           controllers.InventoryController.doEditGroup
@@ -114,5 +114,4 @@ GET         /editWrapperForm                       controllers.InventoryControll
 POST        /doEditWrapper                         controllers.InventoryController.doEditWrapper
 
 #SSE Test
-GET         /clockFeed                             controllers.SSEHandler.clockFeed
 GET         /wrapperStatusFeed                     controllers.SSEHandler.wrapperStatusFeed(id: Long)

@@ -159,12 +159,12 @@ public class InventoryController extends Controller {
 
       group.save();
 
-      return ok(testGroupLister.render(Application
-          .getLocalUser(session())));
+      return ok(restrictedTestDesigner.render(Application
+          .getLocalUser(session()), "testGroups"));
     }
   }
 
-  public static Result createNewGroupForm() {
+  public static Result createNewGroup() {
     return ok(testGroupEditor.render(TEST_GROUP_FORM, null));
   }
 
@@ -203,8 +203,7 @@ public class InventoryController extends Controller {
       tg.update();
 
       Logger.info("Done updating group " + tg.name + ":" + tg.id);
-      return ok(testGroupLister.render(Application
-          .getLocalUser(session())));
+      return ok();
     }
   }
 
@@ -220,8 +219,7 @@ public class InventoryController extends Controller {
         ex.printStackTrace();
         return badRequest(ex.getMessage());
       }
-      return ok(testGroupLister.render(Application
-          .getLocalUser(session())));
+      return ok();
     }
   }
 
@@ -294,7 +292,7 @@ public class InventoryController extends Controller {
 
       Logger.info("Assertion with id " + ta.id + ":" + ta.taId
           + " was created");
-      return ok(testAssertionLister.render(tg, null));
+      return ok(testGroupView.render(tg, null));
     }
   }
 
@@ -555,7 +553,9 @@ public class InventoryController extends Controller {
     if (tc == null){
       return badRequest("No test case with id " + id + ".");
     }
-    return ok(testCaseView.render(tc, Application.getLocalUser(session()), showJobs));
+    return ok(testCaseView.render(tc, Application.getLocalUser(session()), showJobs
+
+    ));
   }
 
 

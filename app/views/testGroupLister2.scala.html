@@ -7,24 +7,26 @@
   });
   </script>
 
-<h1>Test Groups</h1>
   @defining(new AtomicInteger(1)) {index =>
   <table class="shaded">
-    <tr>
-      <th style="border-top: 1px solid white;border-left: 1px solid white;background-color: #ffffff;">&nbsp;</th>
+    @createFirstRow {
       <th>Test Group Name</th>
       <th>Short Description</th>
-      <th style="border-top: 1px solid white;border-right: 1px solid white;background-color: #ffffff;">&nbsp;</th>
-    </tr>
+    }
     @for(tg <- TestGroup.findAll()) {
       <tr>
         <td>@index.getAndIncrement()</td><td><a href="/viewTestGroup?id=@tg.id">@tg.name</a></td> <td>@tg.shortDescription</td>
         <td>
-        <div title="Delete" class="bevel2 celldiv" style="height:30px;width:30px;">
+        <div title="Delete" class="bevel2 celldiv" style="height:30px;width:30px;cursor:hand;"
+        onclick='deleteWithDialog2("/doDeleteGroup?id=@tg.id", $("#dialog-confirm"), "Delete Group", "group", "@tg.name")'>
         <img src="@routes.Assets.at("/images/trash2-64.png")" height="16px" alt='@tg.id'/>
       </div>
         </td>
       </tr>
+    }
+
+    @createLastRow {
+      @createButton("/createNewGroup", Messages("restrictedTestPage.createTestGroup"))
     }
   </table>
   }

@@ -170,7 +170,7 @@
                             @defining(Application.getLocalUser(session())) { user =>
                                 <li class="dropdown">
                                     <a href="#" class="dropdown-toggle" data-toggle="dropdown">
-                                        <span id="clock"></span><i class="glyphicon glyphicon-user"></i> @user.name <span class="caret"></span></a>
+                                        <i class="glyphicon glyphicon-user"></i> @user.name <span class="caret"></span></a>
                                     <ul class="dropdown-menu" role="menu">
                                         <li class="@("active".when(nav == "profile"))"><a href="@routes.Application.profile()">@Messages("playauthenticate.navigation.profile")</a></li>
                                         <li><a href="@routes.Account.link()">@Messages("playauthenticate.navigation.link_more")</a></li>
@@ -178,13 +178,6 @@
                                         <li><a href="@com.feth.play.module.pa.controllers.routes.Authenticate.logout()"><i class="icon-off"></i> @Messages("playauthenticate.navigation.logout")</a></li>
                                     </ul>
                                 </li>
-
-                                <script>
-                                var source = new EventSource ( "/clockFeed" ) ;
-                                source.onmessage = function ( event ) {
-                                $ ( "#clock" )[ 0 ].innerHTML = event.data ;
-                                }
-                                </script>
                             }
                             </ul>
                         } {
@@ -211,6 +204,8 @@
                     </div>
                 }
 
+                <br />
+                <br />
                 <br />
                 <br />
                 @content

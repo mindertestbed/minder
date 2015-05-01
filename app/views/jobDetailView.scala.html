@@ -1,8 +1,8 @@
 @(rc: Job, showHistory: Boolean = true, localUser: models.User = null)
     @main(Messages("playauthenticate.navigation.restricted.testdesigner"), "restrictedTestDesigner") {
         <script>
-            var latch = @rc.mappedWrappers.size();
-
+        $ ( function ( ) {
+            var latch = 0;
             var btn = $("#runbutton" );
             btn.hide();
 
@@ -25,6 +25,7 @@
                   btn.hide();
                 }
             }
+        });
         </script>
             <h2>Job <span class="hl">@{rc.name}</span></h2>
             <div class="indent">
@@ -42,16 +43,14 @@
                         <tr>
                             <th>Test Assertion:</th>
                             <td>
-                                <a href="/testAssertionViewer?id=@{rc.testCase.testAssertion.id}">
+                                <a href="/viewTestAssertion?id=@{rc.testCase.testAssertion.id}">
                                 @rc.testCase.testAssertion.taId
                                 </a>
                             </td>
                         </tr>
                         <tr><th>Test Case:</th>
                             <td>
-                                <a href="/testAssertionViewer?id=@{
-                                    rc.testCase.id
-                                }">
+                                <a href="/viewTestCase?id=@{rc.testCase.id}&showJobs=true">
                                 @rc.testCase.name
                                 </a>
                             </td>
@@ -91,12 +90,13 @@
                 <tr>
                     <td>
                     @if(showHistory == true) {
-
-                        History <br />
                         @testRunLister(rc.id)
 
                     } else {
                         <input id="runbutton" type="button" value="Run"/>
+                        <div class="fullw">
+                            &nbsp;
+                        </div>
                     }
                     </td>
                 </tr>
