@@ -1,47 +1,40 @@
-@(rc: Job, localUser: models.User = null)
-
+@(rc: Job, showHistory: Boolean = true, localUser: models.User = null)
     @main(Messages("playauthenticate.navigation.restricted.testdesigner"), "restrictedTestDesigner") {
-        <style xmlns="http://www.w3.org/1999/html">
-            table.shaded{
-                    border: 1px solid gray;
-            }
-            table.shaded th {
-                background-color: #e7e7e7 ;
-                padding: 10px;
-                border: 1px solid gray;
-            }
-
-            table.shaded td{
-                padding: 10px;
-                border: 1px solid gray;
-            }
-
-            table.section td,th{
-                padding-left: 14px;
-                padding-right: 14px;
-                vertical-align: text-top;
-            }
-
-
-
-        </style>
         <script>
-        //this variable will be used for locking the RUN button. When its value is 0, then
-        //we can run the job
-        var buttonLatch = @rc.mappedWrappers.size()
-        </script>
-        <div class="fullw fullh" style="margin-left:20px ;">
+            var latch = @rc.mappedWrappers.size();
 
+            var btn = $("#runbutton" );
+            btn.hide();
+
+            new EventSource ( '/wrapperStatusFeed?id=@rc.id' ).onmessage = function ( event ) {
+                var kk = JSON.parse ( event.data )
+
+                if ( kk.online == true ) {
+                    $ ( "span.onStatus" + kk.id ).show ( )
+                    $ ( "span.offStatus" + kk.id ).hide ( )
+                    latch--;
+                } else {
+                    $ ( "span.onStatus" + kk.id ).hide ( )
+                    $ ( "span.offStatus" + kk.id ).show ( )
+                    latch ++;
+                }
+
+                if (latch == 0) {
+                  btn.show();
+                } else {
+                  btn.hide();
+                }
+            }
+        </script>
             <h2>Job <span class="hl">@{rc.name}</span></h2>
             <div class="indent">
-                <br />
                 <table class="section"><tr><td>
                 <h3>Test Case Details</h3>
                     <table class="shaded">
                         <tr>
                             <th>Test Group:</th>
                             <td>
-                                <a href="/testGroupViewer?id=@{rc.testCase.testAssertion.testGroup.id}">
+                                <a href="/viewTestGroup?id=@{rc.testCase.testAssertion.testGroup.id}">
                                 @rc.testCase.testAssertion.testGroup.name
                                 </a>
                             </td>
@@ -72,40 +65,40 @@
                             @for(mw <- rc.mappedWrappers) {
                                 <tr>
                                     <td>@mw.parameter.name</td><td>@mw.wrapper.name</td>
-                                    <td>
-                                    <span id="onStatus@{mw.wrapper.id}" style="display: none" class="bignobold online"> <img src="@routes.Assets.at("/images/Pc_Online.png")"/></span>
-                                    <span id="offStatus@{mw.wrapper.id}" style="display: none" class="bignobold offline"> <img src="@routes.Assets.at("/images/Pc_Offline.png")"/></span>
-                                    <script>
-                                        new EventSource ( "/wrapperStatusFeed?label=@{mw.wrapper.name}").onmessage =
-                                        function ( event ) {
-                                            var kk = event.data
-                                            if (kk.indexOf("true") >= 0){
-                                                $( "#onStatus@{mw.wrapper.id}" ).show()
-                                                $( "#offStatus@{mw.wrapper.id}" ).hide()
-                                            } else {
-                                                $( "#onStatus@{mw.wrapper.id}" ).hide()
-                                                $( "#offStatus@{mw.wrapper.id}" ).show()
-                                            }
-                                        }
-
-                                        if(0 == 0){
-                                            $("#runbutton" ).enable()
-                                        } else {
-                                            $("#runbutton" ).disable()
-                                        }
-                                    </script>
+                                    <td align="center">
+                                    <span class="onStatus@{mw.wrapper.id}" style="display:none" class="bignobold online"> <img src="@routes.Assets.at("/images/Pc_Online.png")"/></span>
+                                    <span class="offStatus@{mw.wrapper.id}" style="display:none" class="bignobold offline"> <img src="@routes.Assets.at("/images/Pc_Offline.png")"/></span>
                                 </td></tr>
                             }
                         }
                     </table>
                     </td></tr></table>
                 <hr/>
-                <input id="runbutton" type="button" value="Run" disabled="disabled"/>
 
-                <div id="runStatus" class="fullw" style="height:94%;overflow:auto">
-                    <div class="fullh fullw" id="testStatus">
-                    </div>
-                </div>
             </div>
-        </div>
+
+
+        @if(showHistory == false) {
+            <table><tr><td class="activetab"><h4><a href="/viewJob?id=@rc.id&showHistory=false">
+                Job Status</a></h4></td><td class="passivetab"><h4><a href="/viewJob?id=@rc.id&showHistory=true">
+                History</a></h4></td></tr></table>
+        } else {
+            <table><tr><td class="passivetab"><h4><a href="/viewJob?id=@rc.id&showHistory=false">
+                Job Status</a></h4></td><td class="activetab"><h4><a href="/viewJob?id=@rc.id&showHistory=true">
+                History</a></h4></td></tr></table>
+        }
+            <table class="section fullw" style="border-top:1px solid gray; margin-top:0;">
+                <tr>
+                    <td>
+                    @if(showHistory == true) {
+
+                        History <br />
+                        @testRunLister(rc.id)
+
+                    } else {
+                        <input id="runbutton" type="button" value="Run"/>
+                    }
+                    </td>
+                </tr>
+            </table>
     }

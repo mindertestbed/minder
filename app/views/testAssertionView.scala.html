@@ -1,0 +1,56 @@
+@(ta: TestAssertion, localUser: models.User = null)
+@import java.util.concurrent.atomic.AtomicInteger
+
+
+@main(Messages("playauthenticate.navigation.restricted.testdesigner"), "restrictedTestDesigner") {
+
+    <h2>Test Assertion <span class="hl">@{
+        ta.taId
+    }</span></h2>
+
+    <div class="indent">
+        <h3>Short Description</h3>
+        <p>
+        @ta.shortDescription
+        </p>
+        @if(ta.normativeSource != null && ta.normativeSource.length > 0) {
+            <h3>Normative Source/Statement</h3>
+            <p>
+                @ta.normativeSource
+            </p>
+        }
+        @if(ta.target != null && ta.target.length > 0) {
+            <h3>Target</h3>
+            <p>
+            @ta.target
+            </p>
+        }
+
+        @if(ta.prerequisites != null && ta.prerequisites.length > 0) {
+            <h3>Prerequisites</h3>
+            <p><xmp>@ta.prerequisites</xmp>
+            </p>
+        }
+        <hr />
+        <h3>Test Cases</h3>
+        @if(ta.testCases.size() > 0) {
+            <table class="shaded">
+                <tr>
+                    <th style="border-top : 1 px solid white ; border-left : 1 px solid white ; background-color : #ffffff ;">&nbsp;</th>
+                    <th>Test Case Name</th>
+                    <th>Short Description</th>
+                </tr>
+                @defining(new AtomicInteger(1)) { index =>
+                    @for(tc <- ta.testCases) {
+                        <tr>
+                            <td>@index.getAndIncrement()</td> <td><a href="/viewTestCase?id=@tc.id&showJobs=true">@tc.name</a></td> <td>@tc.shortDescription</td>
+                        </tr>
+                    }
+                }
+            </table>
+        }else {
+            <p>No test cases yet</p>
+        }
+    </div>
+
+}

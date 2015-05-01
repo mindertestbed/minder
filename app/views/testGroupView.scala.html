@@ -1,0 +1,46 @@
+@(tg: TestGroup, localUser: models.User = null)
+@import java.util.concurrent.atomic.AtomicInteger
+
+
+@main(Messages("playauthenticate.navigation.restricted.testdesigner"), "restrictedTestDesigner") {
+
+    <h2>Test Group <span class="hl">@{
+        tg.name
+    }</span></h2>
+
+    <div class="indent">
+        <h3>Owner</h3>
+        <p>
+            @tg.owner.firstName @tg.owner.email
+        </p>
+
+        <h3>Short Description</h3>
+        <p>
+        @tg.shortDescription
+        </p>
+
+        @if(tg.description != null && tg.description.length > 0) {
+            <h3>Description</h3>
+            <p>
+            @tg.description
+            </p>
+        }
+        <hr />
+        <h3>Test Assertions</h3>
+        <table class="shaded">
+            <tr>
+                <th style="border-top: 1px solid white;border-left: 1px solid white;background-color: #ffffff;">&nbsp;</th>
+                <th>Test Assertion Id</th>
+                <th>Short Description</th>
+            </tr>
+            @defining(new AtomicInteger(1)) {index =>
+                @for(ta <- tg.testAssertions) {
+                    <tr>
+                        <td>@index.getAndIncrement()</td><td><a href="/viewTestAssertion?id=@ta.id">@ta.taId</a></td> <td>@ta.shortDescription</td>
+                    </tr>
+                }
+            }
+        </table>
+    </div>
+
+}

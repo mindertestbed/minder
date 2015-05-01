@@ -1,0 +1,30 @@
+@(localUser: models.User = null)
+@import java.util.concurrent.atomic.AtomicInteger
+
+<script>
+  $(function() {
+    $( document ).tooltip();
+  });
+  </script>
+
+<h1>Test Groups</h1>
+  @defining(new AtomicInteger(1)) {index =>
+  <table class="shaded">
+    <tr>
+      <th style="border-top: 1px solid white;border-left: 1px solid white;background-color: #ffffff;">&nbsp;</th>
+      <th>Test Group Name</th>
+      <th>Short Description</th>
+      <th style="border-top: 1px solid white;border-right: 1px solid white;background-color: #ffffff;">&nbsp;</th>
+    </tr>
+    @for(tg <- TestGroup.findAll()) {
+      <tr>
+        <td>@index.getAndIncrement()</td><td><a href="/viewTestGroup?id=@tg.id">@tg.name</a></td> <td>@tg.shortDescription</td>
+        <td>
+        <div title="Delete" class="bevel2 celldiv" style="height:30px;width:30px;">
+        <img src="@routes.Assets.at("/images/trash2-64.png")" height="16px" alt='@tg.id'/>
+      </div>
+        </td>
+      </tr>
+    }
+  </table>
+  }

@@ -30,12 +30,12 @@
           @for(job <- Job.findByTestCase(testCase)){
           <tr class="differ2" style="height:25px;">
             <td style="width:3%;" align="center" valign="middle">
-              <a href="displayJob?id=@job.id">
+              <a href="displayJob?id=@{job.id}&showHistory=false">
                 <img src="@routes.Assets.at("/images/running-64.png")" height="16px"/>
               </a>
             </td>
             <td>
-              <a href="displayJob?id=@job.id">
+              <a href="displayJob?id=@{job.id}&showHistory=true">
                 @job.name
               </a>
             </td>

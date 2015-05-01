@@ -14,6 +14,10 @@ $(function() {
   });
   </script>
 
+<div id="dialog" style="display : none ;">
+
+</div>
+
 <div id="groupAccordion" class="fullw bevel" style="height:100%;padding:0px;">
   @defining(TestGroup.findByUser(localUser)){ testGroups =>
   @for(group <- testGroups){

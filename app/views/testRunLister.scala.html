@@ -8,13 +8,6 @@
 
 <div id="testRunListerDiv@configurationId">
   <table style="width: 100%;">
-    <tr style="height:10%;">
-      <td>
-        <h4 class="demoHeaders">Test Runs</h4>
-      </td>
-    </tr>
-    <tr>
-    </tr>
     <td>
       @defining(TestRun.findByJob(configurationId)){ testRunList =>
       @for(testRun <- testRunList){

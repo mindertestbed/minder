@@ -1,5 +1,7 @@
 body {
     padding-top: 60px; /* 60px to make the container go all the way to the bottom of the topbar */
+    padding-left: 15px;
+    padding-right: 15px;
 }
 
 .absofull{
@@ -357,4 +359,55 @@ td{
 
 .badTestRun{
   background-color: rgb(250,240,230)
+}
+
+table.shaded{
+    border: 1px solid gray;
+}
+table.shaded > tbody > tr > th {
+    background-color: #e7e7e7 ;
+    padding: 10px;
+    border: 1px solid gray;
+}
+
+table.shaded > tbody > tr > td{
+    padding: 10px;
+    border: 1px solid gray;
+}
+
+table.section > tbody > tr > td,th{
+    padding-left: 14px;
+    padding-right: 14px;
+    vertical-align: text-top;
+}
+
+td.activetab, td.passivetab {
+    vertical-align: bottom;
+    padding: 0px;
+}
+
+td.activetab>h4{
+    border: 2px solid #d3d3d3;
+    border-bottom: none;
+    border-radius: 5px 5px 0px 0px;
+    padding: 5px;
+    margin-bottom: 0px;
+}
+
+td.passivetab>h4{
+    border: 1px solid gray;
+    border-radius: 5px 5px 0px 0px;
+    padding: 5px;
+    margin-bottom: 0px;
+    background-color: #e9e9e9 ;
+}
+
+.hl{
+    color: #00cccc;
+}
+
+.topleftcell{
+    border-top: 1px solid white;
+    border-left: 1px solid white;
+    background-color: #ffffff;
 }
