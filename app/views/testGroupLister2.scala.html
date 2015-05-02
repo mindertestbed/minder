@@ -12,10 +12,12 @@
     @createFirstRow {
       <th>Test Group Name</th>
       <th>Short Description</th>
+      <th>Author</th>
     }
     @for(tg <- TestGroup.findAll()) {
       <tr>
         <td>@index.getAndIncrement()</td><td><a href="/viewTestGroup?id=@tg.id">@tg.name</a></td> <td>@tg.shortDescription</td>
+        <td>@tg.owner.firstName @tg.owner.email</td>
         <td>
         <div title="Delete" class="bevel2 celldiv" style="height:30px;width:30px;cursor:hand;"
         onclick='deleteWithDialog2("/doDeleteGroup?id=@tg.id", $("#dialog-confirm"), "Delete Group", "group", "@tg.name")'>
@@ -25,7 +27,7 @@
       </tr>
     }
 
-    @createLastRow {
+    @createLastRow(3){
       @createButton("/createNewGroup", Messages("restrictedTestPage.createTestGroup"))
     }
   </table>

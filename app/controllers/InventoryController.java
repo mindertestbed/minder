@@ -285,6 +285,7 @@ public class InventoryController extends Controller {
       ta.testGroup = tg;
       ta.prescriptionLevel = PrescriptionLevel
           .valueOf(model.prescriptionLevel);
+      ta.owner=Application.getLocalUser(session());
 
       ta.save();
 

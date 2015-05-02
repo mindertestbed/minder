@@ -208,9 +208,11 @@ td{
 .styledtitleinverse{
   font: 100% 'Arial';
   height:28px;
-  width: 100%;
+  #width: 100%;
   border-bottom: 1px solid gray;
   vertical-align: middle;
+    padding-left: 10px;
+    padding-right: 10px;
 
   background: rgb(247,247,247);
     background: -moz-linear-gradient(top,  rgba(247,247,247,1) 0%, rgba(234,234,234,1) 50%, rgba(247,247,247,1) 100%);

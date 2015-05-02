@@ -37,6 +37,10 @@ public class TestCase extends Model {
   @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
   public List<WrapperParam> parameters;
 
+  @ManyToOne
+  @Column(nullable = false)
+  public User owner;
+
   public static final Finder<Long, TestCase> find = new Finder<>(Long.class,
       TestCase.class);
 

@@ -1,6 +1,7 @@
 @(tc: TestCase, localUser: models.User = null, showJobs:Boolean = false)
 @import java.util.concurrent.atomic.AtomicInteger
 
+@import global.Util._
 
 @main(Messages("playauthenticate.navigation.restricted.testdesigner"), "restrictedTestDesigner") {
     <h2>Test Case <span class="hl">@tc.name</span></h2>
@@ -25,15 +26,17 @@
         <hr />
 
 
-        @if(showJobs == true) {
-            <table><tr><td class="activetab"><h4><a href="/viewTestCase?id=@tc.id&showJobs=true">
-                Jobs</a></h4></td><td class="passivetab"><h4><a href="/viewTestCase?id=@tc.id&showJobs=false">
-                Mtdl Code</a></h4></td></tr></table>
-        } else {
-            <table><tr><td class="passivetab"><h4><a href="/viewTestCase?id=@tc.id&showJobs=true">
-                Jobs</a></h4></td><td class="activetab"><h4><a href="/viewTestCase?id=@tc.id&showJobs=false">
-                Mtdl Code</a></h4></td></tr></table>
-        }
+        <table>
+            <tr>
+                <td class="@choose(showJobs, true)">
+                    <h4><a href="/viewTestCase?id=@tc.id&showJobs=true">Jobs</a></h4>
+                </td>
+                <td class="@choose(showJobs, false)">
+                    <h4><a href="/viewTestCase?id=@tc.id&showJobs=false">Mtdl Code</a></h4>
+                </td>
+            </tr>
+        </table>
+
         <table class="section fullw" style="border-top:1px solid gray; margin-top:0;">
             <tr>
                 <td>
@@ -41,27 +44,35 @@
                     <!-- Display the list of Jobs assigned to this test case-->
 
                     <br />
-                    @defining(new AtomicInteger(1)) { index =>
-                        <table class="shaded">
-                            <tr>
-                                <th style="border-top:1px solid white; border-left:1px solid white ; background-color:#ffffff ;">&nbsp;</th>
-                                <th>Job Name</th>
-                                <th>Short Description</th>
-                                <th style="border-top:1px solid white; border-right:1px solid white ; background-color:#ffffff ;">&nbsp;</th>
-                            </tr>
-                            @for(job <- Job.findByTestCase(tc)) {
-                                <tr>
-                                    <td>@index.getAndIncrement()</td> <td><a href="/viewJob?id=@job.id&showHistory=true">@job.name</a></td> <td>SHORT Description</td>
-                                    <td>
-                                        <div title="Delete" class="bevel2 celldiv" style="height:30px; width:30px;">
-                                            <img src="@routes.Assets.at("/images/trash2-64.png")" height="16px" alt='@job.id'/>
-                                        </div>
-                                    </td>
-                                </tr>
+                    @defining(Job.findByTestCase(tc)) { jobs =>
+                        @if(jobs.size() == 0) {
+                            <p>No jobs defined yet</p>
+                            @createButton("/createJobForm?testCaseId=" + tc.id, Messages("restrictedTestPage.createJob"))
+                        } else {
+                            @defining(new AtomicInteger(1)) { index =>
+                                <table class="shaded">
+                                    @createFirstRow {
+                                        <th>Job Name</th>
+                                        <th>Short Description</th>
+                                        <th>Author</th>
+                                    }
+                                    @for(job <- Job.findByTestCase(tc)) {
+                                        <tr>
+                                            <td>@index.getAndIncrement()</td> <td><a href="/viewJob?id=@job.id&showHistory=true">@job.name</a></td> <td>SHORT Description</td>
+                                            <td>
+                                                <div title="Delete" class="bevel2 celldiv" style="height : 30 px ; width : 30 px ;">
+                                                    <img src="@routes.Assets.at("/images/trash2-64.png")" height="16px" alt='@job.id'/>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    }
+                                    @createLastRow(3) {
+                                        @createButton("/createJobForm?testCaseId=" + tc.id, Messages("restrictedTestPage.createJob"))
+                                    }
+                                </table>
                             }
-                        </table>
+                        }
                     }
-
                 } else {
                     <h3>Mtdl Code</h3>
                         <p>Theme: <select id="select">

@@ -22,6 +22,11 @@ public class Job extends Model {
 	@Column(nullable = false)
 	public TestCase testCase;
 
+
+	@ManyToOne
+	@Column(nullable = false)
+	public User owner;
+
 	/**
 	 * When the tdl changes and the wrappers in the new tdl are not compatible with
 	 * this run configurtion, then this configuration is obsoleted. Hence, not visible in the main UI.

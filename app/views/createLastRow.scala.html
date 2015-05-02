@@ -1,4 +1,4 @@
-@(content: Html)
-<tr><td style="border-bottom: 1px solid white;border-left: 1px solid white;background-color: #ffffff;">&nbsp;</td><td colspan="2">
+@(colspan: Int = 2)(content: Html)
+<tr><td style="border-bottom: 1px solid white;border-left: 1px solid white;background-color: #ffffff;">&nbsp;</td><td colspan="@colspan" align="center">
   @content
 </td><td style="border-bottom: 1px solid white;border-right: 1px solid white;background-color: #ffffff;">&nbsp;</td></tr>

@@ -1,9 +1,6 @@
 @(localUser: models.User = null, display: String = "testGroups")
 
-  @getClas(value: String, expected: String) = @{
-    if(value == expected) "activetab"
-    else "passivetab"
-  }
+  @import global.Util._
 
 @main(Messages("playauthenticate.navigation.restricted.testdesigner"), "restrictedTestDesigner") {
 
@@ -18,17 +15,17 @@
 
   <table>
     <tr>
-      <td class='@getClas(display, "testGroups")'>
+      <td class='@choose(display, "testGroups")'>
         <h4>
           <a href="/restrictedTestDesigner?display=testGroups">Test Groups</a>
         </h4>
       </td>
-      <td class="@getClas(display, "testAssets")">
+      <td class="@choose(display, "testAssets")">
         <h4>
           <a href="/restrictedTestDesigner?display=testAssets">Test Assets</a>
         </h4>
       </td>
-      <td class="@getClas(display, "designWithGui")">
+      <td class="@choose(display, "designWithGui")">
         <h4>
           <a href="/restrictedTestDesigner?display=designWithGui">Design With GUI</a></h4>
       </td>
