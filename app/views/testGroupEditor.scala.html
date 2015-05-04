@@ -10,7 +10,7 @@
         @dialogs()
 
         <h2>Create New Test Group</h2>
-        @helper.form(action = routes.InventoryController.doCreateTestGroup()) {
+        @helper.form(action = routes.GroupController.doCreateTestGroup()) {
             @if(frm.hasGlobalErrors) {
                 <p class="alert alert-danger">
                 @frm.globalError.message

@@ -1,8 +1,8 @@
 package controllers;
 
+import global.Util;
 import models.ModelConstants;
 import models.TestAsset;
-import models.TestGroup;
 import models.User;
 import play.Logger;
 import play.data.Form;
@@ -44,7 +44,7 @@ public class TestAssetController extends Controller {
     User localuser = Application.getLocalUser(session());
 
     if (filledForm.hasErrors()) {
-      InventoryController.printFormErrors(filledForm);
+      Util.printFormErrors(filledForm);
       return badRequest(testAssetEditor.render(filledForm, null));
     } else {
       TestAssetModel model = filledForm.get();
@@ -105,7 +105,7 @@ public class TestAssetController extends Controller {
     final Form<TestAssetModel> filledForm = TEST_ASSET_FORM.bindFromRequest();
 
     if (filledForm.hasErrors()) {
-      InventoryController.printFormErrors(filledForm);
+      Util.printFormErrors(filledForm);
       return badRequest(testAssetEditor.render(filledForm, null));
     } else {
       TestAssetModel model = filledForm.get();

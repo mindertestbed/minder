@@ -18,8 +18,8 @@ import scala.io.Source
  */
 object TestEngine {
 
-  def compileTest(userEmail: String, tdl: String): Class[MinderTdl] = {
-    TdlCompiler.compileTdl(userEmail, tdl)
+  def compileTest(userEmail: String, name: String, tdl: String): Class[MinderTdl] = {
+    TdlCompiler.compileTdl(userEmail, name, tdl)
   }
 
   def describe(clsMinderTDL: Class[MinderTdl]): util.List[Rivet] = {
@@ -237,7 +237,7 @@ object TestEngine {
    * @param userEmail the owner email if of the TS that is running the test
    * @param tdl The test definition
    */
-  def runTest(userEmail: String, tdl: String, wrapperMapping: (String, String)*): Unit = {
+  def runTest(userEmail: String, name: String, tdl: String, wrapperMapping: (String, String)*): Unit = {
     val map = {
       val map2 = collection.mutable.Map[String, String]()
       for (e@(k, v) <- wrapperMapping) {
@@ -246,7 +246,7 @@ object TestEngine {
       map2.toMap
     }
 
-    runTest2(userEmail, compileTest(userEmail, tdl), map, null)
+    runTest2(userEmail, compileTest(userEmail, name, tdl), map, null)
   }
 
   /**
@@ -259,7 +259,7 @@ object TestEngine {
   def describeTdl(testCase: TestCase, email: String): util.LinkedHashMap[String, util.Set[SignalSlot]] = {
     Logger.debug("Describing: " + testCase.name + " for user " + email)
     Logger.debug(testCase.tdl)
-    val minderClass = TdlCompiler.compileTdl(email, tdlStr = testCase.tdl)
+    val minderClass = TdlCompiler.compileTdl(email, testCase.name, tdlStr = testCase.tdl)
     val minderTdl = minderClass.getConstructors()(0).newInstance(null, java.lang.Boolean.FALSE).asInstanceOf[MinderTdl]
 
     val slotDefs = minderTdl.SlotDefs

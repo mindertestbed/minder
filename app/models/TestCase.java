@@ -63,13 +63,11 @@ public class TestCase extends Model {
   private void detectParameters() {
     deleteCurrentWrapperParamsOnDatabase();
     deleteCurrentJobsOnDatabase();
-
-    LinkedHashMap<String, Set<SignalSlot>> map = TestEngine.describeTdl(this, this.testAssertion.testGroup.owner.email);
+    LinkedHashMap<String, Set<SignalSlot>> descriptionMap = TestEngine.describeTdl(this, this.testAssertion.testGroup.owner.email);
 
     List<WrapperParam> wpList = new ArrayList<>();
-    for (Map.Entry<String, Set<SignalSlot>> entry : map.entrySet()) {
+    for (Map.Entry<String, Set<SignalSlot>> entry : descriptionMap.entrySet()) {
       Logger.debug("Wrapper Name: " + entry.getKey() + ": " + entry.getKey().startsWith("$") + "");
-
 
       //make sure that we are looping on variables.
       if (!entry.getKey().startsWith("$"))
@@ -95,84 +93,75 @@ public class TestCase extends Model {
       this.parameters.add(wrapperParam);
     }
 
-    try {
-      Ebean.beginTransaction();
-
-
-      for (WrapperParam str : wpList) {
-        str.save();
-        System.out.println("TO SAVE FOR " + str.name);
-        for (ParamSignature signature : str.signatures) {
-          System.out.println("Param Signature " + signature.signature);
-          signature.save();
-        }
+    for (WrapperParam str : wpList) {
+      str.save();
+      System.out.println("TO SAVE FOR " + str.name);
+      for (ParamSignature signature : str.signatures) {
+        System.out.println("Param Signature " + signature.signature);
+        signature.save();
       }
-      System.out.println("============");
-
-      Ebean.commitTransaction();
-    } catch (Exception ex) {
-      ex.printStackTrace();
-      Ebean.endTransaction();
     }
+    System.out.println("============");
   }
 
   private void deleteCurrentJobsOnDatabase() {
-    try {
-      Ebean.beginTransaction();
-      List<Job> all = Job.findByTestCase(this);
+    List<Job> all = Job.findByTestCase(this);
 
-      for (Job rc : all) {
-        System.out.println("Delete " + rc.name);
-        List<MappedWrapper> mwlist = MappedWrapper.findByJob(rc);
-        for (MappedWrapper mappedWrapper : mwlist) {
-          mappedWrapper.delete();
-        }
-
-        List<TestRun> twL = TestRun.findByJob(rc);
-        for (TestRun testRun : twL) {
-          testRun.job =null;
-          testRun.save();
-        }
-
-        rc.delete();
+    for (Job rc : all) {
+      System.out.println("Delete " + rc.name);
+      List<MappedWrapper> mwlist = MappedWrapper.findByJob(rc);
+      for (MappedWrapper mappedWrapper : mwlist) {
+        mappedWrapper.delete();
       }
-      Ebean.commitTransaction();
-    } catch (Exception ex) {
-      ex.printStackTrace();
-      Ebean.endTransaction();
+
+      List<TestRun> twL = TestRun.findByJob(rc);
+      for (TestRun testRun : twL) {
+        testRun.job = null;
+        testRun.save();
+      }
+
+      rc.delete();
     }
   }
 
   private void deleteCurrentWrapperParamsOnDatabase() {
-    try {
-      Ebean.beginTransaction();
-      List<WrapperParam> all = WrapperParam.findByTestCase(this);
+    List<WrapperParam> all = WrapperParam.findByTestCase(this);
 
-      for (WrapperParam wrapperParam : all) {
-        System.out.println("Delete " + wrapperParam.name);
-        List<MappedWrapper> mwlist = MappedWrapper.findByWrapperParam(wrapperParam);
-        for (MappedWrapper mappedWrapper : mwlist) {
-          mappedWrapper.delete();
-        }
-        wrapperParam.delete();
+    for (WrapperParam wrapperParam : all) {
+      System.out.println("Delete " + wrapperParam.name);
+      List<MappedWrapper> mwlist = MappedWrapper.findByWrapperParam(wrapperParam);
+      for (MappedWrapper mappedWrapper : mwlist) {
+        mappedWrapper.delete();
       }
-      Ebean.commitTransaction();
-    } catch (Exception ex) {
-      ex.printStackTrace();
-      Ebean.endTransaction();
+      wrapperParam.delete();
     }
+
   }
 
 
   @Override
   public void save() {
-    super.save();
-    detectParameters();
+    try {
+      Ebean.beginTransaction();
+      detectParameters();
+      super.save();
+      Ebean.commitTransaction();
+    } catch (Exception ex) {
+      ex.printStackTrace();
+      Ebean.endTransaction();
+    }
   }
 
   @Override
   public void update() {
-    super.update();
-    detectParameters();
+    try {
+      Ebean.beginTransaction();
+      super.update();
+      detectParameters();
+      Ebean.commitTransaction();
+    } catch (Exception ex) {
+      ex.printStackTrace();
+      Ebean.endTransaction();
+    }
   }
 }

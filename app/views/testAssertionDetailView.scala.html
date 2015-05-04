@@ -1,0 +1,59 @@
+@(ta: TestAssertion, localUser: models.User = null)
+@import java.util.concurrent.atomic.AtomicInteger
+@import global.Util._;
+<div class="indent">
+    <h3>Short Description</h3>
+    <p>
+    @ta.shortDescription
+    </p>
+
+    <h3>Author</h3>
+    <p>
+    @ta.owner.email
+    </p>
+
+    @if(ta.normativeSource != null && ta.normativeSource.length > 0) {
+        <h3>Normative Source/Statement</h3>
+        <p>
+            @ta.normativeSource
+        </p>
+    }
+    @if(ta.target != null && ta.target.length > 0) {
+        <h3>Target</h3>
+        <p>
+        @ta.target
+        </p>
+    }
+
+    @if(ta.prerequisites != null && ta.prerequisites.length > 0) {
+        <h3>Prerequisites</h3>
+        <p><xmp>@ta.prerequisites</xmp>
+        </p>
+    }
+
+    <h3>Predicate</h3>
+    <p><xmp>@ta.predicate</xmp>
+    </p>
+
+
+    @if(ta.variables != null && ta.variables.length > 0) {
+        <h3>Variables</h3>
+        <p><xmp>@ta.variables</xmp>
+        </p>
+    }
+
+
+    @if(ta.tag != null && ta.tag.length > 0) {
+        <h3>Tag</h3>
+        <p><xmp>@ta.tag</xmp>
+        </p>
+    }
+
+
+    @if(ta.description != null && ta.description.length > 0) {
+        <h3>Detailed Description</h3>
+        <p><xmp>@ta.description</xmp>
+        </p>
+    }
+    <hr />
+</div>

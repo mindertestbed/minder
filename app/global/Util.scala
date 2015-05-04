@@ -1,5 +1,11 @@
 package global
 
+import java.util._
+
+import play.Logger
+import play.data.Form
+import play.data.validation.ValidationError
+
 /**
  * Created by yerlibilgin on 02/05/15.
  */
@@ -11,4 +17,19 @@ object Util {
       nonMatchValue
   }
 
+  /*
+   * test case CRUD
+   */
+  def printFormErrors(filledForm: Form[_]) {
+    val errors: Map[String, List[ValidationError]] = filledForm.errors
+    val set: Set[String] = errors.keySet
+    import scala.collection.JavaConversions._
+    for (key <- set) {
+      Logger.error("KEY")
+      import scala.collection.JavaConversions._
+      for (ve <- errors.get(key)) {
+        Logger.error("\t" + ve.key + ": " + ve.message)
+      }
+    }
+  }
 }

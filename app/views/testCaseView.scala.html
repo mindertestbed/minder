@@ -47,7 +47,7 @@
                     @defining(Job.findByTestCase(tc)) { jobs =>
                         @if(jobs.size() == 0) {
                             <p>No jobs defined yet</p>
-                            @createButton("/createJobForm?testCaseId=" + tc.id, Messages("restrictedTestPage.createJob"))
+                            @createButton("/getCreateJobEditorView?testCaseId=" + tc.id, Messages("restrictedTestPage.createJob"))
                         } else {
                             @defining(new AtomicInteger(1)) { index =>
                                 <table class="shaded">
@@ -59,15 +59,16 @@
                                     @for(job <- Job.findByTestCase(tc)) {
                                         <tr>
                                             <td>@index.getAndIncrement()</td> <td><a href="/viewJob?id=@job.id&showHistory=true">@job.name</a></td> <td>SHORT Description</td>
-                                            <td>
-                                                <div title="Delete" class="bevel2 celldiv" style="height : 30 px ; width : 30 px ;">
+                                            <td>@job.owner.email</td>
+                                            <td align="center">
+                                                <div title="Delete" class="bevel2 celldiv" style="height:30px;width:30px;">
                                                     <img src="@routes.Assets.at("/images/trash2-64.png")" height="16px" alt='@job.id'/>
                                                 </div>
                                             </td>
                                         </tr>
                                     }
                                     @createLastRow(3) {
-                                        @createButton("/createJobForm?testCaseId=" + tc.id, Messages("restrictedTestPage.createJob"))
+                                        @createButton("/getCreateJobEditorView?testCaseId=" + tc.id, Messages("restrictedTestPage.createJob"))
                                     }
                                 </table>
                             }
@@ -110,13 +111,6 @@
                         </select>
                         </p>
                         <hr />
-
-                        <style>
-                        .CodeMirror {
-                        border: 1px solid #eee;
-                        height: auto;
-                        }
-                        </style>
 
                         <form>
                         <textarea id="code" name="code" class="CodeMirror fullw">

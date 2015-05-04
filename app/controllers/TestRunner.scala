@@ -37,7 +37,7 @@ class TestRunner(val job: Job, val user: User) {
 
   val testCase = TestCase.findById(job.testCase.id)
   job.testCase = testCase
-  val cls = TestEngine.compileTest(user.email, testCase.tdl)
+  val cls = TestEngine.compileTest(user.email, testCase.name, testCase.tdl)
   var rivets: List[VisualRivet] = List();
 
   describe(TestEngine.describe(cls))

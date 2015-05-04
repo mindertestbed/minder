@@ -51,37 +51,37 @@ GET         /assets/*file                          controllers.Assets.at(path="/
 GET         /webjars/*file                         controllers.WebJarAssets.at(file)
 
 #test group management
-GET         /createNewGroup                        controllers.InventoryController.createNewGroup
-POST        /doCreateTestGroup                     controllers.InventoryController.doCreateTestGroup
-GET         /editGroupForm                         controllers.InventoryController.editGroupForm(id: Long)
-POST        /doEditGroup                           controllers.InventoryController.doEditGroup
-GET         /doDeleteGroup                         controllers.InventoryController.doDeleteGroup(id: Long)
-GET         /viewTestGroup                         controllers.InventoryController.viewTestGroup(id: Long)
+GET         /getCreateGroupEditorView              controllers.GroupController.getCreateGroupEditorView
+POST        /doCreateTestGroup                     controllers.GroupController.doCreateTestGroup
+GET         /editGroupForm                         controllers.GroupController.editGroupForm(id: Long)
+POST        /doEditGroup                           controllers.GroupController.doEditGroup
+GET         /doDeleteGroup                         controllers.GroupController.doDeleteGroup(id: Long)
+GET         /getGroupDetailView                    controllers.GroupController.getGroupDetailView(id: Long)
 
 #test assertion management
-GET         /createAssertionForm                   controllers.InventoryController.createAssertionForm(groupId: Long)
-POST        /doCreateAssertion                     controllers.InventoryController.doCreateAssertion
-GET         /editAssertionForm                     controllers.InventoryController.editAssertionForm(id: Long)
-POST        /doEditAssertion                       controllers.InventoryController.doEditAssertion
-GET         /doDeleteAssertion                     controllers.InventoryController.doDeleteAssertion(id: Long)
-GET         /viewTestAssertion                     controllers.InventoryController.viewTestAssertion(id: Long)
+GET         /getCreateAssertionEditorView          controllers.AssertionController.getCreateAssertionEditorView(groupId: Long)
+POST        /doCreateAssertion                     controllers.AssertionController.doCreateAssertion
+GET         /editAssertionForm                     controllers.AssertionController.editAssertionForm(id: Long)
+POST        /doEditAssertion                       controllers.AssertionController.doEditAssertion
+GET         /doDeleteAssertion                     controllers.AssertionController.doDeleteAssertion(id: Long)
+GET         /getAssertionDetailView                controllers.AssertionController.getAssertionDetailView(id: Long, display : String ?= "details")
 
 #test case management
-GET         /createCaseForm                        controllers.InventoryController.createCaseForm(assertionId: Long)
-POST        /doCreateCase                          controllers.InventoryController.doCreateCase
-GET         /editCaseForm                          controllers.InventoryController.editCaseForm(id: Long)
-POST        /doEditCase                            controllers.InventoryController.doEditCase
-GET         /doDeleteCase                          controllers.InventoryController.doDeleteCase(id: Long)
-GET         /viewTestCase                          controllers.InventoryController.viewTestCase(id: Long, showJobs: Boolean)
+GET         /getCreateCaseEditorView               controllers.TestCaseController.getCreateCaseEditorView(assertionId: Long)
+POST        /doCreateCase                          controllers.TestCaseController.doCreateCase
+GET         /editCaseForm                          controllers.TestCaseController.editCaseForm(id: Long)
+POST        /doEditCase                            controllers.TestCaseController.doEditCase
+GET         /doDeleteCase                          controllers.TestCaseController.doDeleteCase(id: Long)
+GET         /viewTestCase                          controllers.TestCaseController.viewTestCase(id: Long, showJobs: Boolean)
 
 #test configuration management
-GET         /doDeleteJob                           controllers.InventoryController.doDeleteJob(id: Long)
 
-GET         /createJobForm                         controllers.InventoryController.createJobForm(testCaseId: Long)
-POST        /doCreateJob                           controllers.InventoryController.doCreateJob()
-GET         /editJobForm                           controllers.InventoryController.editJobForm(id: Long)
-GET         /viewJob                               controllers.InventoryController.displayJob(id: Long, showHistory: Boolean)
-POST        /doEditJob                             controllers.InventoryController.doEditJob()
+GET         /getCreateJobEditorView                controllers.JobController.getCreateJobEditorView(testCaseId: Long)
+POST        /doCreateJob                           controllers.JobController.doCreateJob()
+GET         /editJobForm                           controllers.JobController.editJobForm(id: Long)
+GET         /viewJob                               controllers.JobController.displayJob(id: Long, showHistory: Boolean)
+GET         /doDeleteJob                           controllers.JobController.doDeleteJob(id: Long)
+POST        /doEditJob                             controllers.JobController.doEditJob()
 
 #test asset management
 POST        /doCreateTestAsset                     controllers.TestAssetController.doCreateTestAsset
@@ -97,21 +97,21 @@ GET         /runTest                               controllers.Tester.runTest(id
 GET         /syncTest                              controllers.Tester.syncTest(id: Long, userId: Long)
 
 #test run listing
-GET         /listTestRunsForm                      controllers.InventoryController.listTestRuns(configurationId: Long)
-POST        /doListTestRuns                        controllers.InventoryController.doListTestRuns()
-GET         /viewReport                            controllers.InventoryController.viewReport(testRunId: Long, type: String)
+GET         /listTestRunsForm                      controllers.WrapperController.listTestRuns(configurationId: Long)
+POST        /doListTestRuns                        controllers.WrapperController.doListTestRuns()
+GET         /viewReport                            controllers.WrapperController.viewReport(testRunId: Long, type: String)
 
 #User History listing
-GET         /viewUserHistory                       controllers.InventoryController.viewUserHistory(testRunId: Long)
-POST        /doViewUserHistory                     controllers.InventoryController.doViewUserHistory()
+GET         /viewUserHistory                       controllers.WrapperController.viewUserHistory(testRunId: Long)
+POST        /doViewUserHistory                     controllers.WrapperController.doViewUserHistory()
 
 
 #Wrappers
-GET         /createNewWrapperForm                  controllers.InventoryController.createNewWrapperForm
-POST        /doCreateWrapper                       controllers.InventoryController.doCreateWrapper
-GET         /doDeleteWrapper                       controllers.InventoryController.doDeleteWrapper(id: Long)
-GET         /editWrapperForm                       controllers.InventoryController.editWrapperForm(id: Long)
-POST        /doEditWrapper                         controllers.InventoryController.doEditWrapper
+GET         /createNewWrapperForm                  controllers.WrapperController.createNewWrapperForm
+POST        /doCreateWrapper                       controllers.WrapperController.doCreateWrapper
+GET         /doDeleteWrapper                       controllers.WrapperController.doDeleteWrapper(id: Long)
+GET         /editWrapperForm                       controllers.WrapperController.editWrapperForm(id: Long)
+POST        /doEditWrapper                         controllers.WrapperController.doEditWrapper
 
 #SSE Test
 GET         /wrapperStatusFeed                     controllers.SSEHandler.wrapperStatusFeed(id: Long)

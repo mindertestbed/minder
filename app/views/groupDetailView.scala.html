@@ -31,7 +31,7 @@
         <h3>Test Assertions</h3>
         @if(tg.testAssertions.size() == 0){
             <p>No Test assertions yet</p>
-            @createButton("/createAssertionForm?groupId="+tg.id, Messages("restrictedTestPage.createTestAssertion"))
+            @createButton("/getCreateAssertionEditorView?groupId="+tg.id, Messages("restrictedTestPage.createTestAssertion"))
         } else {
         <table class="shaded">
             @createFirstRow {
@@ -42,7 +42,7 @@
             @defining(new AtomicInteger(1)) {index =>
                 @for(ta <- tg.testAssertions) {
                     <tr>
-                        <td>@index.getAndIncrement()</td><td><a href="/viewTestAssertion?id=@ta.id">@ta.taId</a></td> <td>@ta.shortDescription</td>
+                        <td>@index.getAndIncrement()</td><td><a href="/getAssertionDetailView?id=@ta.id">@ta.taId</a></td> <td>@ta.shortDescription</td>
                         <td>@ta.owner.email</td>
                         <td>
                             <div title="Delete" class="bevel2 celldiv" style="height:30px;width:30px;cursor:hand;"
@@ -55,7 +55,7 @@
             }
 
             @createLastRow(3){
-                @createButton("/createAssertionForm?groupId="+tg.id, Messages("restrictedTestPage.createTestAssertion"))
+                @createButton("/getCreateAssertionEditorView?groupId="+tg.id, Messages("restrictedTestPage.createTestAssertion"))
             }
         </table>
         }
