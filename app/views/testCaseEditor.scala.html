@@ -1,8 +1,7 @@
-@import java.util.concurrent.atomic.AtomicInteger
+@(frm: Form[_], localUser: models.User = null, editMode : Boolean = true)
 
-@(frm: Form[_], localUser: models.User = null)
+@import helper._
 
-  @import helper._
 
 @implicitFieldConstructor = @{
   FieldConstructor(myInput.f)
@@ -98,28 +97,51 @@ $(function() {
 </script>
 
   <h2>New Test Case</h2>
-  @helper.form(action = routes.TestCaseController.doCreateCase(), 'class -> "fullh") {
-    <div id="contentPane" style="width:100%;height:94%;margin:0;padding:0;">
-  <table style="width:100%;height:100%;" cellspacing="10px;">
+  <br />
+  @defining(if(editMode == false) {routes.TestCaseController.doCreateCase()} else {routes.TestCaseController.doEditCase()}){ act =>
+  @helper.form(action = act , 'class -> "fullh") {
+    <div id="contentPane" style="width:100%;height:94%;margin:0;padding:20px;">
+  <table style="width:100%;height:100%;">
     <tr>
-      <td style="width:30%;vertical-align: text-top;">
-        @inputText(
-        frm("name"),
-      '_label -> "Name"
-        )
-        <br />
-        @inputText(
-        frm("shortDescription"),
-        '_label -> "Short Description"
-        )
-        <br />
-        <button type="submit">Create</button>&nbsp;
-        <button type="reset">Reset</button>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-        <button type="button" onclick="history.back ( )">Cancel</button>
+      <td style="vertical-align: text-top;">
+        <div class="bevel2" style="padding: 10px;">
+        <label>Name</label>
+        @if(editMode){
+          <div class="fcborder">@frm("name").value</div>
+          <input type="hidden" name="name" id="name" value='@frm("name").value'/>
+        } else {
+          @inputText(
+            frm("name"),
+            '_label -> "Name")
+        }
+
+        <label>Short Description</label>
+        @if(editMode){
+          <div class="fcborder">@frm("shortDescription").value</div>
+          <input type="hidden" name="shortDescription" id="shortDescription" value='@frm("shortDescription").value'/>
+        } else {
+          @inputText(
+            frm("shortDescription"),
+            '_label -> "Short Description"
+          )
+        }
+          </div>
       </td>
-      <td class="maxwh" style="vertical-align:text-top;margin-left: 10px;">
-        <div class="fullw fullh">
-          <div class="fcborder fullh" style="margin-left:10px;" > <label>Tdl</label><br/>
+      <tr />
+    <tr>
+      <td class="maxwh" style="vertical-align:text-top;">
+        <div class="bevel2 fullw fullh">
+          <div style="padding: 10px;">
+            <button type="submit">Save</button>&nbsp;
+            <button type="reset">Reset</button>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+            <button type="button" onclick="history.back ( )">Cancel</button></div>
+
+          <div class="fcborder fullh"> <label>Tdl</label><br/>
+            @if(frm.hasGlobalErrors) {
+              <xmp class="alert alert-danger">
+              @frm.globalError.message
+              </xmp>
+            }<br />
             <button onclick='$("#wrappersDiv").show();' type="button">Insert Reference</button>
               &nbsp;
             <button onclick='$ ( "#funcdiv" ).show( );' type="button">Insert Converter</button>
@@ -176,12 +198,7 @@ $(function() {
                     </script>
                   }
               }
-            <br />
-            @if(frm.hasGlobalErrors) {
-              <xmp class="alert alert-danger">
-              @frm.globalError.message
-              </xmp>
-            }
+
           </div>
         </div>
       </td>
@@ -275,4 +292,5 @@ $(function() {
     <input type="hidden" name="assertionId" id="assertionId" value='@frm("assertionId").value'/>
 
   } <!-- helper.form -->
+  } <!-- defininf -->
 } <!-- main -->

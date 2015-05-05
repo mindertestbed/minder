@@ -5,9 +5,16 @@
 @main(Messages("playauthenticate.navigation.restricted.testdesigner"), "restrictedTestDesigner") {
 
     @dialogs()
-    <h2>Test Assertion <span class="hl">@{
-        ta.taId
-    }</span></h2>
+
+    <script>
+        $(function(){
+            bindValues($("#taId@{ta.id}"))
+        });
+    </script>
+    <h2>Test Assertion
+        <div id="taId@{ta.id}" onclick='showUpdateInputTextDialog(@ta.id, "taId", $(this).next(), "/doEditAssertionField")' class="hl editable"></div>
+        <input type="hidden" value="@ta.taId"/>
+    </h2>
 
 
     <table style="width:100%;">

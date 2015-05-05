@@ -6,9 +6,12 @@
 
     @dialogs()
 
-    <h2>Test Group <span class="hl">@{
-        tg.name
-    }</span></h2>
+    <h2 style="display:table-cell">Test Group
+        <div id="name@{tg.id}" onclick='showUpdateInputTextDialog(@tg.id, "name", $(this).next(), "/doEditGroupField")' class="hl editable"></div>
+        <input type="hidden" value="@tg.name"/>
+        </h2>
+
+    <br />
 
     <div class="indent">
         <h3>Owner</h3>
@@ -17,16 +20,13 @@
         </p>
 
         <h3>Short Description</h3>
-        <p>
-        @tg.shortDescription
-        </p>
+        <div id="shortDescription@{tg.id}" onclick='showUpdateInputTextDialog(@tg.id, "shortDescription", $(this).next(), "/doEditGroupField")' class="editable"></div>
+        <input type="hidden" value="@tg.shortDescription"/>
 
-        @if(tg.description != null && tg.description.length > 0) {
-            <h3>Description</h3>
-            <p>
-            @tg.description
-            </p>
-        }
+        <h3>Description</h3>
+        <div id="description@{tg.id}" onclick='showUpdateTextAreaDialog(@tg.id, "description", $(this ).next(), "/doEditGroupField")' class="editable"></div>
+        <input type="hidden" value="@tg.description"/>
+
         <hr />
         <h3>Test Assertions</h3>
         @if(tg.testAssertions.size() == 0){
@@ -60,5 +60,13 @@
         </table>
         }
     </div>
+
+    <script>
+    $(function(){
+    bindValues($("#description@{tg.id}"))
+    bindValues($("#name@{tg.id}"))
+    bindValues($("#shortDescription@{tg.id}"))
+    })
+    </script>
 
 }

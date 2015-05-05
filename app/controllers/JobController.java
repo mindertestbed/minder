@@ -164,7 +164,7 @@ public class JobController  extends Controller {
     return ok(jobLister.render(tc, null));
   }
 
-  public static Result editJobForm(Long id) {
+  public static Result getEditJobEditorView(Long id) {
     Job rc = Job.findById(id);
     if (rc == null) {
       // it does not exist. error

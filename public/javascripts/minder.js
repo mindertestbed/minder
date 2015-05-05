@@ -277,7 +277,7 @@ function editJob(testCaseId, id, name) {
   //perform ajax to get the edit form
   $.ajax({
     type: 'GET',
-    url: '/editJobForm?id=' + id,
+    url: '/getEditJobEditorView?id=' + id,
     success: function (data) {
       showEditDialog(testCaseId, id, data, name)
     },

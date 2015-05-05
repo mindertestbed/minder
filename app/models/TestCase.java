@@ -148,6 +148,8 @@ public class TestCase extends Model {
       Ebean.commitTransaction();
     } catch (Exception ex) {
       ex.printStackTrace();
+      throw new IllegalArgumentException(ex);
+    } finally{
       Ebean.endTransaction();
     }
   }
@@ -161,6 +163,8 @@ public class TestCase extends Model {
       Ebean.commitTransaction();
     } catch (Exception ex) {
       ex.printStackTrace();
+      throw new IllegalArgumentException(ex);
+    } finally{
       Ebean.endTransaction();
     }
   }

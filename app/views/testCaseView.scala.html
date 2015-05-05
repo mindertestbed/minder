@@ -4,15 +4,17 @@
 @import global.Util._
 
 @main(Messages("playauthenticate.navigation.restricted.testdesigner"), "restrictedTestDesigner") {
-    <h2>Test Case <span class="hl">@tc.name</span></h2>
+    @dialogs()
+
+    <h2>Test Case
+        <div id="name@{tc.id}" onclick='showUpdateInputTextDialog(@tc.id, "name", $(this).next(), "/doEditCaseField")' class="hl editable"></div>
+        <input type="hidden" value="@tc.name"/>
+    </h2>
 
     <div class="indent">
         <h3>Short Description</h3>
-        <p>
-        @tc.shortDescription
-        </p>
-
-
+        <div id="shortDescription@{tc.id}" onclick='showUpdateInputTextDialog(@tc.id, "shortDescription", $(this).next(), "/doEditCaseField")' class="editable"></div>
+        <input type="hidden" value="@tc.shortDescription"/>
         @if(tc.parameters != null && tc.parameters.size() > 0) {
             <h3>Parametric Wrapper Names</h3>
             <ul>
@@ -75,8 +77,9 @@
                         }
                     }
                 } else {
-                    <h3>Mtdl Code</h3>
-                        <p>Theme: <select id="select">
+                    <br />
+                    <div><input type="button" onclick='window.location="/getEditCaseEditorView?id=@{tc.id}"' value="         Edit         "/> &nbsp;&nbsp;&nbsp;&nbsp;
+                            Theme: <select id="select">
                             <option>default</option>
                             <option>3024-day</option>
                             <option>3024-night</option>
@@ -109,9 +112,7 @@
                             <option>xq-dark</option>
                             <option>xq-light</option>
                         </select>
-                        </p>
-                        <hr />
-
+                        </div>
                         <form>
                         <textarea id="code" name="code" class="CodeMirror fullw">
             @tc.tdl
@@ -140,4 +141,11 @@
         </table>
     </div>
     <br />
+
+    <script>
+    $(function(){
+    bindValues($("#name@{tc.id}"))
+    bindValues($("#shortDescription@{tc.id}"))
+    })
+    </script>
 }

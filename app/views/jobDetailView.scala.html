@@ -1,5 +1,8 @@
 @(rc: Job, showHistory: Boolean = true, localUser: models.User = null)
     @main(Messages("playauthenticate.navigation.restricted.testdesigner"), "restrictedTestDesigner") {
+
+        @dialogs()
+        
         <script>
         $ ( function ( ) {
             var latch = 0;

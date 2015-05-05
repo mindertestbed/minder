@@ -57,6 +57,7 @@ GET         /editGroupForm                         controllers.GroupController.e
 POST        /doEditGroup                           controllers.GroupController.doEditGroup
 GET         /doDeleteGroup                         controllers.GroupController.doDeleteGroup(id: Long)
 GET         /getGroupDetailView                    controllers.GroupController.getGroupDetailView(id: Long)
+POST        /doEditGroupField                      controllers.GroupController.doEditGroupField()
 
 #test assertion management
 GET         /getCreateAssertionEditorView          controllers.AssertionController.getCreateAssertionEditorView(groupId: Long)
@@ -65,20 +66,22 @@ GET         /editAssertionForm                     controllers.AssertionControll
 POST        /doEditAssertion                       controllers.AssertionController.doEditAssertion
 GET         /doDeleteAssertion                     controllers.AssertionController.doDeleteAssertion(id: Long)
 GET         /getAssertionDetailView                controllers.AssertionController.getAssertionDetailView(id: Long, display : String ?= "details")
+POST        /doEditAssertionField                  controllers.AssertionController.doEditAssertionField()
 
 #test case management
 GET         /getCreateCaseEditorView               controllers.TestCaseController.getCreateCaseEditorView(assertionId: Long)
 POST        /doCreateCase                          controllers.TestCaseController.doCreateCase
-GET         /editCaseForm                          controllers.TestCaseController.editCaseForm(id: Long)
+GET         /getEditCaseEditorView                 controllers.TestCaseController.getEditCaseEditorView(id: Long)
 POST        /doEditCase                            controllers.TestCaseController.doEditCase
 GET         /doDeleteCase                          controllers.TestCaseController.doDeleteCase(id: Long)
 GET         /viewTestCase                          controllers.TestCaseController.viewTestCase(id: Long, showJobs: Boolean)
+POST        /doEditCaseField                       controllers.TestCaseController.doEditCaseField()
 
-#test configuration management
+#JOB management
 
 GET         /getCreateJobEditorView                controllers.JobController.getCreateJobEditorView(testCaseId: Long)
 POST        /doCreateJob                           controllers.JobController.doCreateJob()
-GET         /editJobForm                           controllers.JobController.editJobForm(id: Long)
+GET         /getEditJobEditorView                  controllers.JobController.getEditJobEditorView(id: Long)
 GET         /viewJob                               controllers.JobController.displayJob(id: Long, showHistory: Boolean)
 GET         /doDeleteJob                           controllers.JobController.doDeleteJob(id: Long)
 POST        /doEditJob                             controllers.JobController.doEditJob()

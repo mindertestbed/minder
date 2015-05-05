@@ -1,17 +1,29 @@
 package controllers;
 
+import com.avaje.ebean.Ebean;
+import com.avaje.ebean.Update;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import editormodels.AssertionEditorModel;
 import global.Util;
+import models.ModelConstants;
 import models.PrescriptionLevel;
 import models.TestAssertion;
 import models.TestGroup;
 import play.Logger;
 import play.data.Form;
+import play.data.validation.Constraints;
+import play.libs.Json;
 import play.mvc.Controller;
 import play.mvc.Result;
 import views.html.assertionDetailView;
 import views.html.testAssertionEditor;
 import views.html.testAssertionLister;
+
+import java.io.PrintWriter;
+import java.io.StringWriter;
+import java.lang.annotation.Retention;
+import java.lang.reflect.Field;
 
 import static play.data.Form.form;
 
@@ -187,5 +199,15 @@ public class AssertionController extends Controller {
     }
     return ok(assertionDetailView.render(ta, Application.getLocalUser(session()), display));
   }
+
+
+  public static Result doEditAssertionField() {
+    com.feth.play.module.pa.controllers.Authenticate.noCache(response());
+
+    JsonNode jsonNode = request().body().asJson();
+
+    return GroupController.doEditField(AssertionEditorModel.class, TestAssertion.class, jsonNode);
+  }
+
 
 }
