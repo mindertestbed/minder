@@ -1,35 +1,51 @@
-@(localUser: models.User = null)
+@(localUser: models.User = null, display: String = "testGroups")
+
+  @import global.Util._
 
 @main(Messages("playauthenticate.navigation.restricted.testdesigner"), "restrictedTestDesigner") {
 
-<h3 class="explanation"><img src="@routes.Assets.at("/images/about-64.png")" height="24px"/></h3>
-<p>
+  @dialogs()
+  <!--
+<h3 class="explanation"><img src=" @routes.Assets.at("/images/about-64.png")
+  " height="24px"/></h3>
+  <p>
   @Messages("playauthenticate.restricted.testdesigner")
-</p>
+  </p>
+  -->
 
+  <table>
+    <tr>
+      <td style="width:10px;border-bottom:1px solid gray;">&nbsp;</td>
+      <td class='@choose(display, "testGroups") tabshrink'>
+        <h4>
+          <a href="/restrictedTestDesigner?display=testGroups">Test Groups</a>
+        </h4>
+      </td>
+      <td class="@choose(display, "testAssets") tabshrink">
+        <h4>
+          <a href="/restrictedTestDesigner?display=testAssets">Test Assets</a>
+        </h4>
+      </td>
+      <td class="@choose(display, "designWithGui") tabshrink">
+        <h4>
+          <a href="/restrictedTestDesigner?display=designWithGui">Design With GUI</a></h4>
+      </td>
+      <td class="tabexpand">&nbsp;</td>
+    </tr>
+  </table>
 
+  <div class="fullw" style="padding: 10px;">
+  @display match {
+    case "testGroups" => {
+      @testManager(localUser)
+    }
+    case "testAssets" => {
+      @testAssetLister(localUser)
+    }
+    case _ => {
+      @testDesignWithGUI(localUser)
+    }
+  }
+  </div>
 
-<script>
-  $(function() {
-    $( "#tabs" ).tabs();
-  });
-  </script>
-
-<div id="tabs" style="height:100%;">
-  <ul>
-    <li><a href="#tabs-1">Test Groups</a></li>
-    <li><a href="#tabs-2">Test Assets</a></li>
-    <li><a href="#tabs-3">Design with GUI</a></li>
-  </ul>
-  <div id="tabs-1">
-    @testManager(localUser)
-  </div>
-  <div id="tabs-2" style="height:100%;">
-    @testAssetLister(localUser)
-  </div>
-  <div id="tabs-3" style="height:100%;">
-    @testDesignWithGUI(localUser)
-  </div>
-  </div>
-</div>
 }

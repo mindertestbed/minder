@@ -23,7 +23,7 @@ object Tester extends Controller {
     try {
       SignalSlotInfoProvider.setSignalSlotInfoProvider(MinderWrapperRegistry.get())
 
-      TestEngine.runTest(mail, tdl, "$xmlValueInitiator" -> "xmlValueInitiator", "$xmlGenerator" -> "xmlGenerator");
+      TestEngine.runTest(mail, "XMLTEST", tdl, "$xmlValueInitiator" -> "xmlValueInitiator", "$xmlGenerator" -> "xmlGenerator");
       Ok
     } catch {
       case t: Throwable => {

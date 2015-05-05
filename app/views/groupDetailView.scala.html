@@ -1,0 +1,72 @@
+@(tg: TestGroup, localUser: models.User = null)
+@import java.util.concurrent.atomic.AtomicInteger
+
+
+@main(Messages("playauthenticate.navigation.restricted.testdesigner"), "restrictedTestDesigner") {
+
+    @dialogs()
+
+    <h2 style="display:table-cell">Test Group
+        <div id="name@{tg.id}" onclick='showUpdateInputTextDialog(@tg.id, "name", $(this).next(), "/doEditGroupField")' class="hl editable"></div>
+        <input type="hidden" value="@tg.name"/>
+        </h2>
+
+    <br />
+
+    <div class="indent">
+        <h3>Owner</h3>
+        <p>
+            @tg.owner.firstName @tg.owner.email
+        </p>
+
+        <h3>Short Description</h3>
+        <div id="shortDescription@{tg.id}" onclick='showUpdateInputTextDialog(@tg.id, "shortDescription", $(this).next(), "/doEditGroupField")' class="editable"></div>
+        <input type="hidden" value="@tg.shortDescription"/>
+
+        <h3>Description</h3>
+        <div id="description@{tg.id}" onclick='showUpdateTextAreaDialog(@tg.id, "description", $(this ).next(), "/doEditGroupField")' class="editable"></div>
+        <input type="hidden" value="@tg.description"/>
+
+        <hr />
+        <h3>Test Assertions</h3>
+        @if(tg.testAssertions.size() == 0){
+            <p>No Test assertions yet</p>
+            @createButton("/getCreateAssertionEditorView?groupId="+tg.id, Messages("restrictedTestPage.createTestAssertion"))
+        } else {
+        <table class="shaded">
+            @createFirstRow {
+                <th>Test Assertion Id</th>
+                <th>Short Description</th>
+                <th>Author</th>
+            }
+            @defining(new AtomicInteger(1)) {index =>
+                @for(ta <- tg.testAssertions) {
+                    <tr>
+                        <td>@index.getAndIncrement()</td><td><a href="/getAssertionDetailView?id=@ta.id">@ta.taId</a></td> <td>@ta.shortDescription</td>
+                        <td>@ta.owner.email</td>
+                        <td>
+                            <div title="Delete" class="bevel2 celldiv" style="height:30px;width:30px;cursor:hand;"
+                            onclick='deleteWithDialog2("/doDeleteAssertion?id=@ta.id", $("#dialog-confirm"), "Delete Test Assertion", "test assertion", "@ta.taId")'>
+                                <img src="@routes.Assets.at("/images/trash2-64.png")" height="16px" alt='@ta.id'/>
+                            </div>
+                        </td>
+                    </tr>
+                }
+            }
+
+            @createLastRow(3){
+                @createButton("/getCreateAssertionEditorView?groupId="+tg.id, Messages("restrictedTestPage.createTestAssertion"))
+            }
+        </table>
+        }
+    </div>
+
+    <script>
+    $(function(){
+    bindValues($("#description@{tg.id}"))
+    bindValues($("#name@{tg.id}"))
+    bindValues($("#shortDescription@{tg.id}"))
+    })
+    </script>
+
+}

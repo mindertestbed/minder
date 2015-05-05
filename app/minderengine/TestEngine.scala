@@ -18,8 +18,8 @@ import scala.io.Source
  */
 object TestEngine {
 
-  def compileTest(userEmail: String, tdl: String): Class[MinderTdl] = {
-    TdlCompiler.compileTdl(userEmail, tdl)
+  def compileTest(userEmail: String, name: String, tdl: String): Class[MinderTdl] = {
+    TdlCompiler.compileTdl(userEmail, name, tdl)
   }
 
   def describe(clsMinderTDL: Class[MinderTdl]): util.List[Rivet] = {
@@ -28,20 +28,21 @@ object TestEngine {
   }
 
   class MyAppender(var sb: StringBuilder) extends AppenderSkeleton {
-    override def append(event: LoggingEvent) : Unit = {
-      if(this.getLayout != null) {
+    override def append(event: LoggingEvent): Unit = {
+      if (this.getLayout != null) {
         val formatted = this.getLayout.format(event);
         sb.append(formatted);
         Logger.debug(formatted)
       }
     }
 
-    def close(){}
+    def close() {}
 
-    def requiresLayout() : Boolean = {
+    def requiresLayout(): Boolean = {
       false;
     }
   }
+
   def runTest2(userEmail: String, clsMinderTDL: Class[MinderTdl], map: Map[String, String], testRunner: TestRunner): Unit = {
     val logBuilder = new StringBuilder
     val lgr: org.apache.log4j.Logger = org.apache.log4j.Logger.getLogger("test");
@@ -57,7 +58,7 @@ object TestEngine {
       }
     }
     rg.startTest()
-    if(testRunner!=null)
+    if (testRunner != null)
       testRunner.startTest()
     lgr.info("Initialize report params")
     rg.setReportTemplate(Source.fromInputStream(this.getClass.getResourceAsStream("/taReport.xml")).mkString.getBytes())
@@ -74,7 +75,7 @@ object TestEngine {
       val minderTDL = clsMinderTDL.getConstructors()(0).newInstance(map, java.lang.Boolean.TRUE).asInstanceOf[MinderTdl]
 
 
-      if(testRunner != null){
+      if (testRunner != null) {
         testRunner.wrappers = minderTDL.wrapperDefs
       }
 
@@ -94,12 +95,25 @@ object TestEngine {
         for (rivet <- minderTDL.SlotDefs) {
           lgr.debug("---- " + "RUN RIVET " + rivetIndex)
 
-          //resolve the minder client id. This might as well be resolved to a local built-in wrapper.
-          val minderClient = if (BuiltInWrapperRegistry.get().containsWrapper(rivet.slot.wrapperId)) {
-            BuiltInWrapperRegistry.get().getWrapper(rivet.slot.wrapperId)
-          } else {
-            XoolaServer.get().getClient(rivet.slot.wrapperId)
-          }
+          //resolve the minder client id. This might as well be resolved to a local built-in wrapper or the null slot.
+          val minderClient =
+            if (rivet.slot.wrapperId == "NULLWRAPPER") {
+              new IMinderClient {
+                override def callSlot(s: String, s1: String, objects: Array[AnyRef]): AnyRef = {
+                  null
+                }
+
+                override def finishTest(): Unit = {}
+
+                override def startTest(s: String): Unit = {}
+              }
+
+            } else if (BuiltInWrapperRegistry.get().containsWrapper(rivet.slot.wrapperId)) {
+              BuiltInWrapperRegistry.get().getWrapper(rivet.slot.wrapperId)
+            } else {
+              XoolaServer.get().getClient(rivet.slot.wrapperId)
+            }
+
           val args = Array.ofDim[Object](rivet.pipes.length)
 
           set.add(rivet.slot.wrapperId)
@@ -223,7 +237,7 @@ object TestEngine {
    * @param userEmail the owner email if of the TS that is running the test
    * @param tdl The test definition
    */
-  def runTest(userEmail: String, tdl: String, wrapperMapping: (String, String)*): Unit = {
+  def runTest(userEmail: String, name: String, tdl: String, wrapperMapping: (String, String)*): Unit = {
     val map = {
       val map2 = collection.mutable.Map[String, String]()
       for (e@(k, v) <- wrapperMapping) {
@@ -232,7 +246,7 @@ object TestEngine {
       map2.toMap
     }
 
-    runTest2(userEmail, compileTest(userEmail, tdl), map, null)
+    runTest2(userEmail, compileTest(userEmail, name, tdl), map, null)
   }
 
   /**
@@ -245,7 +259,7 @@ object TestEngine {
   def describeTdl(testCase: TestCase, email: String): util.LinkedHashMap[String, util.Set[SignalSlot]] = {
     Logger.debug("Describing: " + testCase.name + " for user " + email)
     Logger.debug(testCase.tdl)
-    val minderClass = TdlCompiler.compileTdl(email, tdlStr = testCase.tdl)
+    val minderClass = TdlCompiler.compileTdl(email, testCase.name, tdlStr = testCase.tdl)
     val minderTdl = minderClass.getConstructors()(0).newInstance(null, java.lang.Boolean.FALSE).asInstanceOf[MinderTdl]
 
     val slotDefs = minderTdl.SlotDefs

@@ -1,0 +1,52 @@
+@(ta: TestAssertion, localUser: models.User = null, display: String = "details")
+@import java.util.concurrent.atomic.AtomicInteger
+@import global.Util._;
+
+@main(Messages("playauthenticate.navigation.restricted.testdesigner"), "restrictedTestDesigner") {
+
+    @dialogs()
+
+    <script>
+        $(function(){
+            bindValues($("#taId@{ta.id}"))
+        });
+    </script>
+    <h2>Test Assertion
+        <div id="taId@{ta.id}" onclick='showUpdateInputTextDialog(@ta.id, "taId", $(this).next(), "/doEditAssertionField")' class="hl editable"></div>
+        <input type="hidden" value="@ta.taId"/>
+    </h2>
+
+
+    <table style="width:100%;">
+        <tr>
+            <td style="width:10px;border-bottom:1px solid gray;">&nbsp;</td>
+            <td>
+            <table>
+                <tr>
+                    <td class='@choose(display, "details") tabshrink'>
+                        <h4>
+                            <a href="/getAssertionDetailView?id=@ta.id&display=details">Details</a>
+                        </h4>
+                    </td>
+                    <td class="@choose(display, "testCases") tabshrink">
+                        <h4>
+                            <a href="/getAssertionDetailView?id=@ta.id&display=testCases">Test Cases</a>
+                        </h4>
+                    </td>
+                </tr>
+            </table>
+            </td>
+            <td class="tabexpand">&nbsp;</td>
+        </tr>
+    </table>
+
+    @display match {
+        case "details" => {
+            @testAssertionDetailView(ta, localUser)
+        }
+        case "testCases" => {
+            @testAssertionCaseLister(ta, localUser)
+        }
+    }
+
+}

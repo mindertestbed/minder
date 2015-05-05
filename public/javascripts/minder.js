@@ -45,8 +45,8 @@ function createFormDialog(elm, sourceUrl, action, dialogId, titl, target, w, h) 
 
     var dialog = $("#" + dialogId).dialog({
       autoOpen: false,
-      height: h,
-      width: w,
+      height: "100%",
+      width: "100%",
       title: titl,
       modal: true,
       buttons: {
@@ -224,7 +224,7 @@ function showError(data) {
 function createJob(testCaseId) {
   $.ajax({
     type: 'GET',
-    url: '/createJobForm?testCaseId=' + testCaseId,
+    url: '/getCreateJobEditorView?testCaseId=' + testCaseId,
     success: function (data) {
       showCreateDialog(testCaseId, data)
     },
@@ -277,7 +277,7 @@ function editJob(testCaseId, id, name) {
   //perform ajax to get the edit form
   $.ajax({
     type: 'GET',
-    url: '/editJobForm?id=' + id,
+    url: '/getEditJobEditorView?id=' + id,
     success: function (data) {
       showEditDialog(testCaseId, id, data, name)
     },
@@ -466,3 +466,38 @@ function showReportDialog(dialogId, id) {
   });
 }
 
+
+function deleteWithDialog2(action, dialog, title, category, item) {
+  var deleteUrl;
+  var deleteDialog = dialog.dialog({
+    resizable: false,
+    height: 200,
+    width: "50%",
+    title: title,
+    autoOpen: false,
+    modal: true,
+    buttons: {
+      "Delete": function () {
+        $.ajax({
+          type: 'GET',
+          url: action,
+          success: function (data) {
+            location.reload()
+          },
+          error: function (jqXHR, textStatus, errorMessage) {
+            alert(jqXHR.responseText);
+          }
+        });
+
+        $(this).dialog("close");
+      },
+      Cancel: function () {
+        $(this).dialog("close");
+      }
+    }
+  });
+
+  dialog.find("span.itemtype")[0].innerHTML = category;
+  dialog.find("span.itemname")[0].innerHTML = item;
+  deleteDialog.dialog("open");
+}

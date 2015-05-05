@@ -29,22 +29,22 @@ public class TestAssertion extends Model {
 	@Column(nullable = false, unique = true)
 	public String taId;
 
-	@Column(nullable = false, length = 250)
+	@Column(nullable = false, length = ModelConstants.DESCRIPTION_LENGTH)
 	public String normativeSource;
 
 	@Column(nullable = false)
 	public String target;
 
-	@Column(length = 250)
+	@Column(length = ModelConstants.DESCRIPTION_LENGTH)
 	public String prerequisites;
 
-	@Column(nullable = false)
+	@Column(nullable = false, length = ModelConstants.DESCRIPTION_LENGTH)
 	public String predicate;
 
-	@Column(length = 250)
+	@Column(length = ModelConstants.K)
 	public String variables;
 
-	@Column(length = 250)
+	@Column(length = ModelConstants.K)
 	public String tag;
 
 	@Column(length = ModelConstants.DESCRIPTION_LENGTH)
@@ -60,6 +60,10 @@ public class TestAssertion extends Model {
 
   public static final Finder<Long, TestAssertion> find = new Finder<>(
       Long.class, TestAssertion.class);
+
+	@ManyToOne
+	@Column(nullable = false)
+	public User owner;
 
 	public static List<TestAssertion> findByGroup(TestGroup group){
     return find.where().eq("testGroup", group).setOrderBy("id").findList();

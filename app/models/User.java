@@ -73,6 +73,15 @@ public class User extends Model implements Subject {
 	@OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
 	public List<TestGroup> testGroups;
 
+	@OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+	public List<TestAssertion> testAssertions;
+
+	@OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+	public List<TestCase> testCases;
+
+	@OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+	public List<Job> jobs;
+
 	@OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, mappedBy = "owner")
 	public List<TestAsset> testAssets;
 

@@ -1,13 +1,16 @@
-@(frm: Form[_], localUser: models.User = null)
+@(frm: Form[_], localUser: models.User = null, editMode : Boolean = true)
 
 @import helper._
-@implicitFieldConstructor = @{ FieldConstructor(twitterBootstrapBasic.f) }
 
-@if(frm.hasGlobalErrors) {
-<p class="alert alert-danger">
-  @frm.globalError.message
-</p>
+
+@implicitFieldConstructor = @{
+  FieldConstructor(myInput.f)
 }
+
+
+@main(Messages("playauthenticate.navigation.restricted.testdesigner"), "restrictedTestDesigner") {
+
+  @dialogs()
 
 <link rel="stylesheet" href="@routes.Assets.at("stylesheets/theme/3024-day.css")" rel="stylesheet">
 <link rel="stylesheet" href="@routes.Assets.at("stylesheets/theme/3024-night.css")" rel="stylesheet">
@@ -52,129 +55,98 @@
   background: rgb(200,230,255);
   }
 
-  .CodeMirror, .col-md-5,  .CodeMirror-scroll, .CodeMirror-sizer {
-    width:100%;
-  }
-
-  .CodeMirror{
-    height: auto;
-  }
-
-  .CodeMirror-scroll{
-    overflow-x: auto; overflow-y: hidden;
-  }
-
 
 </style>
 
 <script>
+
+$(function() {
   minderAccordion("#accordion1");
 	var textArea = document.getElementById("tdl");
   var editor = CodeMirror.fromTextArea(textArea, {
       lineNumbers: true,
       lineWrapping: true,
       styleActiveLine: true,
+      viewportMargin: Infinity,
       extraKeys: {"Ctrl-Space": "autocomplete"},
       mode: {name: "text/x-scala", globalVars: true},
       theme: "neo"
   });
 
-  // store it
-  $("#tdl").data('CodeMirrorInstance', editor);
+    // store it
+    $("#tdl").data('CodeMirrorInstance', editor);
 
-  editor.on("change", function(cm, change) {
-  textArea.value = editor.getDoc().getValue();
-  });
+    editor.on("change", function(cm, change) {
+      textArea.value = editor.getDoc().getValue();
+    });
 
-  $( "#select" ).change(function() {
-      $( "#select option:selected" ).each(function() {
-         editor.setOption("theme", $( this ).text());
-      });
+    $( "#select" ).change(function() {
+        $( "#select option:selected" ).each(function() {
+           editor.setOption("theme", $( this ).text());
+        });
 
+    });
+
+    document.onkeydown = function(event){
+      if (event.which == 27){
+        $("#wrappersDiv" ).hide();
+      $ ( "#funcdiv" ).hide ( ) ;
+      }
+    };
   });
 </script>
 
-<div id="contentPane" style="width:100%;height:94%;margin:0;padding:0;">
+  <h2>New Test Case</h2>
+  <br />
+  @defining(if(editMode == false) {routes.TestCaseController.doCreateCase()} else {routes.TestCaseController.doEditCase()}){ act =>
+  @helper.form(action = act , 'class -> "fullh") {
+    <div id="contentPane" style="width:100%;height:94%;margin:0;padding:20px;">
   <table style="width:100%;height:100%;">
-    <tr style="height:30px;">
-      <td>
-        @inputText(
-        frm("name"),
-        '_label -> "Test Case Name"
-        )
-      </td>
-      <td>
-        @inputText(
-        frm("shortDescription"),
-        '_label -> "Short Description"
-        )
-      </td>
-    </tr>
-    <tr style="height:30px;">
-      <td>
-        <h4>Wrappers</h4>
-      </td>
+    <tr>
+      <td style="vertical-align: text-top;">
+        <div class="bevel2" style="padding: 10px;">
+        <label>Name</label>
+        @if(editMode){
+          <div class="fcborder">@frm("name").value</div>
+          <input type="hidden" name="name" id="name" value='@frm("name").value'/>
+        } else {
+          @inputText(
+            frm("name"),
+            '_label -> "Name")
+        }
 
-      <td>
-        <h4>Test Case Editor</h4>
+        <label>Short Description</label>
+        @if(editMode){
+          <div class="fcborder">@frm("shortDescription").value</div>
+          <input type="hidden" name="shortDescription" id="shortDescription" value='@frm("shortDescription").value'/>
+        } else {
+          @inputText(
+            frm("shortDescription"),
+            '_label -> "Short Description"
+          )
+        }
+          </div>
       </td>
-    </tr>
-    <tr class="fullh">
-      <td style="width:30%;height:auto;overflow:scroll;border: 1px solid red">
-        <div id="accordion1" class="fullh">
-          @defining(Wrapper.getAll()){ allWrappers =>
-            @for(currentWrapper <- allWrappers){
-              <div class="title bevelsmall"><b class="trigger">@currentWrapper.name</b></div>
-              <div class="content" style="height:95%">
-                <div class="myscroll" style="overflow:auto;">
-                  <div><b>Signals</b></div>
-                  <div style="overflow:scroll"> <ul>
-                  @for(currentSignal <- currentWrapper.signals){
-                    <li id="signal@currentWrapper.id-@currentSignal.id">- @currentSignal.signature</li>
-                    <script>
-                        $("#signal@currentWrapper.id-@currentSignal.id").click(function(){
-                           // get it
-                           var editor = $("#tdl").data('CodeMirrorInstance');
-                           // from here on the API functions are available to 'myInstance' again.
-                           var start_cursor = editor.getCursor();
-                           var cursorLine = start_cursor.line;
-                           var cursorCh = start_cursor.ch;
-                           editor.replaceRange("\"@currentSignal.signature\" of \"@currentWrapper.name\"", start_cursor);
-                        });
+      <tr />
+    <tr>
+      <td class="maxwh" style="vertical-align:text-top;">
+        <div class="bevel2 fullw fullh">
+          <div style="padding: 10px;">
+            <button type="submit">Save</button>&nbsp;
+            <button type="reset">Reset</button>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+            <button type="button" onclick="history.back ( )">Cancel</button></div>
 
-                    </script>
-                  }
-                  </ul></div>
-                  &nbsp;
-                  <div><b>Slots</b></div>
-                  <div style="overflow:scroll">
-                  <ul>
-                  @for(currentSlot <- currentWrapper.slots){
-                    <li id="slot@currentWrapper.id-@currentSlot.id">- @currentSlot.signature</li>
-                    <script>
-                                          $("#slot@currentWrapper.id-@currentSlot.id").click(function(){
-                                             // get it
-                                             var editor = $("#tdl").data('CodeMirrorInstance');
-                                             // from here on the API functions are available to 'myInstance' again.
-                                             var start_cursor = editor.getCursor();
-                                             var cursorLine = start_cursor.line;
-                                             var cursorCh = start_cursor.ch;
-                                             editor.replaceRange("\"@currentSlot.signature\" of \"@currentWrapper.name\"", start_cursor);
-                                          });
-
-                    </script>
-                  }
-                  </ul></div>
-                </div>
-              </div>
-            }
-          }
-        </div>
-      </td>
-
-      <td clas="maxwh">
-        <div id="sectionnav" class="fullw fullh" style="border:1px solid gray;">
-          <p>Theme: <select id="select">
+          <div class="fcborder fullh"> <label>Tdl</label><br/>
+            @if(frm.hasGlobalErrors) {
+              <xmp class="alert alert-danger">
+              @frm.globalError.message
+              </xmp>
+            }<br />
+            <button onclick='$("#wrappersDiv").show();' type="button">Insert Reference</button>
+              &nbsp;
+            <button onclick='$ ( "#funcdiv" ).show( );' type="button">Insert Converter</button>
+              &nbsp;&nbsp;&nbsp;&nbsp;
+            Theme: <select id="select">
             <option>default</option>
             <option>3024-day</option>
             <option>3024-night</option>
@@ -207,10 +179,26 @@
             <option>xq-dark</option>
             <option>xq-light</option>
           </select>
-          </p>
+          <br />
+          <!-- xtarea(frm("tdl"), 'class -> "CodeMirror ") -->
+            <textarea id="tdl" name="tdl" class = "CodeMirror">@frm("tdl").value </textarea>
+              @defining(if(frm("tdl").value == null){""}else{frm("tdl").value}){ str =>
+                @defining(str.toString.split("\\\n").length) { len =>
+                    <script>
+                      $(function(){
+                        var editor = $("#tdl").data('CodeMirrorInstance');
 
-          <div class="maxw fullh scroll">
-            @textarea(frm("tdl"), 'class -> "CodeMirror ")
+                        var nls = "";
+                        for(i = @len; i < 20; i++){
+                          nls += "\n"
+                        }
+
+                        editor.replaceRange(nls, CodeMirror.Pos(editor.lastLine()))
+                    });
+                    </script>
+                  }
+              }
+
           </div>
         </div>
       </td>
@@ -219,5 +207,90 @@
 
 </div>
 
-<input type="hidden" name="id" id="id" value='@frm("id").value'/>
-<input type="hidden" name="assertionId" id="assertionId" value='@frm("assertionId").value'/>
+    <div class="bevel2" style="z-index:10000000;position:fixed;width:60%;height:60%;top:20%;left:20%;display:none;overflow:scroll;border:1px solid gray;background-color:#ffffff" id="wrappersDiv">
+      <div id="accordion1" class="fullh">
+      @defining(Wrapper.getAll()){ allWrappers =>
+        @for(currentWrapper <- allWrappers){
+          <div class="title bevelsmall"><b class="trigger">@currentWrapper.name</b></div>
+          <div class="content" style="height:95%">
+            <div class="myscroll" style="overflow:auto;">
+              <div><b>Signals</b></div>
+              <div style="overflow:scroll"> <ul>
+              @for(currentSignal <- currentWrapper.signals){
+                <li id="signal@currentWrapper.id-@currentSignal.id">- @currentSignal.signature</li>
+                <script>
+                $("#signal@currentWrapper.id-@currentSignal.id").click(function(){
+                // get it
+                var editor = $("#tdl").data('CodeMirrorInstance');
+                // from here on the API functions are available to 'myInstance' again.
+                var start_cursor = editor.getCursor();
+                var cursorLine = start_cursor.line;
+                var cursorCh = start_cursor.ch;
+                editor.replaceRange("\"@currentSignal.signature\" of \"@currentWrapper.name\"", start_cursor);
+                $("#wrappersDiv" ).hide();
+                });
+
+                </script>
+              }
+              </ul></div>
+                &nbsp;
+              <div><b>Slots</b></div>
+              <div style="overflow:scroll">
+                <ul>
+                @for(currentSlot <- currentWrapper.slots){
+                  <li id="slot@currentWrapper.id-@currentSlot.id">- @currentSlot.signature</li>
+                  <script>
+                  $("#slot@currentWrapper.id-@currentSlot.id").click(function(){
+                  // get it
+                  var editor = $("#tdl").data('CodeMirrorInstance');
+                  // from here on the API functions are available to 'myInstance' again.
+                  var start_cursor = editor.getCursor();
+                  var cursorLine = start_cursor.line;
+                  var cursorCh = start_cursor.ch;
+                  editor.replaceRange("\"@currentSlot.signature\" of \"@currentWrapper.name\"", start_cursor);
+                  $("#wrappersDiv" ).hide();
+                  });
+
+                  </script>
+                }
+                </ul></div>
+            </div>
+          </div>
+        }
+      }
+      </div>
+    </div>
+
+
+    <div class="bevel2" style="z-index:10000000;position:fixed;width:30%;height:20%;padding:20px;top:40%;left:35%;display:none;overflow:scroll;border:1px solid gray;background-color:#ffffff" id="funcdiv">
+
+      <h3>Create New Converter</h3>
+
+      <label for="converterName">Converter Name</label>
+      <input type="text" id="converterName" class="fullw fcborder"/>
+      <br />
+
+      <script>
+        function addConverter() {
+        // get it
+        var editor = $ ( "#tdl" ).data ( 'CodeMirrorInstance' ) ;
+        // from here on the API functions are available to 'myInstance' again.
+        var start_cursor = editor.getCursor ( ) ;
+        var cursorLine = start_cursor.line ;
+        var cursorCh = start_cursor.ch ;
+        editor.replaceRange ( "def " + $ ( "#converterName" ).val() + "(input: Any) : Any ={\n\n}", start_cursor ) ;
+        $ ( "#funcdiv" ).hide ( ) ;
+        $ ( "#converterName" ).val("")
+        }
+
+      </script>
+      <br />
+      <button type="button" onclick="addConverter()">Create</button>
+    </div>
+
+    <input type="hidden" name="id" id="id" value='@frm("id").value'/>
+    <input type="hidden" name="assertionId" id="assertionId" value='@frm("assertionId").value'/>
+
+  } <!-- helper.form -->
+  } <!-- defininf -->
+} <!-- main -->

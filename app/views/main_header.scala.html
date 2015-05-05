@@ -1,0 +1,130 @@
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="Play Authenticate - an authentication module for the Play! Framework 2.0">
+<meta name="author" content="The Play Authenticate Team">
+
+<script type="text/javascript" src="@routes.Assets.at("javascripts/jquery.js")"></script>
+<script type="text/javascript" src="@routes.WebJarAssets.at(WebJarAssets.locate("bootstrap.min.js"))"></script>
+<script type="text/javascript" src="@routes.Assets.at("javascripts/jquery-ui.min.js")"></script>
+<script type="text/javascript" src="@routes.Assets.at("javascripts/codemirror.js")"></script>
+<script type="text/javascript" src="@routes.Assets.at("javascripts/active-line.js")"></script>
+<script type="text/javascript" src="@routes.Assets.at("javascripts/dialog.js")"></script>
+<script type="text/javascript" src="@routes.Assets.at("javascripts/searchcursor.js")"></script>
+<script type="text/javascript" src="@routes.Assets.at("javascripts/search.js")"></script>
+<script type="text/javascript" src="@routes.Assets.at("javascripts/annotatescrollbar.js")"></script>
+<script type="text/javascript" src="@routes.Assets.at("javascripts/matchesonscrollbar.js")"></script>
+<script type="text/javascript" src="@routes.Assets.at("javascripts/show-hint.js")"></script>
+<script type="text/javascript" src="@routes.Assets.at("javascripts/clike.js")"></script>
+<script type="text/javascript" src="@routes.Assets.at("javascripts/javascript-hint.js")"></script>
+<script type="text/javascript" src="@routes.Assets.at("javascripts/minder.js")"></script>
+<script type="text/javascript" src="@routes.Assets.at("javascripts/updater.js")"></script>
+
+<script type="text/javascript" src="@routes.Assets.at("javascripts/SVGDrawingUtils.js")"></script>
+
+<link rel="stylesheet" href="@routes.WebJarAssets.at(WebJarAssets.locate("css/bootstrap.min.css"))">
+<link href="@routes.Assets.at("stylesheets/codemirror.css")" rel="stylesheet">
+<link href="@routes.Assets.at("stylesheets/show-hint.css")" rel="stylesheet">
+<link href="@routes.Assets.at("stylesheets/dialog.css")" rel="stylesheet">
+<link href="@routes.Assets.at("stylesheets/matchesonscrollbar.css")" rel="stylesheet">
+<link href="@routes.Assets.at("stylesheets/jquery-ui.min.css")" rel="stylesheet">
+<link href="@routes.Assets.at("stylesheets/jquery-ui.structure.min.css")" rel="stylesheet">
+<link href="@routes.Assets.at("stylesheets/jquery-ui.theme.min.css")" rel="stylesheet">
+<link href="@routes.Assets.at("stylesheets/main.css")" rel="stylesheet">
+
+<link rel="stylesheet" href="@routes.Assets.at("stylesheets/theme/3024-day.css")" rel="stylesheet">
+<link rel="stylesheet" href="@routes.Assets.at("stylesheets/theme/3024-night.css")" rel="stylesheet">
+<link rel="stylesheet" href="@routes.Assets.at("stylesheets/theme/ambiance.css")" rel="stylesheet">
+<link rel="stylesheet" href="@routes.Assets.at("stylesheets/theme/base16-dark.css")" rel="stylesheet">
+<link rel="stylesheet" href="@routes.Assets.at("stylesheets/theme/base16-light.css")" rel="stylesheet">
+<link rel="stylesheet" href="@routes.Assets.at("stylesheets/theme/blackboard.css")" rel="stylesheet">
+<link rel="stylesheet" href="@routes.Assets.at("stylesheets/theme/cobalt.css")" rel="stylesheet">
+<link rel="stylesheet" href="@routes.Assets.at("stylesheets/theme/eclipse.css")" rel="stylesheet">
+<link rel="stylesheet" href="@routes.Assets.at("stylesheets/theme/elegant.css")" rel="stylesheet">
+<link rel="stylesheet" href="@routes.Assets.at("stylesheets/theme/erlang-dark.css")" rel="stylesheet">
+<link rel="stylesheet" href="@routes.Assets.at("stylesheets/theme/lesser-dark.css")" rel="stylesheet">
+<link rel="stylesheet" href="@routes.Assets.at("stylesheets/theme/mbo.css")" rel="stylesheet">
+<link rel="stylesheet" href="@routes.Assets.at("stylesheets/theme/mdn-like.css")" rel="stylesheet">
+<link rel="stylesheet" href="@routes.Assets.at("stylesheets/theme/midnight.css")" rel="stylesheet">
+<link rel="stylesheet" href="@routes.Assets.at("stylesheets/theme/monokai.css")" rel="stylesheet">
+<link rel="stylesheet" href="@routes.Assets.at("stylesheets/theme/neat.css")" rel="stylesheet">
+<link rel="stylesheet" href="@routes.Assets.at("stylesheets/theme/neo.css")" rel="stylesheet">
+<link rel="stylesheet" href="@routes.Assets.at("stylesheets/theme/night.css")" rel="stylesheet">
+<link rel="stylesheet" href="@routes.Assets.at("stylesheets/theme/paraiso-dark.css")" rel="stylesheet">
+<link rel="stylesheet" href="@routes.Assets.at("stylesheets/theme/paraiso-light.css")" rel="stylesheet">
+<link rel="stylesheet" href="@routes.Assets.at("stylesheets/theme/pastel-on-dark.css")" rel="stylesheet">
+<link rel="stylesheet" href="@routes.Assets.at("stylesheets/theme/rubyblue.css")" rel="stylesheet">
+<link rel="stylesheet" href="@routes.Assets.at("stylesheets/theme/solarized.css")" rel="stylesheet">
+<link rel="stylesheet" href="@routes.Assets.at("stylesheets/theme/the-matrix.css")" rel="stylesheet">
+<link rel="stylesheet" href="@routes.Assets.at("stylesheets/theme/tomorrow-night-eighties.css")" rel="stylesheet">
+<link rel="stylesheet" href="@routes.Assets.at("stylesheets/theme/twilight.css")" rel="stylesheet">
+<link rel="stylesheet" href="@routes.Assets.at("stylesheets/theme/vibrant-ink.css")" rel="stylesheet">
+<link rel="stylesheet" href="@routes.Assets.at("stylesheets/theme/xq-dark.css")" rel="stylesheet">
+<link rel="stylesheet" href="@routes.Assets.at("stylesheets/theme/xq-light.css")" rel="stylesheet">
+
+
+<style>
+html, body {
+height : 100%;
+padding : 0px;
+margin : 0px;
+}
+
+.ui-accordion.ui-accordion-content {
+padding : 10px;
+}
+
+.ui-tabs-panel.ui-tabs {
+padding : 5px;
+}
+
+.ui-tabs.ui-tabs-panel {
+padding : 5px;
+}
+
+.demoHeaders {
+margin-top : 2em;
+}
+#dialog-link {
+padding :.4em 1em .4em 20px ;
+text-decoration : none ;
+position : relative ;
+}
+#dialog-link span.ui-icon {
+margin : 0 5px 0 0 ;
+position : absolute ;
+left :.2em ;
+top : 50% ;
+margin-top : -8px;
+}
+#icons {
+margin : 0 ;
+padding : 0 ;
+}
+#icons li {
+margin: 2px;
+position: relative ;
+padding: 4px 0;
+cursor: pointer;
+float: left;
+list-style: none;
+}
+#icons span.ui-icon {
+float: left;
+margin: 0 4px;
+}
+.fakewindowcontain.ui-widget-overlay {
+position:absolute;
+}
+select {
+width : 200px;
+}
+</style>
+
+<script>
+$ ( function ( ) {
+$ ( ".explanation" ).click ( function ( ) {
+$ ( this ).next ( ).slideToggle ( ) ;
+} ) ;
+$ ( ".explanation + p" ).hide ( ) ;
+} ) ;
+</script>

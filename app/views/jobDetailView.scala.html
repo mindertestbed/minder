@@ -1,65 +1,107 @@
-@(rc: Job, localUser: models.User = null)
+@(rc: Job, showHistory: Boolean = true, localUser: models.User = null)
+    @main(Messages("playauthenticate.navigation.restricted.testdesigner"), "restrictedTestDesigner") {
 
-@main(Messages("playauthenticate.navigation.restricted.testdesigner"), "restrictedTestDesigner") {
+        @dialogs()
+        
+        <script>
+        $ ( function ( ) {
+            var latch = 0;
+            var btn = $("#runbutton" );
+            btn.hide();
 
-<script>
-  $(function() {
-  $( "#wmDetails" ).dialog({
-    autoOpen: false,
-    title: 'Wrapper Mapping',
-    show: {
-      effect: "blind",
-      duration: 1000
-    },
-    hide: {
-      effect: "explode",
-      duration: 1000
+            new EventSource ( '/wrapperStatusFeed?id=@rc.id' ).onmessage = function ( event ) {
+                var kk = JSON.parse ( event.data )
+
+                if ( kk.online == true ) {
+                    $ ( "span.onStatus" + kk.id ).show ( )
+                    $ ( "span.offStatus" + kk.id ).hide ( )
+                    latch--;
+                } else {
+                    $ ( "span.onStatus" + kk.id ).hide ( )
+                    $ ( "span.offStatus" + kk.id ).show ( )
+                    latch ++;
+                }
+
+                if (latch == 0) {
+                  btn.show();
+                } else {
+                  btn.hide();
+                }
+            }
+        });
+        </script>
+            <h2>Job <span class="hl">@{rc.name}</span></h2>
+            <div class="indent">
+                <table class="section"><tr><td>
+                <h3>Test Case Details</h3>
+                    <table class="shaded">
+                        <tr>
+                            <th>Test Group:</th>
+                            <td>
+                                <a href="/getGroupDetailView?id=@{rc.testCase.testAssertion.testGroup.id}">
+                                @rc.testCase.testAssertion.testGroup.name
+                                </a>
+                            </td>
+                        </tr>
+                        <tr>
+                            <th>Test Assertion:</th>
+                            <td>
+                                <a href="/getAssertionDetailView?id=@{rc.testCase.testAssertion.id}">
+                                @rc.testCase.testAssertion.taId
+                                </a>
+                            </td>
+                        </tr>
+                        <tr><th>Test Case:</th>
+                            <td>
+                                <a href="/viewTestCase?id=@{rc.testCase.id}&showJobs=true">
+                                @rc.testCase.name
+                                </a>
+                            </td>
+                        </tr>
+                    </table>
+                    </td><td>
+                <h3>Wrapper Mappings</h3>
+                    <table class="shaded">
+                        <tr><th>Variable</th><th>Actual Wrapper</th><th>Status</th></tr>
+                        @defining(rc.mappedWrappers) { lst =>
+                            @for(mw <- rc.mappedWrappers) {
+                                <tr>
+                                    <td>@mw.parameter.name</td><td>@mw.wrapper.name</td>
+                                    <td align="center">
+                                    <span class="onStatus@{mw.wrapper.id}" style="display:none" class="bignobold online"> <img src="@routes.Assets.at("/images/Pc_Online.png")"/></span>
+                                    <span class="offStatus@{mw.wrapper.id}" style="display:none" class="bignobold offline"> <img src="@routes.Assets.at("/images/Pc_Offline.png")"/></span>
+                                </td></tr>
+                            }
+                        }
+                    </table>
+                    </td></tr></table>
+                <hr/>
+
+            </div>
+
+
+        @if(showHistory == false) {
+            <table><tr><td class="activetab"><h4><a href="/viewJob?id=@rc.id&showHistory=false">
+                Job Status</a></h4></td><td class="passivetab"><h4><a href="/viewJob?id=@rc.id&showHistory=true">
+                History</a></h4></td></tr></table>
+        } else {
+            <table><tr><td class="passivetab"><h4><a href="/viewJob?id=@rc.id&showHistory=false">
+                Job Status</a></h4></td><td class="activetab"><h4><a href="/viewJob?id=@rc.id&showHistory=true">
+                History</a></h4></td></tr></table>
+        }
+            <table class="section fullw" style="border-top:1px solid gray; margin-top:0;">
+                <tr>
+                    <td>
+                    @if(showHistory == true) {
+                        @testRunLister(rc.id)
+
+                    } else {
+                        <input id="runbutton" type="button" value="Run"/>
+                        <div class="fullw">
+                            &nbsp;
+                        </div>
+                    }
+                    </td>
+                </tr>
+            </table>
     }
-  });
-
-  $( document ).tooltip({
-      items: "#showHideMapsClick",
-      content: function() {
-        return "Click to view wrapper mappings."
-      }
-    });
-  });
-</script>
-<div class="fullw fullh">
-  <br />
-  <br />
-  <table>
-    <tr>
-      <td><b>Name:</b></td>
-      <td>@rc.name</td>
-      <td>&nbsp;</td>
-      <td>
-        <div style="padding-left:3px; padding-right:3px;" class="bevel2" onclick='$( "#wmDetails" ).dialog( "open" );'
-             id="showHideMapsClick"><img src="@routes.Assets.at("/images/down4-64.png")" height="16px" />
-        </div>
-      </td>
-    </tr>
-  </table>
-  <div id="runStatus" class="fullw" style="height:94%;overflow:auto">
-    <div class="fullh fullw" id="testStatus">
-    </div>
-  </div>
-</div>
-
-<div id="wmDetails" style="display:none">
-  <table>
-    @defining(rc.mappedWrappers){lst =>
-    <tr>
-      <td><b># mappings:</b></td>
-      <td>@lst.size</td>
-    </tr>
-    @for(mw <- rc.mappedWrappers){
-    <tr>
-      <td><b>@mw.parameter.name:</b></td>
-      <td>@mw.wrapper.name</td>
-    </tr>
-    }
-    }
-  </table>
-</div>
-}

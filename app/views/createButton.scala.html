@@ -1,0 +1,15 @@
+@(href: String, title: String)
+      <a href="@href">
+      <div class="title styledtitleinverse hand create bevel2" style="margin:0;display:table-cell;border: none;" align="center">
+      <table><tr><td>
+        <table>
+          <tr>
+            <td style="height:23px;vertical-align:top; text-align:right;">
+              <img src="@routes.Assets.at("/images/plus-64.png")" height="16px" />
+            </td>
+            <td style="height:23px;">
+            @title
+            </td>
+          </tr>
+        </table></td></tr></table>
+  </div></a>

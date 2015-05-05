@@ -54,20 +54,20 @@ public class Application extends Controller {
   }
 
   @Restrict(@Group(Application.TEST_DESIGNER_ROLE))
-  public static Result restrictedTestDesigner() {
+  public static Result restrictedTestDesigner(String display) {
     final User localUser = getLocalUser(session());
 
     if (!session().containsKey("testPageMode")) {
       session().put("testPageMode", "none");
     }
-    return ok(restrictedTestDesigner.render(localUser));
+    return ok(restrictedTestDesigner.render(localUser, display));
   }
 
   @Restrict(@Group(Application.TEST_DESIGNER_ROLE))
   public static Result createNewTest() {
     final User localUser = getLocalUser(session());
     session().put("testPageMode", "new");
-    return ok(restrictedTestDesigner.render(localUser));
+    return ok(restrictedTestDesigner.render(localUser, "designWithGui"));
   }
 
   @Restrict(@Group(Application.TEST_DEVELOPER_ROLE))

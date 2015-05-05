@@ -1,0 +1,12 @@
+@(elements: helper.FieldElements)
+
+    <div class="input fcborder @if(elements.hasErrors) {has-error}" title='@elements.infos.mkString("\n")'>
+        <label for="@elements.id">@elements.label</label><br />
+        <input class="fullw" type="text" id="@elements.id" name="@elements.name" value="@elements.field.value" />
+        @if(elements.hasErrors) {
+            <br />
+            <span class="errors" style="color:red; font-size: x-small">@elements.errors.mkString(", ")</span>
+        }
+        <br />
+    </div>
+
