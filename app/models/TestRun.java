@@ -1,16 +1,11 @@
 package models;
 
+import controllers.common.enumeration.TestStatus;
+import play.db.ebean.Model;
+
+import javax.persistence.*;
 import java.util.Date;
 import java.util.List;
-
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.ManyToOne;
-import javax.persistence.OneToOne;
-import javax.persistence.Table;
-
-import play.db.ebean.Model;
 
 /**
  * Created by yerlibilgin on 30/12/14.
@@ -45,6 +40,15 @@ public class TestRun extends Model {
 
 	@Column(length = ModelConstants.ERROR_MESSAGE_LENGTH)
 	public String errorMessage;
+
+	@Column
+	public TestStatus status;
+
+	@Transient
+	public int progress = 0;
+
+	@Column
+	public byte[] progressData;
 
 	public TestRun() {
 

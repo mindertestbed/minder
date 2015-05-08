@@ -1,0 +1,28 @@
+@(localUser: models.User = null)
+
+<script>
+    $ ( function ( ) {
+        var queuefeed = $( "#queuefeed" )[0];
+        var statusfeed = $( "#statusfeed" )[0];
+
+        new EventSource ( '/jobQueueFeed' ).onmessage = function ( event ) {
+            //var json = JSON.parse ( event.data )
+            //for (indx in json) {
+            //    k = json[indx];
+            //    resolved.append ( k.jobId + " " + k.jobName + " " + k.startedBy + " " + k.progress + " " + k.status + "<br />" )
+            //}
+            queuefeed.innerHTML = event.data
+        }
+
+        new EventSource ( '/jobStatusFeed' ).onmessage = function ( event ) {
+            statusfeed.innerHTML = event.data
+        }
+    });
+</script>
+
+<table class="fullw">
+    <tr>
+        <td id="queuefeed" style="width:25%;vertical-align:text-top;padding:10px;"></td>
+        <td id="statusfeed" style="vertical-align: text-top;padding:10px;border-left: 1px solid #ccc"></td>
+    </tr>
+</table>

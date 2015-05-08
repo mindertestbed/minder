@@ -178,7 +178,7 @@ public class ReportManager {
       //transformer.transform(source, fresult);
       transformer.transform(source, result);
       String xmlString = result.getWriter().toString();
-      System.out.println(xmlString);
+      //System.out.println(xmlString);
       rep = xmlString.getBytes();
 
     } catch (TransformerException e) {

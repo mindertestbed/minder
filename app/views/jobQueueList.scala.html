@@ -1,0 +1,73 @@
+@(queue: List[TestRun], activejob: TestRun = null)
+@import java.util.concurrent.atomic.AtomicInteger
+
+
+<div id="canceldiv" style="display:none">
+
+</div>
+
+<label>Active Job</label>
+
+@if(activejob != null){
+    <div class="fullw" style="padding: 10px;">
+        <div class="fullw bevel2" style="padding:10px;"
+        title="@activejob.job.id
+            @activejob.job.name
+            @activejob.runner.email
+            @activejob.progress
+            @activejob.status">
+
+            <a href="/viewJob?id=@{activejob.job.id}&showHistory=true" title="View Job">
+            <span class="title">@activejob.job.name</span>
+            </a>
+            <table class="fullw"><tr><td>
+                <div style="border:1px solid gray;background-color:white;height:14px;width:100%;padding:0">
+                    <div style="background-color:lightgreen;height:12px;width:@{activejob.progress}%;margin: 0">&nbsp;</div>
+                </div></td></tr></table>
+        </div>
+    </div>
+} else {
+    <div class="fullw" style="padding: 5px;">
+            <span class="title">NONE</span>
+    </div>
+}
+<hr />
+<label>Pending Jobs</label>
+@if(queue.isEmpty){
+    <br />
+    <span class="title">NONE</span>
+} else {
+    <table class="fullw">
+        @defining(new AtomicInteger(0)){ index =>
+        @for(k <- queue) {
+            <tr>
+                <td>
+                    <div class="fullw" style="padding:5px;padding-left:10px;padding-right:10px;">
+                        <div class="fullw bevel2" style="padding:10px;"
+                        title="@k.job.id
+@k.job.name
+@k.runner.email
+@k.progress
+@k.status">
+                            <a href="/viewJob?id=@{
+                                k.job.id
+                            }&showHistory=true" title="View Job">
+                                <span class="title">@k.job.name</span>
+                            </a>
+                            <table class="fullw"><tr><td>
+                                <div style="border:1px solid #ccc;background-color:white;height:14px;width:100%; padding:0">
+                                    <div style="background-color:lightgreen;height:12px;width:0%;margin:0">&nbsp;</div>
+                                </div></td> <td style="width:20px;vertical-align:text-top;">
+                                    &nbsp; <span title='Cancel "@k.job.name"' style="cursor:hand" onclick='ajaxCancelJob(@{index.getAndIncrement}, "@{k.job.name}")'><img src="@routes.Assets.at("/images/Delete-icon.png")" height="12px"/></span>
+                            </td>
+                            </tr>
+                            </table>
+                        </div>
+                    </div>
+                </td>
+                    <!-- @k.job.id @k.progress @k.status-->
+            </tr>
+        } <!-- for -->
+        </table>
+    } <!-- defining -->
+} <!-- if -->

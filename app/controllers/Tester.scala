@@ -1,19 +1,20 @@
 package controllers
 
-import minderengine.{MinderWrapperRegistry, TestEngine, MinderSignalRegistry, SessionMap}
-import models.{TestCase, User, Job}
+import controllers.common.enumeration.TestStatus
+import minderengine.{MinderSignalRegistry, MinderWrapperRegistry, SessionMap}
+import models.{Job, TestCase, User}
 import mtdl.SignalSlotInfoProvider
 import play.Logger
-import play.api.libs.EventSource
-import play.api.libs.iteratee.{Iteratee, Enumerator, Concurrent}
+import play.api.libs.iteratee.Concurrent
 import play.api.libs.json.JsValue
 import play.api.mvc._
-import play.libs.F.Promise
-import play.mvc.Http
 import views.html._
 
-import scala.concurrent.ExecutionContext
+import scala.collection.mutable
 
+/**
+ * This is the play controller that serves the http side for jobs
+ */
 object Tester extends Controller {
   def test() = Action { implicit request =>
     val tdl = request.body.asText.mkString
@@ -23,7 +24,7 @@ object Tester extends Controller {
     try {
       SignalSlotInfoProvider.setSignalSlotInfoProvider(MinderWrapperRegistry.get())
 
-      TestEngine.runTest(mail, "XMLTEST", tdl, "$xmlValueInitiator" -> "xmlValueInitiator", "$xmlGenerator" -> "xmlGenerator");
+      //TestEngine.runTest(mail, "XMLTEST", tdl, "$xmlValueInitiator" -> "xmlValueInitiator", "$xmlGenerator" -> "xmlGenerator");
       Ok
     } catch {
       case t: Throwable => {
@@ -33,16 +34,16 @@ object Tester extends Controller {
     }
   }
 
-  val testMap: collection.mutable.Map[String, TestRunner] = collection.mutable.Map()
+  val testMap: collection.mutable.Map[String, TestRunContext] = collection.mutable.Map()
 
-  def getTestRunner(user: User, job: Job): TestRunner = {
+  def getTestRunner(user: User, job: Job): TestRunContext = {
     val rc2 = Job.findById(job.id)
     val testCase = TestCase.findById(job.testCase.id)
     var testRunner = testMap(user.email);
 
     if (testRunner == null) {
       //dummy
-      testRunner = new TestRunner(rc2, user)
+      //testRunner = new TestRunner(rc2, user)
     }
 
     return testRunner;
@@ -72,16 +73,16 @@ object Tester extends Controller {
         if (testRunner.status == TestStatus.BAD || testRunner.status == TestStatus.GOOD) {
           SessionMap.registerObject(mail, "signalRegistry", new MinderSignalRegistry());
           SignalSlotInfoProvider.setSignalSlotInfoProvider(MinderWrapperRegistry.get())
-          val testRunner = new TestRunner(rc, user);
-          testMap(mail) = testRunner
+          //val testRunner = new TestRunner(rc, user);
+         // testMap(mail) = testRunner
         }
       } else {
         SessionMap.registerObject(mail, "signalRegistry", new MinderSignalRegistry());
         SignalSlotInfoProvider.setSignalSlotInfoProvider(MinderWrapperRegistry.get())
-        val testRunner = new TestRunner(rc, user);
-        testMap(mail) = testRunner
+        //val testRunner = new TestRunner(rc, user);
+       // testMap(mail) = testRunner
       }
-      Ok(testStatusViewer.render(rc, user))
+      Ok;//testRunStatus.render(rc, user))
     }
 
     catch {
@@ -107,7 +108,15 @@ object Tester extends Controller {
     Logger.debug("SYNC")
 
 
-    Ok(testStatusViewer.render(rc, user))
+    Ok;//(testRunStatus.render(rc, user))
   }
-}
 
+
+  /**
+   * SSE tunnel for listing the active jobs running now.
+   */
+  val (jobListOut, jobListChannel) = Concurrent.broadcast[JsValue];
+
+
+  val testQueue = mutable.Queue[Job]();
+}

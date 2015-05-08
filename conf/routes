@@ -85,6 +85,8 @@ GET         /getEditJobEditorView                  controllers.JobController.get
 GET         /viewJob                               controllers.JobController.displayJob(id: Long, showHistory: Boolean)
 GET         /doDeleteJob                           controllers.JobController.doDeleteJob(id: Long)
 POST        /doEditJob                             controllers.JobController.doEditJob()
+GET         /viewTestRunHistory                    controllers.JobController.viewTestRunHistory(testRunId: Long)
+
 
 #test asset management
 POST        /doCreateTestAsset                     controllers.TestAssetController.doCreateTestAsset
@@ -101,13 +103,7 @@ GET         /syncTest                              controllers.Tester.syncTest(i
 
 #test run listing
 GET         /listTestRunsForm                      controllers.WrapperController.listTestRuns(configurationId: Long)
-POST        /doListTestRuns                        controllers.WrapperController.doListTestRuns()
 GET         /viewReport                            controllers.WrapperController.viewReport(testRunId: Long, type: String)
-
-#User History listing
-GET         /viewUserHistory                       controllers.WrapperController.viewUserHistory(testRunId: Long)
-POST        /doViewUserHistory                     controllers.WrapperController.doViewUserHistory()
-
 
 #Wrappers
 GET         /createNewWrapperForm                  controllers.WrapperController.createNewWrapperForm
@@ -118,3 +114,8 @@ POST        /doEditWrapper                         controllers.WrapperController
 
 #SSE Test
 GET         /wrapperStatusFeed                     controllers.SSEHandler.wrapperStatusFeed(id: Long)
+GET         /jobQueueFeed                          controllers.TestEngineController.jobQueueFeed
+GET         /jobStatusFeed                         controllers.TestEngineController.jobStatusFeed
+GET         /enqueueJob                            controllers.TestEngineController.enqueueJob(id: Long)
+GET         /cancelJob                             controllers.TestEngineController.cancelJob(index: Int)
+

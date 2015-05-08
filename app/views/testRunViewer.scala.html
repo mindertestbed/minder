@@ -1,0 +1,79 @@
+@(testRun: TestRun, localUser: models.User = null)
+
+@main(Messages("playauthenticate.navigation.restricted.testdesigner"), "User History View") {
+    @dialogs()
+    @reportTypeDialog()
+
+    <style>
+        .tipitip{
+            font-family:Monaco;
+            font-size:12px;
+            text-align:left;
+            vertical-align:top;
+        }
+    </style>
+
+<div>
+  <table style="width:100%;" class="shaded" border="5px">
+    <tr>
+        <th colspan="2">
+            Test Run Details
+        </th>
+    </tr>
+    <tr>
+      <td rowspan="3" style="vertical-align: text-top">
+          <table class="shaded">
+              <tr>
+                  <th>Test Group</th><td>
+                  <a href="/getGroupDetailView?id=@{testRun.job.testCase.testAssertion.testGroup.id}">
+                    @testRun.job.testCase.testAssertion.testGroup.name
+                  </a>
+              </td>
+              </tr>
+              <tr>
+                  <th>Test Assertion</th><td>
+                  <a href="/getAssertionDetailView?id=@{testRun.job.testCase.testAssertion.id}">
+                    @testRun.job.testCase.testAssertion.taId
+                  </a>
+
+              </td>
+              </tr>
+              <tr>
+                  <th>Test Case</th><td>
+                  <a href="/viewTestCase?id=@{testRun.job.testCase.id}&showJobs=true">
+                    @testRun.job.testCase.name
+                  </a>
+              </td>
+              </tr>
+              <tr>
+                  <th>Job</th><td>
+                  <a href="/viewJob?id=@testRun.job.id&showHistory=true">
+                    @testRun.job.name</a>
+                  </td>
+              </tr>
+              <tr>
+                  <th>User</th><td>@testRun.runner.email</td>
+              </tr>
+              <tr>
+                  <th>Date</th><td>@testRun.date</td>
+              </tr>
+              <tr>
+                  <th>Operation Type</th><td>@testRun.history.operationType.name</td>
+              </tr>
+          </table>
+      </td>
+        <td><div>
+        @testRunVisualizer(testRun)
+        </div>
+        </td>
+    </tr>
+      <tr>
+          <td class="tipitip" style="height:99%;">
+              <label>Log</label>
+              <div class="tipitip" style="height:100%;border:1px solid gray;border-radius:2px">
+                  <xmp>@testRun.history.systemOutputLog</xmp></div>
+          </td>
+     </tr>
+  </table>
+</div>
+}

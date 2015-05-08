@@ -3,31 +3,37 @@ package controllers
 import java.util
 import java.util.Date
 
-import controllers.common.enumeration.OperationType
-import minderengine.{SignalData, TestEngine}
+import builtin.ReportGenerator
+import controllers.common.enumeration.{TestStatus, OperationType}
+import minderengine.{UserDTO, TestProcessWatcher, SignalData, TestEngine}
 import models._
 import mtdl.Rivet
 import play.Logger
 
 import scala.collection.JavaConversions._
+import scala.io.Source
 
 /**
  * This class starts a test in a new actor and
  * provides information to the main actor (status)
  * Created by yerlibilgin on 13/01/15.
  */
-class TestRunner(val job: Job, val user: User) {
-
+class TestRunContext(val testRun: TestRun) extends Runnable with TestProcessWatcher {
   //prepare a mapping
   val variableWrapperMapping = collection.mutable.Map[String, String]();
-  val mappedWrappers = MappedWrapper.findByJob(job)
-  var log: String = ""
-  var report: Array[Byte] = null
-  var wrappers: scala.collection.mutable.Set[String] = null;
+  val mappedWrappers = MappedWrapper.findByJob(testRun.job)
+  var wrappers: java.util.Set[String] = null;
   var error = ""
+  val job = Job.findById(testRun.job.id);
+  val user = testRun.runner;
+  val testCase = TestCase.findById(job.testCase.id)
+  val testAssertion = TestAssertion.findById(testCase.testAssertion.id)
+  val testGroup = TestGroup.findById(testAssertion.testGroup.id)
+  job.testCase = testCase
+  val cls = TestEngine.compileTest(user.email, testCase.name, testCase.tdl)
+  var rivets: List[VisualRivet] = List();
+  val logStringBuilder = new StringBuilder
 
-
-  Logger.debug("Wrapper mapping")
   for (map: MappedWrapper <- mappedWrappers) {
     val parm = WrapperParam.findById(map.parameter.id)
     val wrp = Wrapper.findById(map.wrapper.id)
@@ -35,21 +41,24 @@ class TestRunner(val job: Job, val user: User) {
     variableWrapperMapping += parm.name -> wrp.name
   }
 
-  val testCase = TestCase.findById(job.testCase.id)
-  job.testCase = testCase
-  val cls = TestEngine.compileTest(user.email, testCase.name, testCase.tdl)
-  var rivets: List[VisualRivet] = List();
+
+  val rg = new ReportGenerator {
+    override def getCurrentTestUserInfo: UserDTO = {
+      null
+    }
+  }
+  rg.startTest()
+  rg.setReportTemplate(Source.fromInputStream(this.getClass.getResourceAsStream("/taReport.xml")).mkString.getBytes())
+  rg.setReportAuthor(user.name, user.email);
 
   describe(TestEngine.describe(cls))
 
-  new Thread(new Runnable {
-    override def run(): Unit = {
-      TestEngine.runTest2(user.email, cls,
-        variableWrapperMapping.toMap, TestRunner.this)
-    }
-  }).start();
+  override def run(): Unit = {
+    TestEngine.runTest(user.email, cls,
+      variableWrapperMapping.toMap, TestRunContext.this)
+  }
 
-  var status: Int = TestStatus.PENDING;
+  var status: TestStatus = TestStatus.PENDING;
 
   /**
    * This callback comes from the engine so that we can create our status data structure and later update it.
@@ -72,7 +81,7 @@ class TestRunner(val job: Job, val user: User) {
 
   def rivetFinished(rivetIndex: Int): Unit = {
     rivets(rivetIndex).status = TestStatus.GOOD
-    println("Rivet " + rivetIndex + " finished")
+    Logger.info("Rivet " + rivetIndex + " finished")
   }
 
   def signalEmitted(rivetIndex: Int, signalIndex: Int, signalData: SignalData): Unit = {
@@ -95,10 +104,10 @@ class TestRunner(val job: Job, val user: User) {
 
   def finished() {
     status = TestStatus.GOOD
-    createRun()
+    updateRun()
   }
 
-  def failed(t: Throwable) {
+  override def failed(t: Throwable) {
     Logger.error(t.getMessage, t)
     status = TestStatus.BAD
     error = {
@@ -114,34 +123,24 @@ class TestRunner(val job: Job, val user: User) {
       }
       err
     }
-    createRun()
+    updateRun()
   }
 
-  def addLog(log: String, report: Array[Byte]): Unit = {
-    Logger.debug("Add Log")
+  def addLog(log: String): Unit = {
     Logger.debug(log)
-    this.log = log
-    this.report = report;
+    logStringBuilder.append(log)
   }
 
-  var testRun: TestRun = null;
+  def updateRun(): Unit = {
+    Logger.debug("Update Run " + status)
 
-  def createRun(): Unit = {
-    Logger.debug("Create Run")
-    Logger.debug(log)
-    testRun = new TestRun()
-    testRun.date = new Date()
-    testRun.job = job;
-    val userHistory = new UserHistory
-    userHistory.user = user;
-    userHistory.operationType = new TOperationType
-    userHistory.operationType.name = OperationType.RUN_TEST_CASE
-    userHistory.operationType.save()
-    userHistory.systemOutputLog = log
-    userHistory.save()
-    testRun.history = userHistory
-    testRun.report = report;
-    testRun.runner = user;
+    val log = logStringBuilder.toString()
+    rg.setTestDetails(testGroup, testAssertion, testCase, job, wrappers, log)
+    testRun.status = status
+    testRun.history.systemOutputLog = log
+    testRun.history.save();
+
+    testRun.report = rg.generateReport();
     testRun.errorMessage = error;
     testRun.success = if (status == TestStatus.GOOD) true else false
     if (wrappers != null) {
@@ -153,12 +152,18 @@ class TestRunner(val job: Job, val user: User) {
       }
       testRun.wrappers = sb.toString();
     }
+
     testRun.save()
   }
 
   def startTest(): Unit = {
     this.status = TestStatus.RUNNING
   }
+
+  override def updateWrappers(set: Set[String]): Unit = {
+    wrappers = set;
+  }
+
 }
 
 class VisualRivet(val rivet: Rivet, val index: Int) {
@@ -200,7 +205,7 @@ class VisualRivet(val rivet: Rivet, val index: Int) {
     lst.toList
   }
 
-  var status: Int = TestStatus.PENDING;
+  var status: TestStatus = TestStatus.PENDING;
 
   override def toString() = "Rivet " + index
 }
@@ -228,7 +233,7 @@ class VisualSS(val label: String, val signature: String) {
     }
   }
 
-  var status: Int = TestStatus.PENDING;
+  var status: TestStatus = TestStatus.PENDING;
 
   override def toString(): String = label + "." + signature
 }
@@ -238,34 +243,14 @@ class VisualSS(val label: String, val signature: String) {
  */
 class VisualParam(val label: String, val signature: String, val parm: String, val index: Int) {
   var value: Any = null;
-  var status: Int = TestStatus.PENDING;
+  var status: TestStatus = TestStatus.PENDING;
+  val asdf = PrescriptionLevel.Mandatory
   println("\t\tparam " + parm + "(index)")
 
   override def toString() = parm + " @" + index
 }
 
-object TestStatus {
-  val PENDING = 0
-  val RUNNING = 1
-  val BAD = 2
-  val GOOD = 3
-
-  def valueOf(status: Int): String = {
-    status match {
-      case PENDING => "Pending"
-      case RUNNING => "Running"
-      case BAD => "Failed"
-      case GOOD => "Successful"
-    }
-  }
-}
-
 object TestStatusDecorator {
-  /*
-  parPending
-parBad
-parGood
-   */
   def cssClassForSlot(slot: VisualSS): String = {
     if (slot.status == TestStatus.PENDING) "pending"
     else if (slot.status == TestStatus.BAD) "slotBad"
@@ -284,8 +269,8 @@ parGood
     else "childGood"
   }
 
-  def cssClassForTest(testRunner: TestRunner): String = {
-    testRunner.status match {
+  def cssClassForTest(testRun: TestRun): String = {
+    testRun.status match {
       case TestStatus.PENDING => "pending"
       case TestStatus.RUNNING => "testRunning"
       case TestStatus.BAD => "testBad"

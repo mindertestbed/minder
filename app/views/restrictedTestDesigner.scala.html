@@ -30,6 +30,10 @@
         <h4>
           <a href="/restrictedTestDesigner?display=designWithGui">Design With GUI</a></h4>
       </td>
+      <td class="@choose(display, "jobQueue") tabshrink">
+        <h4>
+          <a href="/restrictedTestDesigner?display=jobQueue">Job Queue</a></h4>
+      </td>
       <td class="tabexpand">&nbsp;</td>
     </tr>
   </table>
@@ -41,6 +45,9 @@
     }
     case "testAssets" => {
       @testAssetLister(localUser)
+    }
+    case "jobQueue" => {
+      @jobFeed(localUser)
     }
     case _ => {
       @testDesignWithGUI(localUser)
