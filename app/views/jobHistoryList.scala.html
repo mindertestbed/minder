@@ -18,7 +18,7 @@
                         <img src="@routes.Assets.at("/images/Delete-icon.png")" height="12px" alt='B'/>
                     }
                     </td>
-                    <td class="tabshrink">@testRun.job.name</td>
+                    <td class="tabshrink">@if(testRun.job!=null){@testRun.job.name}</td>
                     <td align="center" valign="middle" class="tabshrink">
                         <a href="/viewTestRunHistory?testRunId=@testRun.id" title="View Log" class="celldiv" style="height:16px;width:16px;">
                             <img src="@routes.Assets.at("/images/console-64.png")" height="12px"/>

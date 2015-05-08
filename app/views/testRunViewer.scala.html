@@ -23,17 +23,18 @@
     <tr>
       <td rowspan="3" style="vertical-align:text-top;padding: 10px;">
           <table class="shaded">
+              @if(testRun.job!=null){
               <tr>
                   <th>Test Group</th><td>
                   <a href="/getGroupDetailView?id=@{testRun.job.testCase.testAssertion.testGroup.id}">
-                    @testRun.job.testCase.testAssertion.testGroup.name
+                    @{testRun.job.testCase.testAssertion.testGroup.name}
                   </a>
               </td>
               </tr>
               <tr>
                   <th>Test Assertion</th><td>
                   <a href="/getAssertionDetailView?id=@{testRun.job.testCase.testAssertion.id}">
-                    @testRun.job.testCase.testAssertion.taId
+                    @{testRun.job.testCase.testAssertion.taId}
                   </a>
 
               </td>
@@ -41,16 +42,17 @@
               <tr>
                   <th>Test Case</th><td>
                   <a href="/viewTestCase?id=@{testRun.job.testCase.id}&showJobs=true">
-                    @testRun.job.testCase.name
+                    @{testRun.job.testCase.name}
                   </a>
               </td>
               </tr>
               <tr>
                   <th>Job</th><td>
-                  <a href="/viewJob?id=@testRun.job.id&showHistory=true">
-                    @testRun.job.name</a>
+                  <a href="/viewJob?id=@{testRun.job.id}&showHistory=true">
+                    @{testRun.job.name}</a>
                   </td>
               </tr>
+              }
               <tr>
                   <th>User</th><td>@testRun.runner.email</td>
               </tr>
