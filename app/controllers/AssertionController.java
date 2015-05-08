@@ -1,29 +1,19 @@
 package controllers;
 
-import com.avaje.ebean.Ebean;
-import com.avaje.ebean.Update;
+import be.objectify.deadbolt.java.actions.Group;
+import be.objectify.deadbolt.java.actions.Restrict;
 import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
 import editormodels.AssertionEditorModel;
 import global.Util;
-import models.ModelConstants;
 import models.PrescriptionLevel;
 import models.TestAssertion;
 import models.TestGroup;
 import play.Logger;
 import play.data.Form;
-import play.data.validation.Constraints;
-import play.libs.Json;
 import play.mvc.Controller;
 import play.mvc.Result;
 import views.html.assertionDetailView;
 import views.html.testAssertionEditor;
-import views.html.testAssertionLister;
-
-import java.io.PrintWriter;
-import java.io.StringWriter;
-import java.lang.annotation.Retention;
-import java.lang.reflect.Field;
 
 import static play.data.Form.form;
 
@@ -36,6 +26,7 @@ public class AssertionController extends Controller {
   /*
    * Test Asertion CRUD
    */
+  @Restrict(@Group(Application.TEST_DESIGNER_ROLE))
   public static Result getCreateAssertionEditorView(Long groupId) {
     TestGroup tg = TestGroup.find.byId(groupId);
     if (tg == null) {
@@ -49,6 +40,7 @@ public class AssertionController extends Controller {
     }
   }
 
+  @Restrict(@Group(Application.TEST_DESIGNER_ROLE))
   public static Result doCreateAssertion() {
     com.feth.play.module.pa.controllers.Authenticate.noCache(response());
     final Form<AssertionEditorModel> filledForm = TEST_ASSERTION_FORM
@@ -99,6 +91,7 @@ public class AssertionController extends Controller {
     }
   }
 
+  @Restrict(@Group(Application.TEST_DESIGNER_ROLE))
   public static Result editAssertionForm(Long id) {
     TestAssertion ta = TestAssertion.find.byId(id);
     if (ta == null) {
@@ -124,6 +117,7 @@ public class AssertionController extends Controller {
     }
   }
 
+  @Restrict(@Group(Application.TEST_DESIGNER_ROLE))
   public static Result doEditAssertion() {
     com.feth.play.module.pa.controllers.Authenticate.noCache(response());
     final Form<AssertionEditorModel> filledForm = TEST_ASSERTION_FORM
@@ -172,6 +166,7 @@ public class AssertionController extends Controller {
     }
   }
 
+  @Restrict(@Group(Application.TEST_DESIGNER_ROLE))
   public static Result doDeleteAssertion(Long id) {
     com.feth.play.module.pa.controllers.Authenticate.noCache(response());
 
@@ -192,6 +187,7 @@ public class AssertionController extends Controller {
     return redirect(controllers.routes.GroupController.getGroupDetailView(ta.testGroup.id));
   }
 
+  @Restrict(@Group(Application.TEST_DESIGNER_ROLE))
   public static Result getAssertionDetailView(Long id, String display){
     TestAssertion ta = TestAssertion.findById(id);
     if (ta == null){
@@ -201,6 +197,7 @@ public class AssertionController extends Controller {
   }
 
 
+  @Restrict(@Group(Application.TEST_DESIGNER_ROLE))
   public static Result doEditAssertionField() {
     com.feth.play.module.pa.controllers.Authenticate.noCache(response());
 

@@ -103,25 +103,6 @@ public class WrapperController extends Controller {
 
   }
 
-  public static Result doListTestRuns() {
-    return ok();
-  }
-
-  public static Result viewUserHistory(Long testRunId) {
-    TestRun tr = TestRun.findById(testRunId);
-    if (tr == null) {
-      return badRequest("Test Run with id [" + testRunId + "] not found!");
-    } else {
-
-      UserHistory userHistory = tr.history;
-      return ok(userHistoryLister.render(userHistory, null));
-    }
-  }
-
-  public static Result doViewUserHistory() {
-    return ok();
-  }
-
   public static Result doCreateWrapper() {
     com.feth.play.module.pa.controllers.Authenticate.noCache(response());
     final Form<WrapperEditorModel> filledForm = WRAPPER_FORM.bindFromRequest();

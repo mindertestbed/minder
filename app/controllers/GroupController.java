@@ -1,5 +1,7 @@
 package controllers;
 
+import be.objectify.deadbolt.java.actions.Group;
+import be.objectify.deadbolt.java.actions.Restrict;
 import com.avaje.ebean.Ebean;
 import com.avaje.ebean.Update;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -35,11 +37,12 @@ public class GroupController extends Controller {
   public static final Form<GroupEditorModel> TEST_GROUP_FORM = form(GroupEditorModel.class);
 
 
+  @Restrict(@Group(Application.TEST_DESIGNER_ROLE))
   public static Result getCreateGroupEditorView() {
     return ok(testGroupEditor.render(TEST_GROUP_FORM, null));
   }
 
-
+  @Restrict(@Group(Application.TEST_DESIGNER_ROLE))
   public static Result doCreateTestGroup() {
     com.feth.play.module.pa.controllers.Authenticate.noCache(response());
     final Form<GroupEditorModel> filledForm = TEST_GROUP_FORM
@@ -70,6 +73,7 @@ public class GroupController extends Controller {
     }
   }
 
+  @Restrict(@Group(Application.TEST_DESIGNER_ROLE))
   public static Result editGroupForm(Long id) {
     final User localUser = Application.getLocalUser(session());
     TestGroup tg = TestGroup.find.byId(id);
@@ -87,6 +91,7 @@ public class GroupController extends Controller {
     }
   }
 
+  @Restrict(@Group(Application.TEST_DESIGNER_ROLE))
   public static Result doEditGroupField() {
     com.feth.play.module.pa.controllers.Authenticate.noCache(response());
     JsonNode jsonNode = request().body().asJson();
@@ -94,6 +99,7 @@ public class GroupController extends Controller {
     return doEditField(GroupEditorModel.class, TestGroup.class, jsonNode);
   }
 
+  @Restrict(@Group(Application.TEST_DESIGNER_ROLE))
   public static Result doEditField(Class<?> editorClass, Class<?> cls, JsonNode jsonNode) {
     long id = jsonNode.findPath("id").asInt();
     String field = jsonNode.findPath("field").asText();
@@ -130,6 +136,7 @@ public class GroupController extends Controller {
     }
   }
 
+  @Restrict(@Group(Application.TEST_DESIGNER_ROLE))
   public static Result doEditGroup() {
     com.feth.play.module.pa.controllers.Authenticate.noCache(response());
 
@@ -152,6 +159,7 @@ public class GroupController extends Controller {
     }
   }
 
+  @Restrict(@Group(Application.TEST_DESIGNER_ROLE))
   public static Result doDeleteGroup(Long id) {
     com.feth.play.module.pa.controllers.Authenticate.noCache(response());
     TestGroup tg = TestGroup.find.byId(id);
@@ -168,6 +176,7 @@ public class GroupController extends Controller {
     }
   }
 
+  @Restrict(@Group(Application.TEST_DESIGNER_ROLE))
   public static Result getGroupDetailView(Long id) {
     TestGroup tg = TestGroup.findById(id);
     if (tg == null) {

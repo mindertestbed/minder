@@ -1,56 +1,41 @@
 @(configurationId: Long, localUser: models.User = null)
 
-<script>
-    $( document ).tooltip();
-</script>
-
 @reportTypeDialog()
+  <br />
 
-<div id="testRunListerDiv@configurationId">
-  <table style="width: 100%;">
-    <td>
-      @defining(TestRun.findByJob(configurationId)){ testRunList =>
-      @for(testRun <- testRunList){
-      <div class="title hand differ @if(testRun.success){goodTestRun} else {badTestRun}" style="width:100%; border-bottom: 1px solid black; height: 30px;">
-        <table class="fullw">
-          <tr>
-            <td style="text-align:left;" class="trigger">
-              @if(testRun.success){
-                <img src="@routes.Assets.at("/images/Check-icon.png")" height="16px" alt='G'/>
-              } else {
-                <img src="@routes.Assets.at("/images/Delete-icon.png")" height="16px" alt='B'/>
-              }
-            </td>
-            <td style="text-align:left;" class="trigger">@testRun.date</td>
-            <td class="trigger" style="text-align:left;">@testRun.runner.email</td>
-            <td style="width:3%;" align="center" valign="middle">
-              <div id="viewUserHistory@testRun.id" title="View Log" class="celldiv bevel2" style="height:26px;width:26px;">
-                <img src="@routes.Assets.at("/images/console-64.png")" height="16px"/>
-              </div>
-              <script>
-			              createFormDialog($("#viewUserHistory@testRun.id"),
-			              "/viewUserHistory?testRunId=@testRun.id" ,
-			              "/doViewUserHistory", "mainDialog3", "View User History", null,'1200', '720')
-              </script>
-            </td>
-            <td style="width:10px;" class="trigger">&nbsp;</td>
-            <td style="width:3%;" align="center" valign="middle">
-
-              <!--<a href="/viewReport?testRunId=@testRun.id">-->
-                <div id="viewReport@testRun.id" title="View Report" class="celldiv bevel2" style="height:26px;width:26px;"
-                    onclick='showReportDialog("selectReportType", @testRun.id)'>
-                  <img src="@routes.Assets.at("/images/print-64.png")" height="16px" alt='@testRun.id'/>
-                </div>
-             <!-- </a>-->
-            </td>
-            <td class="trigger">&nbsp;</td>
-            <td style="width:25px;" class="trigger">&nbsp;</td>
-          </tr>
-        </table>
-      </div>
-      }
-      }
-    </td>
+<div>
+  <table class="shaded fullw">
+    <tr>
+      <th>#</th><th>Status</th><th>Date</th><th>Run by</th><th>Log</th><th>Report</th>
     </tr>
+    @defining(TestRun.findByJob(configurationId)){ testRunList =>
+      @for(testRun <- testRunList){
+        <tr class="@if(testRun.success){goodTestRun} else {badTestRun}">
+          <td style="text-align:center;" class="tabshrink">
+          @testRun.number
+          </td>
+          <td style="text-align:center;" class="tabshrink">
+          @if(testRun.success){
+            <img src="@routes.Assets.at("/images/Check-icon.png")" height="16px" alt='G'/>
+          } else {
+            <img src="@routes.Assets.at("/images/Delete-icon.png")" height="16px" alt='B'/>
+          }
+        </td>
+        <td style="text-align:left;" class="tabshrink">@testRun.date</td>
+        <td style="text-align:left;" class="tabexpand">@testRun.runner.email</td>
+        <td align="center" valign="middle" class="tabshrink">
+          <a href="/viewTestRunHistory?testRunId=@testRun.id" title="View Log" class="celldiv bevel2" style="height:26px;width:26px;">
+            <img src="@routes.Assets.at("/images/console-64.png")" height="16px"/>
+          </a>
+        </td>
+        <td align="center" class="tabshrink">
+            <div id="viewReport@testRun.id" title="View Report" class="celldiv bevel2" style="height:26px;width:26px;"
+                onclick='showReportDialog("selectReportType", @testRun.id)'>
+              <img src="@routes.Assets.at("/images/print-64.png")" height="16px" alt='@testRun.id'/>
+            </div>
+        </td>
+        </tr>
+      }
+    }
   </table>
 </div>

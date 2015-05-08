@@ -1,0 +1,57 @@
+@(testRun: TestRun)
+@import java.util.concurrent.atomic.AtomicInteger
+@import controllers.common.enumeration.TestStatus
+
+<script>
+    $( document ).tooltip();
+</script>
+
+@reportTypeDialog()
+
+@if(testRun != null){
+  <label>Status</label>
+
+    @if(TestEngineController.activeRunContext!=null&&TestEngineController.activeRunContext.testRun==testRun){
+        <!-- this is an active test run -->
+        <table class="fullw"><tr><td>
+            <div style="border:1px solid gray;background-color:white;height:14px;width:100%;padding:0">
+                <div style="background-color:lightgreen;height:12px;width:@{TestEngineController.activeRunContext.progressPercent}%;margin:0">&nbsp;</div>
+            </div></td></tr></table>
+    } else {
+        @if(testRun.success) {
+            <div class='statusAll testGood'>Good</div>
+        } else {
+            <div class='statusAll testBad'>Bad</div>
+            <div>
+                <xmp class="code">@testRun.errorMessage</xmp>
+            </div>
+            <div id="testCatcher" style="display : none">Test Status: </div>
+        }
+    }
+
+    <table class="fullw">
+    <tr>
+      <td style="text-align:left;width:auto;">&nbsp;</td>
+      <td style="width:3%;" align="center" title="View Log" valign="middle">
+        <div id="viewUserHistory@testRun.id" class="celldiv bevel2" style="height:26px;width:26px;">
+          <img src="@routes.Assets.at("/images/console-64.png")" height="16px"/>
+        </div>
+        <script>
+                            createFormDialog($("#viewUserHistory@{testRun.id}"),
+                            "/viewUserHistory?testRunId=@testRun.id" ,
+                            "/doViewUserHistory", "mainDialog3", "View User History", null,'1200', '720')
+
+        </script>
+      </td>
+      <td style="width:10px;" class="trigger">&nbsp;</td>
+      <td style="width:3%;" align="center" valign="middle">
+        <div id="viewReport@testRun.id" title="View Report" class="celldiv bevel2" style="height:26px;width:26px;"
+             onclick='showReportDialog("selectReportType", @testRun.id)'>
+          <img src="@routes.Assets.at("/images/print-64.png")" height="16px" alt='@testRun.id'/>
+        </div>
+      </td>
+    </tr>
+  </table>
+} else {
+  No test run specified!
+}

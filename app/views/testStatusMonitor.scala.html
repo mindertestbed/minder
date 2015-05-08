@@ -1,0 +1,14 @@
+@import controllers.common.enumeration.TestStatus
+
+@defining(TestEngineController.activeRunContext) { context =>
+  @if(context == null) {
+    <table>
+      <tr><td></td><td><img src="@routes.Assets.at("/images/Sleep-64.png")" height="32"></td></tr>
+      <tr><td><img src="@routes.Assets.at("/images/Sleeping-64.png")" height="64"> </td><td></td></tr>
+    </table>
+
+  } else {
+    @testRunVisualizer(context.testRun)
+  }
+}
+

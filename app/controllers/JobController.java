@@ -11,6 +11,7 @@ import play.mvc.Result;
 import views.html.jobDetailView;
 import views.html.jobEditor;
 import views.html.jobLister;
+import views.html.testRunViewer;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -315,5 +316,16 @@ public class JobController  extends Controller {
 
     return listOptions;
   }
+
+
+  public static Result viewTestRunHistory(Long testRunId) {
+    TestRun tr = TestRun.findById(testRunId);
+    if (tr == null) {
+      return badRequest("Test Run with id [" + testRunId + "] not found!");
+    } else {
+      return ok(testRunViewer.render(tr, null));
+    }
+  }
+
 
 }

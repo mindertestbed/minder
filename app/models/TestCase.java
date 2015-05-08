@@ -16,7 +16,7 @@ import java.util.*;
 @Table(name = "TestCase")
 public class TestCase extends Model {
   @Id
-  public Long id;
+  public long id;
 
   @ManyToOne
   @Column(nullable = false)

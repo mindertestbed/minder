@@ -50,6 +50,7 @@ object SSEHandler extends Controller {
           println("Wrapper " + wrp._2.name)
           val online = MinderWrapperRegistry.get().isWrapperAvailable(wrp._1);
           val json = JsObject(Seq(
+            "count" -> JsNumber(labelSet.size()),
             "label" -> JsString(wrp._2.name),
             "id" -> JsString(wrp._2.id + ""),
             "online" -> JsBoolean(online)))

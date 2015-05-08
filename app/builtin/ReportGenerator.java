@@ -5,6 +5,8 @@ import minderengine.MinderException;
 import minderengine.Slot;
 import models.Job;
 import models.TestAssertion;
+import models.TestCase;
+import models.TestGroup;
 
 import java.util.HashMap;
 
@@ -50,15 +52,14 @@ public class ReportGenerator extends BuiltInWrapper {
     rmg.setReportAuthor(author, email);
   }
 
-
   @Slot
-  public void setTestDetails(String groupName, TestAssertion ta, String testCaseName, Job rc, java.util.Set<String> wrappers, String log) {
+  public void setTestDetails(TestGroup group, TestAssertion ta, TestCase testCase, Job job, java.util.Set<String> wrappers, String log) {
     if (!isRunning)
       throw new MinderException(MinderException.E_SUT_NOT_RUNNING);
-    rmg.report.getReportModel().getHeader().put("Test Group Name:", groupName);
+    rmg.report.getReportModel().getHeader().put("Test Group Name:", group.name);
     rmg.report.getReportModel().getHeader().put("Test Assertion Id", ta.taId);
-    rmg.report.getReportModel().getHeader().put("Test Case Name", testCaseName);
-    rmg.report.getReportModel().getHeader().put("Job", rc.name);
+    rmg.report.getReportModel().getHeader().put("Test Case Name", testCase.name);
+    rmg.report.getReportModel().getHeader().put("Job", job.name);
 
 
     updateField("Normative Source", ta.normativeSource);
@@ -68,9 +69,13 @@ public class ReportGenerator extends BuiltInWrapper {
     updateField("Predicate", ta.predicate);
 
     int i = 1;
-    for (String wrapper : wrappers) {
-      updateField("Wrapper " + i, wrapper);
-      ++i;
+
+    System.out.println("NULL " + (wrappers == null));
+    if (wrappers!=null) {
+      for (String wrapper : wrappers) {
+        updateField("Wrapper " + i, wrapper);
+        ++i;
+      }
     }
 
     updateField("Log", log);

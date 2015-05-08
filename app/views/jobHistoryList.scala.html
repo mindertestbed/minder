@@ -1,0 +1,37 @@
+@import java.util.concurrent.atomic.AtomicInteger
+
+
+<label>Job History</label>
+
+    <br />
+
+<div>
+    <table>
+        @defining(TestRun.getRecentRuns(20)){ testRunList =>
+            @for(testRun <- testRunList){
+                <tr class="@if(testRun.success){goodTestRun} else {badTestRun}" style="border:1px solid #eee;border-radius: 2px">
+                    <td style="text-align:center;" class="tabshrink">#@testRun.number</td>
+                    <td style="text-align:center;" class="tabshrink">
+                    @if(testRun.success){
+                        <img src="@routes.Assets.at("/images/Check-icon.png")" height="12px" alt='G'/>
+                    } else {
+                        <img src="@routes.Assets.at("/images/Delete-icon.png")" height="12px" alt='B'/>
+                    }
+                    </td>
+                    <td class="tabshrink">@testRun.job.name</td>
+                    <td align="center" valign="middle" class="tabshrink">
+                        <a href="/viewTestRunHistory?testRunId=@testRun.id" title="View Log" class="celldiv" style="height:16px;width:16px;">
+                            <img src="@routes.Assets.at("/images/console-64.png")" height="12px"/>
+                        </a>
+                    </td>
+                    <td align="center" class="tabshrink">
+                        <div id="viewReport@testRun.id" title="View Report" class="celldiv" style="height:16px;width:16px;"
+                        onclick='showReportDialog("selectReportType", @testRun.id)'>
+                            <img src="@routes.Assets.at("/images/print-64.png")" height="12px" alt='@testRun.id'/>
+                        </div>
+                    </td>
+                </tr>
+            }
+        }
+    </table>
+</div>

@@ -2,19 +2,16 @@ package controllers;
 
 
 import com.fasterxml.jackson.databind.JsonNode;
-import editormodels.GroupEditorModel;
 import editormodels.TestCaseEditorModel;
 import global.Util;
 import models.TestAssertion;
 import models.TestCase;
-import models.TestGroup;
 import models.User;
 import play.Logger;
 import play.data.Form;
 import play.mvc.Controller;
 import play.mvc.Result;
 import views.html.testCaseEditor;
-import views.html.testCaseLister;
 import views.html.testCaseView;
 
 import static play.data.Form.form;
@@ -38,7 +35,7 @@ public class TestCaseController extends Controller {
 
       Form<TestCaseEditorModel> bind = TEST_CASE_FORM
           .fill(testCaseEditorModel);
-      return ok(testCaseEditor.render(bind, null, true));
+      return ok(testCaseEditor.render(bind, null, false));
     }
   }
 
@@ -135,6 +132,9 @@ public class TestCaseController extends Controller {
       // check if the name is not duplicate
       TestCase tmp = TestCase.findByName(model.name);
 
+      System.out.println(tmp);
+      System.out.println(tmp.id);
+      System.out.println(tmp.name);
       if (tmp == null || tmp.id == tc.id) {
         // either no such name or it is already this object. so update
         try {
@@ -172,7 +172,7 @@ public class TestCaseController extends Controller {
       Logger.error(ex.getMessage(), ex);
       return badRequest(ex.getMessage());
     }
-    return ok(testCaseLister.render(tc.testAssertion, null));
+    return redirect(routes.AssertionController.getAssertionDetailView(tc.testAssertion.id, "testCases"));
   }
 
   public static Result viewTestCase(long id, boolean showJobs) {

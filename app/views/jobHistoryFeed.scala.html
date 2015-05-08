@@ -1,0 +1,16 @@
+<script>
+    $ ( function ( ) {
+        var historyfeed = $( "#historyfeed" )[0];
+        new EventSource ( '/historyFeed' ).onmessage = function ( event ) {
+            historyfeed.innerHTML = event.data
+        }
+    });
+</script>
+
+<table class="fullw">
+    <tr>
+        <td id="historyfeed" style="vertical-align:text-top;">
+            @jobHistoryList()
+        </td>
+    </tr>
+</table>

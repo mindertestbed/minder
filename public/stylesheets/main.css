@@ -433,7 +433,8 @@ td.passivetab>h4{
 
 
 table td.tabshrink {
-    white-space:nowrap
+    white-space:nowrap;
+    width: 1%;
 }
 table td.tabexpand {
     width: 99%;
@@ -451,3 +452,47 @@ table td.tabexpand {
     border-radius: 2px;
 
 }
+
+div.parent{
+    background-color: #E0E0E0;
+    height: 30px;
+}
+
+div.statusAll{
+    border: 1px solid #ccc;
+    display: table-cell;
+    vertical-align: middle;
+    text-align: center;
+    font-size:11px;
+    font-family: Monaco, Consolas, "Courier New"
+}
+
+.code{
+    font-size:11px;
+    font-family: Monaco, Consolas, "Courier New"
+}
+
+div.child{
+    border-radius: 3px;
+    padding: 5px;
+}
+
+div.testPending{
+    background-color:lightgray;
+}
+
+div.testRunning{
+    background-color:lightblue;
+}
+
+div.testGood{
+    background-color:lightgreen;
+}
+
+div.testBad{
+    background-color:lightcoral;
+}
+
+
+
+

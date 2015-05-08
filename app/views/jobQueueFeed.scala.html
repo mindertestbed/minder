@@ -1,0 +1,17 @@
+@(localUser: models.User = null)
+
+<script>
+    $ ( function ( ) {
+        var queuefeed = $( "#queuefeed" )[0];
+        new EventSource ( '/jobQueueFeed' ).onmessage = function ( event ) {
+            queuefeed.innerHTML = event.data
+        }
+    });
+</script>
+
+<table class="fullw">
+    <tr>
+        <td id="queuefeed" style="vertical-align:text-top;">
+            @jobQueueList()</td>
+    </tr>
+</table>

@@ -45,8 +45,6 @@ function createFormDialog(elm, sourceUrl, action, dialogId, titl, target, w, h) 
 
     var dialog = $("#" + dialogId).dialog({
       autoOpen: false,
-      height: "100%",
-      width: "100%",
       title: titl,
       modal: true,
       buttons: {
@@ -501,3 +499,69 @@ function deleteWithDialog2(action, dialog, title, category, item) {
   dialog.find("span.itemname")[0].innerHTML = item;
   deleteDialog.dialog("open");
 }
+
+
+function simpleAjaxGet(dialogId, url, title, message){
+  var dlgSel = $("#" + dialogId)
+  dlgSel[0].innerHTML = message
+
+  var dialog = dlgSel.dialog({
+    autoOpen: false,
+    title: title,
+    modal: true,
+    buttons: {
+      "Ok": function () {
+          $.ajax({
+            type: 'GET',
+            url: url,
+            success: function (data) {
+              dialog.dialog("close");
+            },
+            error: function (jqXHR, textStatus, errorMessage) {
+              showError(jqXHR.responseText)
+              dialog.dialog("close");
+            }
+          });
+      },
+      Cancel: function () {
+        dialog.dialog("close");
+      }
+    }
+  });
+
+  dialog.dialog("open", title);
+}
+
+function ajaxCancelJob(index, name){
+
+  var dlgSel = $("#canceldiv")
+  dlgSel[0].innerHTML = 'The job with [' + name + '] will be removed from the queue. <br />Do you want to continue?';
+
+  var dialog = dlgSel.dialog({
+    autoOpen: false,
+    title: 'Remove Job From the Queue',
+    modal: true,
+    buttons: {
+      "Ok": function () {
+        $.ajax({
+          type: 'GET',
+          url: '/cancelJob?index='+index,
+          success: function (data) {
+            dialog.dialog("close");
+          },
+          error: function (jqXHR, textStatus, errorMessage) {
+            showError(jqXHR.responseText)
+            dialog.dialog("close");
+          }
+        });
+      },
+      Cancel: function () {
+        dialog.dialog("close");
+      }
+    }
+  });
+
+  dialog.dialog("open");
+
+}
+
