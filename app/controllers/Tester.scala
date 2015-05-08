@@ -70,12 +70,12 @@ object Tester extends Controller {
 
       if (testMap.contains(mail)) {
         val testRunner = testMap(mail);
-        if (testRunner.status == TestStatus.BAD || testRunner.status == TestStatus.GOOD) {
-          SessionMap.registerObject(mail, "signalRegistry", new MinderSignalRegistry());
-          SignalSlotInfoProvider.setSignalSlotInfoProvider(MinderWrapperRegistry.get())
+        //if (testRunner.status == TestStatus.BAD || testRunner.status == TestStatus.GOOD) {
+        //  SessionMap.registerObject(mail, "signalRegistry", new MinderSignalRegistry());
+        //  SignalSlotInfoProvider.setSignalSlotInfoProvider(MinderWrapperRegistry.get())
           //val testRunner = new TestRunner(rc, user);
          // testMap(mail) = testRunner
-        }
+        //a}
       } else {
         SessionMap.registerObject(mail, "signalRegistry", new MinderSignalRegistry());
         SignalSlotInfoProvider.setSignalSlotInfoProvider(MinderWrapperRegistry.get())

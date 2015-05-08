@@ -38,17 +38,11 @@ public class TestRun extends Model {
 	@Column(nullable = false)
 	public boolean success;
 
+	@Column
+	public int number;
+
 	@Column(length = ModelConstants.ERROR_MESSAGE_LENGTH)
 	public String errorMessage;
-
-	@Column
-	public TestStatus status;
-
-	@Transient
-	public int progress = 0;
-
-	@Column
-	public byte[] progressData;
 
 	public TestRun() {
 
@@ -74,5 +68,19 @@ public class TestRun extends Model {
 
 	public static List<TestRun> findByJob(Long id) {
 		return findByJob(Job.findById(id));
+	}
+
+
+	public static List<TestRun> getRecentRuns(int num){
+		return find.where().orderBy("date desc").findPagingList(num).getPage(0).getList();
+	}
+
+	public static int getMaxNumber(){
+		List<TestRun> list = find.where().orderBy("number desc").findPagingList(1).getPage(0).getList();
+
+		if (list.size() == 0)
+			return 0;
+
+		return list.get(0).number;
 	}
 }

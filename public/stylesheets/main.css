@@ -459,13 +459,10 @@ div.parent{
 }
 
 div.statusAll{
-    border: 1px solid black;
+    border: 1px solid #ccc;
     display: table-cell;
     vertical-align: middle;
     text-align: center;
-    padding-left: 2px;
-    padding-right: 2px;
-    margin-left: 3px;
     font-size:11px;
     font-family: Monaco, Consolas, "Courier New"
 }
@@ -476,82 +473,9 @@ div.statusAll{
 }
 
 div.child{
-    height: 20px;
-    border-radius: 2px;
-    margin:3px;
-    padding: 3px;
+    border-radius: 3px;
+    padding: 5px;
 }
-
-div.pending{
-    background-color: #E0E0E0;
-}
-
-div.pending:hover{
-    background-color: #E0E0E0;
-}
-
-div.slotBad {
-    background-color: #CC3300;
-}
-
-div.slotBad:hover{
-    background-color: #EE4400;
-}
-
-div.slotGood {
-    background-color: #00CC33;
-}
-
-div.slotGood:hover{
-    background-color: #00EE44;
-}
-
-div.signalBad {
-    background-color: #CC3366;
-}
-
-div.signalBad:hover{
-    background-color: #EE4477;
-}
-
-div.signalGood {
-    background-color: #99CC66;
-}
-
-div.signalGood:hover{
-    background-color: #AAEE77;
-}
-
-div.blank{
-    width: 10px;
-    display: table-cell;
-}
-
-
-div.childPending {
-    background-color:yellow;
-}
-
-div.childPending:hover{
-    background-color:lightyellow;
-}
-
-div.childBad {
-    background-color:red;
-}
-
-div.childBad:hover{
-    background-color:lightred;
-}
-
-div.childGood {
-    background-color:green;
-}
-
-div.childGood:hover{
-    background-color:lightgreen;
-}
-
 
 div.testPending{
     background-color:lightgray;

@@ -22,12 +22,15 @@ import scala.collection.JavaConversions._
  * Holds a job queue.
  */
 object TestEngineController extends Controller {
+
   /**
    * SSE tunnel for listing the active jobs running now.
    */
   //val (jobListOut, jobListChannel) = Concurrent.broadcast[JsValue];
   val (jobQueueOut, jobQueueChannel) = Concurrent.broadcast[String];
   val (jobStatusOut, jobStatusChannel) = Concurrent.broadcast[String];
+  val (jobHistoryOut, jobHistoryChannel) = Concurrent.broadcast[String];
+  val (logOut, logChannel) = Concurrent.broadcast[String];
 
   /**
    * The queue that holds test runs. When a job is started, a test run is created for it.
@@ -48,32 +51,32 @@ object TestEngineController extends Controller {
    */
   val threadPool = java.util.concurrent.Executors.newFixedThreadPool(20);
 
-
-
-
   /**
    * The main test thread
    */
   val testThread = new Thread() {
     override def run(): Unit = {
       while (true) {
-        Logger.info("Test Thread waiting on job queue")
+        Logger.info(">>> Test Thread waiting on job queue")
+        logFeedUpdate(">>> Test Thread waiting on job queue");
         activeRunContext = TestEngineController.jobQueue.take();
         SessionMap.registerObject(activeRunContext.testRun.runner.email, "signalRegistry", new MinderSignalRegistry());
         SignalSlotInfoProvider.setSignalSlotInfoProvider(MinderWrapperRegistry.get())
-        Logger.info("TAKE")
 
         jobFeedUpdate()
         queueFeedUpdate()
-        Logger.info("Job with id [" + activeRunContext.testRun.job + "] arrived. Wait 5 seconds")
+        Logger.info(">>> Job with id [" + activeRunContext.testRun.job.id + "] arrived. Wait 5 seconds...")
+        logFeedUpdate(">>> Job with id [" + activeRunContext.testRun.job.id + "] arrived. Start in 5 seconds...");
         Thread.sleep(5000);
-        Logger.info("Ron Job [" + activeRunContext.testRun.job + "] arrived")
+        Logger.info("Run Job [" + activeRunContext.testRun.job.id + "]")
+        logFeedUpdate(">>> Run Job [" + activeRunContext.testRun.job.id + "]")
         try {
           activeRunContext.run()
         } catch {
           case th: Throwable =>
             Logger.error(th.getMessage, th)
         } finally {
+          logFeedUpdate(">>> Test Run  #[" + activeRunContext.testRun.number + "] finished.")
           activeRunContext = null
         }
 
@@ -132,6 +135,26 @@ object TestEngineController extends Controller {
   }
 
   /**
+   * An online feed for listing jobs runned
+   * @return
+   */
+  def historyFeed() = Action {
+    Ok.chunked(jobHistoryOut &> EventSource()).as("text/event-stream")
+  }
+
+
+  /**
+   * An action that provides information about the current
+   * running job.
+   * @return
+   */
+  def logFeed() = Action {
+    println("Log feed")
+    Ok.chunked(logOut &> EventSource()).as("text/event-stream")
+  }
+
+
+  /**
    * an action for enqueuing a new job for test engine running
    * @return
    */
@@ -179,13 +202,18 @@ object TestEngineController extends Controller {
     //  "progress" -> (tr.progress + ""))
     //}))
 
-    jobQueueChannel.push(jobQueueList.render(jobQueue.map(trc => {trc.testRun}).toList, activeRunContext.testRun).toString())
+    jobQueueChannel.push(jobQueueList.render().toString())
+    jobHistoryChannel.push(jobHistoryList.render().toString())
   }
 
   def jobFeedUpdate(): Unit = {
     jobStatusChannel.push(testStatusMonitor.apply().toString());
   }
 
+
+  def logFeedUpdate(log: String): Unit = {
+    logChannel.push(log);
+  }
 
   /**
    * Utility method to create a test run
@@ -197,7 +225,6 @@ object TestEngineController extends Controller {
     val testRun = new TestRun()
     testRun.date = new Date()
     testRun.job = job;
-    testRun.status = TestStatus.PENDING
     val userHistory = new UserHistory
     userHistory.user = user;
     userHistory.operationType = new TOperationType
@@ -207,7 +234,6 @@ object TestEngineController extends Controller {
     testRun.runner = user;
     new TestRunContext(testRun)
   }
-
 
   //
   def createDummyTestRun(i: Int): TestRun = {
@@ -220,7 +246,6 @@ object TestEngineController extends Controller {
     val tr = new TestRun()
     tr.date = new Date()
     tr.job = Job.findById(361L);
-    tr.status = TestStatus.PENDING
     tr.runner = User.findByEmail("myildiz83@gmail.com")
     tr;
   }

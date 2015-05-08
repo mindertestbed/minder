@@ -56,8 +56,6 @@ object TestEngine {
 
     lgr.info("Start Test")
 
-    testProcessWatcher.startTest()
-
     val set = new util.HashSet[String]()
     try {
       lgr.debug("Initialize test case")
@@ -123,7 +121,6 @@ object TestEngine {
               //FIX for BUG-1 : added an if for -1 param
               if (paramPipe.in != -1) {
                 convertParam(paramPipe.out, paramPipe.execute(signalData.args(paramPipe.in)))
-                testProcessWatcher.slotParamSet(rivetIndex, paramPipe.out, args(paramPipe.out))
               }
             }
 
@@ -134,7 +131,6 @@ object TestEngine {
 
           for (paramPipe <- rivet.freeVariablePipes) {
             convertParam(paramPipe.out, paramPipe.execute(null))
-            testProcessWatcher.slotParamSet(rivetIndex, paramPipe.out, args(paramPipe.out))
           }
 
           if (rivet.freeVariablePipes.size > 0) {
@@ -151,7 +147,6 @@ object TestEngine {
 
           lgr.debug("Slot ready for call " + rivet.slot.wrapperId + "." + rivet.slot.signature)
 
-          testProcessWatcher.slotSet(rivetIndex);
           rivet.result = minderClient.callSlot(userEmail, rivet.slot.signature, args)
           lgr.debug("Slot call finished sucessfully")
 
@@ -195,7 +190,7 @@ object TestEngine {
         testProcessWatcher.failed(t)
       }
     } finally {
-
+      lgr.removeAppender(app)
     }
 
   }
@@ -268,15 +263,9 @@ object TestEngine {
 
 
 trait TestProcessWatcher {
-  def startTest(): Unit
-
   def updateWrappers(set: Set[String]): Unit
 
   def signalEmitted(rivetIndex: Int, signalIndex: Int, signalData: SignalData): Unit
-
-  def slotParamSet(rivetIndex: Int, paramIndex: Int, value: Any): Unit
-
-  def slotSet(rivetIndex: Int): Unit
 
   def rivetFinished(rivetIndex: Int): Unit
 

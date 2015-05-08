@@ -13,15 +13,15 @@
         }
     </style>
 
-<div>
-  <table style="width:100%;" class="shaded" border="5px">
+<div  class="fullh">
+  <table style="width:100%;" class="fullh" class="shaded">
     <tr>
-        <th colspan="2">
+        <th colspan="2" style="border-bottom: 1px solid #ccc;">
             Test Run Details
         </th>
     </tr>
     <tr>
-      <td rowspan="3" style="vertical-align: text-top">
+      <td rowspan="3" style="vertical-align:text-top;padding: 10px;">
           <table class="shaded">
               <tr>
                   <th>Test Group</th><td>
@@ -67,10 +67,10 @@
         </div>
         </td>
     </tr>
-      <tr>
+      <tr class="fullh">
           <td class="tipitip" style="height:99%;">
               <label>Log</label>
-              <div class="tipitip" style="height:100%;border:1px solid gray;border-radius:2px">
+              <div class="tipitip" style="height:100%;border:1px solid gray;border-radius:2px;overflow: scroll;">
                   <xmp>@testRun.history.systemOutputLog</xmp></div>
           </td>
      </tr>

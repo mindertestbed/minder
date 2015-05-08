@@ -1,41 +1,35 @@
-@(queue: List[TestRun], activejob: TestRun = null)
 @import java.util.concurrent.atomic.AtomicInteger
-
 
 <div id="canceldiv" style="display:none">
 
 </div>
 
-<label>Active Job</label>
+<label>Job Queue</label>
 
-@if(activejob != null){
-    <div class="fullw" style="padding: 10px;">
-        <div class="fullw bevel2" style="padding:10px;"
-        title="@activejob.job.id
-            @activejob.job.name
-            @activejob.runner.email
-            @activejob.progress
-            @activejob.status">
-
-            <a href="/viewJob?id=@{activejob.job.id}&showHistory=true" title="View Job">
-            <span class="title">@activejob.job.name</span>
-            </a>
-            <table class="fullw"><tr><td>
-                <div style="border:1px solid gray;background-color:white;height:14px;width:100%;padding:0">
-                    <div style="background-color:lightgreen;height:12px;width:@{activejob.progress}%;margin: 0">&nbsp;</div>
-                </div></td></tr></table>
+@defining(TestEngineController.activeRunContext){ activeRunContext =>
+    @if(activeRunContext != null){
+        <div class="fullw" style="padding:10px;">
+            <div class="fullw bevel2" style="padding:10px;"
+            title="@activeRunContext.job.id
+@activeRunContext.job.name
+@activeRunContext.testRun.runner.email
+@activeRunContext.progressPercent">
+                <a href="/viewJob?id=@{activeRunContext.job.id}&showHistory=true" title="View Job">
+                <span class="title">@activeRunContext.job.name</span>
+                </a>
+                <table class="fullw"><tr><td>
+                    <div style="border:1px solid gray;background-color:white;height:14px;width:100%;padding:0">
+                        <div style="background-color:lightgreen;height:12px;width:@{activeRunContext.progressPercent}%;margin:0">&nbsp;</div>
+                    </div></td></tr></table>
+            </div>
         </div>
-    </div>
-} else {
-    <div class="fullw" style="padding: 5px;">
-            <span class="title">NONE</span>
-    </div>
+    }
 }
-<hr />
-<label>Pending Jobs</label>
+
+@defining(TestEngineController.jobQueue) { queue =>
 @if(queue.isEmpty){
     <br />
-    <span class="title">NONE</span>
+    <span class="title" style="color:#d3d3d3">EMPTY</span>
 } else {
     <table class="fullw">
         @defining(new AtomicInteger(0)){ index =>
@@ -46,9 +40,7 @@
                         <div class="fullw bevel2" style="padding:10px;"
                         title="@k.job.id
 @k.job.name
-@k.runner.email
-@k.progress
-@k.status">
+@k.testRun.runner.email">
                             <a href="/viewJob?id=@{
                                 k.job.id
                             }&showHistory=true" title="View Job">
@@ -65,9 +57,9 @@
                         </div>
                     </div>
                 </td>
-                    <!-- @k.job.id @k.progress @k.status-->
             </tr>
         } <!-- for -->
         </table>
     } <!-- defining -->
 } <!-- if -->
+} <!-- defining -->

@@ -116,6 +116,8 @@ POST        /doEditWrapper                         controllers.WrapperController
 GET         /wrapperStatusFeed                     controllers.SSEHandler.wrapperStatusFeed(id: Long)
 GET         /jobQueueFeed                          controllers.TestEngineController.jobQueueFeed
 GET         /jobStatusFeed                         controllers.TestEngineController.jobStatusFeed
+GET         /historyFeed                           controllers.TestEngineController.historyFeed
+GET         /logFeed                               controllers.TestEngineController.logFeed
 GET         /enqueueJob                            controllers.TestEngineController.enqueueJob(id: Long)
 GET         /cancelJob                             controllers.TestEngineController.cancelJob(index: Int)
 

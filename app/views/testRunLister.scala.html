@@ -3,15 +3,18 @@
 @reportTypeDialog()
   <br />
 
-<div id="testRunListerDiv@configurationId">
+<div>
   <table class="shaded fullw">
     <tr>
-      <th>Status</th><th>Date</th><th>Run by</th><th>Log</th><th>Report</th>
+      <th>#</th><th>Status</th><th>Date</th><th>Run by</th><th>Log</th><th>Report</th>
     </tr>
     @defining(TestRun.findByJob(configurationId)){ testRunList =>
       @for(testRun <- testRunList){
-        <tr class="@if(testRun.success){goodTestRun} else {badTestRun} tabshrink">
-        <td style="text-align:center;" class="tabshrink">
+        <tr class="@if(testRun.success){goodTestRun} else {badTestRun}">
+          <td style="text-align:center;" class="tabshrink">
+          @testRun.number
+          </td>
+          <td style="text-align:center;" class="tabshrink">
           @if(testRun.success){
             <img src="@routes.Assets.at("/images/Check-icon.png")" height="16px" alt='G'/>
           } else {
@@ -26,12 +29,10 @@
           </a>
         </td>
         <td align="center" class="tabshrink">
-          <!--<a href="/viewReport?testRunId=@testRun.id">-->
             <div id="viewReport@testRun.id" title="View Report" class="celldiv bevel2" style="height:26px;width:26px;"
                 onclick='showReportDialog("selectReportType", @testRun.id)'>
               <img src="@routes.Assets.at("/images/print-64.png")" height="16px" alt='@testRun.id'/>
             </div>
-        <!-- </a>-->
         </td>
         </tr>
       }
