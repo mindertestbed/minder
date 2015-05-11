@@ -55,6 +55,13 @@ public class JobController  extends Controller {
     model.name = testCase.name + "(" + (max + 1) + ")";
 
     //
+    initWrapperListForModel(testCase, model);
+
+    return ok(jobEditor.render(
+        JOB_FORM.fill(model), null));
+  }
+
+  private static void initWrapperListForModel(TestCase testCase, JobEditorModel model) {
     model.mappedWrappers = new ArrayList<>();
 
     for (WrapperParam parameter : testCase.parameters) {
@@ -68,9 +75,6 @@ public class JobController  extends Controller {
         return o1.name.compareTo(o2.name);
       }
     });
-
-    return ok(jobEditor.render(
-        JOB_FORM.fill(model), null));
   }
 
   public static Result doCreateJob() {
@@ -104,6 +108,13 @@ public class JobController  extends Controller {
           form.reject("You have to fill all parameters");
           return badRequest(jobEditor.render(form, null));
         }
+      }
+    } else {
+      System.out.println("Mapped wrappers null");
+      if(testCase.parameters.size() > 0){
+        initWrapperListForModel(testCase, model);
+        form.reject("You have to fill all parameters");
+        return badRequest(jobEditor.render(form, null));
       }
     }
 
@@ -162,7 +173,7 @@ public class JobController  extends Controller {
     }
 
     TestCase tc = TestCase.findById(rc.testCase.id);
-    return ok(jobLister.render(tc, null));
+    return redirect(routes.TestCaseController.viewTestCase(rc.testCase.id, true));
   }
 
   public static Result getEditJobEditorView(Long id) {

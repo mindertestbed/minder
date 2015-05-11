@@ -1,5 +1,6 @@
 package controllers
 
+import java.security.MessageDigest
 import java.util
 import java.util.Date
 
@@ -33,6 +34,9 @@ class TestRunContext(val testRun: TestRun) extends Runnable with TestProcessWatc
   val cls = TestEngine.compileTest(user.email, testCase.name, testCase.tdl)
   val logStringBuilder = new StringBuilder;
   var status = TestStatus.PENDING
+
+
+
 
   /**
    * Number of steps that will be calculated at the beginning for percentage

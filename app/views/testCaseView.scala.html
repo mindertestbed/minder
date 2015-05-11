@@ -63,7 +63,9 @@
                                             <td>@index.getAndIncrement()</td> <td><a href="/viewJob?id=@job.id&showHistory=true">@job.name</a></td> <td>SHORT Description</td>
                                             <td>@job.owner.email</td>
                                             <td align="center">
-                                                <div title="Delete" class="bevel2 celldiv" style="height:30px;width:30px;">
+                                                <div title="Delete" class="bevel2 celldiv" style="height:30px;width:30px;"
+                                                onclick='deleteWithDialog2("/doDeleteJob?id=@job.id", $("#dialog-confirm"), "Delete Job", "job", "@job.name")'
+                                                >
                                                     <img src="@routes.Assets.at("/images/trash2-64.png")" height="16px" alt='@job.id'/>
                                                 </div>
                                             </td>
