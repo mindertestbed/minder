@@ -51,7 +51,7 @@ object TestEngine {
     val logBuilder = new StringBuilder
     val lgr: org.apache.log4j.Logger = org.apache.log4j.Logger.getLogger("test");
     val app = new MyAppender(testProcessWatcher);
-    app.setLayout(new EnhancedPatternLayout("%d{ISO8601}: %-5p - %m%n%throwable"));
+    app.setLayout(new EnhancedPatternLayout("|TEST ENGINE| %d{ISO8601}: %-5p - %m%n%throwable"));
     lgr.addAppender(app);
 
     lgr.info("Start Test")
@@ -60,6 +60,13 @@ object TestEngine {
     try {
       lgr.debug("Initialize test case")
       val minderTDL = clsMinderTDL.getConstructors()(0).newInstance(map, java.lang.Boolean.TRUE).asInstanceOf[MinderTdl]
+      minderTDL.debug = (any: Any) => {lgr.debug(any)}
+      minderTDL.debugThrowable = (any: Any, th: Throwable) => {lgr.debug(any, th)}
+      minderTDL.info = (any: Any) => {lgr.info(any)}
+      minderTDL.infoThrowable = (any: Any, th: Throwable) => {lgr.info(any, th)}
+      minderTDL.error = (any: Any) => {lgr.error(any)}
+      minderTDL.errorThrowable = (any: Any, th: Throwable) => {lgr.error(any, th)}
+
       testProcessWatcher.updateWrappers(minderTDL.wrapperDefs.toSet)
 
       //first, call the start methods for all registered wrappers of this test.
@@ -70,13 +77,16 @@ object TestEngine {
         } else {
           XoolaServer.get().getClient(wrapperName)
         }
+
+        lgr.debug(">>>> CALL START TEST ON [" + wrapperName + "]");
         minderClient.startTest(userEmail)
+        lgr.debug("<<<< START TEST ON [" + wrapperName + "] FINISHED");
       }
 
       try {
         var rivetIndex = 0;
         for (rivet <- minderTDL.SlotDefs) {
-          lgr.debug("---- " + "RUN RIVET " + rivetIndex)
+          lgr.debug(">>>> " + "RUN RIVET " + rivetIndex)
 
           //resolve the minder client id. This might as well be resolved to a local built-in wrapper or the null slot.
           val minderClient =
@@ -107,13 +117,13 @@ object TestEngine {
             val me: MinderSignalRegistry = SessionMap.getObject(userEmail, "signalRegistry")
             if (me == null) throw new IllegalArgumentException("No MinderSignalRegistry object defined for session " + userEmail)
 
-            lgr.debug("Dequeue Signal:" + label + "." + signature)
+            lgr.debug(">>>>>>>> Dequeue Signal:" + label + "." + signature)
 
             set.add(label)
 
             val signalData = me.dequeueSignal(label, signature)
 
-            lgr.debug("Signal Obtained Signal: " + label + "." + signature)
+            lgr.debug("<<<<<<<< Signal Obtained Signal: " + label + "." + signature)
 
             testProcessWatcher.signalEmitted(rivetIndex, signalIndex, signalData)
 
@@ -127,7 +137,7 @@ object TestEngine {
             signalIndex += 1
           }
 
-          lgr.debug("Assign free vars")
+          lgr.debug(">>>>>>>> Assign free vars")
 
           for (paramPipe <- rivet.freeVariablePipes) {
             convertParam(paramPipe.out, paramPipe.execute(null))
@@ -144,14 +154,16 @@ object TestEngine {
             testProcessWatcher.signalEmitted(rivetIndex, signalIndex, signalData2)
           }
 
+          lgr.debug("<<<<<<<< Free vars assigned")
 
-          lgr.debug("Slot ready for call " + rivet.slot.wrapperId + "." + rivet.slot.signature)
+          lgr.debug(">>>>>>>> CALL SLOT " + rivet.slot.wrapperId + "." + rivet.slot.signature)
 
           rivet.result = minderClient.callSlot(userEmail, rivet.slot.signature, args)
-          lgr.debug("Slot call finished sucessfully")
+          lgr.debug("<<<<<<<< SLOT CALL FINISHED " + rivet.slot.wrapperId + "." + rivet.slot.signature)
+
 
           testProcessWatcher.rivetFinished(rivetIndex)
-          lgr.debug("Rivet finished sucessfully")
+          lgr.debug("<<<< Rivet finished sucessfully")
           lgr.debug("----------\n")
 
           def convertParam(out: Int, arg: Any) {
@@ -165,7 +177,7 @@ object TestEngine {
           rivetIndex += 1
         }
       } finally {
-        testProcessWatcher.addLog("Send finish message to all wrappers")
+        testProcessWatcher.addLog(">>>> Send finish message to all wrappers")
         //make sure that we call finish test for all
         for (wrapperName <- minderTDL.wrapperDefs) {
           val minderClient = if (BuiltInWrapperRegistry.get().contains(wrapperName)) {
@@ -175,9 +187,12 @@ object TestEngine {
           }
 
           try {
+            testProcessWatcher.addLog(">>>> Send finish message [" + wrapperName + "]")
             minderClient.finishTest()
           } catch {
             case _: Throwable => {}
+          } finally{
+            testProcessWatcher.addLog("<<<< Finish message sent [" + wrapperName + "]")
           }
         }
       }
