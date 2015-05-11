@@ -23,7 +23,13 @@
 
 
         new EventSource ( '/logFeed' ).onmessage = function ( event ) {
-            logfeed.textContent += event.data + "\n"
+            var logp =  $("#logp");
+
+            var newd  = event.data
+            newd = newd.split(/\n/g).join("<br/>");
+            newd = newd.replace(/ /g, '&nbsp;')
+            newd = newd.replace(/\t/g, '&nbsp;&nbsp;&nbsp;&nbsp;')
+            logp[0].innerHTML += "<br />" + newd;
             logdiv.scrollTop(logdiv.prop("scrollHeight"));
         }
 
@@ -52,7 +58,21 @@
         <td class="tipitip" style="height:99%;">
             <label>Log</label>
             <div class="tipitip" id="logdiv" style="height:100%;border:1px solid gray;border-radius:2px;overflow:scroll">
-                <xmp id="logfeed"></xmp></div>
+            <p id="logp" style='font-family:"Monaco", "Courier New", "monospace"'></p>
+            <xmp id="logfeed" style="display: none">@TestEngineController.currentLog</xmp>
+            <script>
+            $(function(){
+                    var logsrc = $("#logfeed" );
+                    var logp =  $("#logp");
+
+                    var newd  = logsrc.text()
+                    newd = newd.split(/\n/g).join("<br/>");
+                    newd = newd.replace(/ /g, '&nbsp;')
+                    newd = newd.replace(/\t/g, '&nbsp;&nbsp;&nbsp;&nbsp;')
+                    logp[0].innerHTML = newd;
+                });
+            </script>
+            </div>
         </td>
     </tr>
 </table>

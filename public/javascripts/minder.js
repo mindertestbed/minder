@@ -565,3 +565,39 @@ function ajaxCancelJob(index, name){
 
 }
 
+
+function ajaxCancelActiveJob(name){
+
+  var dlgSel = $("#canceldiv")
+  dlgSel[0].innerHTML = 'The job [' + name +
+  '] is running. <br /> It might be waiting for manual interaction. <br />' +
+  'Are you still sure that you want to cancel it?';
+
+  var dialog = dlgSel.dialog({
+    autoOpen: false,
+    title: 'Cancel Active Job',
+    modal: true,
+    buttons: {
+      "Ok": function () {
+        $.ajax({
+          type: 'GET',
+          url: '/cancelActiveJob',
+          success: function (data) {
+            dialog.dialog("close");
+          },
+          error: function (jqXHR, textStatus, errorMessage) {
+            showError(jqXHR.responseText)
+            dialog.dialog("close");
+          }
+        });
+      },
+      Cancel: function () {
+        dialog.dialog("close");
+      }
+    }
+  });
+
+  dialog.dialog("open");
+
+}
+
