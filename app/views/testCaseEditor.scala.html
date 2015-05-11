@@ -138,10 +138,20 @@ $(function() {
 
           <div class="fcborder fullh"> <label>Tdl</label><br/>
             @if(frm.hasGlobalErrors) {
-              <xmp class="alert alert-danger">
-              @frm.globalError.message
-              </xmp>
+              <p id="error" class="alert alert-danger" style='font-family:"Monaco", "Courier New", "monospace"'></p>
+              <xmp id="source" style="display: none">@frm.globalError.message</xmp>
+
+              <script>
+                $(function(){
+                  var newd  = $("#source" ).text()
+                  newd = newd.split(/\n/g).join("<br/>");
+                  newd = newd.replace(/ /g, '&nbsp;')
+                  $("#error")[0 ].innerHTML = newd;
+                });
+              </script>
             }<br />
+
+
             <button onclick='$("#wrappersDiv").show();' type="button">Insert Reference</button>
               &nbsp;
             <button onclick='$ ( "#funcdiv" ).show( );' type="button">Insert Converter</button>

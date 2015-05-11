@@ -143,8 +143,8 @@ public class TestCase extends Model {
   public void save() {
     try {
       Ebean.beginTransaction();
-      detectParameters();
       super.save();
+      detectParameters();
       Ebean.commitTransaction();
     } catch (Exception ex) {
       ex.printStackTrace();
