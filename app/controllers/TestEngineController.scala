@@ -254,7 +254,7 @@ object TestEngineController extends Controller {
     if (index >= 0 && index < jobQueue.size()) {
       val arr = jobQueue.toArray
 
-      val tr = arr(index).asInstanceOf[TestRun]
+      val tr = arr(index).asInstanceOf[TestRunContext]
       jobQueue.remove(tr)
       queueFeedUpdate();
     }
