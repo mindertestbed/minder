@@ -11,7 +11,7 @@ import java.util.Properties;
 /**
  * Created by yerlibilgin on 02/12/14.
  */
-public class XoolaServer {
+public class XoolaServer{
   private static XoolaServer xoolaServer;
   private Xoola server;
   private MinderServer minderServer = new MinderServer();

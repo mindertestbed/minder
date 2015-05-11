@@ -51,37 +51,52 @@ object TestEngineController extends Controller {
    */
   val threadPool = java.util.concurrent.Executors.newFixedThreadPool(20);
 
+  //a flag indicating the life of the thread.
+  var goon = true;
+
+  val currentLog = new StringBuilder
   /**
    * The main test thread
    */
   val testThread = new Thread() {
     override def run(): Unit = {
-      while (true) {
-        Logger.info(">>> Test Thread waiting on job queue")
-        logFeedUpdate(">>> Test Thread waiting on job queue");
-        activeRunContext = TestEngineController.jobQueue.take();
-        SessionMap.registerObject(activeRunContext.testRun.runner.email, "signalRegistry", new MinderSignalRegistry());
-        SignalSlotInfoProvider.setSignalSlotInfoProvider(MinderWrapperRegistry.get())
-
-        jobFeedUpdate()
-        queueFeedUpdate()
-        Logger.info(">>> Job with id [" + activeRunContext.testRun.job.id + "] arrived. Wait 5 seconds...")
-        logFeedUpdate(">>> Job with id [" + activeRunContext.testRun.job.id + "] arrived. Start in 5 seconds...");
-        Thread.sleep(5000);
-        Logger.info("Run Job [" + activeRunContext.testRun.job.id + "]")
-        logFeedUpdate(">>> Run Job [" + activeRunContext.testRun.job.id + "]")
+      while (goon) {
+        currentLog.clear()
         try {
-          activeRunContext.run()
-        } catch {
-          case th: Throwable =>
-            Logger.error(th.getMessage, th)
-        } finally {
-          logFeedUpdate(">>> Test Run  #[" + activeRunContext.testRun.number + "] finished.")
-          activeRunContext = null
-        }
+          logFeedUpdate(">>> Test Thread waiting on job queue");
+          activeRunContext = TestEngineController.jobQueue.take();
+          SessionMap.registerObject(activeRunContext.testRun.runner.email, "signalRegistry", new MinderSignalRegistry());
+          SignalSlotInfoProvider.setSignalSlotInfoProvider(MinderWrapperRegistry.get())
 
-        queueFeedUpdate()
-        jobFeedUpdate()
+          jobFeedUpdate()
+          queueFeedUpdate()
+          logFeedUpdate(">>> Job with id [" + activeRunContext.testRun.job.id + "] arrived. Start in 5 seconds...");
+          Thread.sleep(5000);
+          logFeedUpdate(">>> Run Job [" + activeRunContext.testRun.job.id + "]")
+          try {
+            activeRunContext.run()
+          } catch {
+            case th: Throwable =>
+              Logger.error(th.getMessage, th)
+              logFeedUpdate(th.getMessage)
+          } finally {
+            logFeedUpdate(">>> Test Run  #[" + activeRunContext.testRun.number + "] finished.")
+            activeRunContext = null
+          }
+
+          queueFeedUpdate()
+          jobFeedUpdate()
+        } catch  {
+          case inter : InterruptedException => {
+            //someone interrupted me.
+            //check the exit flag and go back.
+            logFeedUpdate(">>> Test thread interrupted")
+          }
+
+          case t : Throwable => {
+            logFeedUpdate(">>> Error [" + t.getMessage + "]")
+          }
+        }
       }
     }
   };
@@ -212,7 +227,9 @@ object TestEngineController extends Controller {
 
 
   def logFeedUpdate(log: String): Unit = {
-    logChannel.push(log);
+    Logger.debug(log)
+    currentLog.append(log).append("\n")
+    logChannel.push(log)
   }
 
   /**
@@ -238,9 +255,9 @@ object TestEngineController extends Controller {
   //
   def createDummyTestRun(i: Int): TestRun = {
 
-    val tpl = Array((5,6))
+    val tpl = Array((5, 6))
 
-    for( (l,r) <- tpl){
+    for ((l, r) <- tpl) {
 
     }
     val tr = new TestRun()
@@ -259,5 +276,29 @@ object TestEngineController extends Controller {
       queueFeedUpdate();
     }
     Ok
+  }
+
+  def cancelActiveJob() = Action { implicit request =>
+    if (activeRunContext != null) {
+
+      val java_ctx = play.core.j.JavaHelpers.createJavaContext(request)
+      val java_session = java_ctx.session()
+
+      val user = Application.getLocalUser(java_session);
+
+      //only allow root to do that
+      if (user.email == "root@minder") {
+        //cancel
+
+        //now interrupt the thread.
+        testThread.interrupt();
+
+        Ok
+      } else {
+        BadRequest("Hey! Only root can cancel an active job!!!")
+      }
+    } else {
+      Ok
+    }
   }
 }

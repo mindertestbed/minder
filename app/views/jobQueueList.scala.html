@@ -20,7 +20,9 @@
                 <table class="fullw"><tr><td>
                     <div style="border:1px solid gray;background-color:white;height:14px;width:100%;padding:0">
                         <div style="background-color:lightgreen;height:12px;width:@{activeRunContext.progressPercent}%;margin:0">&nbsp;</div>
-                    </div></td></tr></table>
+                    </div></td><td style="width:20px;vertical-align:text-top;">
+                        &nbsp; <span title='Cancel "@activeRunContext.job.name"' style="cursor:hand" onclick='ajaxCancelActiveJob("@{activeRunContext.job.name}")'><img src="@routes.Assets.at("/images/Delete-icon.png")" height="12px"/></span>
+                </td></tr></table>
             </div>
         </div>
     }
@@ -49,7 +51,7 @@
                             <table class="fullw"><tr><td>
                                 <div style="border:1px solid #ccc;background-color:white;height:14px;width:100%; padding:0">
                                     <div style="background-color:lightgreen;height:12px;width:0%;margin:0">&nbsp;</div>
-                                </div></td> <td style="width:20px;vertical-align:text-top;">
+                                </div></td><td style="width:20px;vertical-align:text-top;">
                                     &nbsp; <span title='Cancel "@k.job.name"' style="cursor:hand" onclick='ajaxCancelJob(@{index.getAndIncrement}, "@{k.job.name}")'><img src="@routes.Assets.at("/images/Delete-icon.png")" height="12px"/></span>
                             </td>
                             </tr>
