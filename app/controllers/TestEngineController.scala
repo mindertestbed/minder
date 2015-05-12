@@ -174,7 +174,7 @@ object TestEngineController extends Controller {
    * @return
    */
   def enqueueJob(id: Long) = Action { implicit request =>
-    if (jobQueue.size >= 10) {
+    if (jobQueue.size >= 20) {
       BadRequest("The job queue is full.")
     } else {
       //check if the job is already in queue.
@@ -228,7 +228,7 @@ object TestEngineController extends Controller {
 
   def logFeedUpdate(log: String): Unit = {
     Logger.debug(log)
-    currentLog.append(log).append("\n")
+    currentLog.append(log)
     logChannel.push(log)
   }
 
