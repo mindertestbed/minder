@@ -279,15 +279,19 @@ object TestEngineController extends Controller {
   }
 
   def cancelActiveJob() = Action { implicit request =>
-    if (activeRunContext != null) {
+
+    val runContext = activeRunContext; //take it before its null
+
+    if (runContext != null) {
 
       val java_ctx = play.core.j.JavaHelpers.createJavaContext(request)
       val java_session = java_ctx.session()
 
       val user = Application.getLocalUser(java_session);
 
-      //only allow root to do that
-      if (user.email == "root@minder") {
+
+      //only allow root or the runner to do that
+      if (user.email == "root@minder" || user.email == runContext.testRun.runner.email) {
         //cancel
 
         //now interrupt the thread.
@@ -295,7 +299,7 @@ object TestEngineController extends Controller {
 
         Ok
       } else {
-        BadRequest("Hey! Only root can cancel an active job!!!")
+        BadRequest("Hey! <br/>Only root or the runner can cancel an active job!!!")
       }
     } else {
       Ok
