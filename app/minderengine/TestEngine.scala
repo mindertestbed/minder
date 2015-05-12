@@ -5,7 +5,7 @@ import java.util
 import models.TestCase
 import mtdl._
 import org.apache.log4j.spi.LoggingEvent
-import org.apache.log4j.{AppenderSkeleton, EnhancedPatternLayout}
+import org.apache.log4j.{Level, AppenderSkeleton, EnhancedPatternLayout}
 import play.api.Logger
 
 import scala.collection.JavaConversions._
@@ -28,7 +28,12 @@ object TestEngine {
     override def append(event: LoggingEvent): Unit = {
       if (this.getLayout != null) {
         val formatted = this.getLayout.format(event);
+
         testProcessWatcher.addLog(formatted);
+
+        if (event.getLevel.toInt == Level.INFO.toInt || event.getLevel.toInt == Level.ERROR.toInt){
+          testProcessWatcher.addReportLog(formatted);
+        }
         Logger.debug(formatted)
       }
     }
@@ -48,17 +53,16 @@ object TestEngine {
    * @param testProcessWatcher
    */
   def runTest(userEmail: String, clsMinderTDL: Class[MinderTdl], map: Map[String, String], testProcessWatcher: TestProcessWatcher): Unit = {
-    val logBuilder = new StringBuilder
     val lgr: org.apache.log4j.Logger = org.apache.log4j.Logger.getLogger("test");
     val app = new MyAppender(testProcessWatcher);
-    app.setLayout(new EnhancedPatternLayout("|TEST ENGINE| %d{ISO8601}: %-5p - %m%n%throwable"));
+    app.setLayout(new EnhancedPatternLayout("%d{ISO8601}: %-5p - %m%n%throwable"));
     lgr.addAppender(app);
 
     lgr.info("Start Test")
 
     val set = new util.HashSet[String]()
     try {
-      lgr.debug("Initialize test case")
+      lgr.info("Initialize test case")
       val minderTDL = clsMinderTDL.getConstructors()(0).newInstance(map, java.lang.Boolean.TRUE).asInstanceOf[MinderTdl]
       minderTDL.debug = (any: Any) => {lgr.debug(any)}
       minderTDL.debugThrowable = (any: Any, th: Throwable) => {lgr.debug(any, th)}
@@ -78,15 +82,15 @@ object TestEngine {
           XoolaServer.get().getClient(wrapperName)
         }
 
-        lgr.debug(">>>> CALL START TEST ON [" + wrapperName + "]");
+        lgr.info(">>>> CALL START TEST ON [" + wrapperName + "]");
         minderClient.startTest(userEmail)
-        lgr.debug("<<<< START TEST ON [" + wrapperName + "] FINISHED");
+        lgr.info("<<<< START TEST ON [" + wrapperName + "] FINISHED");
       }
 
       try {
         var rivetIndex = 0;
         for (rivet <- minderTDL.SlotDefs) {
-          lgr.debug(">>>> " + "RUN RIVET " + rivetIndex)
+          lgr.info(">>>> " + "RUN RIVET " + rivetIndex)
 
           //resolve the minder client id. This might as well be resolved to a local built-in wrapper or the null slot.
           val minderClient =
@@ -117,13 +121,13 @@ object TestEngine {
             val me: MinderSignalRegistry = SessionMap.getObject(userEmail, "signalRegistry")
             if (me == null) throw new IllegalArgumentException("No MinderSignalRegistry object defined for session " + userEmail)
 
-            lgr.debug(">>>>>>>> Dequeue Signal:" + label + "." + signature)
+            lgr.info(">>>> Dequeue Signal:" + label + "." + signature)
 
             set.add(label)
 
             val signalData = me.dequeueSignal(label, signature)
 
-            lgr.debug("<<<<<<<< Signal Obtained Signal: " + label + "." + signature)
+            lgr.info("<<<< Signal Obtained Signal: " + label + "." + signature)
 
             testProcessWatcher.signalEmitted(rivetIndex, signalIndex, signalData)
 
@@ -137,7 +141,7 @@ object TestEngine {
             signalIndex += 1
           }
 
-          lgr.debug(">>>>>>>> Assign free vars")
+          lgr.info(">>>> Assign free vars")
 
           for (paramPipe <- rivet.freeVariablePipes) {
             convertParam(paramPipe.out, paramPipe.execute(null))
@@ -154,17 +158,17 @@ object TestEngine {
             testProcessWatcher.signalEmitted(rivetIndex, signalIndex, signalData2)
           }
 
-          lgr.debug("<<<<<<<< Free vars assigned")
+          lgr.info("<<<< Free vars assigned")
 
-          lgr.debug(">>>>>>>> CALL SLOT " + rivet.slot.wrapperId + "." + rivet.slot.signature)
+          lgr.info(">>>> CALL SLOT " + rivet.slot.wrapperId + "." + rivet.slot.signature)
 
           rivet.result = minderClient.callSlot(userEmail, rivet.slot.signature, args)
-          lgr.debug("<<<<<<<< SLOT CALL FINISHED " + rivet.slot.wrapperId + "." + rivet.slot.signature)
+          lgr.info("<<<< SLOT CALL FINISHED " + rivet.slot.wrapperId + "." + rivet.slot.signature)
 
 
           testProcessWatcher.rivetFinished(rivetIndex)
-          lgr.debug("<<<< Rivet finished sucessfully")
-          lgr.debug("----------\n")
+          lgr.info("<<<< Rivet finished sucessfully")
+          lgr.info("----------\n")
 
           def convertParam(out: Int, arg: Any) {
             if (arg.isInstanceOf[Rivet]) {
@@ -177,7 +181,7 @@ object TestEngine {
           rivetIndex += 1
         }
       } finally {
-        testProcessWatcher.addLog(">>>> Send finish message to all wrappers")
+        lgr.info(">>>> Send finish message to all wrappers")
         //make sure that we call finish test for all
         for (wrapperName <- minderTDL.wrapperDefs) {
           val minderClient = if (BuiltInWrapperRegistry.get().contains(wrapperName)) {
@@ -187,17 +191,15 @@ object TestEngine {
           }
 
           try {
-            testProcessWatcher.addLog(">>>> Send finish message [" + wrapperName + "]")
+            lgr.info(">>>> Send finish message [" + wrapperName + "]")
             minderClient.finishTest()
           } catch {
             case _: Throwable => {}
           } finally{
-            testProcessWatcher.addLog("<<<< Finish message sent [" + wrapperName + "]")
+            lgr.info("<<<< Finish message sent [" + wrapperName + "]")
           }
         }
       }
-
-      testProcessWatcher.addLog(logBuilder.toString())
       testProcessWatcher.finished()
     } catch {
       case t: Throwable => {
@@ -278,6 +280,7 @@ object TestEngine {
 
 
 trait TestProcessWatcher {
+
   def updateWrappers(set: Set[String]): Unit
 
   def signalEmitted(rivetIndex: Int, signalIndex: Int, signalData: SignalData): Unit
@@ -287,6 +290,8 @@ trait TestProcessWatcher {
   def finished(): Unit
 
   def addLog(log: String): Unit
+
+  def addReportLog(s: String) : Unit
 
   def failed(t: Throwable): Unit
 }

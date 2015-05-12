@@ -33,10 +33,8 @@ class TestRunContext(val testRun: TestRun) extends Runnable with TestProcessWatc
   job.testCase = testCase
   val cls = TestEngine.compileTest(user.email, testCase.name, testCase.tdl)
   val logStringBuilder = new StringBuilder;
+  val reportLogBuilder = new StringBuilder;
   var status = TestStatus.PENDING
-
-
-
 
   /**
    * Number of steps that will be calculated at the beginning for percentage
@@ -106,16 +104,16 @@ class TestRunContext(val testRun: TestRun) extends Runnable with TestProcessWatc
     TestEngineController.jobFeedUpdate()
   }
 
-  def rivetFinished(rivetIndex: Int): Unit = {
+  override def rivetFinished(rivetIndex: Int): Unit = {
     stepUp()
     Logger.info("Rivet " + rivetIndex + " finished")
   }
 
-  def signalEmitted(rivetIndex: Int, signalIndex: Int, signalData: SignalData): Unit = {
+  override def signalEmitted(rivetIndex: Int, signalIndex: Int, signalData: SignalData): Unit = {
     stepUp()
   }
 
-  def finished() {
+  override def finished() {
     status = TestStatus.GOOD
     updateRun()
   }
@@ -140,16 +138,23 @@ class TestRunContext(val testRun: TestRun) extends Runnable with TestProcessWatc
     stepUp()
   }
 
-  def addLog(log: String): Unit = {
+  override def addLog(log: String): Unit = {
     Logger.debug(log)
     logStringBuilder.append(log)
     TestEngineController.logFeedUpdate(log)
   }
 
+
+  override def addReportLog(log: String) : Unit = {
+    Logger.debug(log)
+    reportLogBuilder.append(log)
+    logStringBuilder.append(log)
+    TestEngineController.logFeedUpdate(log)
+  }
+
   def updateRun(): Unit = {
-    val log = logStringBuilder.toString()
-    rg.setTestDetails(testGroup, testAssertion, testCase, job, wrappers, log)
-    testRun.history.systemOutputLog = log
+    rg.setTestDetails(testGroup, testAssertion, testCase, job, wrappers, reportLogBuilder.toString())
+    testRun.history.systemOutputLog = logStringBuilder.toString()
     testRun.history.save();
     testRun.success = (status == TestStatus.GOOD)
     testRun.number = TestRun.getMaxNumber()+1;
