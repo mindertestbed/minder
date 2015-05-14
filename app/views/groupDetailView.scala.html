@@ -40,7 +40,7 @@
                 <th>Author</th>
             }
             @defining(new AtomicInteger(1)) {index =>
-                @for(ta <- tg.testAssertions) {
+                @for(ta <- TestAssertion.findByGroup(tg)) {
                     <tr>
                         <td>@index.getAndIncrement()</td><td><a href="/getAssertionDetailView?id=@ta.id">@ta.taId</a></td> <td>@ta.shortDescription</td>
                         <td>@ta.owner.email</td>
