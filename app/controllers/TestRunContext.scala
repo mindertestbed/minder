@@ -139,14 +139,12 @@ class TestRunContext(val testRun: TestRun) extends Runnable with TestProcessWatc
   }
 
   override def addLog(log: String): Unit = {
-    Logger.debug(log)
     logStringBuilder.append(log)
     TestEngineController.logFeedUpdate(log)
   }
 
 
   override def addReportLog(log: String) : Unit = {
-    Logger.debug(log)
     reportLogBuilder.append(log)
     logStringBuilder.append(log)
     TestEngineController.logFeedUpdate(log)

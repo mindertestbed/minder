@@ -66,7 +66,7 @@ public class TestAssertion extends Model {
 	public User owner;
 
 	public static List<TestAssertion> findByGroup(TestGroup group){
-    return find.where().eq("testGroup", group).setOrderBy("id").findList();
+    return find.where().eq("testGroup", group).setOrderBy("taId").findList();
      }
 
   public static TestAssertion findByTaId(String taId){
