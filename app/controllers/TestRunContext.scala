@@ -118,22 +118,10 @@ class TestRunContext(val testRun: TestRun) extends Runnable with TestProcessWatc
     updateRun()
   }
 
-  override def failed(t: Throwable) {
-    Logger.error(t.getMessage, t)
+  override def failed(err: String, t: Throwable) {
     status = TestStatus.BAD
-    error = {
-      var cause = t;
-      var err: String = null;
-      while (err == null && cause != null) {
-        err = cause.getMessage;
-        cause = cause.getCause
-      }
-
-      if (err == null) {
-        err = "Unknown error";
-      }
-      err
-    }
+    error = err
+    Logger.error(error, t)
     updateRun()
     stepUp()
   }
@@ -144,7 +132,7 @@ class TestRunContext(val testRun: TestRun) extends Runnable with TestProcessWatc
   }
 
 
-  override def addReportLog(log: String) : Unit = {
+  override def addReportLog(log: String): Unit = {
     reportLogBuilder.append(log)
     logStringBuilder.append(log)
     TestEngineController.logFeedUpdate(log)
@@ -155,8 +143,6 @@ class TestRunContext(val testRun: TestRun) extends Runnable with TestProcessWatc
     testRun.history.systemOutputLog = logStringBuilder.toString()
     testRun.history.save();
     testRun.success = (status == TestStatus.GOOD)
-    testRun.number = TestRun.getMaxNumber()+1;
-
     testRun.report = rg.generateReport();
     testRun.errorMessage = error;
     if (wrappers != null) {
@@ -174,6 +160,10 @@ class TestRunContext(val testRun: TestRun) extends Runnable with TestProcessWatc
 
   override def updateWrappers(set: Set[String]): Unit = {
     wrappers = set;
+  }
+
+  def updateNumber() = {
+    testRun.number = TestRun.getMaxNumber() + 1
   }
 
 }

@@ -29,12 +29,11 @@ object TestEngine {
       if (this.getLayout != null) {
         val formatted = this.getLayout.format(event);
 
-        testProcessWatcher.addLog(formatted);
-
         if (event.getLevel.toInt == Level.INFO.toInt || event.getLevel.toInt == Level.ERROR.toInt){
           testProcessWatcher.addReportLog(formatted);
+        } else {
+          testProcessWatcher.addLog(formatted);
         }
-        Logger.debug(formatted)
       }
     }
 
@@ -203,8 +202,22 @@ object TestEngine {
       testProcessWatcher.finished()
     } catch {
       case t: Throwable => {
-        lgr.error(t.getMessage, t)
-        testProcessWatcher.failed(t)
+
+        val error = {
+          var cause = t;
+          var err: String = null;
+          while (err == null && cause != null) {
+            err = cause.getMessage;
+            cause = cause.getCause
+          }
+
+          if (err == null) {
+            err = "Unknown error";
+          }
+          err
+        }
+        lgr.error(error);
+        testProcessWatcher.failed(error, t);
       }
     } finally {
       lgr.removeAppender(app)
@@ -293,5 +306,5 @@ trait TestProcessWatcher {
 
   def addReportLog(s: String) : Unit
 
-  def failed(t: Throwable): Unit
+  def failed(message: String, t: Throwable): Unit
 }

@@ -3,6 +3,7 @@ package controllers;
 import be.objectify.deadbolt.java.actions.Group;
 import be.objectify.deadbolt.java.actions.Restrict;
 import com.avaje.ebean.Ebean;
+import com.avaje.ebean.Query;
 import com.avaje.ebean.Update;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -27,6 +28,7 @@ import java.io.StringWriter;
 import java.lang.reflect.Field;
 import java.util.Arrays;
 import java.util.HashSet;
+import java.util.List;
 
 import static play.data.Form.form;
 
@@ -113,6 +115,29 @@ public class GroupController extends Controller {
       } catch (IllegalArgumentException ex) {
         ex.printStackTrace();
         return badRequest(ex.getMessage());
+      }
+
+      //check access.
+      // first lets see if we have a field named owner
+      try {
+        Field fld = cls.getDeclaredField("owner");
+
+        //we have an owner. Lets verify if we are the rightfull owner
+
+        String queryString = "find " + cls.getSimpleName() + " where id = :id";
+        Query<?> query = Ebean.createQuery(cls, queryString);
+        query.setParameter("id", id);
+        Object o = query.findUnique();
+        User user = (User) fld.get(o);
+        System.out.println("UNique " + user.email);
+
+        User localUser = Application.getLocalUser(session());
+
+        if (localUser==null || !localUser.email.equals(user.email)){
+          return badRequest("You don't have the permission to modify this resource");
+        }
+      } catch (NoSuchFieldException ex) {
+
       }
       String updStatement = "update " + cls.getSimpleName() + " set " + field + " = :value where id = :id";
       Update<?> update = Ebean.createUpdate(cls, updStatement);

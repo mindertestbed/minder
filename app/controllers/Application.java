@@ -53,6 +53,18 @@ public class Application extends Controller {
     return ok(restrictedObserver.render(localUser));
   }
 
+  public static Result root() {
+    final User localUser = getLocalUser(session());
+    System.out.println(localUser.email);
+    if (localUser.email.equals("root@minder")) {
+      return ok(rootPage.render());
+    } else {
+      return badRequest("You cannot access this resoruce.");
+    }
+  }
+
+
+
   @Restrict(@Group(Application.TEST_DESIGNER_ROLE))
   public static Result restrictedTestDesigner(String display) {
     final User localUser = getLocalUser(session());

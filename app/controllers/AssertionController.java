@@ -79,7 +79,7 @@ public class AssertionController extends Controller {
       ta.testGroup = tg;
       ta.prescriptionLevel = PrescriptionLevel
           .valueOf(model.prescriptionLevel);
-      ta.owner=Application.getLocalUser(session());
+      ta.owner = Application.getLocalUser(session());
 
       ta.save();
 
@@ -96,6 +96,8 @@ public class AssertionController extends Controller {
     TestAssertion ta = TestAssertion.find.byId(id);
     if (ta == null) {
       return badRequest("Test assertion with id [" + id + "] not found!");
+    } else if (!ta.owner.email.equals(Application.getLocalUser(session()))) {
+      return badRequest("You don't have the permission to edit this resource");
     } else {
       AssertionEditorModel taModel = new AssertionEditorModel();
       taModel.id = id;
@@ -134,6 +136,11 @@ public class AssertionController extends Controller {
         filledForm.reject("The test assertion with ID [" + model.id
             + "] does not exist");
         return badRequest(testAssertionEditor.render(filledForm, null));
+      }
+
+
+      if (!ta.owner.email.equals(Application.getLocalUser(session()))) {
+        return badRequest("You don't have the permission to edit this resource");
       }
 
       ta.taId = model.taId;
@@ -177,6 +184,10 @@ public class AssertionController extends Controller {
           + " does not exist.");
     }
 
+    if (!ta.owner.email.equals(Application.getLocalUser(session()))) {
+      return badRequest("You don't have the permission to modify this resource");
+    }
+
     try {
       ta.delete();
     } catch (Exception ex) {
@@ -188,9 +199,9 @@ public class AssertionController extends Controller {
   }
 
   @Restrict(@Group(Application.TEST_DESIGNER_ROLE))
-  public static Result getAssertionDetailView(Long id, String display){
+  public static Result getAssertionDetailView(Long id, String display) {
     TestAssertion ta = TestAssertion.findById(id);
-    if (ta == null){
+    if (ta == null) {
       return badRequest("No test assertion with id " + id + ".");
     }
     return ok(assertionDetailView.render(ta, Application.getLocalUser(session()), display));

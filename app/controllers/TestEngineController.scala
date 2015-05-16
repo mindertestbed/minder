@@ -63,43 +63,36 @@ object TestEngineController extends Controller {
       while (goon) {
         currentLog.clear()
         try {
-          logFeedUpdate(">>> Test Thread waiting on job queue");
+          logFeedUpdate("--> Test Thread waiting on job queue");
           activeRunContext = TestEngineController.jobQueue.take();
           SessionMap.registerObject(activeRunContext.testRun.runner.email, "signalRegistry", new MinderSignalRegistry());
           SignalSlotInfoProvider.setSignalSlotInfoProvider(MinderWrapperRegistry.get())
 
           jobFeedUpdate()
           queueFeedUpdate()
-          logFeedUpdate(">>> Job with id [" + activeRunContext.testRun.job.id + "] arrived. Start in 5 seconds...");
+          logFeedUpdate("--> Job with id [" + activeRunContext.testRun.job.id + "] arrived. Start in 5 seconds...");
           Thread.sleep(5000);
-          logFeedUpdate(">>> Run Job [" + activeRunContext.testRun.job.id + "]")
-          try {
-            activeRunContext.run()
-          } catch {
-            case th: Throwable =>
-              Logger.error(th.getMessage, th)
-              logFeedUpdate(th.getMessage)
-          } finally {
-            logFeedUpdate(">>> Test Run  #[" + activeRunContext.testRun.number + "] finished.")
-            activeRunContext = null
-          }
-
-          queueFeedUpdate()
-          jobFeedUpdate()
-        } catch  {
-          case inter : InterruptedException => {
+          activeRunContext.updateNumber()
+          logFeedUpdate("--> Run Job #[" + activeRunContext.testRun.number + "]")
+          activeRunContext.run()
+        } catch {
+          case inter: InterruptedException => {
             //someone interrupted me.
             //check the exit flag and go back.
-            logFeedUpdate(">>> Test thread interrupted")
+            logFeedUpdate("<-- Job Interrupted")
           }
-
-          case t : Throwable => {
-            logFeedUpdate(">>> Error [" + t.getMessage + "]")
+          case t: Throwable => {
+            logFeedUpdate("<-- Error [" + t.getMessage + "]")
           }
+        } finally {
+          logFeedUpdate(">>> Test Run  #[" + activeRunContext.testRun.number + "] finished.")
+          activeRunContext = null
+          queueFeedUpdate()
+          jobFeedUpdate()
         }
       }
     }
-  };
+  }
 
   testThread.start();
 
@@ -173,38 +166,39 @@ object TestEngineController extends Controller {
    * an action for enqueuing a new job for test engine running
    * @return
    */
-  def enqueueJob(id: Long) = Action { implicit request =>
-    if (jobQueue.size >= 20) {
-      BadRequest("The job queue is full.")
-    } else {
-      //check if the job is already in queue.
-      var already = false;
-      for (tr <- jobQueue) {
-        if (tr.job != null && tr.job.id == id) {
-          already = true;
-        }
-      }
-      if (already) {
-        BadRequest("The job is already enqueued.")
+  def enqueueJob(id: Long) = Action {
+    implicit request =>
+      if (jobQueue.size >= 20) {
+        BadRequest("The job queue is full.")
       } else {
-
-        val job = Job.findById(id)
-
-        if (job == null) {
-          BadRequest("A job with id [" + id + "] was not found!")
+        //check if the job is already in queue.
+        var already = false;
+        for (tr <- jobQueue) {
+          if (tr.job != null && tr.job.id == id) {
+            already = true;
+          }
+        }
+        if (already) {
+          BadRequest("The job is already enqueued.")
         } else {
-          //everything is fine. Create a test run and add to queue.
-          // if (jobQueue.contains())
 
-          val java_ctx = play.core.j.JavaHelpers.createJavaContext(request)
-          val java_session = java_ctx.session()
+          val job = Job.findById(id)
 
-          jobQueue.offer(createTestRunContext(job, Application.getLocalUser(java_session)))
-          queueFeedUpdate();
-          Ok;
+          if (job == null) {
+            BadRequest("A job with id [" + id + "] was not found!")
+          } else {
+            //everything is fine. Create a test run and add to queue.
+            // if (jobQueue.contains())
+
+            val java_ctx = play.core.j.JavaHelpers.createJavaContext(request)
+            val java_session = java_ctx.session()
+
+            jobQueue.offer(createTestRunContext(job, Application.getLocalUser(java_session)))
+            queueFeedUpdate();
+            Ok;
+          }
         }
       }
-    }
   }
 
 
@@ -267,42 +261,44 @@ object TestEngineController extends Controller {
     tr;
   }
 
-  def cancelJob(index: Int) = Action { implicit request =>
-    if (index >= 0 && index < jobQueue.size()) {
-      val arr = jobQueue.toArray
+  def cancelJob(index: Int) = Action {
+    implicit request =>
+      if (index >= 0 && index < jobQueue.size()) {
+        val arr = jobQueue.toArray
 
-      val tr = arr(index).asInstanceOf[TestRunContext]
-      jobQueue.remove(tr)
-      queueFeedUpdate();
-    }
-    Ok
+        val tr = arr(index).asInstanceOf[TestRunContext]
+        jobQueue.remove(tr)
+        queueFeedUpdate();
+      }
+      Ok
   }
 
-  def cancelActiveJob() = Action { implicit request =>
+  def cancelActiveJob() = Action {
+    implicit request =>
 
-    val runContext = activeRunContext; //take it before its null
+      val runContext = activeRunContext; //take it before its null
 
-    if (runContext != null) {
+      if (runContext != null) {
 
-      val java_ctx = play.core.j.JavaHelpers.createJavaContext(request)
-      val java_session = java_ctx.session()
+        val java_ctx = play.core.j.JavaHelpers.createJavaContext(request)
+        val java_session = java_ctx.session()
 
-      val user = Application.getLocalUser(java_session);
+        val user = Application.getLocalUser(java_session);
 
 
-      //only allow root or the runner to do that
-      if (user.email == "root@minder" || user.email == runContext.testRun.runner.email) {
-        //cancel
+        //only allow root or the runner to do that
+        if (user.email == "root@minder" || user.email == runContext.testRun.runner.email) {
+          //cancel
 
-        //now interrupt the thread.
-        testThread.interrupt();
+          //now interrupt the thread.
+          testThread.interrupt();
 
-        Ok
+          Ok
+        } else {
+          BadRequest("Hey! <br/>Only root or the runner can cancel an active job!!!")
+        }
       } else {
-        BadRequest("Hey! <br/>Only root or the runner can cancel an active job!!!")
+        Ok
       }
-    } else {
-      Ok
-    }
   }
 }
