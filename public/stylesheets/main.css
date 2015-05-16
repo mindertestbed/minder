@@ -441,6 +441,16 @@ table td.tabexpand {
     border-bottom:1px solid gray;
 }
 
+
+table td.tabexpandNoBorder {
+    width: 99%;
+}
+
+
+table.padabit td{
+    padding: 3px;
+}
+
 .editable{
     border: 1px solid transparent;
     border-radius: 2px;
@@ -493,6 +503,8 @@ div.testBad{
     background-color:lightcoral;
 }
 
-
-
+.logp {
+    font-family:"Monaco", "Courier New", "monospace";
+    font-size:11px;
+}
 

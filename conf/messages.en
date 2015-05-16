@@ -122,6 +122,7 @@ playauthenticate.navigation.link_more=Link more providers
 playauthenticate.navigation.logout=Sign out
 playauthenticate.navigation.login=Log in
 playauthenticate.navigation.restricted.observer=Test Observers
+playauthenticate.navigation.restricted.root=Root
 playauthenticate.navigation.restricted.testdesigner=Test Designers
 playauthenticate.navigation.restricted.testdeveloper=Test Developers
 playauthenticate.navigation.testdesigner.createtestcase=Create a Test Case

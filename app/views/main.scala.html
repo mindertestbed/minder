@@ -32,6 +32,12 @@
                             <li class="@("active".when(nav == "restrictedTestDesigner"))"><a href="@routes.Application.restrictedTestDesigner()">@Messages("playauthenticate.navigation.restricted.testdesigner")</a></li>
                             <li class="@("active".when(nav == "restrictedTestDeveloper"))"><a href="@routes.Application.restrictedTestDeveloper()">@Messages("playauthenticate.navigation.restricted.testdeveloper")</a></li>
                             <li class="@("active".when(nav == "restrictedObserver"))"><a href="@routes.Application.restrictedObserver()">@Messages("playauthenticate.navigation.restricted.observer")</a></li>
+
+                            @defining(Application.getLocalUser(session())) { user =>
+                                    @if(user!=null&&user.email=="root@minder") {
+                                        <li class="@("active".when(nav == "root"))"><a href="@routes.Application.root()">@Messages("playauthenticate.navigation.restricted.root")</a></li>
+                                    }
+                            }
                             <!--
                             @subjectNotPresent() {
                                 <li class="@("active".when(nav == "signup"))"><a href="@routes.Application.signup()">@Messages("playauthenticate.navigation.signup")</a></li>
