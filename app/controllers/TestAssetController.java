@@ -3,6 +3,7 @@ package controllers;
 import global.Util;
 import models.ModelConstants;
 import models.TestAsset;
+import models.TestGroup;
 import models.User;
 import play.Logger;
 import play.data.Form;
@@ -37,42 +38,52 @@ public class TestAssetController extends Controller {
     public String description;
   }
 
-  public static Result doCreateTestAsset() {
+  public static Result doCreateTestAsset(Long testGroupId) {
     com.feth.play.module.pa.controllers.Authenticate.noCache(response());
     final Form<TestAssetModel> filledForm = TEST_ASSET_FORM.bindFromRequest();
 
+    TestGroup group = TestGroup.findById(testGroupId);
+
+    if (group == null) {
+      return badRequest("Test Group with [" + testGroupId + "] not found");
+    }
+
     User localuser = Application.getLocalUser(session());
+    if (localuser.email.equals("root@minder") || group.owner.email.equals(localuser.email)) {
 
-    if (filledForm.hasErrors()) {
-      Util.printFormErrors(filledForm);
-      return badRequest(testAssetEditor.render(filledForm, null));
+      if (filledForm.hasErrors()) {
+        Util.printFormErrors(filledForm);
+        return badRequest(testAssetEditor.render(filledForm, null));
+      } else {
+        TestAssetModel model = filledForm.get();
+
+        TestAsset asset = TestAsset.findByGroup(group, model.name);
+        if (asset != null) {
+          filledForm.reject("An asset with name [" + asset.name + "] already exists");
+          return badRequest(testAssetEditor.render(filledForm, null));
+        }
+
+        //file upload part
+        try {
+          handleFileUpload(group.id, model.name);
+        } catch (Exception ex) {
+          Logger.error(ex.getMessage(), ex);
+          filledForm.reject("Unknown error");
+          return badRequest(testAssetEditor.render(filledForm, null));
+        }
+
+        asset = new TestAsset();
+        asset.group = group;
+        asset.shortDescription = model.shortDescription;
+        asset.description = model.description;
+        asset.name = model.name;
+
+        asset.save();
+
+        return redirect(controllers.routes.GroupController.getGroupDetailView(group.id, "assets"));
+      }
     } else {
-      TestAssetModel model = filledForm.get();
-
-      TestAsset asset = TestAsset.findByUserAndName(localuser, model.name);
-      if (asset != null) {
-        filledForm.reject("An asset with name [" + asset.name + "] already exists");
-        return badRequest(testAssetEditor.render(filledForm, null));
-      }
-
-      //file upload part
-      try {
-        handleFileUpload(localuser.email, model.name);
-      } catch (Exception ex) {
-        Logger.error(ex.getMessage(), ex);
-        filledForm.reject("Unknown error");
-        return badRequest(testAssetEditor.render(filledForm, null));
-      }
-
-      asset = new TestAsset();
-      asset.owner = localuser;
-      asset.shortDescription = model.shortDescription;
-      asset.description = model.description;
-      asset.name = model.name;
-
-      asset.save();
-
-      return ok(testAssetLister.render(localuser));
+      return badRequest("You cant use this resource");
     }
   }
 
@@ -82,8 +93,14 @@ public class TestAssetController extends Controller {
 
 
   public static Result editAssetForm(Long id) {
-    final User localUser = Application.getLocalUser(session());
-    TestAsset ta = TestAsset.find.byId(id);
+    User localuser = Application.getLocalUser(session());
+
+    TestGroup group = TestGroup.findById(id);
+    if (!localuser.email.equals("root@minder") && !group.owner.email.equals(localuser.email)) {
+      return badRequest("You cant use this resource");
+    }
+
+    TestAsset ta = TestAsset.findById(id);
     if (ta == null) {
       return badRequest("Test asset with id [" + id + "] not found!");
     } else {
@@ -109,30 +126,36 @@ public class TestAssetController extends Controller {
       return badRequest(testAssetEditor.render(filledForm, null));
     } else {
       TestAssetModel model = filledForm.get();
+      TestAsset ta = TestAsset.findById(model.id);
+      User localuser = Application.getLocalUser(session());
+      if (!localuser.email.equals("root@minder") && !ta.group.owner.email.equals(localuser.email)) {
+        return badRequest("You cant use this resource");
+      }
+
 
       //file upload part
       User localUser = Application.getLocalUser(session());
       try {
-        handleFileUpload(localUser.email, model.name);
+        handleFileUpload(ta.group.id, model.name);
       } catch (Exception ex) {
         filledForm.reject(ex.getMessage());
         return badRequest(testAssetEditor.render(filledForm, null));
       }
 
-      TestAsset ta = TestAsset.find.byId(model.id);
       ta.name = model.name;
       ta.shortDescription = model.shortDescription;
       ta.description = model.description;
       ta.update();
 
       Logger.info("Done updating test asset " + ta.name + ":" + ta.id);
-      return ok(testAssetLister.render(localUser));
+
+      return redirect(controllers.routes.GroupController.getGroupDetailView(ta.group.id, "assets"));
     }
   }
 
   public static Result doDeleteAsset(Long id) {
     com.feth.play.module.pa.controllers.Authenticate.noCache(response());
-    TestAsset ta = TestAsset.find.byId(id);
+    TestAsset ta = TestAsset.findById(id);
     if (ta == null) {
       return badRequest("Test asset with id [" + id + "] not found!");
     } else {
@@ -144,21 +167,22 @@ public class TestAssetController extends Controller {
       }
       User user = Application.getLocalUser(session());
 
-      new File("assets/" + formatMail(user.email) + "/" + ta.name).delete();
-      return ok(testAssetLister.render(user));
+      new File("assets/_" + ta.group.id + "/" + ta.name).delete();
+
+      return redirect(controllers.routes.GroupController.getGroupDetailView(ta.group.id, "assets"));
     }
   }
 
-  public static Result downloadAsset(Long id){
+  public static Result downloadAsset(Long id) {
     com.feth.play.module.pa.controllers.Authenticate.noCache(response());
-    TestAsset ta = TestAsset.find.byId(id);
+    TestAsset ta = TestAsset.findById(id);
     if (ta == null) {
       return badRequest("Test asset with id [" + id + "] not found!");
     } else {
       User user = Application.getLocalUser(session());
       response().setContentType("application/x-download");
-      response().setHeader("Content-disposition","attachment; filename=" + ta.name);
-      return ok(new File("assets/" + formatMail(user.email) + "/" + ta.name));
+      response().setHeader("Content-disposition", "attachment; filename=" + ta.name);
+      return ok(new File("assets/_" + ta.group.id + "/" + ta.name));
     }
   }
 
@@ -167,16 +191,16 @@ public class TestAssetController extends Controller {
    * Opens the asset identified by the user <code>email</code> and asset name <code>name</code>
    * as an input stream. Its the callers' responsibility to close the stream.
    *
-   * @param email
+   * @param tgId
    * @param name
    * @return
    */
-  public static InputStream getAssetAsStream(String email, String name) {
+  public static InputStream getAssetAsStream(long tgId, String name) {
     try {
-      FileInputStream fis = new FileInputStream("assets/" + formatMail(email) + "/" + name);
+      FileInputStream fis = new FileInputStream("assets/_" + tgId + "/" + name);
       return fis;
     } catch (Exception ex) {
-      throw new RuntimeException("an asset file [" + name + "] was not found for user [" + email + "]");
+      throw new RuntimeException("an asset file [" + name + "] was not found for test group with id [" + tgId + "]");
     }
   }
 
@@ -184,16 +208,16 @@ public class TestAssetController extends Controller {
    * Reads the asset identified by the user <code>email</code> and asset name <code>name</code>
    * and returns it in a byte array.
    *
-   * @param email
+   * @param groupId
    * @param name
    * @return
    */
-  public static byte[] getAssetAsByteArray(String email, String name) {
+  public static byte[] getAssetAsByteArray(long groupId, String name) {
     int read = -1;
     byte[] bulk = new byte[1024];
     ByteArrayOutputStream baos = new ByteArrayOutputStream();
 
-    InputStream is = getAssetAsStream(email, name);
+    InputStream is = getAssetAsStream(groupId, name);
     try {
       while ((read = is.read(bulk)) != -1) {
         baos.write(bulk, 0, read);
@@ -202,17 +226,17 @@ public class TestAssetController extends Controller {
       return baos.toByteArray();
     } catch (Exception ex) {
       Logger.error(ex.getMessage(), ex);
-      throw new RuntimeException("Couldn't read asset [" + email + "/" + name + "]");
+      throw new RuntimeException("Couldn't read asset [_" + groupId + "/" + name + "]");
     }
   }
 
   /**
    * Reads the file uploaded with the current request (if any)
    *
-   * @param email
+   * @param groupId
    * @param name
    */
-  private static void handleFileUpload(String email, String name) {
+  private static void handleFileUpload(long groupId, String name) {
     Http.MultipartFormData body = request().body().asMultipartFormData();
 
     if (body == null)
@@ -223,9 +247,8 @@ public class TestAssetController extends Controller {
     if (body.getFiles() != null && body.getFiles().size() > 0)
       asset = body.getFiles().get(0).getFile();
 
-    String formattedMail = formatMail(email);
-    new File("assets/" + formattedMail).mkdirs();
-    File fl = new File("assets/" + formattedMail + "/" + name);
+    new File("assets/_" + groupId).mkdirs();
+    File fl = new File("assets/_" + groupId + "/" + name);
     if (asset == null) {
       //no asset defined check if a file already exists? (edit mode)
       if (fl.exists())
@@ -237,7 +260,7 @@ public class TestAssetController extends Controller {
       try {
         fos = new FileOutputStream(fl);
       } catch (FileNotFoundException e) {
-        throw new RuntimeException("Asset for [" + email + "/" + name + "] couldn't be created");
+        throw new RuntimeException("Asset for [_" + groupId + "/" + name + "] couldn't be created");
       }
       try {
         fis = new FileInputStream(asset);
@@ -257,9 +280,5 @@ public class TestAssetController extends Controller {
         throw new RuntimeException(ex.getMessage());
       }
     }
-  }
-
-  private static String formatMail(String email) {
-    return email.replaceAll("(@|\\.|\\-)", "_");
   }
 }

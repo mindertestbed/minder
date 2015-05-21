@@ -1,0 +1,47 @@
+@import java.util.concurrent.atomic.AtomicInteger
+
+@import models.User
+@import global.Util._
+
+<script>
+  $(function() {
+    $( document ).tooltip();
+  });
+  </script>
+
+  @defining(new AtomicInteger(1)) {index =>
+  <table class="shaded">
+    @createFirstRow {
+      <th>Email</th>
+      <th>Name</th>
+      <th><div title="Test Designer">TS</div></th>
+      <th><div title="Test Developer">TD</div></th>
+      <th><div title="Test Observer">TO</div></th>
+      <th>Active</th>
+    }
+    @for(user <- User.findAll) {
+      <tr>
+        <td>@index.getAndIncrement()</td><td>@user.email</td> <td>@user.name</td>
+        <td align="center"><img src="@routes.Assets.at(getBooleanIcon(user.isTester))" height="16px" alt='@user.id'/></td>
+        <td align="center"><img src="@routes.Assets.at(getBooleanIcon(user.isDeveloper))" height="16px" alt='@user.id'/></td>
+        <td align="center"><img src="@routes.Assets.at(getBooleanIcon(user.isObserver))" height="16px" alt='@user.id'/></td>
+        <td align="center"><img src="@routes.Assets.at(getBooleanIcon(user.active))" height="16px" alt='@user.id'/></td>
+        <td>
+          <div title="Edit" class="bevel2 celldiv" style="height:30px;width:30px;cursor:hand;">
+            <a href="@routes.UserController.editUserForm(user.id)"><img src="@routes.Assets.at("/images/edit_property-64.png")" height="16px" alt='@user.id'/></a>
+          </div>
+          <div class="celldiv" style="width:5px;">&nbsp;
+          </div>
+        <div title="Delete" class="bevel2 celldiv" style="height:30px;width:30px;cursor:hand;"
+        onclick='deleteWithDialog2("/doDeleteUser?id=@user.id", $("#dialog-confirm"), "Delete User", "user", "@user.email")'>
+        <img src="@routes.Assets.at("/images/trash2-64.png")" height="16px" alt='@user.id'/>
+      </div>
+        </td>
+      </tr>
+    }
+
+    @createLastRow(5){
+      @createButton("/getUserEditorView", "Create New User")
+    }
+  </table>
+  }

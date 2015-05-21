@@ -1,17 +1,16 @@
 package controllers
 
-import java.text.SimpleDateFormat
 import java.util
-import java.util.concurrent.Executor
-import java.util.{Observable, Observer, Calendar}
+import java.util.{Observable, Observer}
 
 import minderengine.MinderWrapperRegistry
-import models.{Wrapper, MappedWrapper, Job}
-import play.api.libs.json._
-import play.api.mvc._
-import play.api.libs.iteratee.{Concurrent, Enumeratee}
+import models.{Job, Wrapper}
 import play.api.libs.EventSource
 import play.api.libs.concurrent.Execution.Implicits._
+import play.api.libs.iteratee.{Concurrent, Enumeratee}
+import play.api.libs.json._
+import play.api.mvc._
+
 import scala.collection.JavaConversions._
 
 object SSEHandler extends Controller {

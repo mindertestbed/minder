@@ -1,11 +1,13 @@
 package minderengine;
 
 import minderengine.SignalData;
+import org.interop.xoola.core.XoolaProperty;
 
 import java.util.HashMap;
 import java.util.Objects;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.PriorityBlockingQueue;
+import java.util.concurrent.TimeUnit;
 
 /**
  * This class has instances per session. It holds the values of signal calls that have occurred on the wrappers' side.
@@ -37,9 +39,15 @@ public class MinderSignalRegistry {
     PriorityBlockingQueue<SignalData> queue = initMap(label, signature);
 
     try {
-      return queue.take();
+      long timeout = Long.parseLong(XoolaServer.properties.getProperty(XoolaProperty.NETWORK_RESPONSE_TIMEOUT));
+      SignalData result = queue.poll(timeout, TimeUnit.MILLISECONDS);
+      if(result == null){
+        throw new RuntimeException("No signal was received in the given timeout (" + timeout + ")");
+      }
+
+      return result;
     } catch (InterruptedException e) {
-      throw new RuntimeException(e);
+      throw new RuntimeException("Signal dequeue operation cancelled");
     }
   }
 

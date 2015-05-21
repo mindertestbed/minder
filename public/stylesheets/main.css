@@ -4,62 +4,71 @@ body {
     padding-right: 15px;
 }
 
-.absofull{
+.absofull {
     position: absolute;
-    top:0;
-    left:0;
-    width:100%;
-    height:100%;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
 }
 
 form .error {
-  input {
+
+input {
     background-color: #F2DEDE;
     border-color: #EED3D7;
     color: #B94A48;
-  }
-  .help-inline {
+}
+
+.help-inline {
     color: #B94A48;
-  }
+}
+
 }
 
 .providers {
-	margin: 5px 0;
-	list-style: none;
-	li {
-		display: inline;
-	}
+    margin: 5px 0;
+    list-style: none;
+
+li {
+    display: inline;
+}
+
 }
 
 .help-block {
-	margin: -10px 0 10px 0;
-	font-size: 10px;
-	color: #ccc !important;
+    margin: -10px 0 10px 0;
+    font-size: 10px;
+    color: #ccc !important;
 }
 
 h1 {
-	margin-bottom: 30px !important;
+    margin-bottom: 30px !important;
 }
 
 #nav {
-    line-height:30px;
-    background-color:#eeeeee;
-    height:500px;
-    width:300px;
-    float:left;
-    padding:0px; 
+    line-height: 30px;
+    background-color: #eeeeee;
+    height: 500px;
+    width: 300px;
+    float: left;
+    padding: 0px;
 }
+
 #sectionnav {
-    width:800px;
-    height:500px;
-    float:left;
-    padding:0px; 
+    width: 800px;
+    height: 500px;
+    float: left;
+    padding: 0px;
 }
 
-section, article { display: block; padding: 0; }
+section, article {
+    display: block;
+    padding: 0;
+}
 
-.scroll{
-  overflow:scroll;
+.scroll {
+    overflow: scroll;
 }
 
 .menu-bar {
@@ -68,312 +77,275 @@ section, article { display: block; padding: 0; }
 }
 
 code {
-  padding: 0 2px;  
+    padding: 0 2px;
 }
+
 .CodeMirror-scroll {
-  height: auto;
-  overflow-y: hidden;
-  overflow-x: auto;
-  width: 100%
+    height: auto;
+    overflow-y: hidden;
+    overflow-x: auto;
+    width: 100%
 }
 
-.explanation{
-  cursor: pointer;
+.explanation {
+    cursor: pointer;
 }
 
-.explanation + p{
-  border-radius: 4px;
-  border: 1px solid gray;
+.explanation + p {
+    border-radius: 4px;
+    border: 1px solid gray;
 }
 
-td{
-  vertical-align: middle;
+td {
+    vertical-align: middle;
 }
 
-.bevel{
-   font: 100% 'Arial';
-   padding: 15px;
-   overflow: auto;
-   border-radius: 4px;
-   /* Chrome10+,Safari5.1+ */
-   background: -o-linear-gradient(top, rgba(255,255,255,1) 0%,rgba(240, 240, 240,1) 100%);
-   /* Opera 11.10+ */
-   background: -ms-linear-gradient(top, rgba(255,255,255,1) 0%,rgba(240, 240, 240,1) 100%);
-   /* IE10+ */
-   background: linear-gradient(to bottom, rgba(255,255,255,1) 0%,rgba(240, 240, 240,1) 100%);
-   /* W3C */
-   /*filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#73bbe9', endColorstr='#17567f',GradientType=0 ); IE6-9 */
-   filter: none; /*IE6-9 */
-   -moz-box-shadow:
-   0px 0px 5px rgba(0,0,0,0.5), /*top external highlight*/
-   2px 3px 5px rgba(0,0,0,0.2), /*bottom external shadow*/
-   inset 0 -1px 1px rgba(0,0,0,0.5), /*bottom internal shadow*/
-   inset 0 1px 1px rgba(255,255,255,1); /*top internal highlight*/
-   -webkit-box-shadow:
-   0px -1px 3px rgba(255,255,255,0.5), /*top external highlight*/
-   2px 3px 3px rgba(0,0,0,0.2), /*bottom external shadow*/
-   inset 0 -1px 1px rgba(0,0,0,0.5), /*bottom internal shadow*/
-   inset 0 1px 1px rgba(255,255,255,1); /*top internal highlight*/
-   box-shadow:
-   0px -1px 3px rgba(255,255,255,0.5), /*top external highlight*/
-   2px 3px 3px rgba(0,0,0,0.2), /*bottom external shadow*/
-   inset 0 -1px 1px rgba(0,0,0,0.5), /*bottom internal shadow*/
-   inset 0 1px 1px rgba(255,255,255,1); /*top internal highlight*/
- }
-
-
-.bevelsmall{
-   font: 100% 'Arial';
-   padding: 2px;
-   overflow: auto;
-   border-radius: 2px;
-   /* Chrome10+,Safari5.1+ */
-   background: -o-linear-gradient(top, rgba(255,255,255,1) 0%,rgba(240, 240, 240,1) 100%);
-   /* Opera 11.10+ */
-   background: -ms-linear-gradient(top, rgba(255,255,255,1) 0%,rgba(240, 240, 240,1) 100%);
-   /* IE10+ */
-   background: linear-gradient(to bottom, rgba(255,255,255,1) 0%,rgba(240, 240, 240,1) 100%);
-   /* W3C */
-   /*filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#73bbe9', endColorstr='#17567f',GradientType=0 ); IE6-9 */
-   filter: none; /*IE6-9 */
-   -moz-box-shadow:
-   0px 0px 5px rgba(0,0,0,0.5), /*top external highlight*/
-   2px 3px 5px rgba(0,0,0,0.2), /*bottom external shadow*/
-   inset 0 -1px 1px rgba(0,0,0,0.5), /*bottom internal shadow*/
-   inset 0 1px 1px rgba(255,255,255,1); /*top internal highlight*/
-   -webkit-box-shadow:
-   0px -1px 3px rgba(255,255,255,0.5), /*top external highlight*/
-   2px 3px 3px rgba(0,0,0,0.2), /*bottom external shadow*/
-   inset 0 -1px 1px rgba(0,0,0,0.5), /*bottom internal shadow*/
-   inset 0 1px 1px rgba(255,255,255,1); /*top internal highlight*/
-   box-shadow:
-   0px -1px 3px rgba(255,255,255,0.5), /*top external highlight*/
-   2px 3px 3px rgba(0,0,0,0.2), /*bottom external shadow*/
-   inset 0 -1px 1px rgba(0,0,0,0.5), /*bottom internal shadow*/
-   inset 0 1px 1px rgba(255,255,255,1); /*top internal highlight*/
- }
-
- .bevel2{
-      border-radius: 4px;
-      /* Chrome10+,Safari5.1+ */
-      background: -o-linear-gradient(top, rgba(255,255,255,1) 0%,rgba(240, 240, 240,1) 100%);
-      /* Opera 11.10+ */
-      background: -ms-linear-gradient(top, rgba(255,255,255,1) 0%,rgba(240, 240, 240,1) 100%);
-      /* IE10+ */
-      background: linear-gradient(to bottom, rgba(255,255,255,1) 0%,rgba(240, 240, 240,1) 100%);
-      /* W3C */
-      /*filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#73bbe9', endColorstr='#17567f',GradientType=0 ); IE6-9 */
-      filter: none; /*IE6-9 */
-      -moz-box-shadow:
-      0px 0px 5px rgba(0,0,0,0.5), /*top external highlight*/
-      inset 0 -1px 1px rgba(0,0,0,0.5), /*bottom internal shadow*/
-      inset 0 1px 1px rgba(255,255,255,1); /*top internal highlight*/
-      -webkit-box-shadow:
-      0px 0px 5px rgba(0,0,0,0.5), /*top external highlight*/
-      inset 0 -1px 1px rgba(0,0,0,0.5), /*bottom internal shadow*/
-      inset 0 1px 1px rgba(255,255,255,1); /*top internal highlight*/
-      box-shadow:
-      0px 0px 5px rgba(0,0,0,0.5), /*top external highlight*/
-      inset 0 -1px 1px rgba(0,0,0,0.5), /*bottom internal shadow*/
-      inset 0 1px 1px rgba(255,255,255,1); /*top internal highlight*/
- }
-
-.styledtitle{
-  font: 100% 'Arial';
-  height:28px;
-  width: 100%;
-  border-bottom: 1px solid gray;
-  vertical-align: middle;
-
-  background: rgb(234,234,234);
-  background: -moz-linear-gradient(top,  rgba(234,234,234,1) 0%, rgba(247,247,247,1) 50%, rgba(234,234,234,1) 100%);
-  background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,rgba(234,234,234,1)), color-stop(50%,rgba(247,247,247,1)), color-stop(100%,rgba(234,234,234,1)));
-  background: -webkit-linear-gradient(top,  rgba(234,234,234,1) 0%,rgba(247,247,247,1) 50%,rgba(234,234,234,1) 100%);
-  background: -o-linear-gradient(top,  rgba(234,234,234,1) 0%,rgba(247,247,247,1) 50%,rgba(234,234,234,1) 100%);
-  background: -ms-linear-gradient(top,  rgba(234,234,234,1) 0%,rgba(247,247,247,1) 50%,rgba(234,234,234,1) 100%);
-  background: linear-gradient(to bottom,  rgba(234,234,234,1) 0%,rgba(247,247,247,1) 50%,rgba(234,234,234,1) 100%);
-  filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#eaeaea', endColorstr='#eaeaea',GradientType=0 );
-  /*
-  background: rgb(247,247,247);
-    background: -moz-linear-gradient(top,  rgba(247,247,247,1) 0%, rgba(234,234,234,1) 50%, rgba(247,247,247,1) 100%);
-    background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,rgba(247,247,247,1)), color-stop(50%,rgba(234,234,234,1)), color-stop(100%,rgba(247,247,247,1)));
-    background: -webkit-linear-gradient(top,  rgba(247,247,247,1) 0%,rgba(234,234,234,1) 50%,rgba(247,247,247,1) 100%);
-    background: -o-linear-gradient(top,  rgba(247,247,247,1) 0%,rgba(234,234,234,1) 50%,rgba(247,247,247,1) 100%);
-    background: -ms-linear-gradient(top,  rgba(247,247,247,1) 0%,rgba(234,234,234,1) 50%,rgba(247,247,247,1) 100%);
-    background: linear-gradient(to bottom,  rgba(247,247,247,1) 0%,rgba(234,234,234,1) 50%,rgba(247,247,247,1) 100%);
-    filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#f7f7f7', endColorstr='#f7f7f7',GradientType=0 );*/
+.bevel {
+    font: 100% 'Arial';
+    padding: 15px;
+    overflow: auto;
+    border-radius: 4px;
+    /* Chrome10+,Safari5.1+ */
+    background: -o-linear-gradient(top, rgba(255, 255, 255, 1) 0%, rgba(240, 240, 240, 1) 100%);
+    /* Opera 11.10+ */
+    background: -ms-linear-gradient(top, rgba(255, 255, 255, 1) 0%, rgba(240, 240, 240, 1) 100%);
+    /* IE10+ */
+    background: linear-gradient(to bottom, rgba(255, 255, 255, 1) 0%, rgba(240, 240, 240, 1) 100%);
+    /* W3C */
+    /*filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#73bbe9', endColorstr='#17567f',GradientType=0 ); IE6-9 */
+    filter: none; /*IE6-9 */
+    -moz-box-shadow: 0px 0px 5px rgba(0, 0, 0, 0.5), /*top external highlight*/ 2px 3px 5px rgba(0, 0, 0, 0.2), /*bottom external shadow*/ inset 0 -1px 1px rgba(0, 0, 0, 0.5), /*bottom internal shadow*/ inset 0 1px 1px rgba(255, 255, 255, 1); /*top internal highlight*/
+    -webkit-box-shadow: 0px -1px 3px rgba(255, 255, 255, 0.5), /*top external highlight*/ 2px 3px 3px rgba(0, 0, 0, 0.2), /*bottom external shadow*/ inset 0 -1px 1px rgba(0, 0, 0, 0.5), /*bottom internal shadow*/ inset 0 1px 1px rgba(255, 255, 255, 1); /*top internal highlight*/
+    box-shadow: 0px -1px 3px rgba(255, 255, 255, 0.5), /*top external highlight*/ 2px 3px 3px rgba(0, 0, 0, 0.2), /*bottom external shadow*/ inset 0 -1px 1px rgba(0, 0, 0, 0.5), /*bottom internal shadow*/ inset 0 1px 1px rgba(255, 255, 255, 1); /*top internal highlight*/
 }
 
+.bevelsmall {
+    font: 100% 'Arial';
+    padding: 2px;
+    overflow: auto;
+    border-radius: 2px;
+    /* Chrome10+,Safari5.1+ */
+    background: -o-linear-gradient(top, rgba(255, 255, 255, 1) 0%, rgba(240, 240, 240, 1) 100%);
+    /* Opera 11.10+ */
+    background: -ms-linear-gradient(top, rgba(255, 255, 255, 1) 0%, rgba(240, 240, 240, 1) 100%);
+    /* IE10+ */
+    background: linear-gradient(to bottom, rgba(255, 255, 255, 1) 0%, rgba(240, 240, 240, 1) 100%);
+    /* W3C */
+    /*filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#73bbe9', endColorstr='#17567f',GradientType=0 ); IE6-9 */
+    filter: none; /*IE6-9 */
+    -moz-box-shadow: 0px 0px 5px rgba(0, 0, 0, 0.5), /*top external highlight*/ 2px 3px 5px rgba(0, 0, 0, 0.2), /*bottom external shadow*/ inset 0 -1px 1px rgba(0, 0, 0, 0.5), /*bottom internal shadow*/ inset 0 1px 1px rgba(255, 255, 255, 1); /*top internal highlight*/
+    -webkit-box-shadow: 0px -1px 3px rgba(255, 255, 255, 0.5), /*top external highlight*/ 2px 3px 3px rgba(0, 0, 0, 0.2), /*bottom external shadow*/ inset 0 -1px 1px rgba(0, 0, 0, 0.5), /*bottom internal shadow*/ inset 0 1px 1px rgba(255, 255, 255, 1); /*top internal highlight*/
+    box-shadow: 0px -1px 3px rgba(255, 255, 255, 0.5), /*top external highlight*/ 2px 3px 3px rgba(0, 0, 0, 0.2), /*bottom external shadow*/ inset 0 -1px 1px rgba(0, 0, 0, 0.5), /*bottom internal shadow*/ inset 0 1px 1px rgba(255, 255, 255, 1); /*top internal highlight*/
+}
 
-.styledtitleinverse{
-  font: 100% 'Arial';
-  height:28px;
-  #width: 100%;
-  border-bottom: 1px solid gray;
-  vertical-align: middle;
+.bevel2 {
+    border-radius: 4px;
+    /* Chrome10+,Safari5.1+ */
+    background: -o-linear-gradient(top, rgba(255, 255, 255, 1) 0%, rgba(240, 240, 240, 1) 100%);
+    /* Opera 11.10+ */
+    background: -ms-linear-gradient(top, rgba(255, 255, 255, 1) 0%, rgba(240, 240, 240, 1) 100%);
+    /* IE10+ */
+    background: linear-gradient(to bottom, rgba(255, 255, 255, 1) 0%, rgba(240, 240, 240, 1) 100%);
+    /* W3C */
+    /*filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#73bbe9', endColorstr='#17567f',GradientType=0 ); IE6-9 */
+    filter: none; /*IE6-9 */
+    -moz-box-shadow: 0px 0px 5px rgba(0, 0, 0, 0.5), /*top external highlight*/ inset 0 -1px 1px rgba(0, 0, 0, 0.5), /*bottom internal shadow*/ inset 0 1px 1px rgba(255, 255, 255, 1); /*top internal highlight*/
+    -webkit-box-shadow: 0px 0px 5px rgba(0, 0, 0, 0.5), /*top external highlight*/ inset 0 -1px 1px rgba(0, 0, 0, 0.5), /*bottom internal shadow*/ inset 0 1px 1px rgba(255, 255, 255, 1); /*top internal highlight*/
+    box-shadow: 0px 0px 5px rgba(0, 0, 0, 0.5), /*top external highlight*/ inset 0 -1px 1px rgba(0, 0, 0, 0.5), /*bottom internal shadow*/ inset 0 1px 1px rgba(255, 255, 255, 1); /*top internal highlight*/
+}
+
+.styledtitle {
+    font: 100% 'Arial';
+    height: 28px;
+    width: 100%;
+    border-bottom: 1px solid gray;
+    vertical-align: middle;
+
+    background: rgb(234, 234, 234);
+    background: -moz-linear-gradient(top, rgba(234, 234, 234, 1) 0%, rgba(247, 247, 247, 1) 50%, rgba(234, 234, 234, 1) 100%);
+    background: -webkit-gradient(linear, left top, left bottom, color-stop(0%, rgba(234, 234, 234, 1)), color-stop(50%, rgba(247, 247, 247, 1)), color-stop(100%, rgba(234, 234, 234, 1)));
+    background: -webkit-linear-gradient(top, rgba(234, 234, 234, 1) 0%, rgba(247, 247, 247, 1) 50%, rgba(234, 234, 234, 1) 100%);
+    background: -o-linear-gradient(top, rgba(234, 234, 234, 1) 0%, rgba(247, 247, 247, 1) 50%, rgba(234, 234, 234, 1) 100%);
+    background: -ms-linear-gradient(top, rgba(234, 234, 234, 1) 0%, rgba(247, 247, 247, 1) 50%, rgba(234, 234, 234, 1) 100%);
+    background: linear-gradient(to bottom, rgba(234, 234, 234, 1) 0%, rgba(247, 247, 247, 1) 50%, rgba(234, 234, 234, 1) 100%);
+    filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#eaeaea', endColorstr='#eaeaea', GradientType=0);
+    /*
+    background: rgb(247,247,247);
+      background: -moz-linear-gradient(top,  rgba(247,247,247,1) 0%, rgba(234,234,234,1) 50%, rgba(247,247,247,1) 100%);
+      background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,rgba(247,247,247,1)), color-stop(50%,rgba(234,234,234,1)), color-stop(100%,rgba(247,247,247,1)));
+      background: -webkit-linear-gradient(top,  rgba(247,247,247,1) 0%,rgba(234,234,234,1) 50%,rgba(247,247,247,1) 100%);
+      background: -o-linear-gradient(top,  rgba(247,247,247,1) 0%,rgba(234,234,234,1) 50%,rgba(247,247,247,1) 100%);
+      background: -ms-linear-gradient(top,  rgba(247,247,247,1) 0%,rgba(234,234,234,1) 50%,rgba(247,247,247,1) 100%);
+      background: linear-gradient(to bottom,  rgba(247,247,247,1) 0%,rgba(234,234,234,1) 50%,rgba(247,247,247,1) 100%);
+      filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#f7f7f7', endColorstr='#f7f7f7',GradientType=0 );*/
+}
+
+.styledtitleinverse {
+    font: 100% 'Arial';
+    height: 28px;
+    #width: 100%;
+    border-bottom: 1px solid gray;
+    vertical-align: middle;
     padding-left: 10px;
     padding-right: 10px;
 
-  background: rgb(247,247,247);
-    background: -moz-linear-gradient(top,  rgba(247,247,247,1) 0%, rgba(234,234,234,1) 50%, rgba(247,247,247,1) 100%);
-    background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,rgba(247,247,247,1)), color-stop(50%,rgba(234,234,234,1)), color-stop(100%,rgba(247,247,247,1)));
-    background: -webkit-linear-gradient(top,  rgba(247,247,247,1) 0%,rgba(234,234,234,1) 50%,rgba(247,247,247,1) 100%);
-    background: -o-linear-gradient(top,  rgba(247,247,247,1) 0%,rgba(234,234,234,1) 50%,rgba(247,247,247,1) 100%);
-    background: -ms-linear-gradient(top,  rgba(247,247,247,1) 0%,rgba(234,234,234,1) 50%,rgba(247,247,247,1) 100%);
-    background: linear-gradient(to bottom,  rgba(247,247,247,1) 0%,rgba(234,234,234,1) 50%,rgba(247,247,247,1) 100%);
-    filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#f7f7f7', endColorstr='#f7f7f7',GradientType=0 );
+    background: rgb(247, 247, 247);
+    background: -moz-linear-gradient(top, rgba(247, 247, 247, 1) 0%, rgba(234, 234, 234, 1) 50%, rgba(247, 247, 247, 1) 100%);
+    background: -webkit-gradient(linear, left top, left bottom, color-stop(0%, rgba(247, 247, 247, 1)), color-stop(50%, rgba(234, 234, 234, 1)), color-stop(100%, rgba(247, 247, 247, 1)));
+    background: -webkit-linear-gradient(top, rgba(247, 247, 247, 1) 0%, rgba(234, 234, 234, 1) 50%, rgba(247, 247, 247, 1) 100%);
+    background: -o-linear-gradient(top, rgba(247, 247, 247, 1) 0%, rgba(234, 234, 234, 1) 50%, rgba(247, 247, 247, 1) 100%);
+    background: -ms-linear-gradient(top, rgba(247, 247, 247, 1) 0%, rgba(234, 234, 234, 1) 50%, rgba(247, 247, 247, 1) 100%);
+    background: linear-gradient(to bottom, rgba(247, 247, 247, 1) 0%, rgba(234, 234, 234, 1) 50%, rgba(247, 247, 247, 1) 100%);
+    filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#f7f7f7', endColorstr='#f7f7f7', GradientType=0);
 }
 
 .hand {
-   cursor: pointer;
+    cursor: pointer;
 }
 
-.navbar-brand{
-  color: rgb(97, 97, 97);
-  #background-color: rgb(186, 186, 186);
-  text-shadow: rgb(224, 224, 224) 1px 1px 0px;
+.navbar-brand {
+    color: rgb(97, 97, 97);
+    #background-color: rgb(186, 186, 186);
+    text-shadow: rgb(224, 224, 224) 1px 1px 0px;
 }
 
-.nospace{
- padding: 0;
+.nospace {
+    padding: 0;
 }
 
-
-.fullw{
-  width: 100%;
+.fullw {
+    width: 100%;
 }
 
-.fullh{
-  height: 100%;
+.fullh {
+    height: 100%;
 }
 
-.brdr{
-  border: 1px solid black;
-}
-.brdred{
-  border: 2px solid red;
+.brdr {
+    border: 1px solid black;
 }
 
-.round{
-  border: 1px solid gray;
-  border-radius: 4px;
+.brdred {
+    border: 2px solid red;
 }
 
-
-.vary0{
-  background-color: rgb(248,255,240);
-  cursor: pointer;
+.round {
+    border: 1px solid gray;
+    border-radius: 4px;
 }
 
-.vary0:hover{
-  background-color: rgb(250,255,250);
-  font-weight: bold;
+.vary0 {
+    background-color: rgb(248, 255, 240);
+    cursor: pointer;
 }
 
-.vary1{
-  background-color: rgb(240,255,248);
-  cursor: pointer;
+.vary0:hover {
+    background-color: rgb(250, 255, 250);
+    font-weight: bold;
 }
 
-.vary1:hover{
-  background-color: rgb(250,255,250);
-  font-weight: bold;
+.vary1 {
+    background-color: rgb(240, 255, 248);
+    cursor: pointer;
 }
 
-
-.vary20{
-  background-color: rgb(248,240,255);
-  cursor: pointer;
+.vary1:hover {
+    background-color: rgb(250, 255, 250);
+    font-weight: bold;
 }
 
-.vary20:hover{
-  background-color: rgb(250,250,255);
-  font-weight: bold;
+.vary20 {
+    background-color: rgb(248, 240, 255);
+    cursor: pointer;
 }
 
-.vary21{
-  background-color: rgb(240,248,255);
-  cursor: pointer;
+.vary20:hover {
+    background-color: rgb(250, 250, 255);
+    font-weight: bold;
 }
 
-.vary21:hover{
-  background-color: rgb(250,250,255);
-  font-weight: bold;
+.vary21 {
+    background-color: rgb(240, 248, 255);
+    cursor: pointer;
 }
 
+.vary21:hover {
+    background-color: rgb(250, 250, 255);
+    font-weight: bold;
+}
 
 .tablediv {
-     display: table;
-     vertical-align: middle
+    display: table;
+    vertical-align: middle
 }
 
 .celldiv {
-     display: table-cell;
-     vertical-align: middle;
-     text-align: center;
+    display: table-cell;
+    vertical-align: middle;
+    text-align: center;
 }
 
 .create {
-  font-family:  "Lucida Grande", sans-serif;
-  color:#3837FD;
-  font-weight:bold;
-  text-shadow:1px 1px 0 #FFFFFF;
+    font-family: "Lucida Grande", sans-serif;
+    color: #3837FD;
+    font-weight: bold;
+    text-shadow: 1px 1px 0 #FFFFFF;
 }
 
 .create:hover {
-  font-size:101%;
+    font-size: 101%;
 }
 
 .create:active {
-  font-size:99%;
+    font-size: 99%;
 }
 
-.center{
-   text-align: center;
-   vertical-align: middle;
+.center {
+    text-align: center;
+    vertical-align: middle;
 }
 
-.control-label{
-  #font-size: 10px;
+.control-label {
+    #font-size: 10px;
 }
 
-.maxwh{
-  width: auto;
-  height: auto;
+.maxwh {
+    width: auto;
+    height: auto;
 }
 
-.maxw{
-  width: auto;
+.maxw {
+    width: auto;
 }
 
-.maxh{
-  height: auto;
+.maxh {
+    height: auto;
 }
 
-
-.goodTestRun{
-  background-color: rgb(230,250,240)
+.goodTestRun {
+    background-color: rgb(230, 250, 240)
 }
 
-.badTestRun{
-  background-color: rgb(250,240,230)
+.badTestRun {
+    background-color: rgb(250, 240, 230)
 }
 
-table.shaded{
+table.shaded {
     border: 1px solid gray;
 }
+
 table.shaded > tbody > tr > th {
-    background-color: #e7e7e7 ;
+    background-color: #e7e7e7;
     padding: 10px;
     border: 1px solid gray;
 }
 
-table.shaded > tbody > tr > td{
+table.shaded > tbody > tr > td {
     padding: 10px;
     border: 1px solid gray;
 }
 
-table.section > tbody > tr > td,th{
+table.section > tbody > tr > td, th {
     padding-left: 14px;
     padding-right: 14px;
     vertical-align: text-top;
@@ -384,7 +356,7 @@ td.activetab, td.passivetab {
     padding: 0px;
 }
 
-td.activetab>h4{
+td.activetab > h4 {
     border: 2px solid #d3d3d3;
     border-bottom: none;
     border-radius: 5px 5px 0px 0px;
@@ -392,19 +364,19 @@ td.activetab>h4{
     margin-bottom: 0px;
 }
 
-td.passivetab>h4{
+td.passivetab > h4 {
     border: 1px solid gray;
     border-radius: 5px 5px 0px 0px;
     padding: 5px;
     margin-bottom: 0px;
-    background-color: #e9e9e9 ;
+    background-color: #e9e9e9;
 }
 
-.hl{
+.hl {
     color: #00cccc;
 }
 
-.topleftcell{
+.topleftcell {
     border-top: 1px solid white;
     border-left: 1px solid white;
     background-color: #ffffff;
@@ -431,80 +403,95 @@ td.passivetab>h4{
     transition: border-color ease-in-out .15s, box-shadow ease-in-out .15s
 }
 
-
 table td.tabshrink {
-    white-space:nowrap;
+    white-space: nowrap;
     width: 1%;
 }
-table td.tabexpand {
-    width: 99%;
-    border-bottom:1px solid gray;
+
+table th.tabshrink {
+    white-space: nowrap;
+    width: 1%;
 }
 
+table td.tabexpand {
+    width: 99%;
+    border-bottom: 1px solid gray;
+}
+
+table th.tabexpand {
+    width: 99%;
+    border-bottom: 1px solid gray;
+}
 
 table td.tabexpandNoBorder {
     width: 99%;
 }
 
-
-table.padabit td{
+table.padabit td {
     padding: 3px;
 }
 
-.editable{
+.editable {
     border: 1px solid transparent;
     border-radius: 2px;
     padding: 3px;
     display: inline-block;
 }
-.editable:hover{
+
+.editable:hover {
     border: 1px solid #ccc;
     border-radius: 2px;
 
 }
 
-div.parent{
+div.parent {
     background-color: #E0E0E0;
     height: 30px;
 }
 
-div.statusAll{
+div.statusAll {
     border: 1px solid #ccc;
     display: table-cell;
     vertical-align: middle;
     text-align: center;
-    font-size:11px;
+    font-size: 11px;
     font-family: Monaco, Consolas, "Courier New"
 }
 
-.code{
-    font-size:11px;
+.code {
+    font-size: 11px;
     font-family: Monaco, Consolas, "Courier New"
 }
 
-div.child{
+div.child {
     border-radius: 3px;
     padding: 5px;
 }
 
-div.testPending{
-    background-color:lightgray;
+div.testPending {
+    background-color: lightgray;
 }
 
-div.testRunning{
-    background-color:lightblue;
+div.testRunning {
+    background-color: lightblue;
 }
 
-div.testGood{
-    background-color:lightgreen;
+div.testGood {
+    background-color: lightgreen;
 }
 
-div.testBad{
-    background-color:lightcoral;
+div.testBad {
+    background-color: lightcoral;
 }
 
 .logp {
-    font-family:"Monaco", "Courier New", "monospace";
-    font-size:11px;
+    font-family: "Monaco", "Courier New", "monospace";
+    font-size: 11px;
 }
 
+pre {
+    white-space: pre-wrap;
+    overflow: scroll;
+    font-size: 11px;
+    font-family: Monaco, Consolas, "Courier New"
+}

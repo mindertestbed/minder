@@ -2,7 +2,7 @@ package minderengine
 
 import java.util
 
-import models.TestCase
+import models.{TestGroup, TestAssertion, TestCase}
 import mtdl._
 import org.apache.log4j.spi.LoggingEvent
 import org.apache.log4j.{Level, AppenderSkeleton, EnhancedPatternLayout}
@@ -14,11 +14,6 @@ import scala.collection.JavaConversions._
  * Created by yerlibilgin on 07/12/14.
  */
 object TestEngine {
-
-  def compileTest(userEmail: String, name: String, tdl: String): Class[MinderTdl] = {
-    TdlCompiler.compileTdl(userEmail, name, tdl)
-  }
-
   def describe(clsMinderTDL: Class[MinderTdl]): util.List[Rivet] = {
     val minderTDL = clsMinderTDL.getConstructors()(0).newInstance(null, java.lang.Boolean.FALSE).asInstanceOf[MinderTdl]
     minderTDL.SlotDefs
@@ -206,13 +201,14 @@ object TestEngine {
         val error = {
           var cause = t;
           var err: String = null;
-          while (err == null && cause != null) {
-            err = cause.getMessage;
+          while (cause.getCause != null) {
             cause = cause.getCause
           }
 
+          err = cause.getMessage
+
           if (err == null) {
-            err = "Unknown error";
+            err = "Unknown error [" + t.getClass.getName + "]";
           }
           err
         }
@@ -226,35 +222,17 @@ object TestEngine {
   }
 
   /**
-   * Runs the given test case as a tdl
-   * Created by yerlibilgin on 07/12/14.
-   *
-   * @param userEmail the owner email if of the TS that is running the test
-   * @param tdl The test definition
-   */
-  def runTdl(userEmail: String, name: String, tdl: String, wrapperMapping: (String, String)*): Unit = {
-    val map = {
-      val map2 = collection.mutable.Map[String, String]()
-      for (e@(k, v) <- wrapperMapping) {
-        map2 += e
-      }
-      map2.toMap
-    }
-
-    runTest(userEmail, compileTest(userEmail, name, tdl), map, null)
-  }
-
-  /**
    * Evaluates the whole test case without running it and creates a list of wrappers and their signals-slots.
    *
    * @param testCase
-   * @param email the email of the user used for package declaration
    * @return
    */
-  def describeTdl(testCase: TestCase, email: String): util.LinkedHashMap[String, util.Set[SignalSlot]] = {
-    Logger.debug("Describing: " + testCase.name + " for user " + email)
-    Logger.debug(testCase.tdl)
-    val minderClass = TdlCompiler.compileTdl(email, testCase.name, tdlStr = testCase.tdl)
+  def describeTdl(testCase: TestCase): util.LinkedHashMap[String, util.Set[SignalSlot]] = {
+    testCase.testAssertion = TestAssertion.findById(testCase.testAssertion.id)
+    testCase.testAssertion.testGroup = TestGroup.findById(testCase.testAssertion.testGroup.id)
+    val root = "_" + testCase.testAssertion.testGroup.id;
+    val packagePath = root + "/_" + testCase.id;
+    val minderClass = TdlCompiler.compileTdl(root, packagePath, testCase.name, source = testCase.tdl)
     val minderTdl = minderClass.getConstructors()(0).newInstance(null, java.lang.Boolean.FALSE).asInstanceOf[MinderTdl]
 
     val slotDefs = minderTdl.SlotDefs

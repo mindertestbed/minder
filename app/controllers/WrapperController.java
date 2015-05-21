@@ -218,8 +218,8 @@ public class WrapperController extends Controller {
     try {
       JasperReport report = JasperCompileManager.compileReport(WrapperController.class.getResourceAsStream("/taReport.jrxml"));
       Map<String, Object> values = new HashMap<String, Object>();
-      values.put("user", tr.history.user.name);
-      values.put("email", tr.history.user.email);
+      values.put("user", tr.history.email);
+      values.put("email", tr.history.email);
       values.put("result", tr.success);
       values.put("date", tr.date);
       values.put("errorMessage", tr.errorMessage);

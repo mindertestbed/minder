@@ -10,6 +10,7 @@ import java.util.Set;
 
 import javax.persistence.*;
 
+import controllers.Application;
 import models.TokenAction.Type;
 import play.data.format.Formats;
 import play.data.validation.Constraints;
@@ -31,260 +32,296 @@ import com.feth.play.module.pa.user.NameIdentity;
 @Entity
 @Table(name = "Users")
 public class User extends Model implements Subject {
-	@Id
-	public Long id;
+  @Id
+  public Long id;
 
-	private static final long serialVersionUID = 1L;
+  private static final long serialVersionUID = 1L;
 
-	@Constraints.Email
-	// if you make this unique, keep in mind that users *must* merge/link their
-	// accounts then on signup with additional providers
-	// @Column(unique = true)
-	public String email;
+  @Constraints.Email
+  // if you make this unique, keep in mind that users *must* merge/link their
+  // accounts then on signup with additional providers
+  // @Column(unique = true)
+  public String email;
 
-	public String name;
+  public String name;
 
-	public String firstName;
+  public String firstName;
 
-	public String lastName;
+  public String lastName;
 
-	@Formats.DateTime(pattern = "yyyy-MM-dd HH:mm:ss")
-	public Date lastLogin;
+  @Formats.DateTime(pattern = "yyyy-MM-dd HH:mm:ss")
+  public Date lastLogin;
 
-	public boolean active;
+  public boolean active;
 
-	public boolean emailValidated;
+  public boolean emailValidated;
 
-	@ManyToMany
-	public List<SecurityRole> roles;
+  @ManyToMany(cascade = CascadeType.ALL)
+  public List<SecurityRole> roles;
 
-	@OneToMany(cascade = CascadeType.ALL)
-	public List<LinkedAccount> linkedAccounts;
+  @OneToMany(cascade = CascadeType.ALL)
+  public List<LinkedAccount> linkedAccounts;
 
-	@ManyToMany
-	public List<UserPermission> permissions;
+  @ManyToMany(cascade = CascadeType.ALL)
+  public List<UserPermission> permissions;
 
-	@OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-	public List<UserHistory> userHistories;
+  @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.PERSIST)
+  public List<Wrapper> wrappers;
 
-	@OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-	public List<Wrapper> wrappers;
+  @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.PERSIST, mappedBy = "owner")
+  public List<TestGroup> testGroups;
 
-	@OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-	public List<TestGroup> testGroups;
+  @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.PERSIST, mappedBy = "owner")
+  public List<TestAssertion> testAssertions;
 
-	@OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-	public List<TestAssertion> testAssertions;
+  @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.PERSIST, mappedBy = "owner")
+  public List<TestCase> testCases;
 
-	@OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-	public List<TestCase> testCases;
+  @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.PERSIST, mappedBy = "owner")
+  public List<Job> jobs;
 
-	@OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-	public List<Job> jobs;
+  public static final Model.Finder<Long, User> find = new Model.Finder<Long, User>(
+      Long.class, User.class);
 
-	@OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, mappedBy = "owner")
-	public List<TestAsset> testAssets;
+  @Override
+  public String getIdentifier() {
+    return Long.toString(id);
+  }
 
-	public static final Model.Finder<Long, User> find = new Model.Finder<Long, User>(
-			Long.class, User.class);
+  @Override
+  public List<? extends Role> getRoles() {
+    return roles;
+  }
 
-	@Override
-	public String getIdentifier() {
-		return Long.toString(id);
-	}
+  @Override
+  public List<? extends Permission> getPermissions() {
+    return permissions;
+  }
 
-	@Override
-	public List<? extends Role> getRoles() {
-		return roles;
-	}
+  public static List<User> findAll() {
+    return find.where().orderBy("email").findList();
+  }
 
-	@Override
-	public List<? extends Permission> getPermissions() {
-		return permissions;
-	}
 
-	public static boolean existsByAuthUserIdentity(
-			final AuthUserIdentity identity) {
-		final ExpressionList<User> exp;
-		if (identity instanceof UsernamePasswordAuthUser) {
-			exp = getUsernamePasswordAuthUserFind((UsernamePasswordAuthUser) identity);
-		} else {
-			exp = getAuthUserFind(identity);
-		}
-		return exp.findRowCount() > 0;
-	}
+  public boolean isTester(){
+    for (SecurityRole role : roles){
+      if (role.getName().equals(Application.TEST_DESIGNER_ROLE)){
+        return true;
+      }
+    }
 
-	private static ExpressionList<User> getAuthUserFind(
-			final AuthUserIdentity identity) {
-		return find.where().eq("active", true)
-				.eq("linkedAccounts.providerUserId", identity.getId())
-				.eq("linkedAccounts.providerKey", identity.getProvider());
-	}
+    return false;
+  }
 
-	public static User findByAuthUserIdentity(final AuthUserIdentity identity) {
-		if (identity == null) {
-			return null;
-		}
-		if (identity instanceof UsernamePasswordAuthUser) {
-			return findByUsernamePasswordIdentity((UsernamePasswordAuthUser) identity);
-		} else {
-			return getAuthUserFind(identity).findUnique();
-		}
-	}
 
-	public static User findByUsernamePasswordIdentity(
-			final UsernamePasswordAuthUser identity) {
-		return getUsernamePasswordAuthUserFind(identity).findUnique();
-	}
+  public boolean isDeveloper(){
+    for (SecurityRole role : roles){
+      if (role.getName().equals(Application.TEST_DEVELOPER_ROLE)){
+        return true;
+      }
+    }
 
-	private static ExpressionList<User> getUsernamePasswordAuthUserFind(
-			final UsernamePasswordAuthUser identity) {
-		return getEmailUserFind(identity.getEmail()).eq(
-				"linkedAccounts.providerKey", identity.getProvider());
-	}
+    return false;
+  }
 
-	public void merge(final User otherUser) {
-		for (final LinkedAccount acc : otherUser.linkedAccounts) {
-			this.linkedAccounts.add(LinkedAccount.create(acc));
-		}
-		// do all other merging stuff here - like resources, etc.
 
-		// deactivate the merged owner that got added to this one
-		otherUser.active = false;
-		Ebean.save(Arrays.asList(new User[] { otherUser, this }));
-	}
 
-	public static User create(final AuthUser authUser) {
-		final User user = new User();
 
-		// owner.permissions = new ArrayList<UserPermission>();
-		// owner.permissions.add(UserPermission.findByValue("printers.edit"));
-		user.active = true;
-		user.lastLogin = new Date();
-		user.linkedAccounts = Collections.singletonList(LinkedAccount
-				.create(authUser));
+  public boolean isObserver(){
+    for (SecurityRole role : roles){
+      if (role.getName().equals(Application.OBSERVER_ROLE)){
+        return true;
+      }
+    }
 
-		if (authUser instanceof EmailIdentity) {
-			final EmailIdentity identity = (EmailIdentity) authUser;
-			// Remember, even when getting them from FB & Co., emails should be
-			// verified within the application as a security breach there might
-			// break your security as well!
-			user.email = identity.getEmail();
-			user.emailValidated = false;
-		}
+    return false;
+  }
 
-		if (authUser instanceof NameIdentity) {
-			final NameIdentity identity = (NameIdentity) authUser;
-			final String name = identity.getName();
-			if (name != null) {
-				user.name = name;
-			}
+  public static boolean existsByAuthUserIdentity(
+      final AuthUserIdentity identity) {
+    final ExpressionList<User> exp;
+    if (identity instanceof UsernamePasswordAuthUser) {
+      exp = getUsernamePasswordAuthUserFind((UsernamePasswordAuthUser) identity);
+    } else {
+      exp = getAuthUserFind(identity);
+    }
+    return exp.findRowCount() > 0;
+  }
 
-			ArrayList<SecurityRole> roleList = new ArrayList<SecurityRole>();
-			final MyUsernamePasswordAuthUser identity2 = (MyUsernamePasswordAuthUser) authUser;
-			if (identity2.isObserver()) {
-				roleList.add(SecurityRole
-						.findByRoleName(controllers.Application.OBSERVER_ROLE));
-			}
+  private static ExpressionList<User> getAuthUserFind(
+      final AuthUserIdentity identity) {
+    return find.where().eq("active", true)
+        .eq("linkedAccounts.providerUserId", identity.getId())
+        .eq("linkedAccounts.providerKey", identity.getProvider());
+  }
 
-			if (identity2.isTestDesigner()) {
-				roleList.add(SecurityRole
-						.findByRoleName(controllers.Application.TEST_DESIGNER_ROLE));
-			}
+  public static User findByAuthUserIdentity(final AuthUserIdentity identity) {
+    if (identity == null) {
+      return null;
+    }
+    if (identity instanceof UsernamePasswordAuthUser) {
+      return findByUsernamePasswordIdentity((UsernamePasswordAuthUser) identity);
+    } else {
+      return getAuthUserFind(identity).findUnique();
+    }
+  }
 
-			if (identity2.isTestDeveloper()) {
-				roleList.add(SecurityRole
-						.findByRoleName(controllers.Application.TEST_DEVELOPER_ROLE));
-			}
-			user.roles = roleList;
+  public static User findByUsernamePasswordIdentity(
+      final UsernamePasswordAuthUser identity) {
+    return getUsernamePasswordAuthUserFind(identity).findUnique();
+  }
 
-		}
+  private static ExpressionList<User> getUsernamePasswordAuthUserFind(
+      final UsernamePasswordAuthUser identity) {
+    return getEmailUserFind(identity.getEmail()).eq(
+        "linkedAccounts.providerKey", identity.getProvider());
+  }
 
-		if (authUser instanceof FirstLastNameIdentity) {
-			final FirstLastNameIdentity identity = (FirstLastNameIdentity) authUser;
-			final String firstName = identity.getFirstName();
-			final String lastName = identity.getLastName();
-			if (firstName != null) {
-				user.firstName = firstName;
-			}
-			if (lastName != null) {
-				user.lastName = lastName;
-			}
-		}
+  public void merge(final User otherUser) {
+    for (final LinkedAccount acc : otherUser.linkedAccounts) {
+      this.linkedAccounts.add(LinkedAccount.create(acc));
+    }
+    // do all other merging stuff here - like resources, etc.
 
-		user.save();
-		user.saveManyToManyAssociations("roles");
-		// owner.saveManyToManyAssociations("permissions");
-		return user;
-	}
+    // deactivate the merged owner that got added to this one
+    otherUser.active = false;
+    Ebean.save(Arrays.asList(new User[]{otherUser, this}));
+  }
 
-	public static void merge(final AuthUser oldUser, final AuthUser newUser) {
-		User.findByAuthUserIdentity(oldUser).merge(
-				User.findByAuthUserIdentity(newUser));
-	}
+  public static User create(final AuthUser authUser) {
+    final User user = new User();
 
-	public Set<String> getProviders() {
-		final Set<String> providerKeys = new HashSet<String>(
-				linkedAccounts.size());
-		for (final LinkedAccount acc : linkedAccounts) {
-			providerKeys.add(acc.providerKey);
-		}
-		return providerKeys;
-	}
+    // owner.permissions = new ArrayList<UserPermission>();
+    // owner.permissions.add(UserPermission.findByValue("printers.edit"));
+    user.active = true;
+    user.lastLogin = new Date();
+    user.linkedAccounts = Collections.singletonList(LinkedAccount
+        .create(authUser));
 
-	public static void addLinkedAccount(final AuthUser oldUser,
-			final AuthUser newUser) {
-		final User u = User.findByAuthUserIdentity(oldUser);
-		u.linkedAccounts.add(LinkedAccount.create(newUser));
-		u.save();
-	}
+    if (authUser instanceof EmailIdentity) {
+      final EmailIdentity identity = (EmailIdentity) authUser;
+      // Remember, even when getting them from FB & Co., emails should be
+      // verified within the application as a security breach there might
+      // break your security as well!
+      user.email = identity.getEmail();
+      user.emailValidated = false;
+    }
 
-	public static void setLastLoginDate(final AuthUser knownUser) {
-		final User u = User.findByAuthUserIdentity(knownUser);
-		u.lastLogin = new Date();
-		u.save();
-	}
+    if (authUser instanceof NameIdentity) {
+      final NameIdentity identity = (NameIdentity) authUser;
+      final String name = identity.getName();
+      if (name != null) {
+        user.name = name;
+      }
 
-	public static User findByEmail(final String email) {
-		return getEmailUserFind(email).findUnique();
-	}
+      ArrayList<SecurityRole> roleList = new ArrayList<SecurityRole>();
+      final MyUsernamePasswordAuthUser identity2 = (MyUsernamePasswordAuthUser) authUser;
+      if (identity2.isObserver()) {
+        roleList.add(SecurityRole
+            .findByRoleName(controllers.Application.OBSERVER_ROLE));
+      }
 
-	private static ExpressionList<User> getEmailUserFind(final String email) {
-		return find.where().eq("active", true).eq("email", email);
-	}
+      if (identity2.isTestDesigner()) {
+        roleList.add(SecurityRole
+            .findByRoleName(controllers.Application.TEST_DESIGNER_ROLE));
+      }
 
-	public LinkedAccount getAccountByProvider(final String providerKey) {
-		return LinkedAccount.findByProviderKey(this, providerKey);
-	}
+      if (identity2.isTestDeveloper()) {
+        roleList.add(SecurityRole
+            .findByRoleName(controllers.Application.TEST_DEVELOPER_ROLE));
+      }
+      user.roles = roleList;
 
-	public static void verify(final User unverified) {
-		// You might want to wrap this into a transaction
-		unverified.emailValidated = true;
-		unverified.save();
-		TokenAction.deleteByUser(unverified, Type.EMAIL_VERIFICATION);
-	}
+    }
 
-	public void changePassword(final UsernamePasswordAuthUser authUser,
-			final boolean create) {
-		LinkedAccount a = this.getAccountByProvider(authUser.getProvider());
-		if (a == null) {
-			if (create) {
-				a = LinkedAccount.create(authUser);
-				a.user = this;
-			} else {
-				throw new RuntimeException(
-						"Account not enabled for password usage");
-			}
-		}
-		a.providerUserId = authUser.getHashedPassword();
-		a.save();
-	}
+    if (authUser instanceof FirstLastNameIdentity) {
+      final FirstLastNameIdentity identity = (FirstLastNameIdentity) authUser;
+      final String firstName = identity.getFirstName();
+      final String lastName = identity.getLastName();
+      if (firstName != null) {
+        user.firstName = firstName;
+      }
+      if (lastName != null) {
+        user.lastName = lastName;
+      }
+    }
 
-	public void resetPassword(final UsernamePasswordAuthUser authUser,
-			final boolean create) {
-		// You might want to wrap this into a transaction
-		this.changePassword(authUser, create);
-		TokenAction.deleteByUser(this, Type.PASSWORD_RESET);
-	}
+    user.save();
+    user.saveManyToManyAssociations("roles");
+    // owner.saveManyToManyAssociations("permissions");
+    return user;
+  }
 
+  public static void merge(final AuthUser oldUser, final AuthUser newUser) {
+    User.findByAuthUserIdentity(oldUser).merge(
+        User.findByAuthUserIdentity(newUser));
+  }
+
+  public Set<String> getProviders() {
+    final Set<String> providerKeys = new HashSet<String>(
+        linkedAccounts.size());
+    for (final LinkedAccount acc : linkedAccounts) {
+      providerKeys.add(acc.providerKey);
+    }
+    return providerKeys;
+  }
+
+  public static void addLinkedAccount(final AuthUser oldUser,
+                                      final AuthUser newUser) {
+    final User u = User.findByAuthUserIdentity(oldUser);
+    u.linkedAccounts.add(LinkedAccount.create(newUser));
+    u.save();
+  }
+
+  public static void setLastLoginDate(final AuthUser knownUser) {
+    final User u = User.findByAuthUserIdentity(knownUser);
+    u.lastLogin = new Date();
+    u.save();
+  }
+
+  public static User findByEmail(final String email) {
+    return getEmailUserFind(email).findUnique();
+  }
+
+  private static ExpressionList<User> getEmailUserFind(final String email) {
+    return find.where().eq("active", true).eq("email", email);
+  }
+
+  public LinkedAccount getAccountByProvider(final String providerKey) {
+    return LinkedAccount.findByProviderKey(this, providerKey);
+  }
+
+  public static void verify(final User unverified) {
+    // You might want to wrap this into a transaction
+    unverified.emailValidated = true;
+    unverified.save();
+    TokenAction.deleteByUser(unverified, Type.EMAIL_VERIFICATION);
+  }
+
+  public void changePassword(final UsernamePasswordAuthUser authUser,
+                             final boolean create) {
+    LinkedAccount a = this.getAccountByProvider(authUser.getProvider());
+    if (a == null) {
+      if (create) {
+        a = LinkedAccount.create(authUser);
+        a.user = this;
+      } else {
+        throw new RuntimeException(
+            "Account not enabled for password usage");
+      }
+    }
+    a.providerUserId = authUser.getHashedPassword();
+    a.save();
+  }
+
+  public void resetPassword(final UsernamePasswordAuthUser authUser,
+                            final boolean create) {
+    // You might want to wrap this into a transaction
+    this.changePassword(authUser, create);
+    TokenAction.deleteByUser(this, Type.PASSWORD_RESET);
+  }
+
+  public static User findById(Long id) {
+    return find.byId(id);
+  }
 }

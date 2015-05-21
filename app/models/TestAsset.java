@@ -17,8 +17,8 @@ public class TestAsset extends Model{
   public Long id;
 
   @ManyToOne
-  @Column(name = "owner", nullable = false)
-  public User owner;
+  @Column(name = "group", nullable = false)
+  public TestGroup group;
 
   /**
    * The name of the asset,
@@ -26,7 +26,7 @@ public class TestAsset extends Model{
   @Column(nullable = false)
   public String name;
 
-  public static final Finder<Long, TestAsset> find = new Finder<>(Long.class,
+  private static final Finder<Long, TestAsset> find = new Finder<>(Long.class,
       TestAsset.class);
 
   @Column(length = ModelConstants.SHORT_DESC_LENGTH)
@@ -35,11 +35,15 @@ public class TestAsset extends Model{
   @Column(length = ModelConstants.DESCRIPTION_LENGTH)
   public String description;
 
-  public static List<TestAsset> findByOwner(User owner){
-    return find.where().eq("owner", owner).orderBy("id").findList();
+  public static List<TestAsset> findByGroup(TestGroup group){
+    return find.where().eq("group", group).orderBy("id").findList();
   }
 
-  public static TestAsset findByUserAndName(User owner, String name) {
-    return find.where().eq("owner", owner).eq("name", name).findUnique();
+  public static TestAsset findByGroup(TestGroup group, String name) {
+    return find.where().eq("group", group).eq("name", name).findUnique();
+  }
+
+  public static TestAsset findById(Long id) {
+    return find.byId(id);
   }
 }

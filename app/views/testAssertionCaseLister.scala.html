@@ -19,7 +19,7 @@
                         <td>@index.getAndIncrement()</td>
                         <td><a href="/viewTestCase?id=@tc.id&showJobs=true">@tc.name</a></td>
                         <td>@tc.shortDescription</td>
-                        <td>@tc.owner.email</td>
+                        <td>@{tc.owner.email}</td>
                         <td>
                             <div title="Delete" class="bevel2 celldiv" style="height:30px;width:30px;cursor:hand;"
                             onclick='deleteWithDialog2("/doDeleteCase?id=@tc.id", $("#dialog-confirm"), "Delete Test Case", "test case", "@tc.name")'>

@@ -25,7 +25,7 @@ public class TestCaseController extends Controller {
 
 
   public static Result getCreateCaseEditorView(Long assertionId) {
-    TestAssertion ta = TestAssertion.find.byId(assertionId);
+    TestAssertion ta = TestAssertion.findById(assertionId);
     if (ta == null) {
       return badRequest("Test assertion with id [" + assertionId
           + "] not found!");
@@ -70,7 +70,7 @@ public class TestCaseController extends Controller {
       tc.tdl = model.tdl;
       tc.shortDescription = model.shortDescription;
       tc.testAssertion = ta;
-      tc.owner = Application.getLocalUser(session());
+      tc.owner = localUser;
       try {
         tc.save();
       } catch (Exception ex) {
@@ -88,10 +88,13 @@ public class TestCaseController extends Controller {
   }
 
   public static Result getEditCaseEditorView(Long id) {
-    TestCase tc = TestCase.find.byId(id);
+    TestCase tc = TestCase.findById(id);
     if (tc == null) {
       return badRequest("Test case with id [" + id + "] not found!");
     } else {
+      if (!Util.canAccess(Application.getLocalUser(session()), tc.owner))
+        return badRequest("You don't have permission to modify this resource");
+
       TestCaseEditorModel tcModel = new TestCaseEditorModel();
       tcModel.id = id;
       tcModel.assertionId = tc.testAssertion.id;
@@ -106,7 +109,6 @@ public class TestCaseController extends Controller {
   }
 
   public static Result doEditCase() {
-    System.out.println("doEditCase\n");
     com.feth.play.module.pa.controllers.Authenticate.noCache(response());
     final Form<TestCaseEditorModel> filledForm = TEST_CASE_FORM
         .bindFromRequest();
@@ -124,6 +126,9 @@ public class TestCaseController extends Controller {
         return badRequest(testCaseEditor.render(filledForm, null, true));
       }
 
+      if (!Util.canAccess(Application.getLocalUser(session()), tc.owner))
+        return badRequest("You don't have permission to modify this resource");
+
       tc.description = model.description;
       tc.name = model.name;
       tc.shortDescription = model.shortDescription;
@@ -132,9 +137,6 @@ public class TestCaseController extends Controller {
       // check if the name is not duplicate
       TestCase tmp = TestCase.findByName(model.name);
 
-      System.out.println(tmp);
-      System.out.println(tmp.id);
-      System.out.println(tmp.name);
       if (tmp == null || tmp.id == tc.id) {
         // either no such name or it is already this object. so update
         try {
@@ -164,6 +166,10 @@ public class TestCaseController extends Controller {
       // it does not exist. error
       return badRequest("Test case with id " + id + " does not exist.");
     }
+
+
+    if (!Util.canAccess(Application.getLocalUser(session()), tc.owner))
+      return badRequest("You don't have permission to modify this resource");
 
     try {
       tc.delete();

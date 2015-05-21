@@ -5,7 +5,7 @@
 # Home page
 GET         /                                      controllers.Application.index
 GET         /restrictedObserver                    controllers.Application.restrictedObserver
-GET         /root                                  controllers.Application.root
+GET         /root                                  controllers.Application.root(display: String ?= "users")
 GET         /restrictedTestDesigner                controllers.Application.restrictedTestDesigner(display: String ?= "testGroups")
 GET         /createNewTest                         controllers.Application.createNewTest
 GET         /restrictedTestDeveloper               controllers.Application.restrictedTestDeveloper
@@ -21,6 +21,12 @@ GET         /authenticate/:provider                com.feth.play.module.pa.contr
 
 GET         /signup                                controllers.Application.signup
 POST        /signup                                controllers.Application.doSignup
+
+GET         /getUserEditorView                     controllers.UserController.getUserEditorView
+GET         /editUserForm                          controllers.UserController.editUserForm(id: Long)
+POST        /doCreateUser                          controllers.UserController.doCreateUser
+GET         /doDeleteUser                          controllers.UserController.doDeleteUser(id: Long)
+POST        /doEditUser                            controllers.UserController.doEditUser()
 
 GET         /accounts/unverified                   controllers.Signup.unverified
 GET         /authenticate/:provider/denied         controllers.Signup.oAuthDenied(provider: String)
@@ -55,16 +61,13 @@ GET         /webjars/*file                         controllers.WebJarAssets.at(f
 GET         /getCreateGroupEditorView              controllers.GroupController.getCreateGroupEditorView
 POST        /doCreateTestGroup                     controllers.GroupController.doCreateTestGroup
 GET         /editGroupForm                         controllers.GroupController.editGroupForm(id: Long)
-POST        /doEditGroup                           controllers.GroupController.doEditGroup
 GET         /doDeleteGroup                         controllers.GroupController.doDeleteGroup(id: Long)
-GET         /getGroupDetailView                    controllers.GroupController.getGroupDetailView(id: Long)
+GET         /getGroupDetailView                    controllers.GroupController.getGroupDetailView(id: Long, display : String ?= "details")
 POST        /doEditGroupField                      controllers.GroupController.doEditGroupField()
 
 #test assertion management
 GET         /getCreateAssertionEditorView          controllers.AssertionController.getCreateAssertionEditorView(groupId: Long)
 POST        /doCreateAssertion                     controllers.AssertionController.doCreateAssertion
-GET         /editAssertionForm                     controllers.AssertionController.editAssertionForm(id: Long)
-POST        /doEditAssertion                       controllers.AssertionController.doEditAssertion
 GET         /doDeleteAssertion                     controllers.AssertionController.doDeleteAssertion(id: Long)
 GET         /getAssertionDetailView                controllers.AssertionController.getAssertionDetailView(id: Long, display : String ?= "details")
 POST        /doEditAssertionField                  controllers.AssertionController.doEditAssertionField()
@@ -90,7 +93,7 @@ GET         /viewTestRunHistory                    controllers.JobController.vie
 
 
 #test asset management
-POST        /doCreateTestAsset                     controllers.TestAssetController.doCreateTestAsset
+POST        /doCreateTestAsset                     controllers.TestAssetController.doCreateTestAsset(groupId: Long)
 GET         /createNewAssetForm                    controllers.TestAssetController.createNewAssetForm
 GET         /editAssetForm                         controllers.TestAssetController.editAssetForm(id: Long)
 POST        /doEditAsset                           controllers.TestAssetController.doEditAsset
@@ -122,3 +125,16 @@ GET         /logFeed                               controllers.TestEngineControl
 GET         /enqueueJob                            controllers.TestEngineController.enqueueJob(id: Long)
 GET         /cancelJob                             controllers.TestEngineController.cancelJob(index: Int)
 GET         /cancelActiveJob                       controllers.TestEngineController.cancelActiveJob
+
+
+
+
+GET         /getCreateUtilClassEditorView          controllers.UtilClassController.getCreateUtilClassEditorView(groupId: Long)
+POST        /doCreateUtilClass                     controllers.UtilClassController.doCreateUtilClass
+GET         /getEditUtilClassEditorView            controllers.UtilClassController.getEditCaseEditorView(id: Long)
+POST        /doEditUtilClass                       controllers.UtilClassController.doEditUtilClass
+GET         /doDeleteUtilClass                     controllers.UtilClassController.doDeleteUtilClass(id: Long)
+GET         /viewUtilClass                         controllers.UtilClassController.viewUtilClass(id: Long)
+POST        /doEditUtilClassField                  controllers.UtilClassController.doEditUtilClassField()
+
+POST        /updateSettings                        controllers.SettingsController.updateSettings
