@@ -8,7 +8,7 @@ import builtin.ReportGenerator
 import controllers.common.enumeration.{TestStatus, OperationType}
 import minderengine.{UserDTO, TestProcessWatcher, SignalData, TestEngine}
 import models._
-import mtdl.Rivet
+import mtdl.{TdlCompiler, Rivet}
 import play.Logger
 
 import scala.collection.JavaConversions._
@@ -31,7 +31,10 @@ class TestRunContext(val testRun: TestRun) extends Runnable with TestProcessWatc
   val testAssertion = TestAssertion.findById(testCase.testAssertion.id)
   val testGroup = TestGroup.findById(testAssertion.testGroup.id)
   job.testCase = testCase
-  val cls = TestEngine.compileTest(user.email, testCase.name, testCase.tdl)
+
+  val packageRoot = "_" + testGroup.id;
+  val packagePath = packageRoot + "/_" + testCase.id;
+  val cls = TdlCompiler.compileTdl(packageRoot, packagePath, testCase.name, source = testCase.tdl)
   val logStringBuilder = new StringBuilder;
   val reportLogBuilder = new StringBuilder;
   var status = TestStatus.PENDING

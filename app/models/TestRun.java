@@ -54,11 +54,13 @@ public class TestRun extends Model {
 		this.date = new Date();
 	}
 
-	public static final Finder<Long, TestRun> find = new Finder<>(Long.class,
+	private static final Finder<Long, TestRun> find = new Finder<>(Long.class,
 			TestRun.class);
 
 	public static TestRun findById(Long id) {
-		return find.byId(id);
+		TestRun byId = find.byId(id);
+		byId.runner = User.findById(byId.runner.id);
+		return byId;
 	}
 
 	public static List<TestRun> findByJob(Job rc) {
@@ -82,5 +84,9 @@ public class TestRun extends Model {
 			return 0;
 
 		return list.get(0).number;
+	}
+
+	public static void updateUser(User user, User localUser) {
+
 	}
 }

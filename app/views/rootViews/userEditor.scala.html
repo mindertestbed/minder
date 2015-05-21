@@ -1,0 +1,85 @@
+@(frm: Form[_], createMode: Boolean = true)
+
+    @import helper._
+    @implicitFieldConstructor = @{
+        FieldConstructor(twitterBootstrapBasic.f)
+    }
+
+    @main("User Editor", "root") {
+    @dialogs()
+
+    @if(createMode) {
+        <h2>Create New User</h2>
+        @helper.form(action = routes.UserController.doCreateUser()) {
+            @if(frm.hasGlobalErrors) {
+                <p class="alert alert-danger">
+                @frm.globalError.message
+                </p>
+            }
+            @inputText(
+                frm("name"),
+                '_label -> "Name"
+            )
+
+            @_emailPartial(frm)
+
+            @_passwordPartial(frm)
+
+            <label>Is Active &nbsp;&nbsp;&nbsp;&nbsp;</label>
+            <input type="checkbox" name="@frm("active").name" value='@frm("active").value'  @if(frm("active").value!=null){checked="checked"}/>
+
+            <br />
+            <strong>@Messages("playauthenticate.signup.role")</strong>
+            <table>
+                <tr>
+                    <td><i>Test Designer &nbsp;&nbsp;&nbsp;&nbsp;</i></td><td><input type="checkbox" name="ists" value='@frm("ists").value'  @if(frm("ists").value!=null){checked="checked"}/></td>
+                </tr>
+                <tr>
+                    <td><i>Test Developer</i> </td><td><input type="checkbox" name="@frm("istd").name" value='@frm("istd").value' @if(frm("istd").value!=null){checked="checked"} /></td>
+                </tr>
+                <tr>
+                    <td><i>Test Observer</i></td><td><input type="checkbox" name="@frm("isto").name" value='@frm("isto").value'  @if(frm("isto").value!=null){checked="checked"} /></td>
+                </tr>
+            </table>
+
+            <button type="submit" class="btn btn-default">Create</button>
+        }
+    } else {
+        <h2>Edit User</h2>
+        @helper.form(action = routes.UserController.doEditUser()) {
+            @if(frm.hasGlobalErrors) {
+                <p class="alert alert-danger">
+                @frm.globalError.message
+                </p>
+            }
+
+            @inputText(
+                frm("name"),
+                '_label -> "Name"
+            )
+
+            @_passwordPartial(frm)
+
+            <label>Is Active &nbsp;&nbsp;&nbsp;&nbsp;</label>
+            <input type="checkbox" name="@frm("active").name" value='@frm("active").value'  @if(frm("active").value!=null){checked="checked"}/>
+            <input type="hidden" name="id" id="id" value='@frm("id").value'/>
+            <input type="hidden" name="email" id="email" value='@frm("email").value'/>
+
+            <br />
+            <strong>@Messages("playauthenticate.signup.role")</strong>
+            <table>
+                <tr>
+                    <td><i>Test Designer &nbsp;&nbsp;&nbsp;&nbsp;</i></td><td><input type="checkbox" name="ists" value='@frm("ists").value'  @if(frm("ists").value!=null){checked="checked"}/></td>
+                </tr>
+                <tr>
+                    <td><i>Test Developer</i> </td><td><input type="checkbox" name="@frm("istd").name" value='@frm("istd").value' @if(frm("istd").value!=null){checked="checked"} /></td>
+                </tr>
+                <tr>
+                    <td><i>Test Observer</i></td><td><input type="checkbox" name="@frm("isto").name" value='@frm("isto").value'  @if(frm("isto").value!=null){checked="checked"} /></td>
+                </tr>
+            </table>
+
+            <button type="submit" class="btn btn-default">Update</button>
+        }
+    }
+}

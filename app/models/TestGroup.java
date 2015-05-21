@@ -11,6 +11,7 @@ import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
+import com.avaje.ebean.Ebean;
 import play.db.ebean.Model;
 
 /**
@@ -33,6 +34,9 @@ public class TestGroup extends Model {
   @OneToMany(cascade = CascadeType.ALL,fetch = FetchType.LAZY)
   public List<TestAssertion> testAssertions;
 
+  @OneToMany(cascade = CascadeType.ALL,fetch = FetchType.LAZY)
+  public List<UtilClass> utilClasses;
+
 
   @Column(length = ModelConstants.DESCRIPTION_LENGTH)
   public String description;
@@ -40,7 +44,7 @@ public class TestGroup extends Model {
   @Column(nullable = false, length = ModelConstants.SHORT_DESC_LENGTH)
   public String shortDescription;
 
-  public static final Finder<Long, TestGroup> find = new Finder<>(
+  private static final Finder<Long, TestGroup> find = new Finder<>(
       Long.class, TestGroup.class);
 
   public static List<TestGroup> findByUser(User user){
@@ -56,7 +60,13 @@ public class TestGroup extends Model {
   }
 
   public static TestGroup findById(Long id){
-    return find.byId(id);
+
+    TestGroup byId = find.byId(id);
+    byId.owner = User.findById(byId.owner.id);
+    return byId;
   }
 
+  public static void updateUser(User user, User localUser) {
+    //Ebean.createUpdate(TestGroup.class, )
+  }
 }

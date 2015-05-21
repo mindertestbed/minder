@@ -49,7 +49,7 @@ public class Job extends Model {
 	@OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
 	public List<TestRun> testRuns;
 
-	public static final Finder<Long, Job> find = new Finder<>(Long.class,
+	private static final Finder<Long, Job> find = new Finder<>(Long.class,
 			Job.class);
 
 
@@ -59,10 +59,16 @@ public class Job extends Model {
 	}
 
 	public static Job findById(Long id) {
-		return find.byId(id);
+		Job byId = find.byId(id);
+		byId.owner = User.findById(byId.owner.id);
+		return byId;
 	}
 	public static Job findByTestCaseAndName(TestCase testCase, String name) {
 		return find.where().eq("testCase", testCase).eq("name", name).findUnique();
+	}
+
+	public static void updateUser(User user, User localUser) {
+
 	}
 }
 

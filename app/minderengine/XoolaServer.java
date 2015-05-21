@@ -16,6 +16,8 @@ public class XoolaServer{
   private Xoola server;
   private MinderServer minderServer = new MinderServer();
   private boolean started = false;
+
+  public static Properties properties;
   /**
    * Use this lock to ensure globally that only one thread tries to start the server
    */
@@ -39,7 +41,7 @@ public class XoolaServer{
     synchronized (startLock) {
       try {
         //load the xoola properties from resource "xoola.properties"
-        Properties properties = new java.util.Properties();
+        properties = new java.util.Properties();
         properties.load(this.getClass().getResourceAsStream("/application.conf"));
         properties.setProperty(XoolaProperty.MODE, XoolaTierMode.SERVER);
 

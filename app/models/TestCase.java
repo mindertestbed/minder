@@ -41,11 +41,13 @@ public class TestCase extends Model {
   @Column(nullable = false)
   public User owner;
 
-  public static final Finder<Long, TestCase> find = new Finder<>(Long.class,
+  private static final Finder<Long, TestCase> find = new Finder<>(Long.class,
       TestCase.class);
 
   public static TestCase findById(Long id) {
-    return find.byId(id);
+    TestCase byId = find.byId(id);
+    byId.owner = User.findById(byId.owner.id);
+    return byId;
   }
 
   public void setTdl(String tdl) {
@@ -63,7 +65,7 @@ public class TestCase extends Model {
   private void detectParameters() {
     deleteCurrentWrapperParamsOnDatabase();
     deleteCurrentJobsOnDatabase();
-    LinkedHashMap<String, Set<SignalSlot>> descriptionMap = TestEngine.describeTdl(this, this.testAssertion.testGroup.owner.email);
+    LinkedHashMap<String, Set<SignalSlot>> descriptionMap = TestEngine.describeTdl(this);
 
     List<WrapperParam> wpList = new ArrayList<>();
     for (Map.Entry<String, Set<SignalSlot>> entry : descriptionMap.entrySet()) {
@@ -167,5 +169,8 @@ public class TestCase extends Model {
     } finally{
       Ebean.endTransaction();
     }
+  }
+
+  public static void updateUser(User user, User localUser) {
   }
 }

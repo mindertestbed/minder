@@ -58,13 +58,11 @@ public class GroupController extends Controller {
 
       TestGroup group = TestGroup.findByName(model.name);
       if (group != null) {
-        filledForm.reject("The group with name [" + group.name
-            + "] already exists");
+        filledForm.reject("The group with name [" + group.name + "] already exists");
         return badRequest(testGroupEditor.render(filledForm, null));
       }
 
       group = new TestGroup();
-
       group.owner = localUser;
       group.shortDescription = model.shortDescription;
       group.description = model.description;
@@ -78,10 +76,14 @@ public class GroupController extends Controller {
   @Restrict(@Group(Application.TEST_DESIGNER_ROLE))
   public static Result editGroupForm(Long id) {
     final User localUser = Application.getLocalUser(session());
-    TestGroup tg = TestGroup.find.byId(id);
+    TestGroup tg = TestGroup.findById(id);
     if (tg == null) {
       return badRequest("Test group with id [" + id + "] not found!");
     } else {
+
+      if (!Util.canAccess(Application.getLocalUser(session()), tg.owner))
+        return badRequest("You don't have permission to modify this resource");
+
       GroupEditorModel tgem = new GroupEditorModel();
       tgem.id = tg.id;
       tgem.name = tg.name;
@@ -133,7 +135,7 @@ public class GroupController extends Controller {
 
         User localUser = Application.getLocalUser(session());
 
-        if (localUser==null || !localUser.email.equals(user.email)){
+        if (localUser == null || !localUser.email.equals(user.email)) {
           return badRequest("You don't have the permission to modify this resource");
         }
       } catch (NoSuchFieldException ex) {
@@ -162,35 +164,15 @@ public class GroupController extends Controller {
   }
 
   @Restrict(@Group(Application.TEST_DESIGNER_ROLE))
-  public static Result doEditGroup() {
-    com.feth.play.module.pa.controllers.Authenticate.noCache(response());
-
-    final Form<GroupEditorModel> filledForm = TEST_GROUP_FORM
-        .bindFromRequest();
-
-    if (filledForm.hasErrors()) {
-      Util.printFormErrors(filledForm);
-      return badRequest(testGroupEditor.render(filledForm, null));
-    } else {
-      GroupEditorModel model = filledForm.get();
-      TestGroup tg = TestGroup.find.byId(model.id);
-      tg.name = model.name;
-      tg.shortDescription = model.shortDescription;
-      tg.description = model.description;
-      tg.update();
-
-      Logger.info("Done updating group " + tg.name + ":" + tg.id);
-      return ok();
-    }
-  }
-
-  @Restrict(@Group(Application.TEST_DESIGNER_ROLE))
   public static Result doDeleteGroup(Long id) {
     com.feth.play.module.pa.controllers.Authenticate.noCache(response());
-    TestGroup tg = TestGroup.find.byId(id);
+    TestGroup tg = TestGroup.findById(id);
     if (tg == null) {
       return badRequest("Test group with id [" + id + "] not found!");
     } else {
+      if (!Util.canAccess(Application.getLocalUser(session()), tg.owner))
+        return badRequest("You don't have permission to modify this resource");
+
       try {
         tg.delete();
       } catch (Exception ex) {
@@ -202,12 +184,12 @@ public class GroupController extends Controller {
   }
 
   @Restrict(@Group(Application.TEST_DESIGNER_ROLE))
-  public static Result getGroupDetailView(Long id) {
+  public static Result getGroupDetailView(Long id, String display) {
     TestGroup tg = TestGroup.findById(id);
     if (tg == null) {
       return badRequest("No job with id " + id + ".");
     }
-    return ok(groupDetailView.render(tg, Application.getLocalUser(session())));
+    return ok(groupDetailView.render(tg, display));
   }
 
 

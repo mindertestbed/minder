@@ -237,7 +237,7 @@ object TestEngineController extends Controller {
     testRun.date = new Date()
     testRun.job = job;
     val userHistory = new UserHistory
-    userHistory.user = user;
+    userHistory.email = user.email;
     userHistory.operationType = new TOperationType
     userHistory.operationType.name = OperationType.RUN_TEST_CASE
     userHistory.operationType.save()

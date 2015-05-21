@@ -58,8 +58,7 @@ public class JobController  extends Controller {
     //
     initWrapperListForModel(testCase, model);
 
-    return ok(jobEditor.render(
-        JOB_FORM.fill(model), null));
+    return ok(jobEditor.render(JOB_FORM.fill(model), null));
   }
 
   private static void initWrapperListForModel(TestCase testCase, JobEditorModel model) {
@@ -165,6 +164,11 @@ public class JobController  extends Controller {
           + " does not exist.");
     }
 
+
+    if (!Util.canAccess(Application.getLocalUser(session()), rc.owner))
+      return badRequest("You don't have permission to modify this resource");
+
+
     try {
       rc.delete();
     } catch (Exception ex) {
@@ -185,21 +189,26 @@ public class JobController  extends Controller {
           + " does not exist.");
     }
 
-    JobEditorModel rome = new JobEditorModel();
-    rome.id = rc.id;
-    rome.name = rc.name;
-    rome.tdl = rc.tdl;
-    rome.testCaseId = rc.testCase.id;
-    rome.obsolete = rc.obsolete;
-    rome.mappedWrappers = new ArrayList<>();
+
+    if (!Util.canAccess(Application.getLocalUser(session()), rc.owner))
+      return badRequest("You don't have permission to modify this resource");
+
+
+    JobEditorModel jobEditorModel = new JobEditorModel();
+    jobEditorModel.id = rc.id;
+    jobEditorModel.name = rc.name;
+    jobEditorModel.tdl = rc.tdl;
+    jobEditorModel.testCaseId = rc.testCase.id;
+    jobEditorModel.obsolete = rc.obsolete;
+    jobEditorModel.mappedWrappers = new ArrayList<>();
 
     for (MappedWrapper mappedWrapper : rc.mappedWrappers) {
-      rome.mappedWrappers.add(new MappedWrapperModel(mappedWrapper.id,
+      jobEditorModel.mappedWrappers.add(new MappedWrapperModel(mappedWrapper.id,
           mappedWrapper.parameter.id, mappedWrapper.parameter.name,
           mappedWrapper.wrapper.name));
     }
 
-    Form<?> fill = JOB_FORM.fill(rome);
+    Form<?> fill = JOB_FORM.fill(jobEditorModel);
 
     return ok(jobEditor.render(fill, null));
   }
@@ -219,6 +228,11 @@ public class JobController  extends Controller {
       return badRequest("The Job " + rc.id
           + " is not found.");
     }
+
+
+    if (!Util.canAccess(Application.getLocalUser(session()), rc.owner))
+      return badRequest("You don't have permission to modify this resource");
+
     rc.name = model.name;
     rc.obsolete = false;
     rc.tdl = rc.testCase.tdl;

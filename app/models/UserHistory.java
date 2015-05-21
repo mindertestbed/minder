@@ -9,9 +9,8 @@ import play.db.ebean.Model;
 public class UserHistory extends Model {
 	@Id
 	public Long id;
-	
-	@ManyToOne
-	public User user;
+
+	public String email;
 	
 	@OneToOne(fetch=FetchType.EAGER)
 	public TOperationType operationType;

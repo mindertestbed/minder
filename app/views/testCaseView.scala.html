@@ -12,6 +12,8 @@
     </h2>
 
     <div class="indent">
+        <h3>Owner</h3>
+        @{tc.owner.email}
         <h3>Short Description</h3>
         <div id="shortDescription@{tc.id}" onclick='showUpdateInputTextDialog(@tc.id, "shortDescription", $(this).next(), "/doEditCaseField")' class="editable"></div>
         <input type="hidden" value="@tc.shortDescription"/>

@@ -28,6 +28,7 @@ import providers.MyUsernamePasswordAuthProvider.MySignup;
 import views.html.*;
 import be.objectify.deadbolt.java.actions.Group;
 import be.objectify.deadbolt.java.actions.Restrict;
+import views.html.rootViews.rootPage;
 
 public class Application extends Controller {
 
@@ -53,11 +54,11 @@ public class Application extends Controller {
     return ok(restrictedObserver.render(localUser));
   }
 
-  public static Result root() {
+  public static Result root(String display) {
     final User localUser = getLocalUser(session());
     System.out.println(localUser.email);
     if (localUser.email.equals("root@minder")) {
-      return ok(rootPage.render());
+      return ok(rootPage.render(display));
     } else {
       return badRequest("You cannot access this resoruce.");
     }
@@ -114,7 +115,6 @@ public class Application extends Controller {
       if (result.toScala().header().status() == SEE_OTHER) {
         //if the user successfully logged in, then we have to create a new signal registry for him.
         SessionMap.registerObject(lgn.getEmail(), "signalRegistry", new MinderSignalRegistry());
-        UserManager.addUser(lgn.getEmail());
       } else {
         Logger.debug("Different status " + result.toScala().header().status());
       }

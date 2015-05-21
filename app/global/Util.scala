@@ -3,8 +3,9 @@ package global
 import java.lang.reflect.Field
 import java.util._
 
+import controllers.Assets
 import editormodels.AssertionEditorModel
-import models.PrescriptionLevel
+import models.{User, PrescriptionLevel}
 import play.Logger
 import play.data.Form
 import play.data.validation.{Constraints, ValidationError}
@@ -88,5 +89,16 @@ object Util {
 
   def convertValue(converter: String, newValue: String) : Any = {
     converters(converter).convert(newValue)
+  }
+
+
+  def getBooleanIcon(flag: Boolean) : String = {
+    if (flag) {"/images/Happy-32.png"} else {"/images/Sad-32.png"}
+  }
+
+
+  def canAccess(localUser: User, owner: User) : Boolean = {
+    println(localUser.email + " vs. " + owner.email)
+    localUser.email=="root@minder" || localUser.email==owner.email
   }
 }

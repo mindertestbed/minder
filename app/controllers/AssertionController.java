@@ -28,7 +28,7 @@ public class AssertionController extends Controller {
    */
   @Restrict(@Group(Application.TEST_DESIGNER_ROLE))
   public static Result getCreateAssertionEditorView(Long groupId) {
-    TestGroup tg = TestGroup.find.byId(groupId);
+    TestGroup tg = TestGroup.findById(groupId);
     if (tg == null) {
       return badRequest("Test group with id [" + groupId + "] not found!");
     } else {
@@ -87,36 +87,38 @@ public class AssertionController extends Controller {
 
       Logger.info("Assertion with id " + ta.id + ":" + ta.taId
           + " was created");
-      return redirect(controllers.routes.GroupController.getGroupDetailView(tg.id));
+      return redirect(controllers.routes.GroupController.getGroupDetailView(tg.id, "assertions"));
     }
   }
 
   @Restrict(@Group(Application.TEST_DESIGNER_ROLE))
   public static Result editAssertionForm(Long id) {
-    TestAssertion ta = TestAssertion.find.byId(id);
+    TestAssertion ta = TestAssertion.findById(id);
     if (ta == null) {
       return badRequest("Test assertion with id [" + id + "] not found!");
-    } else if (!ta.owner.email.equals(Application.getLocalUser(session()))) {
-      return badRequest("You don't have the permission to edit this resource");
-    } else {
-      AssertionEditorModel taModel = new AssertionEditorModel();
-      taModel.id = id;
-      taModel.taId = ta.taId;
-      taModel.normativeSource = ta.normativeSource;
-      taModel.target = ta.target;
-      taModel.predicate = ta.predicate;
-      taModel.prerequisites = ta.prerequisites;
-      taModel.variables = ta.variables;
-      taModel.tag = ta.tag;
-      taModel.description = ta.description;
-      taModel.shortDescription = ta.shortDescription;
-      taModel.groupId = ta.testGroup.id;
-      taModel.prescriptionLevel = ta.prescriptionLevel.name();
 
-      Form<AssertionEditorModel> bind = TEST_ASSERTION_FORM
-          .fill(taModel);
-      return ok(testAssertionEditor.render(bind, null));
     }
+
+    if (!Util.canAccess(Application.getLocalUser(session()), ta.owner))
+      return badRequest("You don't have permission to modify this resource");
+
+    AssertionEditorModel taModel = new AssertionEditorModel();
+    taModel.id = id;
+    taModel.taId = ta.taId;
+    taModel.normativeSource = ta.normativeSource;
+    taModel.target = ta.target;
+    taModel.predicate = ta.predicate;
+    taModel.prerequisites = ta.prerequisites;
+    taModel.variables = ta.variables;
+    taModel.tag = ta.tag;
+    taModel.description = ta.description;
+    taModel.shortDescription = ta.shortDescription;
+    taModel.groupId = ta.testGroup.id;
+    taModel.prescriptionLevel = ta.prescriptionLevel.name();
+
+    Form<AssertionEditorModel> bind = TEST_ASSERTION_FORM
+        .fill(taModel);
+    return ok(testAssertionEditor.render(bind, null));
   }
 
   @Restrict(@Group(Application.TEST_DESIGNER_ROLE))
@@ -138,10 +140,8 @@ public class AssertionController extends Controller {
         return badRequest(testAssertionEditor.render(filledForm, null));
       }
 
-
-      if (!ta.owner.email.equals(Application.getLocalUser(session()))) {
-        return badRequest("You don't have the permission to edit this resource");
-      }
+      if (!Util.canAccess(Application.getLocalUser(session()), ta.owner))
+        return badRequest("You don't have permission to modify this resource");
 
       ta.taId = model.taId;
       ta.normativeSource = model.normativeSource;
@@ -163,7 +163,7 @@ public class AssertionController extends Controller {
         ta.update();
         Logger.info("Assertion with id " + ta.id + ":" + ta.taId
             + " was updated");
-        return redirect(controllers.routes.GroupController.getGroupDetailView(ta.testGroup.id));
+        return redirect(controllers.routes.GroupController.getGroupDetailView(ta.testGroup.id, "assertions"));
       } else {
         filledForm.reject("The ID [" + model.taId
             + "] is used by another test assertion");
@@ -184,9 +184,8 @@ public class AssertionController extends Controller {
           + " does not exist.");
     }
 
-    if (!ta.owner.email.equals(Application.getLocalUser(session()))) {
-      return badRequest("You don't have the permission to modify this resource");
-    }
+    if (!Util.canAccess(Application.getLocalUser(session()), ta.owner))
+      return badRequest("You don't have permission to modify this resource");
 
     try {
       ta.delete();
@@ -195,7 +194,7 @@ public class AssertionController extends Controller {
       Logger.error(ex.getMessage(), ex);
       return badRequest(ex.getMessage());
     }
-    return redirect(controllers.routes.GroupController.getGroupDetailView(ta.testGroup.id));
+    return redirect(controllers.routes.GroupController.getGroupDetailView(ta.testGroup.id, "assertions"));
   }
 
   @Restrict(@Group(Application.TEST_DESIGNER_ROLE))

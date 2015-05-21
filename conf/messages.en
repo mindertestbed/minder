@@ -55,7 +55,7 @@ playauthenticate.password.reset_email.subject=PlayAuthenticate: How to reset you
 
 # play-authenticate: Additional translations
 
-playauthenticate.login.email.placeholder=Your e-mail address
+playauthenticate.login.email.placeholder=E-mail address
 playauthenticate.login.password.placeholder=Choose a password
 playauthenticate.login.password.repeat=Repeat chosen password
 playauthenticate.login.title=Login
@@ -66,9 +66,9 @@ playauthenticate.login.oauth=or log in using one of the following providers:
 playauthenticate.login.basic=or try HTTP basic auth (as example/secret)
 
 playauthenticate.signup.title=Signup
-playauthenticate.signup.name=Your name
+playauthenticate.signup.name=Name
 playauthenticate.signup.now=Sign up now
-playauthenticate.signup.role = Your role
+playauthenticate.signup.role = Role
 playauthenticate.signup.role.testdesigner = Test designer
 playauthenticate.signup.role.testdeveloper = Test developer
 playauthenticate.signup.role.observer = Observer
