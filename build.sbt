@@ -43,7 +43,17 @@ libraryDependencies ++= Seq(
   "net.sourceforge.barbecue" % "barbecue" % "1.5-beta1",
   "org.codehaus.groovy" % "groovy" % "2.3.9",
   "gov.tubitak.minder.test" % "xml-value-initiator" % "0.0.1" % "test",
-  "gov.tubitak.minder.test" % "xml-generator" % "0.0.1" % "test"
+  "gov.tubitak.minder.test" % "xml-generator" % "0.0.1" % "test",
+  "org.eclipse.aether" % "aether-api" % "1.0.2.v20150114",
+  "org.eclipse.aether" % "aether-spi" % "1.0.2.v20150114",
+  "org.eclipse.aether" % "aether-util" % "1.0.2.v20150114",
+  "org.eclipse.aether" % "aether-impl" % "1.0.2.v20150114",
+  "org.eclipse.aether" % "aether-connector-basic" % "1.0.2.v20150114",
+  "org.eclipse.aether" % "aether-transport-classpath" % "1.0.2.v20150114",
+  "org.eclipse.aether" % "aether-transport-file" % "1.0.2.v20150114",
+  "org.eclipse.aether" % "aether-transport-http" % "1.0.2.v20150114",
+  "org.eclipse.aether" % "aether-transport-wagon" % "1.0.2.v20150114",
+  "org.apache.maven" % "maven-aether-provider" % "3.1.0"
 )
 
 resolvers ++= Seq(

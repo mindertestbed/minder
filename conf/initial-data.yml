@@ -79,6 +79,7 @@ groups:
     description: A sample test gest assertions and test cases
     name: Sample Test Group
     shortDescription:  A sample test group
+    dependencyString: null
     owner: *user
     testAssertions:
     - &taSample1 !!models.TestAssertion
@@ -100,6 +101,7 @@ groups:
     description: A sample test gest assertions and test cases
     name: Sample Test Group2
     shortDescription:  A sample test group
+    dependencyString: null
     owner: *massi
     testAssertions:
     - &taSample2 !!models.TestAssertion
@@ -121,6 +123,7 @@ groups:
     description: null
     name: AS4 Tests
     shortDescription: All test cases related to AS4
+    dependencyString: null
     owner: *massi
     testAssertions:
     - &taas41 !!models.TestAssertion
@@ -150,6 +153,7 @@ groups:
     description: null
     name: SMP Tests
     shortDescription: All test cases related to SMP
+    dependencyString: null
     owner: *massi
     testAssertions:
     - &tasmp1 !!models.TestAssertion
@@ -172,6 +176,7 @@ groups:
     description: null
     name: BDXL Tests
     shortDescription: All test cases related to BDXL
+    dependencyString: null
     owner: *user
     testAssertions:
     - &tabdxl1 !!models.TestAssertion
@@ -194,6 +199,7 @@ groups:
     description: null
     name: Non-Repudiation Tests
     shortDescription: All test cases related to Non-repudiation SAT
+    dependencyString: null
     owner: *massi
     testAssertions:
     - &tanonrep1 !!models.TestAssertion
@@ -286,6 +292,6 @@ TOperationTypes:
 #User Histories
 histories:
 - &history1 !!models.UserHistory
-  user: *user
+  email: myildiz83@gmail.com
   operationType: *opType1
   systemOutputLog: Bir loglar bir loglar

@@ -18,4 +18,7 @@ public class GroupEditorModel {
   public String shortDescription;
 
   public String description;
+
+  @Constraints.MaxLength(ModelConstants.DESCRIPTION_LENGTH)
+  public String dependencyString;
 }
