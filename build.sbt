@@ -32,7 +32,7 @@ libraryDependencies ++= Seq(
   "postgresql" % "postgresql" % "9.1-901-1.jdbc4",
   "org.beybunproject" % "xoola" % "1.0.0",
   "gov.tubitak.minder" % "minder-common" % "0.0.6",
-  "gov.tubitak.minder" %% "minder-tdl" % "0.1.1-alpha0",
+  "gov.tubitak.minder" %% "minder-tdl" % "0.1.1-temp",
   "com.feth" %%  "play-authenticate" % "0.6.5-SNAPSHOT",
   "be.objectify" %% "deadbolt-java" % "2.3.0-RC1",
   "org.webjars" %% "webjars-play" % "2.3.0",
@@ -53,7 +53,8 @@ libraryDependencies ++= Seq(
   "org.eclipse.aether" % "aether-transport-file" % "1.0.2.v20150114",
   "org.eclipse.aether" % "aether-transport-http" % "1.0.2.v20150114",
   "org.eclipse.aether" % "aether-transport-wagon" % "1.0.2.v20150114",
-  "org.apache.maven" % "maven-aether-provider" % "3.1.0"
+  "org.apache.maven" % "maven-aether-provider" % "3.1.0",
+  "minder" % "AS4Utils" % "1.0.2-beta"
 )
 
 resolvers ++= Seq(
