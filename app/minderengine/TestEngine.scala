@@ -115,11 +115,18 @@ object TestEngine {
             val me: MinderSignalRegistry = SessionMap.getObject(userEmail, "signalRegistry")
             if (me == null) throw new IllegalArgumentException("No MinderSignalRegistry object defined for session " + userEmail)
 
+            //obtain the source signal object
+            val signalList = rivet.signalPipeMap(tuple);
+            if (signalList == null || signalList.isEmpty)
+              throw new IllegalArgumentException("singal list is empty for " + label + "." + signature);
+
+            val signal = signalList(0).inRef.source;
+
             lgr.info(">>>> Dequeue Signal:" + label + "." + signature)
 
             set.add(label)
 
-            val signalData = me.dequeueSignal(label, signature)
+            val signalData = me.dequeueSignal(label, signature, signal.timeout)
 
             lgr.info("<<<< Signal Obtained Signal: " + label + "." + signature)
 
@@ -138,7 +145,8 @@ object TestEngine {
           lgr.info(">>>> Assign free vars")
 
           for (paramPipe <- rivet.freeVariablePipes) {
-            convertParam(paramPipe.out, paramPipe.execute(null))
+            val any = paramPipe.execute(null)
+            convertParam(paramPipe.out, any)
           }
 
           if (rivet.freeVariablePipes.size > 0) {
@@ -165,8 +173,13 @@ object TestEngine {
           lgr.info("----------\n")
 
           def convertParam(out: Int, arg: Any) {
-            if (arg.isInstanceOf[Rivet]) {
+            println("ARG CAME IN -------------------------------------" + arg)
+            if(arg == null){
+              args(out) = null;
+            } else if (arg.isInstanceOf[Rivet]) {
               args(out) = arg.asInstanceOf[Rivet].result
+            } else if (arg.isInstanceOf[MinderNull]) {
+              args(out) = null;
             } else {
               args(out) = arg.asInstanceOf[AnyRef]
             }
