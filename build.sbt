@@ -54,7 +54,7 @@ libraryDependencies ++= Seq(
   "org.eclipse.aether" % "aether-transport-http" % "1.0.2.v20150114",
   "org.eclipse.aether" % "aether-transport-wagon" % "1.0.2.v20150114",
   "org.apache.maven" % "maven-aether-provider" % "3.1.0",
-  "minder" % "AS4Utils" % "1.0.2-beta"
+  "minder" % "AS4Utils" % "1.0.2"
 )
 
 resolvers ++= Seq(

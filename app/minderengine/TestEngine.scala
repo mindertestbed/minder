@@ -69,22 +69,20 @@ object TestEngine {
 
       //first, call the start methods for all registered wrappers of this test.
 
+      lgr.info("> CALL START TEST ON Wrappers");
       for (wrapperName <- minderTDL.wrapperDefs) {
         val minderClient = if (BuiltInWrapperRegistry.get().contains(wrapperName)) {
           BuiltInWrapperRegistry.get().getWrapper(wrapperName)
         } else {
           XoolaServer.get().getClient(wrapperName)
         }
-
-        lgr.info(">>>> CALL START TEST ON [" + wrapperName + "]");
         minderClient.startTest(userEmail)
-        lgr.info("<<<< START TEST ON [" + wrapperName + "] FINISHED");
       }
 
       try {
         var rivetIndex = 0;
         for (rivet <- minderTDL.SlotDefs) {
-          lgr.info(">>>> " + "RUN RIVET " + rivetIndex)
+          lgr.info("> " + "RUN RIVET " + rivetIndex)
 
           //resolve the minder client id. This might as well be resolved to a local built-in wrapper or the null slot.
           val minderClient =
@@ -108,8 +106,6 @@ object TestEngine {
           val args = Array.ofDim[Object](rivet.pipes.length)
 
           set.add(rivet.slot.wrapperId)
-          lgr.debug("ARG LEN:" + rivet.pipes.length)
-
           var signalIndex = 0
           for (tuple@(label, signature) <- rivet.signalPipeMap.keySet) {
             val me: MinderSignalRegistry = SessionMap.getObject(userEmail, "signalRegistry")
@@ -122,13 +118,13 @@ object TestEngine {
 
             val signal = signalList(0).inRef.source;
 
-            lgr.info(">>>> Dequeue Signal:" + label + "." + signature)
+            lgr.debug("> Wait For Signal:" + label + "." + signature)
 
             set.add(label)
 
             val signalData = me.dequeueSignal(label, signature, signal.timeout)
 
-            lgr.info("<<<< Signal Obtained Signal: " + label + "." + signature)
+            lgr.debug("< Signal Arrived: " + label + "." + signature)
 
             testProcessWatcher.signalEmitted(rivetIndex, signalIndex, signalData)
 
@@ -142,7 +138,7 @@ object TestEngine {
             signalIndex += 1
           }
 
-          lgr.info(">>>> Assign free vars")
+          lgr.debug("Assign free vars")
 
           for (paramPipe <- rivet.freeVariablePipes) {
             val any = paramPipe.execute(null)
@@ -160,20 +156,16 @@ object TestEngine {
             testProcessWatcher.signalEmitted(rivetIndex, signalIndex, signalData2)
           }
 
-          lgr.info("<<<< Free vars assigned")
-
-          lgr.info(">>>> CALL SLOT " + rivet.slot.wrapperId + "." + rivet.slot.signature)
-
+          lgr.info("> CALL SLOT " + rivet.slot.wrapperId + "." + rivet.slot.signature)
           rivet.result = minderClient.callSlot(userEmail, rivet.slot.signature, args)
-          lgr.info("<<<< SLOT CALL FINISHED " + rivet.slot.wrapperId + "." + rivet.slot.signature)
+          lgr.info("< SLOT CALLED " + rivet.slot.wrapperId + "." + rivet.slot.signature)
 
 
           testProcessWatcher.rivetFinished(rivetIndex)
-          lgr.info("<<<< Rivet finished sucessfully")
+          lgr.info("< Rivet finished sucessfully")
           lgr.info("----------\n")
 
           def convertParam(out: Int, arg: Any) {
-            println("ARG CAME IN -------------------------------------" + arg)
             if(arg == null){
               args(out) = null;
             } else if (arg.isInstanceOf[Rivet]) {
@@ -188,7 +180,7 @@ object TestEngine {
           rivetIndex += 1
         }
       } finally {
-        lgr.info(">>>> Send finish message to all wrappers")
+        lgr.info("> Send finish message to all wrappers")
         //make sure that we call finish test for all
         for (wrapperName <- minderTDL.wrapperDefs) {
           val minderClient = if (BuiltInWrapperRegistry.get().contains(wrapperName)) {
@@ -198,12 +190,10 @@ object TestEngine {
           }
 
           try {
-            lgr.info(">>>> Send finish message [" + wrapperName + "]")
             minderClient.finishTest()
           } catch {
             case _: Throwable => {}
           } finally{
-            lgr.info("<<<< Finish message sent [" + wrapperName + "]")
           }
         }
       }
@@ -229,8 +219,11 @@ object TestEngine {
         testProcessWatcher.failed(error, t);
       }
     } finally {
+      lgr.info("Test Finished")
       lgr.removeAppender(app)
     }
+
+ //   mapMe("A" -> "A".getBytes(), "B" -> "B".getBytes())
 
   }
 
