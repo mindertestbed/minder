@@ -33,17 +33,24 @@ public class MinderSignalRegistry {
    * and wait on a queue. That is why, we have to call init-map method here too
    * @param label
    * @param signature
+   * @param timeout maximum timeout to wait for the deque operation. 0 means get the default (XoolaProperty.NETWORK_RESPONSE_TIMEOUT)
+   *                from app.conf.
    * @return
    */
-  public SignalData dequeueSignal(String label, String signature){
+  public SignalData dequeueSignal(String label, String signature, long timeout){
     PriorityBlockingQueue<SignalData> queue = initMap(label, signature);
 
+    if(timeout == 0)
+      timeout = Long.parseLong(XoolaServer.properties.getProperty(XoolaProperty.NETWORK_RESPONSE_TIMEOUT));
+
     try {
-      long timeout = Long.parseLong(XoolaServer.properties.getProperty(XoolaProperty.NETWORK_RESPONSE_TIMEOUT));
       SignalData result = queue.poll(timeout, TimeUnit.MILLISECONDS);
       if(result == null){
-        throw new RuntimeException("No signal was received in the given timeout (" + timeout + ")");
+        throw new RuntimeException("Signal Timeout Expired (" + timeout + ")");
       }
+
+      if (result.error != null)
+        throw new RuntimeException("Signal " + label + "." + signature + " reported failure [" + result.error + "]");
 
       return result;
     } catch (InterruptedException e) {

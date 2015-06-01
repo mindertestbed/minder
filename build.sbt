@@ -31,8 +31,8 @@ libraryDependencies ++= Seq(
   "org.scala-lang.modules" % "scala-xml_2.11" % "1.0.2",
   "postgresql" % "postgresql" % "9.1-901-1.jdbc4",
   "org.beybunproject" % "xoola" % "1.0.0",
-  "gov.tubitak.minder" % "minder-common" % "0.0.5",
-  "gov.tubitak.minder" %% "minder-tdl" % "0.1.0-beta1",
+  "gov.tubitak.minder" % "minder-common" % "0.0.6",
+  "gov.tubitak.minder" %% "minder-tdl" % "0.1.1-temp",
   "com.feth" %%  "play-authenticate" % "0.6.5-SNAPSHOT",
   "be.objectify" %% "deadbolt-java" % "2.3.0-RC1",
   "org.webjars" %% "webjars-play" % "2.3.0",
@@ -43,7 +43,18 @@ libraryDependencies ++= Seq(
   "net.sourceforge.barbecue" % "barbecue" % "1.5-beta1",
   "org.codehaus.groovy" % "groovy" % "2.3.9",
   "gov.tubitak.minder.test" % "xml-value-initiator" % "0.0.1" % "test",
-  "gov.tubitak.minder.test" % "xml-generator" % "0.0.1" % "test"
+  "gov.tubitak.minder.test" % "xml-generator" % "0.0.1" % "test",
+  "org.eclipse.aether" % "aether-api" % "1.0.2.v20150114",
+  "org.eclipse.aether" % "aether-spi" % "1.0.2.v20150114",
+  "org.eclipse.aether" % "aether-util" % "1.0.2.v20150114",
+  "org.eclipse.aether" % "aether-impl" % "1.0.2.v20150114",
+  "org.eclipse.aether" % "aether-connector-basic" % "1.0.2.v20150114",
+  "org.eclipse.aether" % "aether-transport-classpath" % "1.0.2.v20150114",
+  "org.eclipse.aether" % "aether-transport-file" % "1.0.2.v20150114",
+  "org.eclipse.aether" % "aether-transport-http" % "1.0.2.v20150114",
+  "org.eclipse.aether" % "aether-transport-wagon" % "1.0.2.v20150114",
+  "org.apache.maven" % "maven-aether-provider" % "3.1.0",
+  "minder" % "AS4Utils" % "1.0.2"
 )
 
 resolvers ++= Seq(

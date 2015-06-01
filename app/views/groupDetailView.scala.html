@@ -55,6 +55,11 @@
                         <a href="/getGroupDetailView?id=@{tg.id}&display=utils">Utility Classes</a></h4>
                 </td>
 
+                <td class="@choose(display, "dependencies") tabshrink">
+                    <h4>
+                        <a href="/getGroupDetailView?id=@{tg.id}&display=dependencies">Dependencies</a></h4>
+                </td>
+
 
                 <td class="tabexpand">&nbsp;</td>
             </tr>
@@ -103,6 +108,21 @@
             case "utils" => {
                 @testGroupUtilClassLister(tg)
             }
+            case "dependencies" => {
+                <div class="indent">
+                    <div id="dependencies@{tg.id}" onclick='showUpdateTextAreaDialog(@tg.id, "dependencyString", $(this ).next(), "/doEditGroupField")' class="editable"></div>
+                    <input type="hidden" value="@tg.dependencyString"/>
+                </div>
+
+
+                <script>
+                    $(function(){
+                        bindValues($("#dependencies@{tg.id}"))
+                    });
+                </script>
+
+            }
+
         }
     </div>
 

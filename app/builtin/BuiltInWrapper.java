@@ -75,6 +75,15 @@ public abstract class BuiltInWrapper extends Wrapper implements IMinderClient, I
   }
 
 
+  @Override
+  public Object reportError(Object obj, String signalName, String errorMessage){
+    return null;
+  }
+
+  @Override
+  public void reportErrorForSignal(String signalIdentifier, String errorMessage){
+
+  }
   /**
    * A ready to use method that creates a successful result
    * @return

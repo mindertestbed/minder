@@ -1,6 +1,5 @@
 package controllers
 
-import controllers.common.enumeration.TestStatus
 import minderengine.{MinderSignalRegistry, MinderWrapperRegistry, SessionMap}
 import models.{Job, TestCase, User}
 import mtdl.SignalSlotInfoProvider
@@ -8,7 +7,6 @@ import play.Logger
 import play.api.libs.iteratee.Concurrent
 import play.api.libs.json.JsValue
 import play.api.mvc._
-import views.html._
 
 import scala.collection.mutable
 
@@ -73,16 +71,16 @@ object Tester extends Controller {
         //if (testRunner.status == TestStatus.BAD || testRunner.status == TestStatus.GOOD) {
         //  SessionMap.registerObject(mail, "signalRegistry", new MinderSignalRegistry());
         //  SignalSlotInfoProvider.setSignalSlotInfoProvider(MinderWrapperRegistry.get())
-          //val testRunner = new TestRunner(rc, user);
-         // testMap(mail) = testRunner
+        //val testRunner = new TestRunner(rc, user);
+        // testMap(mail) = testRunner
         //a}
       } else {
         SessionMap.registerObject(mail, "signalRegistry", new MinderSignalRegistry());
         SignalSlotInfoProvider.setSignalSlotInfoProvider(MinderWrapperRegistry.get())
         //val testRunner = new TestRunner(rc, user);
-       // testMap(mail) = testRunner
+        // testMap(mail) = testRunner
       }
-      Ok;//testRunStatus.render(rc, user))
+      Ok; //testRunStatus.render(rc, user))
     }
 
     catch {
@@ -108,7 +106,7 @@ object Tester extends Controller {
     Logger.debug("SYNC")
 
 
-    Ok;//(testRunStatus.render(rc, user))
+    Ok; //(testRunStatus.render(rc, user))
   }
 
 

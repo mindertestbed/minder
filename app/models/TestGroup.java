@@ -1,18 +1,9 @@
 package models;
 
-import java.util.List;
-
-import javax.persistence.CascadeType;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.FetchType;
-import javax.persistence.Id;
-import javax.persistence.ManyToOne;
-import javax.persistence.OneToMany;
-import javax.persistence.Table;
-
-import com.avaje.ebean.Ebean;
 import play.db.ebean.Model;
+
+import javax.persistence.*;
+import java.util.List;
 
 /**
  * Represents an entity that might contain multiple test cases
@@ -43,6 +34,9 @@ public class TestGroup extends Model {
 
   @Column(nullable = false, length = ModelConstants.SHORT_DESC_LENGTH)
   public String shortDescription;
+
+  @Column
+  public String dependencyString;
 
   private static final Finder<Long, TestGroup> find = new Finder<>(
       Long.class, TestGroup.class);

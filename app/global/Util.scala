@@ -39,6 +39,8 @@ object Util {
 
 
   def checkField(cls: Class[_], fieldName: String, newValue: String): Unit ={
+    System.out.println("Class Name"+cls);
+    System.out.println("Field Name"+fieldName);
     val fld: Field = cls.getDeclaredField(fieldName)
     val required: Boolean = fld.getAnnotation(classOf[Constraints.Required]) != null
 

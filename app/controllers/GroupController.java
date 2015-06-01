@@ -7,28 +7,20 @@ import com.avaje.ebean.Query;
 import com.avaje.ebean.Update;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import editormodels.AssertionEditorModel;
 import editormodels.GroupEditorModel;
 import global.Util;
-import models.TestAssertion;
 import models.TestGroup;
 import models.User;
-import play.Logger;
 import play.data.Form;
-import play.db.ebean.Model;
 import play.libs.Json;
 import play.mvc.Controller;
 import play.mvc.Result;
 import views.html.groupDetailView;
-import views.html.restrictedTestDesigner;
 import views.html.testGroupEditor;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.lang.reflect.Field;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.List;
 
 import static play.data.Form.form;
 
@@ -67,6 +59,7 @@ public class GroupController extends Controller {
       group.shortDescription = model.shortDescription;
       group.description = model.description;
       group.name = model.name;
+      group.dependencyString = "";
 
       group.save();
       return redirect(routes.Application.restrictedTestDesigner("testGroups"));
