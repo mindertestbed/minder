@@ -71,6 +71,10 @@ public class MinderWrapperRegistry extends Observable implements ISignalSlotInfo
       TSlot.deleteByWrapper(wrapper);
 
       for (MethodContainer mc : methodSet) {
+        if(mc.methodKey.startsWith("getCurrentTestUserInfo")){
+          //ignore this, it is meant for use only at client side.
+          continue;
+        }
         Logger.debug("\t" + (mc.isSignal ? "Signal " : "Slot ") + mc.methodKey);
 
         if (mc.isSignal) {
