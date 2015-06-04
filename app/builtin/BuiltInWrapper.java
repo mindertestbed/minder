@@ -3,7 +3,6 @@ package builtin;
 import minderengine.*;
 import models.User;
 
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.HashMap;
 
@@ -75,15 +74,15 @@ public abstract class BuiltInWrapper extends Wrapper implements IMinderClient, I
   }
 
 
-  @Override
-  public Object reportError(Object obj, String signalName, String errorMessage){
-    return null;
-  }
-
-  @Override
-  public void reportErrorForSignal(String signalIdentifier, String errorMessage){
-
-  }
+//  @Override
+//  public Object reportError(Object obj, String signalName, String errorMessage){
+//    return null;
+//  }
+//
+//  @Override
+//  public void reportErrorForSignal(String signalIdentifier, String errorMessage){
+//
+//  }
   /**
    * A ready to use method that creates a successful result
    * @return

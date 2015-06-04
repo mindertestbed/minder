@@ -245,7 +245,7 @@ object TestEngine {
     testCase.testAssertion.testGroup = TestGroup.findById(testCase.testAssertion.testGroup.id)
     val root = "_" + testCase.testAssertion.testGroup.id;
     val packagePath = root + "/_" + testCase.id;
-    val minderClass = TdlCompiler.compileTdl(root, packagePath, testCase.name, source = testCase.tdl)
+    val minderClass = TdlCompiler.compileTdl(root, packagePath, testCase.testAssertion.testGroup.dependencyString,testCase.name, source = testCase.tdl)
     val minderTdl = minderClass.getConstructors()(0).newInstance(null, java.lang.Boolean.FALSE).asInstanceOf[MinderTdl]
 
     val slotDefs = minderTdl.SlotDefs

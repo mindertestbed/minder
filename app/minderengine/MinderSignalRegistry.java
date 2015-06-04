@@ -1,11 +1,8 @@
 package minderengine;
 
-import minderengine.SignalData;
 import org.interop.xoola.core.XoolaProperty;
 
 import java.util.HashMap;
-import java.util.Objects;
-import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.PriorityBlockingQueue;
 import java.util.concurrent.TimeUnit;
 
@@ -49,8 +46,8 @@ public class MinderSignalRegistry {
         throw new RuntimeException("Signal Timeout Expired (" + timeout + ")");
       }
 
-      if (result.error != null)
-        throw new RuntimeException("Signal " + label + "." + signature + " reported failure [" + result.error + "]");
+//      if (result.error != null)
+//        throw new RuntimeException("Signal " + label + "." + signature + " reported failure [" + result.error + "]");
 
       return result;
     } catch (InterruptedException e) {
