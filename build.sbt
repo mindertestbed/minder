@@ -4,7 +4,7 @@ name := """minder"""
 
 offline := true
 
-version := "0.1.0-beta5"
+version := "0.1.0-beta6"
 
 resolvers += "play-authenticate (snapshot)" at "http://joscha.github.io/play-authenticate/repo/snapshots/"
 
