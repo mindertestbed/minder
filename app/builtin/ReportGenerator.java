@@ -31,6 +31,11 @@ public class ReportGenerator extends BuiltInWrapper {
   }
 
   @Override
+  public void reportErrorForSignal(String s, String s1) {
+
+  }
+
+  @Override
   public String getShortDescription() {
     return "The minder built-in xml report generator wrapper";
   }
@@ -100,7 +105,6 @@ public class ReportGenerator extends BuiltInWrapper {
   public void updateField(String name, String value) {
     currentMap.put(name, value);
   }
-
   @Slot
   public byte[] generateReport() {
     rmg.setReportData(currentMap);

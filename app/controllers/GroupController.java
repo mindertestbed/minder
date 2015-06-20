@@ -7,6 +7,7 @@ import com.avaje.ebean.Query;
 import com.avaje.ebean.Update;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import dependencyutils.DependencyService;
 import editormodels.GroupEditorModel;
 import global.Util;
 import models.TestGroup;
@@ -93,7 +94,16 @@ public class GroupController extends Controller {
     com.feth.play.module.pa.controllers.Authenticate.noCache(response());
     JsonNode jsonNode = request().body().asJson();
 
-    return doEditField(GroupEditorModel.class, TestGroup.class, jsonNode);
+    Result result = doEditField(GroupEditorModel.class, TestGroup.class, jsonNode);
+
+    String field = jsonNode.findPath("field").asText();
+
+    if (field.equals("dependencyString")) {
+      String dependencyString = jsonNode.findPath("newValue").asText();
+      long groupId = jsonNode.findPath("id").asInt();
+      DependencyService.getInstance().getClassPathString(dependencyString, "_" + String.valueOf(groupId));
+    }
+    return result;
   }
 
   @Restrict(@Group(Application.TEST_DESIGNER_ROLE))

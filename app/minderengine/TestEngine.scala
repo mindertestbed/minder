@@ -1,5 +1,6 @@
 package minderengine
 
+import java.lang.reflect.InvocationTargetException
 import java.util
 
 import models.{TestGroup, TestAssertion, TestCase}
@@ -196,6 +197,11 @@ object TestEngine {
           } finally{
           }
         }
+
+        if (minderTDL.exception != null){
+          //we have a late error
+          throw minderTDL.exception;
+        }
       }
       testProcessWatcher.finished()
     } catch {
@@ -238,8 +244,17 @@ object TestEngine {
     testCase.testAssertion.testGroup = TestGroup.findById(testCase.testAssertion.testGroup.id)
     val root = "_" + testCase.testAssertion.testGroup.id;
     val packagePath = root + "/_" + testCase.id;
-    val minderClass = TdlCompiler.compileTdl(root, packagePath, testCase.name, source = testCase.tdl)
-    val minderTdl = minderClass.getConstructors()(0).newInstance(null, java.lang.Boolean.FALSE).asInstanceOf[MinderTdl]
+    val minderClass = TdlCompiler.compileTdl(root, packagePath, testCase.testAssertion.testGroup.dependencyString,testCase.name, source = testCase.tdl)
+
+    val minderTdl = try {
+      minderClass.getConstructors()(0).newInstance(null, java.lang.Boolean.FALSE).asInstanceOf[MinderTdl]
+    }catch{
+      case ex : InvocationTargetException => {
+        var cause : Throwable = ex
+        while(cause.getCause != null) cause = cause.getCause
+        throw cause
+      }
+    }
 
     val slotDefs = minderTdl.SlotDefs
 

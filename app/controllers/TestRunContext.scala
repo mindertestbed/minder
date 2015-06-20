@@ -34,7 +34,7 @@ class TestRunContext(val testRun: TestRun) extends Runnable with TestProcessWatc
 
   val packageRoot = "_" + testGroup.id;
   val packagePath = packageRoot + "/_" + testCase.id;
-  val cls = TdlCompiler.compileTdl(packageRoot, packagePath, testCase.name, source = testCase.tdl)
+  val cls = TdlCompiler.compileTdl(packageRoot, packagePath, testGroup.dependencyString,testCase.name, source = testCase.tdl)
   val logStringBuilder = new StringBuilder;
   val reportLogBuilder = new StringBuilder;
   var status = TestStatus.PENDING

@@ -102,6 +102,7 @@ public class MinderWrapperRegistry extends Observable implements ISignalSlotInfo
 
   @Override
   public SignalSlot getSignalSlot(String label, String signature) {
+    signature=signature.replaceAll("\\s", "");
     if (!wrapperMap.containsKey(label))
       throw new IllegalArgumentException("No wrapper with name [" + label + "]");
 

@@ -3,7 +3,6 @@ package builtin;
 import minderengine.*;
 import models.User;
 
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.HashMap;
 
@@ -15,10 +14,10 @@ public abstract class BuiltInWrapper extends Wrapper implements IMinderClient, I
   private final HashMap<String, MethodContainer> slots = new HashMap<>();
   private String sessionId;
 
-  public BuiltInWrapper(){
+  public BuiltInWrapper() {
     //lets resolve methods first
     for (Method method : this.getClass().getMethods()) {
-      if (method.isAnnotationPresent(Slot.class)){
+      if (method.isAnnotationPresent(Slot.class)) {
         MethodContainer mc = new MethodContainer(method);
         this.slots.put(mc.methodKey, mc);
       }
@@ -27,7 +26,7 @@ public abstract class BuiltInWrapper extends Wrapper implements IMinderClient, I
 
   @Override
   public Object callSlot(String sessionId, String slotName, Object[] args) {
-    if (slots.containsKey(slotName)){
+    if (slots.containsKey(slotName)) {
       try {
         return slots.get(slotName).method.invoke(this, args);
       } catch (Exception e) {
@@ -76,16 +75,18 @@ public abstract class BuiltInWrapper extends Wrapper implements IMinderClient, I
 
 
   @Override
-  public Object reportError(Object obj, String signalName, String errorMessage){
+  public Object reportError(Object obj, String signalName, String errorMessage) {
     return null;
   }
 
   @Override
-  public void reportErrorForSignal(String signalIdentifier, String errorMessage){
+  public void reportErrorForSignal(String signalIdentifier, String errorMessage) {
 
   }
+
   /**
    * A ready to use method that creates a successful result
+   *
    * @return
    */
   public static final Result success() {
@@ -94,6 +95,7 @@ public abstract class BuiltInWrapper extends Wrapper implements IMinderClient, I
 
   /**
    * A ready to use method that creates a failure result
+   *
    * @return
    */
   public static final Result failure(String message) {

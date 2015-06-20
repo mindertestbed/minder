@@ -4,7 +4,7 @@ name := """minder"""
 
 offline := true
 
-version := "0.1.0-beta5"
+version := "0.1.0-beta6"
 
 resolvers += "play-authenticate (snapshot)" at "http://joscha.github.io/play-authenticate/repo/snapshots/"
 
@@ -19,7 +19,6 @@ resolvers += Resolver.mavenLocal
 scalaVersion := "2.11.2"
 
 libraryDependencies ++= Seq(
-  jdbc,
   cache,
   ws,
   javaCore,
@@ -31,8 +30,8 @@ libraryDependencies ++= Seq(
   "org.scala-lang.modules" % "scala-xml_2.11" % "1.0.2",
   "postgresql" % "postgresql" % "9.1-901-1.jdbc4",
   "org.beybunproject" % "xoola" % "1.0.0",
-  "gov.tubitak.minder" % "minder-common" % "0.0.6",
-  "gov.tubitak.minder" %% "minder-tdl" % "0.1.1-temp",
+  "gov.tubitak.minder" % "minder-common" % "0.0.7",
+  "gov.tubitak.minder" %% "minder-tdl" % "0.1.7.3",
   "com.feth" %%  "play-authenticate" % "0.6.5-SNAPSHOT",
   "be.objectify" %% "deadbolt-java" % "2.3.0-RC1",
   "org.webjars" %% "webjars-play" % "2.3.0",
