@@ -94,18 +94,16 @@ public class GroupController extends Controller {
     com.feth.play.module.pa.controllers.Authenticate.noCache(response());
     JsonNode jsonNode = request().body().asJson();
 
-      Result result = doEditField(GroupEditorModel.class, TestGroup.class, jsonNode);
+    Result result = doEditField(GroupEditorModel.class, TestGroup.class, jsonNode);
 
-      String field = jsonNode.findPath("field").asText();
+    String field = jsonNode.findPath("field").asText();
 
-      if(field.equals("dependencyString")){
-          String dependencyString = jsonNode.findPath("newValue").asText();
-          long groupId = jsonNode.findPath("id").asInt();
-
-          String path = DependencyService.getInstance().getClassPathString(dependencyString, "_"+String.valueOf(groupId));
-          System.out.println("DependencyService called:"+path);
-      }
-      return result;
+    if (field.equals("dependencyString")) {
+      String dependencyString = jsonNode.findPath("newValue").asText();
+      long groupId = jsonNode.findPath("id").asInt();
+      DependencyService.getInstance().getClassPathString(dependencyString, "_" + String.valueOf(groupId));
+    }
+    return result;
   }
 
   @Restrict(@Group(Application.TEST_DESIGNER_ROLE))

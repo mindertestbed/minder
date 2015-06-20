@@ -5,9 +5,10 @@ import com.feth.play.module.pa.PlayAuthenticate.Resolver;
 import com.feth.play.module.pa.exceptions.AccessDeniedException;
 import com.feth.play.module.pa.exceptions.AuthException;
 import minderengine.BuiltInWrapperRegistry;
-import minderengine.ReflectionUtils;
+import mtdl.ReflectionUtils;
 import minderengine.XoolaServer;
 import models.*;
+import mtdl.TdlClassLoader;
 import org.yaml.snakeyaml.Yaml;
 import org.yaml.snakeyaml.constructor.CustomClassLoaderConstructor;
 import play.Application;
@@ -77,8 +78,8 @@ public class Global extends GlobalSettings {
 
     System.out.println("OnStart");
     initialData();
-
-    ReflectionUtils.defaultClassLoader = Play.classloader(Play.current());
+    TdlClassLoader.appendClassLoader(Play.classloader(Play.current()));
+    TdlClassLoader.appendClassLoader(ClassLoader.getSystemClassLoader());
     BuiltInWrapperRegistry.get().initiate();
     XoolaServer.get().start();
   }
