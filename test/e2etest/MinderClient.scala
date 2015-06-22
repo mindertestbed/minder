@@ -85,4 +85,6 @@ class MinderClient(properties: Properties) extends IMinderClient with ISignalHan
     wrapper finishTest;
     this sessionId = null
   }
+
+  override def reportError(o: scala.Any, s: String, s1: String): AnyRef = null
 }
