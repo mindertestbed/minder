@@ -4,6 +4,7 @@ package controllers;
 import com.fasterxml.jackson.databind.JsonNode;
 import editormodels.TestCaseEditorModel;
 import global.Util;
+import models.Job;
 import models.TestAssertion;
 import models.TestCase;
 import models.User;
@@ -13,6 +14,8 @@ import play.mvc.Controller;
 import play.mvc.Result;
 import views.html.testCaseEditor;
 import views.html.testCaseView;
+
+import java.util.List;
 
 import static play.data.Form.form;
 
@@ -33,6 +36,23 @@ public class TestCaseController extends Controller {
       TestCaseEditorModel testCaseEditorModel = new TestCaseEditorModel();
       testCaseEditorModel.assertionId = assertionId;
 
+      List<TestCase> list = TestCase.listByTestAssertionId(assertionId);
+      int max = 0;
+      if (list != null) {
+        for (TestCase testCase : list) {
+          System.out.println(testCase.name + "------" + ta.taId);
+          if (testCase.name.matches("^" + ta.taId + "_TC\\d+$")) {
+            int val = Integer.parseInt(testCase.name.split("_TC")[1]);
+            if (max < val)
+              max = val;
+          }
+        }
+      }
+      max += 1;
+      String maxx = max < 10 ? ("0" + max) : "" + max;
+
+      testCaseEditorModel.name = ta.taId + "_TC" + maxx;
+      testCaseEditorModel.shortDescription = testCaseEditorModel.name;
       Form<TestCaseEditorModel> bind = TEST_CASE_FORM
           .fill(testCaseEditorModel);
       return ok(testCaseEditor.render(bind, null, false));

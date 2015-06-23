@@ -173,4 +173,8 @@ public class TestCase extends Model {
 
   public static void updateUser(User user, User localUser) {
   }
+
+  public static List<TestCase> listByTestAssertionId(Long assertionId) {
+    return find.where().eq("testAssertion.id", assertionId).findList();
+  }
 }
