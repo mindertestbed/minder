@@ -20,21 +20,21 @@ public class TSignal extends Model {
   public Long id;
 
   @ManyToOne
-  public Wrapper wrapper;
+  public WrapperVersion wrapperVersion;
 
   public String signature;
 
   public static final Finder<Long, TSignal> find = new Finder<>(
       Long.class, TSignal.class);
 
-  public static void deleteByWrapper(Wrapper wrapper) {
-    SqlUpdate tangoDown = Ebean.createSqlUpdate("DELETE FROM TSignal WHERE wrapper_id = " + wrapper.id);
+  public static void deleteByVersion(WrapperVersion wrapperVersion) {
+    SqlUpdate tangoDown = Ebean.createSqlUpdate("DELETE FROM TSignal WHERE wrapper_version_id = " + wrapperVersion.id);
     tangoDown.execute();
   }
 
-  public static TSignal createNew(Wrapper wrapper, String methodKey) {
+  public static TSignal createNew(WrapperVersion wrapperVersion, String methodKey) {
     TSignal ts = new TSignal();
-    ts.wrapper = wrapper;
+    ts.wrapperVersion = wrapperVersion;
     ts.signature = methodKey;
     ts.save();
     return ts;

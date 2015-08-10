@@ -30,13 +30,16 @@
       '_label -> "Job name"
       )
 
-      @repeat(frm("mappedWrappers"), min=0){ field =>
+    @textarea(frm("mtdlParameters"), 'rows -> 5, '_label -> "Parameters", '_style -> "height:auto;")
+
+    @repeat(frm("wrapperMappingList"), min=0){ field =>
         @defining(field.value.get){ str =>
           @defining(MappedWrapperModel.parse(str)){ entry =>
-          <label for="@field.name" class="control-label">@entry.name</label>:
-          <select id="@entry.id" name="@field.name" class="form-control" style="width:350px;">
-            @options(JobController.listOptions(entry)).map { v =>
-            <option value="@MappedWrapperModel.jsonFor(entry.id, entry.wrapperParamId, entry.name, v._1)" @if(entry.value.contains(v._1)){selected="selected" }>@v._2</option>
+          <label for="@field.name" class="control-label">@entry.wrapperParam.name</label>:
+          <select id="@entry.wrapperParam.id" name="@field.name" class="form-control" style="width:350px;">
+            @for(wrapperVersion <- JobController.listFittingWrappers(entry)) {
+                <option value="@entry.toJsonWith(wrapperVersion)"
+                    @if(entry.wrapperVersion==wrapperVersion){selected="selected" }>@{wrapperVersion.wrapper.name+" ("+wrapperVersion.version+")"}</option>
             }
           </select>
           }
@@ -49,7 +52,7 @@
     <button type="button" onclick="history.back ( )">Cancel</button>
 
     <input type="hidden" name="id" id="id" value='@frm("id").value'/>
-    <input type="hidden" name="testCaseId" id="testCaseId" value='@frm("testCaseId").value'/>
+    <input type="hidden" name="tdlID" id="tdlID" value='@frm("tdlID").value'/>
     <input type="hidden" name="obsolete" id="obsolete" value='@frm("obsolete").value'/>
     <input type="hidden" name="tdl" id="tdl" value='@frm("tdl").value'/>
 

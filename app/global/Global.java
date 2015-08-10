@@ -8,7 +8,7 @@ import minderengine.BuiltInWrapperRegistry;
 import mtdl.ReflectionUtils;
 import minderengine.XoolaServer;
 import models.*;
-import mtdl.TdlClassLoader;
+import mtdl.TDLClassLoaderProvider;
 import org.yaml.snakeyaml.Yaml;
 import org.yaml.snakeyaml.constructor.CustomClassLoaderConstructor;
 import play.Application;
@@ -22,6 +22,7 @@ import scala.io.Source;
 
 import java.io.*;
 import java.util.*;
+
 import controllers.*;
 
 public class Global extends GlobalSettings {
@@ -76,25 +77,14 @@ public class Global extends GlobalSettings {
       }
     });
 
-    System.out.println("OnStart");
     initialData();
-    TdlClassLoader.appendClassLoader(Play.classloader(Play.current()));
-    TdlClassLoader.appendClassLoader(ClassLoader.getSystemClassLoader());
+    TDLClassLoaderProvider.appendExternalClassLoader(Play.classloader(Play.current()));
+    TDLClassLoaderProvider.appendExternalClassLoader(ClassLoader.getSystemClassLoader());
     BuiltInWrapperRegistry.get().initiate();
     XoolaServer.get().start();
   }
 
   private void initialData() {
-//    if (SecurityRole.find.findRowCount() == 0) {
-//      String rolesList[] = new String[]{controllers.Application.OBSERVER_ROLE, controllers.Application.TEST_DESIGNER_ROLE, controllers.Application.TEST_DEVELOPER_ROLE};
-//      for (final String roleName : Arrays
-//          .asList(rolesList)) {
-//        final SecurityRole role = new SecurityRole();
-//        role.roleName = roleName;
-//        role.save();
-//      }
-//    }
-
     if (User.find.findRowCount() == 0) {
       System.out.println("Adding sample data");
       try {
@@ -109,27 +99,30 @@ public class Global extends GlobalSettings {
         Map<String, List<Model>> all = (Map<String, List<Model>>) yaml.load(new FileInputStream(yml));
         for (String key : all.keySet()) {
           for (Model model : all.get(key)) {
+            System.out.println(model);
             model.save();
 
-            if (model instanceof TestGroup){
+            if (model instanceof TestGroup) {
               TestGroup group = (TestGroup) model;
-              for(TestAssertion assertion : group.testAssertions){
-                for (TestCase tcase : assertion.testCases){
-                  BufferedSource file = Source.fromFile(tcase.tdl, "utf-8");
-                  tcase.setTdl(file.mkString());
+              group.save();
+              for (TestAssertion assertion : group.testAssertions) {
+                assertion.save();
+                for (TestCase tcase : assertion.testCases) {
                   tcase.save();
+                  for (Tdl tdl : tcase.tdls) {
+                    BufferedSource file = Source.fromFile(tdl.tdl, "utf-8");
+                    tdl.creationDate = new Date();
+                    tdl.tdl = file.mkString();
+                    tdl.testCase = tcase;
+                    tdl.save();
+                    TestCaseController.detectAndSaveParameters(tdl);
+                  }
                 }
-              }
-            }
-            if (model instanceof Job){
-              Job rc = (Job) model;
-
-              for (MappedWrapper mappedWrapper : rc.mappedWrappers) {
               }
             }
           }
         }
-      } catch (Throwable th){
+      } catch (Throwable th) {
         th.printStackTrace();
       }
     }

@@ -1,7 +1,7 @@
 package controllers
 
 import minderengine.{MinderSignalRegistry, MinderWrapperRegistry, SessionMap}
-import models.{Job, TestCase, User}
+import models.{Tdl, Job, TestCase, User}
 import mtdl.SignalSlotInfoProvider
 import play.Logger
 import play.api.libs.iteratee.Concurrent
@@ -36,7 +36,8 @@ object Tester extends Controller {
 
   def getTestRunner(user: User, job: Job): TestRunContext = {
     val rc2 = Job.findById(job.id)
-    val testCase = TestCase.findById(job.testCase.id)
+    val tdl = Tdl.findById(rc2.tdl.id);
+    val testCase = TestCase.findById(rc2.tdl.id)
     var testRunner = testMap(user.email);
 
     if (testRunner == null) {
@@ -58,11 +59,6 @@ object Tester extends Controller {
     val mail = user.email;
 
     val rc = Job.findById(id);
-
-    println("--------------")
-    println("TEST CASE TDL " + rc.testCase.id)
-    println("TEST CASE TDL " + rc.testCase.tdl)
-    println("--------------")
     //
     try {
 

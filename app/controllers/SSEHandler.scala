@@ -4,7 +4,7 @@ import java.util
 import java.util.{Observable, Observer}
 
 import minderengine.MinderWrapperRegistry
-import models.{Job, Wrapper}
+import models.{WrapperVersion, Job, Wrapper}
 import play.api.libs.EventSource
 import play.api.libs.concurrent.Execution.Implicits._
 import play.api.libs.iteratee.{Concurrent, Enumeratee}
@@ -19,39 +19,33 @@ object SSEHandler extends Controller {
 
   MinderWrapperRegistry.get().addObserver(new Observer {
     override def update(o: Observable, arg: scala.Any): Unit = {
-      val label = arg.toString;
-      updateWrapperStatus(label, MinderWrapperRegistry.get().isWrapperAvailable(label))
+      val wrapperVersionId = arg.asInstanceOf[Long];
+      val wrapperVersion = WrapperVersion.findById(wrapperVersionId);
+      updateWrapperStatus(wrapperVersion, MinderWrapperRegistry.get().isWrapperAvailable(wrapperVersion))
     }
   })
 
-  def updateWrapperStatus(label: String, online: Boolean): Unit = {
-    val wr = Wrapper.findByName(label);
+  def updateWrapperStatus(wrapperVersion: WrapperVersion, online: Boolean): Unit = {
     val json = JsObject(Seq(
-      "label" -> JsString(label),
-      "id" -> JsString(wr.id + ""),
+      "id" -> JsString(wrapperVersion.id + ""),
       "online" -> JsBoolean(online)))
     wsChannel.push(json);
   }
 
-  def filterWS(labelSet: util.HashMap[String, models.Wrapper]) = Enumeratee.filter[JsValue] {
+  def filterWS(labelMap: util.HashMap[String, models.WrapperVersion]) = Enumeratee.filter[JsValue] {
     tpl: JsValue => {
-      println("Filter " + tpl + " >>> " + labelSet.containsKey((tpl \ "label").as[String]))
-      labelSet.containsKey((tpl \ "label").as[String])
+      labelMap.containsKey((tpl \ "id").as[String])
     }
   }
 
-  class JobStatusRunnable(val labelSet: util.HashMap[String, models.Wrapper]) extends Runnable {
+  class JobStatusRunnable(val labelMap: util.HashMap[String, models.WrapperVersion]) extends Runnable {
     override def run(): Unit = {
-      if (labelSet != null) {
+      if (labelMap != null) {
         Thread.sleep(1000)
-        labelSet.foreach(wrp => {
-          println("Wrapper " + wrp._1)
-          println("Wrapper " + wrp._2.name)
-          val online = MinderWrapperRegistry.get().isWrapperAvailable(wrp._1);
+        labelMap.foreach(wrp => {
+          val online = MinderWrapperRegistry.get().isWrapperAvailable(wrp._2);
           val json = JsObject(Seq(
-            "count" -> JsNumber(labelSet.size()),
-            "label" -> JsString(wrp._2.name),
-            "id" -> JsString(wrp._2.id + ""),
+            "id" -> JsString(wrp._1 + ""),
             "online" -> JsBoolean(online)))
           wsChannel.push(json);
         });
@@ -60,19 +54,16 @@ object SSEHandler extends Controller {
   }
 
   val threadPool = java.util.concurrent.Executors.newFixedThreadPool(20);
+
   def wrapperStatusFeed(id: Long) = Action {
-    println("WS Feed")
-    val labelSet = new util.HashMap[String, models.Wrapper]()
-
-
+    println("Wrapper Status Feed " + id)
+    val labelMap = new util.HashMap[String, models.WrapperVersion]()
     val job = Job.findById(id);
     job.mappedWrappers.foreach(mw => {
-      val wrp = Wrapper.findById(mw.wrapper.id);
-      println("Mapped Wrapper " + wrp.name + " " + mw.wrapper.id)
-      labelSet.put(wrp.name, wrp)
-    }
-    )
-    threadPool.submit(new JobStatusRunnable(labelSet))
-    Ok.chunked(wsOut &> filterWS(labelSet) &> EventSource()).as("text/event-stream")
+      mw.wrapperVersion = WrapperVersion.findById(mw.wrapperVersion.id);
+      labelMap.put(mw.wrapperVersion.id + "", mw.wrapperVersion);
+    })
+    threadPool.submit(new JobStatusRunnable(labelMap))
+    Ok.chunked(wsOut &> filterWS(labelMap) &> EventSource()).as("text/event-stream")
   }
 }

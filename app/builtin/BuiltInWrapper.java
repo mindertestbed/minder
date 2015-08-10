@@ -34,7 +34,7 @@ public abstract class BuiltInWrapper extends Wrapper implements IMinderClient, I
       }
     }
 
-    throw new IllegalArgumentException("Slot named [" + slotName + "] not found on [" + this.getLabel() + "]");
+    throw new IllegalArgumentException("Slot named [" + slotName + "] not found on [" + this.getSUTName() + "]");
   }
 
   @Override
@@ -73,17 +73,6 @@ public abstract class BuiltInWrapper extends Wrapper implements IMinderClient, I
     return null;
   }
 
-
-  @Override
-  public Object reportError(Object obj, String signalName, String errorMessage) {
-    return null;
-  }
-
-  @Override
-  public void reportErrorForSignal(String signalIdentifier, String errorMessage) {
-
-  }
-
   /**
    * A ready to use method that creates a successful result
    *
@@ -103,4 +92,9 @@ public abstract class BuiltInWrapper extends Wrapper implements IMinderClient, I
   }
 
   public abstract String getShortDescription();
+
+  @Override
+  public String getSUTName(){
+    return "";
+  }
 }

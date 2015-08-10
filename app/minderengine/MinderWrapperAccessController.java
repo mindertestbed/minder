@@ -23,14 +23,21 @@ public class MinderWrapperAccessController implements ClientAccessController {
   }
 
   @Override
-  public boolean clientIsAllowed(String label) {
-    Logger.info("A client with name [" + label + "] is trying to connect...");
+  public boolean clientIsAllowed(String identifier) {
+    Logger.info("A client with name [" + identifier + "] is trying to connect...");
+
+    String label = identifier;
+    if (identifier.contains("|")){
+      String []tmp = identifier.split("\\|");
+      label = tmp[0];
+    }
+
     Wrapper wrp = Wrapper.findByName(label);
     if (wrp != null) {
-      Logger.info("ALLOW [" + label + "]");
+      Logger.info("ALLOW [" + identifier + "]");
       return true;
     }
-    Logger.info("DENY [" + label + "]");
+    Logger.info("DENY [" + identifier + "]");
     return false;
   }
 }

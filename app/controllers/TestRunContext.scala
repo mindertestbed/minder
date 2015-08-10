@@ -1,14 +1,12 @@
 package controllers
 
-import java.security.MessageDigest
 import java.util
-import java.util.Date
 
 import builtin.ReportGenerator
-import controllers.common.enumeration.{TestStatus, OperationType}
-import minderengine.{UserDTO, TestProcessWatcher, SignalData, TestEngine}
+import controllers.common.enumeration.TestStatus
+import minderengine.{SignalData, TestEngine, TestProcessWatcher, UserDTO}
 import models._
-import mtdl.{TdlCompiler, Rivet}
+import mtdl.{Rivet, TdlCompiler}
 import play.Logger
 
 import scala.collection.JavaConversions._
@@ -21,20 +19,22 @@ import scala.io.Source
  */
 class TestRunContext(val testRun: TestRun) extends Runnable with TestProcessWatcher {
   //prepare a mapping
-  val variableWrapperMapping = collection.mutable.Map[String, String]();
+  val variableWrapperMapping = collection.mutable.Map[String, MappedWrapper]();
   val mappedWrappers = MappedWrapper.findByJob(testRun.job)
-  var wrappers: java.util.Set[String] = null;
+  var sutNames: java.util.Set[String] = null;
   var error = ""
   val job = Job.findById(testRun.job.id);
   val user = testRun.runner;
-  val testCase = TestCase.findById(job.testCase.id)
+  val tdl = Tdl.findById(job.tdl.id);
+  val testCase = TestCase.findById(tdl.testCase.id)
   val testAssertion = TestAssertion.findById(testCase.testAssertion.id)
   val testGroup = TestGroup.findById(testAssertion.testGroup.id)
-  job.testCase = testCase
+  job.tdl = tdl;
+  tdl.testCase = testCase;
 
   val packageRoot = "_" + testGroup.id;
   val packagePath = packageRoot + "/_" + testCase.id;
-  val cls = TdlCompiler.compileTdl(packageRoot, packagePath, testGroup.dependencyString,testCase.name, source = testCase.tdl)
+  val cls = TdlCompiler.compileTdl(packageRoot, packagePath, testGroup.dependencyString, testCase.name, source = tdl.tdl, version=tdl.version);
   val logStringBuilder = new StringBuilder;
   val reportLogBuilder = new StringBuilder;
   var status = TestStatus.PENDING
@@ -58,11 +58,11 @@ class TestRunContext(val testRun: TestRun) extends Runnable with TestProcessWatc
   var progressPercent = 0;
 
 
-  for (map: MappedWrapper <- mappedWrappers) {
-    val parm = WrapperParam.findById(map.parameter.id)
-    val wrp = Wrapper.findById(map.wrapper.id)
-    Logger.debug(parm.name + "<--" + wrp.name)
-    variableWrapperMapping += parm.name -> wrp.name
+  for (mappedWrapper: MappedWrapper <- mappedWrappers) {
+    mappedWrapper.parameter = WrapperParam.findById(mappedWrapper.parameter.id);
+    mappedWrapper.wrapperVersion = WrapperVersion.findById(mappedWrapper.wrapperVersion.id);
+    mappedWrapper.wrapperVersion.wrapper = Wrapper.findById(mappedWrapper.wrapperVersion.wrapper.id);
+    variableWrapperMapping.put(mappedWrapper.parameter.name,mappedWrapper)
   }
 
 
@@ -70,6 +70,8 @@ class TestRunContext(val testRun: TestRun) extends Runnable with TestProcessWatc
     override def getCurrentTestUserInfo: UserDTO = {
       null
     }
+
+    override def getSUTName(): String = ""
   }
   rg.startTest()
   rg.setReportTemplate(Source.fromInputStream(this.getClass.getResourceAsStream("/taReport.xml")).mkString.getBytes())
@@ -79,8 +81,7 @@ class TestRunContext(val testRun: TestRun) extends Runnable with TestProcessWatc
 
   override def run(): Unit = {
     status = TestStatus.RUNNING
-    TestEngine.runTest(user.email, cls,
-      variableWrapperMapping.toMap, TestRunContext.this)
+    TestEngine.runTest(user.email, cls, variableWrapperMapping, TestRunContext.this, job.mtdlParameters)
   }
 
   /**
@@ -142,27 +143,27 @@ class TestRunContext(val testRun: TestRun) extends Runnable with TestProcessWatc
   }
 
   def updateRun(): Unit = {
-    rg.setTestDetails(testGroup, testAssertion, testCase, job, wrappers, reportLogBuilder.toString())
-    testRun.history.systemOutputLog = logStringBuilder.toString()
+    rg.setTestDetails(testGroup, testAssertion, testCase, job, sutNames, reportLogBuilder.toString())
+    testRun.history.setSystemOutputLog(logStringBuilder.toString());
     testRun.history.save();
     testRun.success = (status == TestStatus.GOOD)
     testRun.report = rg.generateReport();
     testRun.errorMessage = error;
-    if (wrappers != null) {
+    if (sutNames != null) {
       val sb = new StringBuilder()
       var i: Int = 1
-      for (wrapper <- wrappers) {
-        sb.append(i).append(". ").append(wrapper).append('\n')
+      for (sut <- sutNames) {
+        sb.append(i).append("- ").append(sut).append('\n')
         i += 1
       }
-      testRun.wrappers = sb.toString();
+      testRun.sutNames = sb.toString();
     }
 
     testRun.save()
   }
 
-  override def updateWrappers(set: Set[String]): Unit = {
-    wrappers = set;
+  override def updateSUTNames(set: scala.collection.Set[String]): Unit = {
+    sutNames = set;
   }
 
   def updateNumber() = {

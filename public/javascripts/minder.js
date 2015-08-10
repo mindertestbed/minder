@@ -222,7 +222,7 @@ function showError(data) {
 function createJob(testCaseId) {
   $.ajax({
     type: 'GET',
-    url: '/getCreateJobEditorView?testCaseId=' + testCaseId,
+    url: '/getCreateJobEditorView?tdlID=' + testCaseId,
     success: function (data) {
       showCreateDialog(testCaseId, data)
     },

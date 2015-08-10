@@ -33,7 +33,7 @@ public class TestRun extends Model {
 	public byte[] report;
 
 	@Column(length = ModelConstants.LOG_LENGTH)
-	public String wrappers;
+	public String sutNames;
 
 	@Column(nullable = false)
 	public boolean success;

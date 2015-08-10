@@ -20,21 +20,21 @@ public class TSlot extends Model {
   public Long id;
 
   @ManyToOne
-  public Wrapper wrapper;
+  public WrapperVersion wrapperVersion;
 
   public String signature;
 
   public static final Finder<Long, TSlot> find = new Finder<>(
       Long.class, TSlot.class);
 
-  public static void deleteByWrapper(Wrapper wrapper) {
-    SqlUpdate tangoDown = Ebean.createSqlUpdate("DELETE FROM TSlot WHERE wrapper_id = " + wrapper.id);
+  public static void deleteByVersion(WrapperVersion wrapperVersion) {
+    SqlUpdate tangoDown = Ebean.createSqlUpdate("DELETE FROM TSlot WHERE wrapper_version_id = " + wrapperVersion.id);
     tangoDown.execute();
   }
 
-  public static TSlot createNew(Wrapper wrapper, String methodKey) {
+  public static TSlot createNew(WrapperVersion wrapperVersion, String methodKey) {
     TSlot ts = new TSlot();
-    ts.wrapper = wrapper;
+    ts.wrapperVersion = wrapperVersion;
     ts.signature = methodKey;
     ts.save();
     return ts;

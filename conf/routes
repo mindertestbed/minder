@@ -78,17 +78,17 @@ POST        /doCreateCase                          controllers.TestCaseControlle
 GET         /getEditCaseEditorView                 controllers.TestCaseController.getEditCaseEditorView(id: Long)
 POST        /doEditCase                            controllers.TestCaseController.doEditCase
 GET         /doDeleteCase                          controllers.TestCaseController.doDeleteCase(id: Long)
-GET         /viewTestCase                          controllers.TestCaseController.viewTestCase(id: Long, showJobs: Boolean)
+GET         /viewTestCase                          controllers.TestCaseController.viewTestCase(id: Long, display: String ?= "jobs")
+GET         /viewTestCase2                         controllers.TestCaseController.viewTestCase2(id: Long, tdlId: Long, display: String ?= "jobs")
 POST        /doEditCaseField                       controllers.TestCaseController.doEditCaseField()
 
 #JOB management
 
-GET         /getCreateJobEditorView                controllers.JobController.getCreateJobEditorView(testCaseId: Long)
+GET         /getCreateJobEditorView                controllers.JobController.getCreateJobEditorView(tdlID: Long)
 POST        /doCreateJob                           controllers.JobController.doCreateJob()
 GET         /getEditJobEditorView                  controllers.JobController.getEditJobEditorView(id: Long)
 GET         /viewJob                               controllers.JobController.displayJob(id: Long, showHistory: Boolean)
 GET         /doDeleteJob                           controllers.JobController.doDeleteJob(id: Long)
-POST        /doEditJob                             controllers.JobController.doEditJob()
 GET         /viewTestRunHistory                    controllers.JobController.viewTestRunHistory(testRunId: Long)
 
 

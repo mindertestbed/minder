@@ -7,6 +7,7 @@ import com.avaje.ebean.Query;
 import com.avaje.ebean.Update;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import dependencyutils.DependencyClassLoaderCache;
 import dependencyutils.DependencyService;
 import editormodels.GroupEditorModel;
 import global.Util;
@@ -100,8 +101,7 @@ public class GroupController extends Controller {
 
     if (field.equals("dependencyString")) {
       String dependencyString = jsonNode.findPath("newValue").asText();
-      long groupId = jsonNode.findPath("id").asInt();
-      DependencyService.getInstance().getClassPathString(dependencyString, "_" + String.valueOf(groupId));
+      DependencyClassLoaderCache.getDependencyClassLoader(dependencyString);
     }
     return result;
   }

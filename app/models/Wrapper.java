@@ -9,45 +9,43 @@ import play.db.ebean.Model;
 @Entity
 @Table(name = "Wrapper")
 public class Wrapper extends Model {
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = 1L;
+  /**
+   *
+   */
+  private static final long serialVersionUID = 1L;
 
-	@Id
-	public Long id;
+  @Id
+  public Long id;
 
-	@Column(name = "NAME", unique = true)
-	public String name;
+  @Column(name = "NAME", unique = true)
+  public String name;
 
 
-	@Column(nullable = false, length = ModelConstants.SHORT_DESC_LENGTH)
-	public String shortDescription;
+  @Column(nullable = false, length = ModelConstants.SHORT_DESC_LENGTH)
+  public String shortDescription;
 
-	@Column(length = ModelConstants.DESCRIPTION_LENGTH)
-	public String description;
 
-	@ManyToOne
-	public User user;
+  @Column(length = ModelConstants.DESCRIPTION_LENGTH)
+  public String description;
 
-	@OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
-	public List<TSignal> signals;
+  @ManyToOne
+  public User user;
 
-	@OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
-	public List<TSlot> slots;
+  @OneToMany
+  public List<WrapperVersion> wrapperVersions;
 
-	public static final Finder<Long, Wrapper> find = new Finder<>(Long.class,
-			Wrapper.class);
-	
-	public static List<Wrapper> getAll() {
-		return find.all();
-	}
+  public static final Finder<Long, Wrapper> find = new Finder<>(Long.class,
+      Wrapper.class);
 
-	public static Wrapper findByName(String value) {
-		return find.where().eq("name", value).findUnique();
-	}
-	
-    public static Wrapper findById(Long id) {
-	    return find.byId(id);
-	  }
+  public static List<Wrapper> getAll() {
+    return find.all();
+  }
+
+  public static Wrapper findByName(String value) {
+    return find.where().eq("name", value).findUnique();
+  }
+
+  public static Wrapper findById(Long id) {
+    return find.byId(id);
+  }
 }

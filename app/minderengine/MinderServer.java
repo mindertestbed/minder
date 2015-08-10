@@ -15,11 +15,13 @@ public class MinderServer implements IMinderServer {
   /**
    * The client calls this method after a sucessfull handshake.
    *
+   * @param identifier
+   * Wrapper|Version
    * @param methodSet
    */
   @Override
-  public void hello(String label, Set<MethodContainer> methodSet) {
-    MinderWrapperRegistry.get().updateWrapper(label, methodSet);
+  public void hello(String identifier, Set<MethodContainer> methodSet) {
+    MinderWrapperRegistry.get().updateWrapper(identifier, methodSet);
   }
 
   /**

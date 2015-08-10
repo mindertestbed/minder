@@ -173,10 +173,5 @@ public class XmlContentVerifier extends BuiltInWrapper {
     fisXml.close();
     fosResult.close();
   }
-
-  @Override
-  public String getLabel() {
-    return "xmlContentVerifier";
-  }
 }
 
