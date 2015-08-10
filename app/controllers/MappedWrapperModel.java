@@ -1,6 +1,9 @@
 package controllers;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import models.MappedWrapper;
+import models.WrapperParam;
+import models.WrapperVersion;
 import play.data.format.Formatters;
 import play.libs.Json;
 
@@ -13,41 +16,50 @@ import java.util.Map;
  * Created by yerlibilgin on 09/01/15.
  */
 public class MappedWrapperModel {
-  public final Long id;
-  public final Long wrapperParamId;
-  public final String name;
-  public final String value;
+  public MappedWrapper mappedWrapper;
+  public WrapperParam wrapperParam;
+  public WrapperVersion wrapperVersion;
 
-  public MappedWrapperModel(Long id, Long wrapperParamId, String name, String value) {
-    this.id = id;
-    this.name = name;
-    this.value = value;
-    this.wrapperParamId = wrapperParamId;
+  public MappedWrapperModel(MappedWrapper mappedWrapper, WrapperParam wrapperParam, WrapperVersion wrapperVersion) {
+    this.mappedWrapper = mappedWrapper;
+    this.wrapperParam = wrapperParam;
+    this.wrapperVersion = wrapperVersion;
   }
 
   public static MappedWrapperModel parse(String jsonString) throws ParseException {
     try {
       JsonNode parse = Json.parse(jsonString);
-      Long id = parse.findPath("id").asLong();
+      Long mappedWrapperId = parse.findPath("mappedWrapperId").asLong();
       Long wrapperParamId = parse.findPath("wrapperParamId").asLong();
-      String paramName = parse.findPath("name").asText();
-      String wrapper = parse.findPath("value").asText();
-      return new MappedWrapperModel(id, wrapperParamId, paramName, wrapper);
+      Long wrapperVersionId = parse.findPath("wrapperVersionId").asLong();
+      return new MappedWrapperModel(MappedWrapper.findById(mappedWrapperId), WrapperParam.findById(wrapperParamId), WrapperVersion.findById(wrapperVersionId));
     } catch (Exception ex) {
       throw new ParseException("Coudln't parse " + jsonString, 0);
     }
   }
 
-  public static String jsonFor(Long id, Long wrapperParamId, String name, String value) {
-    return new MappedWrapperModel(id, wrapperParamId, name, value).toJson();
+  public String toJson() {
+    Map<String, Object> map = new HashMap<>();
+
+    long id = mappedWrapper == null ? -1 : mappedWrapper.id;
+    map.put("mappedWrapperId", id);
+    id = wrapperParam == null ? -1 : wrapperParam.id;
+    map.put("wrapperParamId", id);
+    id = wrapperVersion == null ? -1 : wrapperVersion.id;
+    map.put("wrapperVersionId", id);
+    JsonNode result = Json.toJson(map);
+    return Json.stringify(result);
   }
 
-  private String toJson() {
+  public String toJsonWith(WrapperVersion wrapperVersion) {
     Map<String, Object> map = new HashMap<>();
-    map.put("id", id);
-    map.put("name", name);
-    map.put("value", value);
-    map.put("wrapperParamId", wrapperParamId);
+
+    long id = mappedWrapper == null ? -1 : mappedWrapper.id;
+    map.put("mappedWrapperId", id);
+    id = wrapperParam == null ? -1 : wrapperParam.id;
+    map.put("wrapperParamId", id);
+    id = wrapperVersion == null ? -1 : wrapperVersion.id;
+    map.put("wrapperVersionId", id);
     JsonNode result = Json.toJson(map);
     return Json.stringify(result);
   }

@@ -1,9 +1,11 @@
 package minderengine
 
+import java.io.ByteArrayInputStream
 import java.lang.reflect.InvocationTargetException
 import java.util
+import java.util.Properties
 
-import models.{TestGroup, TestAssertion, TestCase}
+import models._
 import mtdl._
 import org.apache.log4j.spi.LoggingEvent
 import org.apache.log4j.{Level, AppenderSkeleton, EnhancedPatternLayout}
@@ -25,7 +27,7 @@ object TestEngine {
       if (this.getLayout != null) {
         val formatted = this.getLayout.format(event);
 
-        if (event.getLevel.toInt == Level.INFO.toInt || event.getLevel.toInt == Level.ERROR.toInt){
+        if (event.getLevel.toInt == Level.INFO.toInt || event.getLevel.toInt == Level.ERROR.toInt) {
           testProcessWatcher.addReportLog(formatted);
         } else {
           testProcessWatcher.addLog(formatted);
@@ -44,10 +46,12 @@ object TestEngine {
    * Runs the provided already compiled tdl class with the given parameter mapping
    * @param userEmail
    * @param clsMinderTDL
-   * @param map
+   * @param wrapperMapping
    * @param testProcessWatcher
    */
-  def runTest(userEmail: String, clsMinderTDL: Class[MinderTdl], map: Map[String, String], testProcessWatcher: TestProcessWatcher): Unit = {
+  def runTest(userEmail: String, clsMinderTDL: Class[MinderTdl],
+              wrapperMapping: collection.mutable.Map[String, MappedWrapper],
+              testProcessWatcher: TestProcessWatcher, params: String): Unit = {
     val lgr: org.apache.log4j.Logger = org.apache.log4j.Logger.getLogger("test");
     val app = new MyAppender(testProcessWatcher);
     app.setLayout(new EnhancedPatternLayout("%d{ISO8601}: %-5p - %m%n%throwable"));
@@ -55,36 +59,65 @@ object TestEngine {
 
     lgr.info("Start Test")
 
-    val set = new util.HashSet[String]()
     try {
       lgr.info("Initialize test case")
-      val minderTDL = clsMinderTDL.getConstructors()(0).newInstance(map, java.lang.Boolean.TRUE).asInstanceOf[MinderTdl]
-      minderTDL.debug = (any: Any) => {lgr.debug(any)}
-      minderTDL.debugThrowable = (any: Any, th: Throwable) => {lgr.debug(any, th)}
-      minderTDL.info = (any: Any) => {lgr.info(any)}
-      minderTDL.infoThrowable = (any: Any, th: Throwable) => {lgr.info(any, th)}
-      minderTDL.error = (any: Any) => {lgr.error(any)}
-      minderTDL.errorThrowable = (any: Any, th: Throwable) => {lgr.error(any, th)}
+      //mtdl does not know the minder model, it uses String->String
+      val newMapping = wrapperMapping.map(entry => (entry._1,
+        entry._2.wrapperVersion.wrapper.name + "|" + entry._2.wrapperVersion.version))
+      //we need to map wrappers to versions as well
+      //because the tdl calls the wrapper name and does not know the version
+      //but we know what versio  of which wrapper is used here, and Xoola maps the remote id
+      //to wrapper|version not only wrapper.
 
-      testProcessWatcher.updateWrappers(minderTDL.wrapperDefs.toSet)
+      val wrapperToVersionMap = wrapperMapping.map(entry => (entry._2.wrapperVersion.wrapper.name,
+        entry._2.wrapperVersion.version))
+      val const = clsMinderTDL.getConstructors()(0)
+      val minderTDL = const.newInstance(newMapping, java.lang.Boolean.TRUE).asInstanceOf[MinderTdl]
+      minderTDL.debug = (any: Any) => {
+        lgr.debug(any)
+      }
+      minderTDL.debugThrowable = (any: Any, th: Throwable) => {
+        lgr.debug(any, th)
+      }
+      minderTDL.info = (any: Any) => {
+        lgr.info(any)
+      }
+      minderTDL.infoThrowable = (any: Any, th: Throwable) => {
+        lgr.info(any, th)
+      }
+      minderTDL.error = (any: Any) => {
+        lgr.error(any)
+      }
+      minderTDL.errorThrowable = (any: Any, th: Throwable) => {
+        lgr.error(any, th)
+      }
+
+      minderTDL.setParams(params);
+
+
+      val mutableSutSet = new java.util.HashSet[String]
 
       //first, call the start methods for all registered wrappers of this test.
 
       lgr.info("> CALL START TEST ON Wrappers");
       for (wrapperName <- minderTDL.wrapperDefs) {
-        val minderClient = if (BuiltInWrapperRegistry.get().contains(wrapperName)) {
-          BuiltInWrapperRegistry.get().getWrapper(wrapperName)
+        val identifier = wrapperName + "|" + wrapperToVersionMap(wrapperName)
+        val minderClient = if (BuiltInWrapperRegistry.get().contains(identifier)) {
+          BuiltInWrapperRegistry.get().getWrapper(identifier)
         } else {
-          XoolaServer.get().getClient(wrapperName)
+          val mC = XoolaServer.get().getClient(identifier);
+          mutableSutSet.add(mC.getSUTName)
+          mC
         }
         minderClient.startTest(userEmail)
       }
+
+      testProcessWatcher.updateSUTNames(mutableSutSet)
 
       try {
         var rivetIndex = 0;
         for (rivet <- minderTDL.SlotDefs) {
           lgr.info("> " + "RUN RIVET " + rivetIndex)
-
           //resolve the minder client id. This might as well be resolved to a local built-in wrapper or the null slot.
           val minderClient =
             if (rivet.slot.wrapperId == "NULLWRAPPER") {
@@ -96,17 +129,21 @@ object TestEngine {
                 override def finishTest(): Unit = {}
 
                 override def startTest(s: String): Unit = {}
+
+                override def getSUTName(): String = ""
               }
 
-            } else if (BuiltInWrapperRegistry.get().containsWrapper(rivet.slot.wrapperId)) {
-              BuiltInWrapperRegistry.get().getWrapper(rivet.slot.wrapperId)
             } else {
-              XoolaServer.get().getClient(rivet.slot.wrapperId)
+              val identifier = rivet.slot.wrapperId + "|" + wrapperToVersionMap(rivet.slot.wrapperId)
+              if (BuiltInWrapperRegistry.get().containsWrapper(identifier)) {
+                BuiltInWrapperRegistry.get().getWrapper(identifier)
+              } else {
+                XoolaServer.get().getClient(identifier)
+              }
             }
 
           val args = Array.ofDim[Object](rivet.pipes.length)
 
-          set.add(rivet.slot.wrapperId)
           var signalIndex = 0
           for (tuple@(label, signature) <- rivet.signalPipeMap.keySet) {
             val me: MinderSignalRegistry = SessionMap.getObject(userEmail, "signalRegistry")
@@ -119,13 +156,15 @@ object TestEngine {
 
             val signal = signalList(0).inRef.source;
 
-            lgr.debug("> Wait For Signal:" + label + "." + signature)
+            val identifier = label + "|" + wrapperToVersionMap(label)
+            lgr.debug("> Wait For Signal:" + identifier + "." + signature)
 
-            set.add(label)
+            val signalData = me.dequeueSignal(identifier, signature, signal.timeout).asInstanceOf[SignalCallData]
 
-            val signalData = me.dequeueSignal(label, signature, signal.timeout)
-
-            lgr.debug("< Signal Arrived: " + label + "." + signature)
+            //
+            //TODO: instance control ekle ve hata durumlarini ayrica handle et.MTDLde
+            //
+            lgr.debug("< Signal Arrived: " + identifier + "." + signature)
 
             testProcessWatcher.signalEmitted(rivetIndex, signalIndex, signalData)
 
@@ -153,7 +192,7 @@ object TestEngine {
               freeArgs(k) = args(paramPipe.out)
               k += 1
             }
-            val signalData2 = new SignalData(freeArgs);
+            val signalData2 = new SignalCallData(freeArgs);
             testProcessWatcher.signalEmitted(rivetIndex, signalIndex, signalData2)
           }
 
@@ -167,7 +206,7 @@ object TestEngine {
           lgr.info("----------\n")
 
           def convertParam(out: Int, arg: Any) {
-            if(arg == null){
+            if (arg == null) {
               args(out) = null;
             } else if (arg.isInstanceOf[Rivet]) {
               args(out) = arg.asInstanceOf[Rivet].result
@@ -194,11 +233,11 @@ object TestEngine {
             minderClient.finishTest()
           } catch {
             case _: Throwable => {}
-          } finally{
+          } finally {
           }
         }
 
-        if (minderTDL.exception != null){
+        if (minderTDL.exception != null) {
           //we have a late error
           throw minderTDL.exception;
         }
@@ -229,29 +268,30 @@ object TestEngine {
       lgr.removeAppender(app)
     }
 
- //   mapMe("A" -> "A".getBytes(), "B" -> "B".getBytes())
+    //   mapMe("A" -> "A".getBytes(), "B" -> "B".getBytes())
 
   }
 
   /**
    * Evaluates the whole test case without running it and creates a list of wrappers and their signals-slots.
    *
-   * @param testCase
+   * @param tdl
    * @return
    */
-  def describeTdl(testCase: TestCase): util.LinkedHashMap[String, util.Set[SignalSlot]] = {
+  def describeTdl(tdl: Tdl): util.LinkedHashMap[String, util.Set[SignalSlot]] = {
+    val testCase = tdl.testCase;
     testCase.testAssertion = TestAssertion.findById(testCase.testAssertion.id)
     testCase.testAssertion.testGroup = TestGroup.findById(testCase.testAssertion.testGroup.id)
     val root = "_" + testCase.testAssertion.testGroup.id;
     val packagePath = root + "/_" + testCase.id;
-    val minderClass = TdlCompiler.compileTdl(root, packagePath, testCase.testAssertion.testGroup.dependencyString,testCase.name, source = testCase.tdl)
+    val minderClass = TdlCompiler.compileTdl(root, packagePath, testCase.testAssertion.testGroup.dependencyString, testCase.name, source = tdl.tdl, version = tdl.version);
 
     val minderTdl = try {
       minderClass.getConstructors()(0).newInstance(null, java.lang.Boolean.FALSE).asInstanceOf[MinderTdl]
-    }catch{
-      case ex : InvocationTargetException => {
-        var cause : Throwable = ex
-        while(cause.getCause != null) cause = cause.getCause
+    } catch {
+      case ex: InvocationTargetException => {
+        var cause: Throwable = ex
+        while (cause.getCause != null) cause = cause.getCause
         throw cause
       }
     }
@@ -293,7 +333,7 @@ object TestEngine {
 
 trait TestProcessWatcher {
 
-  def updateWrappers(set: Set[String]): Unit
+  def updateSUTNames(set: scala.collection.Set[String]): Unit
 
   def signalEmitted(rivetIndex: Int, signalIndex: Int, signalData: SignalData): Unit
 
@@ -303,7 +343,7 @@ trait TestProcessWatcher {
 
   def addLog(log: String): Unit
 
-  def addReportLog(s: String) : Unit
+  def addReportLog(s: String): Unit
 
   def failed(message: String, t: Throwable): Unit
 }

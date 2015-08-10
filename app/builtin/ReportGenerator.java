@@ -31,11 +31,6 @@ public class ReportGenerator extends BuiltInWrapper {
   }
 
   @Override
-  public void reportErrorForSignal(String s, String s1) {
-
-  }
-
-  @Override
   public String getShortDescription() {
     return "The minder built-in xml report generator wrapper";
   }
@@ -58,7 +53,7 @@ public class ReportGenerator extends BuiltInWrapper {
   }
 
   @Slot
-  public void setTestDetails(TestGroup group, TestAssertion ta, TestCase testCase, Job job, java.util.Set<String> wrappers, String log) {
+  public void setTestDetails(TestGroup group, TestAssertion ta, TestCase testCase, Job job, java.util.Set<String> sutNames, String log) {
     if (!isRunning)
       throw new MinderException(MinderException.E_SUT_NOT_RUNNING);
     rmg.report.getReportModel().getHeader().put("Test Group Name:", group.name);
@@ -75,10 +70,9 @@ public class ReportGenerator extends BuiltInWrapper {
 
     int i = 1;
 
-    System.out.println("NULL " + (wrappers == null));
-    if (wrappers!=null) {
-      for (String wrapper : wrappers) {
-        updateField("Wrapper " + i, wrapper);
+    if (sutNames!=null) {
+      for (String sut : sutNames) {
+        updateField("Test Candidate " + i, sut);
         ++i;
       }
     }

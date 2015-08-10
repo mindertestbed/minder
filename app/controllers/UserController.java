@@ -223,8 +223,8 @@ public class UserController extends Controller {
 
         TestGroup.updateUser(user, localUser);
         TestAssertion.updateUser(user, localUser);
-        TestCase.updateUser(user, localUser);
-        Job.updateUser(user, localUser);
+        //TestCase.updateUser(user, localUser);
+        //Job.updateUser(user, localUser);
         TestRun.updateUser(user, localUser);
         user.delete();
 

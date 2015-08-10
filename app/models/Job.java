@@ -20,24 +20,14 @@ public class Job extends Model {
 
 	@ManyToOne
 	@Column(nullable = false)
-	public TestCase testCase;
+	public Tdl tdl;
 
 
 	@ManyToOne
 	@Column(nullable = false)
 	public User owner;
 
-	/**
-	 * When the tdl changes and the wrappers in the new tdl are not compatible with
-	 * this run configurtion, then this configuration is obsoleted. Hence, not visible in the main UI.
-	 */
-	public boolean obsolete;
-
-	/**
-	 * When this configuration is obsoleted, the tdl is backed up here.
-	 */
-	@Column(length = 20000)
-	public String tdl;
+	public String mtdlParameters;
 
 	public Job() {
 
@@ -53,9 +43,9 @@ public class Job extends Model {
 			Job.class);
 
 
-	public static List<Job> findByTestCase(TestCase testCase){
-		ExpressionList<Job> f = find.where().eq("testCase", testCase);
-		return f.setOrderBy("id").findList();
+	public static List<Job> findByTdl(Tdl tdl){
+		ExpressionList<Job> f = find.where().eq("tdl", tdl);
+		return f.orderBy().desc("id").findList();
 	}
 
 	public static Job findById(Long id) {
@@ -63,12 +53,8 @@ public class Job extends Model {
 		byId.owner = User.findById(byId.owner.id);
 		return byId;
 	}
-	public static Job findByTestCaseAndName(TestCase testCase, String name) {
-		return find.where().eq("testCase", testCase).eq("name", name).findUnique();
-	}
-
-	public static void updateUser(User user, User localUser) {
-
+	public static Job findByTdlAndName(Tdl tdl, String name) {
+		return find.where().eq("tdl", tdl).eq("name", name).findUnique();
 	}
 }
 

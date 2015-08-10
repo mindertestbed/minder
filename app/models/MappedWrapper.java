@@ -19,7 +19,7 @@ public class MappedWrapper extends Model{
   public WrapperParam parameter;
 
   @OneToOne
-  public Wrapper wrapper;
+  public WrapperVersion wrapperVersion;
 
   @ManyToOne
   @Column(nullable = false)

@@ -18,61 +18,6 @@ users:
     - {id: 2, roleName: Test Designer}
     - {id: 3, roleName: Test Developer}
     testGroups: []
-  - &user !!models.User
-    active: true
-    email: myildiz83@gmail.com
-    emailValidated: true
-    firstName: null
-    lastLogin: 2014-12-29T07:08:49.850Z
-    lastName: null
-    linkedAccounts:
-    - providerKey: password
-      providerUserId: $2a$10$QoJy1UgFXMjLMJlQ6hAnhe1Y07yoBH0Eucna1OSag2qKWhS79HQg6
-      user: *user
-    name: Muhammet YILDIZ
-    permissions: []
-    roles:
-    - {id: 1, roleName: observer}
-    - {id: 2, roleName: Test Designer}
-    - {id: 3, roleName: Test Developer}
-    testGroups: []
-  - &user2 !!models.User
-    active: true
-    email: cetinkayamelis@gmail.com
-    emailValidated: true
-    firstName: null
-    lastLogin: 2014-12-29T07:08:49.850Z
-    lastName: null
-    linkedAccounts:
-    - providerKey: password
-      providerUserId: $2a$10$QoJy1UgFXMjLMJlQ6hAnhe1Y07yoBH0Eucna1OSag2qKWhS79HQg6
-      user: *user
-    name: Melis Demir
-    permissions: []
-    roles:
-    - {id: 1, roleName: observer}
-    - {id: 2, roleName: Test Designer}
-    - {id: 3, roleName: Test Developer}
-    testGroups: []
-  - &massi !!models.User
-    active: true
-    email: massimiliano.masi@tiani-spirit.com
-    emailValidated: true
-    firstName: Massimiliano
-    lastLogin: 2014-12-29T07:08:49.850Z
-    lastName: Masi
-    linkedAccounts:
-    - providerKey: password
-      providerUserId: $2a$10$QoJy1UgFXMjLMJlQ6hAnhe1Y07yoBH0Eucna1OSag2qKWhS79HQg6
-      user: *user
-    name: Massimiliano Masi
-    permissions: []
-    roles:
-    - {id: 1, roleName: observer}
-    - {id: 2, roleName: Test Designer}
-    - {id: 3, roleName: Test Developer}
-    testGroups: []
-
 #Groups
 groups:
 - &sampleGroup !!models.TestGroup
@@ -94,7 +39,12 @@ groups:
         testCases:
         - &testCase1 !!models.TestCase
            shortDescription: A tel against books.xsd
-           tdl: sampletdl/xmltest.tdl
+           tdls:
+           - !!models.Tdl
+             tdl: sampletdl/xmltest.tdl
+             version: 0.0.1
+             creationDate: "2015-02-02 00:00:00"
+             testCase: *testCase1
            testAssertion: *taSample1
            name: TestCaseSample1
 - &sampleGroup2 !!models.TestGroup
@@ -116,182 +66,40 @@ groups:
         testCases:
         - !!models.TestCase
            shortDescription: A tel against books.xsd
-           tdl: sampletdl/xmltest.tdl
+           tdls:
+           - !!models.Tdl
+              tdl: sampletdl/xmltest.tdl
+              version: 0.0.1
+              creationDate: "2015-02-02 00:00:00"
+              testCase: *testCase1
            testAssertion: *taSample2
            name: TestCaseSample2
-- &as4 !!models.TestGroup
-    description: null
-    name: AS4 Tests
-    shortDescription: All test cases related to AS4
-    dependencyString: null
-    owner: *massi
-    testAssertions:
-    - &taas41 !!models.TestAssertion
-        testGroup: *as4
-        taId: TAAS41
-        normativeSource: src1
-        target: as4 message
-        prerequisites: be cool
-        predicate: as4 message is terribly valid
-        prescriptionLevel: Mandatory
-        shortDescription:  A sample test assertion
-        testCases:
-        - &as4case1 !!models.TestCase
-            shortDescription: A test case to check the eb code party id
-            tdl: sampletdl/as41.tdl
-            testAssertion: *taas41
-            name: AS41
-            parameters: []
-        - &as4case2 !!models.TestCase
-            description: null
-            shortDescription: A test case to check the hede hodo
-            tdl: sampletdl/as42.tdl
-            testAssertion: *taas41
-            name: AS42
-            parameters: []
-- &smp !!models.TestGroup
-    description: null
-    name: SMP Tests
-    shortDescription: All test cases related to SMP
-    dependencyString: null
-    owner: *massi
-    testAssertions:
-    - &tasmp1 !!models.TestAssertion
-        testGroup: *smp
-        taId: TASMP1
-        normativeSource: src2
-        target: smp message
-        prerequisites: be cool
-        predicate: smp message is terribly valid
-        prescriptionLevel: Permitted
-        shortDescription:  A sample test assertion
-        testCases:
-        - !!models.TestCase
-            description: null
-            shortDescription: Check for the public key of BDX
-            tdl: sampletdl/SMP1.tdl
-            testAssertion: *tasmp1
-            name: SMP1
-- &bdxl !!models.TestGroup
-    description: null
-    name: BDXL Tests
-    shortDescription: All test cases related to BDXL
-    dependencyString: null
-    owner: *user
-    testAssertions:
-    - &tabdxl1 !!models.TestAssertion
-        testGroup: *smp
-        taId: TABDXL1
-        normativeSource: src2
-        target: smp message
-        prerequisites: be cool
-        predicate: smp message is terribly valid
-        prescriptionLevel: Preferred
-        shortDescription:  A sample test assertion
-        testCases:
-        - !!models.TestCase
-            description: null
-            shortDescription: Check for the BDXL id,address match
-            tdl: sampletdl/BDXL1.tdl
-            testAssertion: *tabdxl1
-            name: BDXL1
-- &nonrepudiation !!models.TestGroup
-    description: null
-    name: Non-Repudiation Tests
-    shortDescription: All test cases related to Non-repudiation SAT
-    dependencyString: null
-    owner: *massi
-    testAssertions:
-    - &tanonrep1 !!models.TestAssertion
-        testGroup: *nonrepudiation
-        taId: SAMPLE
-        normativeSource: SAMPLE
-        target: SAMPLE
-        prerequisites: be cool
-        predicate: the evidence is awesome
-        prescriptionLevel: Preferred
-        shortDescription:  A sample test assertion
-        testCases: []
 #wrappers
 wrappers:
 - &xmlGenerator !!models.Wrapper
   name: xmlGenerator
   user: *user
   shortDescription: XMl Generator Wrapper
-  signals: []
-  slots: []
+  wrapperVersions:
+  - !!models.WrapperVersion
+    signals: []
+    slots: []
+    version: "0.0.1"
+    creationDate: "2015-02-02 00:00:00"
+    wrapper: *xmlGenerator
 - &xmlValueInitiator  !!models.Wrapper
   name: xmlValueInitiator
   shortDescription: XMl Value Initiator Wrapper
   user: *user
-  signals: []
-  slots: []
-- &testWrapper0 !!models.Wrapper
-  name: testWrapper0
-  user: *user
-  shortDescription: Sample Wrapper 0
-  signals:
-  - !!models.TSignal
-    wrapper: *testWrapper0
-    signature: signal0()
-  slots:
-  - !!models.TSlot
-    wrapper: *testWrapper0
-    signature: slot0()
-- &testWrapper1 !!models.Wrapper
-  name: testWrapper1
-  user: *user
-  shortDescription: Sample Wrapper 1
-  signals:
-  - !!models.TSignal
-    wrapper: *testWrapper1
-    signature: signal1(int, int, java.lang.String)
-  slots:
-  - !!models.TSlot
-    wrapper: *testWrapper1
-    signature: slot0()
-- &testWrapper2 !!models.Wrapper
-  name: testWrapper2
-  user: *user
-  shortDescription: Sample Wrapper 2
-  signals:
-  - !!models.TSignal
-    wrapper: *testWrapper2
-    signature: signal1(int, int, java.lang.String)
-  slots:
-  - !!models.TSlot
-    wrapper: *testWrapper2
-    signature: slot1(int, int, java.lang.String)
-- &testWrapper3 !!models.Wrapper
-  name: testWrapper3
-  user: *user
-  shortDescription: Sample Wrapper 3
-  signals:
-  - !!models.TSignal
-    wrapper: *testWrapper3
-    signature: signal2(byte[], byte[], java.lang.String)
-  slots:
-  - !!models.TSlot
-    wrapper: *testWrapper3
-    signature: slot1(int, int, java.lang.String)
-- &testWrapper4 !!models.Wrapper
-  name: testWrapper4
-  user: *user
-  shortDescription: Sample Wrapper 4
-  signals: []
-  slots:
-  - !!models.TSlot
-    wrapper: *testWrapper4
-    signature: slot2(int, int, java.lang.String, byte [], byte [], java.util.Date)
-
+  wrapperVersions:
+  - !!models.WrapperVersion
+    signals: []
+    slots: []
+    version: "0.0.1"
+    creationDate: "2015-02-02 00:00:00"
+    wrapper: *xmlValueInitiator
 #Operation Types
 TOperationTypes:
 - &opType1 !!models.TOperationType
   name: RUN_TEST_CASE
 
-#User Histories
-histories:
-- &history1 !!models.UserHistory
-  email: myildiz83@gmail.com
-  operationType: *opType1
-  systemOutputLog: Bir loglar bir loglar

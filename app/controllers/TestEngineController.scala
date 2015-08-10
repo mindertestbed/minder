@@ -126,7 +126,7 @@ object TestEngineController extends Controller {
    * @return
    */
   def jobStatusFeed() = Action {
-    println("Incoming request")
+    println("Job Status Feed")
     threadPool.submit(new Runnable {
       override def run(): Unit = {
         Thread.sleep(1000);
@@ -147,6 +147,7 @@ object TestEngineController extends Controller {
    * @return
    */
   def historyFeed() = Action {
+    println("Job History Feed")
     Ok.chunked(jobHistoryOut &> EventSource()).as("text/event-stream")
   }
 
@@ -160,7 +161,6 @@ object TestEngineController extends Controller {
     println("Log feed")
     Ok.chunked(logOut &> EventSource()).as("text/event-stream")
   }
-
 
   /**
    * an action for enqueuing a new job for test engine running

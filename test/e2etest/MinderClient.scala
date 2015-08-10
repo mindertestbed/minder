@@ -72,7 +72,7 @@ class MinderClient(properties: Properties) extends IMinderClient with ISignalHan
     if (signalMethod getName() equals ("getCurrentTestUserInfo")) {
       nonBlockingServerObject.getUserInfo(sessionId)
     } else {
-      nonBlockingServerObject signalEmitted(sessionId, wrapperName, MethodContainer.generateMethodKey(signalMethod), new SignalData(args));
+      nonBlockingServerObject signalEmitted(sessionId, wrapperName, MethodContainer.generateMethodKey(signalMethod), new SignalCallData(args));
     }
   }
 
@@ -85,6 +85,4 @@ class MinderClient(properties: Properties) extends IMinderClient with ISignalHan
     wrapper finishTest;
     this sessionId = null
   }
-
-  override def reportError(o: scala.Any, s: String, s1: String): AnyRef = null
 }

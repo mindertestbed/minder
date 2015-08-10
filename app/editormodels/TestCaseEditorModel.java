@@ -22,5 +22,6 @@ public class TestCaseEditorModel {
   @Constraints.Required
   public String tdl;
 
-  public String description;
+  @Constraints.Required
+  public String version;
 }

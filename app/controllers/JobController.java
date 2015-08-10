@@ -10,7 +10,6 @@ import play.mvc.Controller;
 import play.mvc.Result;
 import views.html.jobDetailView;
 import views.html.jobEditor;
-import views.html.jobLister;
 import views.html.testRunViewer;
 
 
@@ -24,23 +23,22 @@ import static play.data.Form.form;
 /**
  * Created by yerlibilgin on 03/05/15.
  */
-public class JobController  extends Controller {
+public class JobController extends Controller {
   public static final Form<JobEditorModel> JOB_FORM = form(JobEditorModel.class);
 
-  public static Result getCreateJobEditorView(Long testCaseId) {
-    TestCase testCase = TestCase.findById(testCaseId);
+  public static Result getCreateJobEditorView(Long tdlId) {
+    Tdl tdl = Tdl.findById(tdlId);
+    tdl.testCase = TestCase.findById(tdl.testCase.id);
 
-    if (testCase == null)
-      return badRequest("Test case with id " + testCaseId
-          + " couldn't be found");
+    if (tdl == null)
+      return badRequest("No TDL definition found with id " + tdl);
 
     int max = 0;
 
-    List<Job> list = Job.findByTestCase(testCase);
+    List<Job> list = Job.findByTdl(tdl);
     if (list != null) {
       for (Job job : list) {
-        if (job.name
-            .matches(testCase.name + "\\(\\d+\\)$")) {
+        if (job.name.matches(tdl.testCase.name + "\\(\\d+\\)$")) {
           int val = Integer.parseInt(job.name.substring(
               job.name.lastIndexOf('(') + 1,
               job.name.lastIndexOf(')')));
@@ -52,27 +50,27 @@ public class JobController  extends Controller {
     }
 
     JobEditorModel model = new JobEditorModel();
-    model.testCaseId = testCaseId;
-    model.name = testCase.name + "(" + (max + 1) + ")";
+    model.tdlID = tdlId;
+    model.name = tdl.testCase.name + "(" + (max + 1) + ")";
+    model.mtdlParameters = "";
 
     //
-    initWrapperListForModel(testCase, model);
+    initWrapperListForModel(tdl, model);
 
     return ok(jobEditor.render(JOB_FORM.fill(model), null));
   }
 
-  private static void initWrapperListForModel(TestCase testCase, JobEditorModel model) {
-    model.mappedWrappers = new ArrayList<>();
+  private static void initWrapperListForModel(Tdl tdl, JobEditorModel model) {
+    model.wrapperMappingList = new ArrayList<>();
 
-    for (WrapperParam parameter : testCase.parameters) {
-      model.mappedWrappers.add(new MappedWrapperModel(null, parameter.id,
-          parameter.name, ""));
+    for (WrapperParam parameter : tdl.parameters) {
+      model.wrapperMappingList.add(new MappedWrapperModel(null, parameter, null));
     }
 
-    Collections.sort(model.mappedWrappers, new Comparator<MappedWrapperModel>() {
+    Collections.sort(model.wrapperMappingList, new Comparator<MappedWrapperModel>() {
       @Override
       public int compare(MappedWrapperModel o1, MappedWrapperModel o2) {
-        return o1.name.compareTo(o2.name);
+        return o1.wrapperParam.name.compareTo(o2.wrapperParam.name);
       }
     });
   }
@@ -80,8 +78,7 @@ public class JobController  extends Controller {
   public static Result doCreateJob() {
     com.feth.play.module.pa.controllers.Authenticate.noCache(response());
 
-    Form<JobEditorModel> form = JOB_FORM
-        .bindFromRequest();
+    Form<JobEditorModel> form = JOB_FORM.bindFromRequest();
 
     if (form.hasErrors()) {
       Util.printFormErrors(form);
@@ -91,57 +88,51 @@ public class JobController  extends Controller {
     JobEditorModel model = form.get();
 
     // check if we have a repetition
-    TestCase testCase = TestCase.findById(model.testCaseId);
-    Job existing = Job.findByTestCaseAndName(
-        testCase, model.name);
+    Tdl tdl = Tdl.findById(model.tdlID);
+    Job existing = Job.findByTdlAndName(tdl, model.name);
 
     if (existing != null) {
-      form.reject("A Job with the name [" + model.name
-          + "] already exists");
+      form.reject("A Job with the name [" + model.name + "] already exists");
       return badRequest(jobEditor.render(form, null));
     }
 
     // check the parameters.
-    if (model.mappedWrappers != null) {
-      for (MappedWrapperModel mappedWrapper : model.mappedWrappers) {
-        if (mappedWrapper.value == null || mappedWrapper.value.equals("")) {
+    if (model.wrapperMappingList != null) {
+      for (MappedWrapperModel mappedWrapper : model.wrapperMappingList) {
+        if (mappedWrapper.wrapperVersion == null) {
           form.reject("You have to fill all parameters");
           return badRequest(jobEditor.render(form, null));
         }
       }
     } else {
-      System.out.println("Mapped wrappers null");
-      if(testCase.parameters.size() > 0){
-        initWrapperListForModel(testCase, model);
+      if (tdl.parameters.size() > 0) {
+        initWrapperListForModel(tdl, model);
         form.reject("You have to fill all parameters");
         return badRequest(jobEditor.render(form, null));
       }
     }
 
     // everything is tip-top. So save
-    Job rc = new Job();
-    rc.name = model.name;
-    rc.testCase = testCase;
-    rc.obsolete = false;
-    rc.tdl = testCase.tdl;
-    rc.owner = Application.getLocalUser(session());
+    Job job = new Job();
+    job.name = model.name;
+    job.tdl = tdl;
+    job.owner = Application.getLocalUser(session());
 
     try {
       Ebean.beginTransaction();
       List<MappedWrapper> mappedWrappers = new ArrayList<>();
-      if (model.mappedWrappers != null) {
-        for (MappedWrapperModel mappedWrapper : model.mappedWrappers) {
+      if (model.wrapperMappingList != null) {
+        for (MappedWrapperModel mappedWrapperModel : model.wrapperMappingList) {
           MappedWrapper mw = new MappedWrapper();
-          mw.parameter = WrapperParam.findByTestCaseAndName(testCase,
-              mappedWrapper.name);
-          mw.job = rc;
-          mw.wrapper = Wrapper.findByName(mappedWrapper.value);
+          mw.parameter = mappedWrapperModel.wrapperParam;
+          mw.wrapperVersion = mappedWrapperModel.wrapperVersion;
+          mw.job = job;
           mw.save();
         }
       }
-
-      rc.mappedWrappers = mappedWrappers;
-      rc.save();
+      job.mappedWrappers = mappedWrappers;
+      job.mtdlParameters = model.mtdlParameters;
+      job.save();
       Ebean.commitTransaction();
     } catch (Exception ex) {
       ex.printStackTrace();
@@ -151,7 +142,7 @@ public class JobController  extends Controller {
       return badRequest(jobEditor.render(form, null));
     }
 
-    return redirect(routes.TestCaseController.viewTestCase( testCase.id, true));
+    return redirect(routes.TestCaseController.viewTestCase(tdl.testCase.id, "jobs"));
   }
 
   public static Result doDeleteJob(Long id) {
@@ -177,90 +168,33 @@ public class JobController  extends Controller {
       return badRequest(ex.getMessage());
     }
 
-    TestCase tc = TestCase.findById(rc.testCase.id);
-    return redirect(routes.TestCaseController.viewTestCase(rc.testCase.id, true));
+    return redirect(routes.TestCaseController.viewTestCase(rc.tdl.testCase.id, "jobs"));
   }
 
   public static Result getEditJobEditorView(Long id) {
-    Job rc = Job.findById(id);
-    if (rc == null) {
+    Job job = Job.findById(id);
+    if (job == null) {
       // it does not exist. error
-      return badRequest("Job with id " + id
-          + " does not exist.");
+      return badRequest("Job with id " + id + " does not exist.");
     }
 
-
-    if (!Util.canAccess(Application.getLocalUser(session()), rc.owner))
+    if (!Util.canAccess(Application.getLocalUser(session()), job.owner))
       return badRequest("You don't have permission to modify this resource");
 
 
     JobEditorModel jobEditorModel = new JobEditorModel();
-    jobEditorModel.id = rc.id;
-    jobEditorModel.name = rc.name;
-    jobEditorModel.tdl = rc.tdl;
-    jobEditorModel.testCaseId = rc.testCase.id;
-    jobEditorModel.obsolete = rc.obsolete;
-    jobEditorModel.mappedWrappers = new ArrayList<>();
+    jobEditorModel.id = job.id;
+    jobEditorModel.name = job.name;
+    jobEditorModel.wrapperMappingList = new ArrayList<>();
+    jobEditorModel.mtdlParameters = job.mtdlParameters;
 
-    for (MappedWrapper mappedWrapper : rc.mappedWrappers) {
-      jobEditorModel.mappedWrappers.add(new MappedWrapperModel(mappedWrapper.id,
-          mappedWrapper.parameter.id, mappedWrapper.parameter.name,
-          mappedWrapper.wrapper.name));
+    for (MappedWrapper mappedWrapper : job.mappedWrappers) {
+      jobEditorModel.wrapperMappingList.add(new MappedWrapperModel(mappedWrapper, mappedWrapper.parameter, mappedWrapper.wrapperVersion));
     }
 
     Form<?> fill = JOB_FORM.fill(jobEditorModel);
 
     return ok(jobEditor.render(fill, null));
-  }
-
-  public static Result doEditJob() {
-    Form<JobEditorModel> form = JOB_FORM
-        .bindFromRequest();
-
-    if (form.hasErrors()) {
-      return badRequest(jobEditor.render(form, null));
-    }
-
-    JobEditorModel model = form.get();
-
-    Job rc = Job.findById(model.id);
-    if (rc == null) {
-      return badRequest("The Job " + rc.id
-          + " is not found.");
-    }
-
-
-    if (!Util.canAccess(Application.getLocalUser(session()), rc.owner))
-      return badRequest("You don't have permission to modify this resource");
-
-    rc.name = model.name;
-    rc.obsolete = false;
-    rc.tdl = rc.testCase.tdl;
-
-    try {
-      Ebean.beginTransaction();
-      MappedWrapper.deleteByJob(rc);
-      List<MappedWrapper> mappedWrappers = new ArrayList<>();
-      for (MappedWrapperModel mappedWrapper : model.mappedWrappers) {
-        MappedWrapper mw = new MappedWrapper();
-        mw.parameter = WrapperParam.findByTestCaseAndName(rc.testCase,
-            mappedWrapper.name);
-        mw.job = rc;
-        mw.wrapper = Wrapper.findByName(mappedWrapper.value);
-        mw.save();
-      }
-
-      rc.mappedWrappers = mappedWrappers;
-      rc.save();
-      Ebean.commitTransaction();
-    } catch (Exception ex) {
-      ex.printStackTrace();
-      Ebean.endTransaction();
-
-      form.reject(ex.getMessage());
-      return badRequest(jobEditor.render(form, null));
-    }
-    return ok(jobLister.render(rc.testCase, null));
   }
 
   public static Result displayJob(Long id, boolean showHistory) {
@@ -283,16 +217,12 @@ public class JobController  extends Controller {
    * @param mappedWrapperModel
    * @return
    */
-  public static List<String> listOptions(MappedWrapperModel mappedWrapperModel) {
-    // get MappedParam
-    // get the wrapperparam
-    WrapperParam wp = WrapperParam
-        .findById(mappedWrapperModel.wrapperParamId);
+  public static List<WrapperVersion> listFittingWrappers(MappedWrapperModel mappedWrapperModel) {
     // get signatures supported by this wp.
-    List<ParamSignature> psList = ParamSignature.getByWrapperParam(wp);
+    List<ParamSignature> psList = ParamSignature.getByWrapperParam(mappedWrapperModel.wrapperParam);
 
     // create the return list.
-    List<String> listOptions = new ArrayList<>();
+    List<WrapperVersion> listOptions = new ArrayList<>();
     // List<SignalSlot> TdlCompiler.getSignatures(testCase.tdl,
     // mappedWrapperModel.name);
     // we have to list the wrappers that cover all these signatures (might
@@ -303,41 +233,43 @@ public class JobController  extends Controller {
 
     out:
     for (Wrapper wrapper : all) {
-      System.out.println("Wrapper " + wrapper.name);
       // check if all the signatures are covered by the signals or slots
       // of this wrapper.
-      for (ParamSignature ps : psList) {
-        System.out.print("\t" + ps.signature);
-        boolean included = false;
-        for (TSignal signal : wrapper.signals) {
-          if (ps.signature.equals(signal.signature.replaceAll("\\s",
-              ""))) {
-            included = true;
-            break;
-          }
-        }
+      List<WrapperVersion> wrapperVersions = WrapperVersion.getAllByWrapper(wrapper);
+      for (WrapperVersion wrapperVersion : wrapperVersions) {
+        for (ParamSignature ps : psList) {
+          boolean included = false;
 
-        if (!included) {
-          for (TSlot slot : wrapper.slots) {
-            if (ps.signature.equals(slot.signature.replaceAll(
-                "\\s", ""))) {
+          for (TSignal signal : wrapperVersion.signals) {
+            if (ps.signature.equals(signal.signature.replaceAll("\\s",
+                ""))) {
               included = true;
               break;
             }
           }
+
+          if (!included) {
+            for (TSlot slot : wrapperVersion.slots) {
+              if (ps.signature.equals(slot.signature.replaceAll(
+                  "\\s", ""))) {
+                included = true;
+                break;
+              }
+            }
+          }
+
+          if (included)
+            System.out.println(" included");
+          else
+            System.out.println("NOT included");
+          if (!included)
+            continue out;
         }
 
-        if (included)
-          System.out.println(" included");
-        else
-          System.out.println("NOT included");
-        if (!included)
-          continue out;
+        // if we are here, then this wrapper contains all.
+        // so add it to the list.
+        listOptions.add(wrapperVersion);
       }
-
-      // if we are here, then this wrapper contains all.
-      // so add it to the list.
-      listOptions.add(wrapper.name);
     }
 
     return listOptions;

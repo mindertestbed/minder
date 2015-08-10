@@ -14,11 +14,9 @@ public class JobEditorModel {
   @Constraints.Required
   public String name;
 
-  public Long testCaseId;
+  public Long tdlID;
 
-  public boolean obsolete;
+  public List<MappedWrapperModel> wrapperMappingList;
 
-  public String tdl;
-
-  public List<MappedWrapperModel> mappedWrappers;
+  public String mtdlParameters;
 }

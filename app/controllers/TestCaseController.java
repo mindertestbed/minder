@@ -1,13 +1,13 @@
 package controllers;
 
 
+import com.avaje.ebean.Ebean;
 import com.fasterxml.jackson.databind.JsonNode;
 import editormodels.TestCaseEditorModel;
 import global.Util;
-import models.Job;
-import models.TestAssertion;
-import models.TestCase;
-import models.User;
+import minderengine.TestEngine;
+import models.*;
+import mtdl.SignalSlot;
 import play.Logger;
 import play.data.Form;
 import play.mvc.Controller;
@@ -15,7 +15,7 @@ import play.mvc.Result;
 import views.html.testCaseEditor;
 import views.html.testCaseView;
 
-import java.util.List;
+import java.util.*;
 
 import static play.data.Form.form;
 
@@ -87,16 +87,26 @@ public class TestCaseController extends Controller {
 
       tc = new TestCase();
       tc.name = model.name;
-      tc.tdl = model.tdl;
+      Tdl tdl = new Tdl();
+      tdl.version = model.version;
+      tdl.testCase = tc;
+      tdl.tdl = model.tdl;
+      tdl.creationDate = new Date();
       tc.shortDescription = model.shortDescription;
       tc.testAssertion = ta;
       tc.owner = localUser;
       try {
+        Ebean.beginTransaction();
         tc.save();
+        tdl.save();
+        detectAndSaveParameters(tdl);
+        Ebean.commitTransaction();
       } catch (Exception ex) {
         filledForm.reject("Compilation Failed [" + ex.getMessage() + "]");
         Logger.error(ex.getMessage(), ex);
         return badRequest(testCaseEditor.render(filledForm, null, false));
+      } finally {
+        Ebean.endTransaction();
       }
 
       tc = TestCase.findByName(tc.name);
@@ -107,21 +117,21 @@ public class TestCaseController extends Controller {
     }
   }
 
-  public static Result getEditCaseEditorView(Long id) {
-    TestCase tc = TestCase.findById(id);
-    if (tc == null) {
-      return badRequest("Test case with id [" + id + "] not found!");
+  public static Result getEditCaseEditorView(Long tdlId) {
+    Tdl tdl = Tdl.findById(tdlId);
+    if (tdl == null) {
+      return badRequest("TDL with id [" + tdlId + "] not found!");
     } else {
-      if (!Util.canAccess(Application.getLocalUser(session()), tc.owner))
+      tdl.testCase = TestCase.findById(tdl.testCase.id);
+      if (!Util.canAccess(Application.getLocalUser(session()), tdl.testCase.owner))
         return badRequest("You don't have permission to modify this resource");
 
       TestCaseEditorModel tcModel = new TestCaseEditorModel();
-      tcModel.id = id;
-      tcModel.assertionId = tc.testAssertion.id;
-      tcModel.name = tc.name;
-      tcModel.shortDescription = tc.shortDescription;
-      tcModel.tdl = tc.tdl;
-      tcModel.description = tc.description;
+      tcModel.id = tdlId;
+      tcModel.name = tdl.testCase.name;
+      tcModel.shortDescription = tdl.testCase.name;
+      tcModel.tdl = tdl.tdl;
+      tcModel.version = tdl.version;
 
       Form<TestCaseEditorModel> bind = TEST_CASE_FORM.fill(tcModel);
       return ok(testCaseEditor.render(bind, null, true));
@@ -132,50 +142,92 @@ public class TestCaseController extends Controller {
     com.feth.play.module.pa.controllers.Authenticate.noCache(response());
     final Form<TestCaseEditorModel> filledForm = TEST_CASE_FORM
         .bindFromRequest();
-
     if (filledForm.hasErrors()) {
       Util.printFormErrors(filledForm);
       return badRequest(testCaseEditor.render(filledForm, null, true));
     } else {
       TestCaseEditorModel model = filledForm.get();
 
-      TestCase tc = TestCase.findById(model.id);
+      Tdl tdl = Tdl.findById(model.id);
+      TestCase tc = tdl.testCase = TestCase.findById(tdl.testCase.id);
       if (tc == null) {
         filledForm.reject("The test case with ID [" + model.id
             + "] does not exist");
         return badRequest(testCaseEditor.render(filledForm, null, true));
       }
-
       if (!Util.canAccess(Application.getLocalUser(session()), tc.owner))
         return badRequest("You don't have permission to modify this resource");
 
-      tc.description = model.description;
-      tc.name = model.name;
-      tc.shortDescription = model.shortDescription;
-      tc.setTdl(model.tdl);
-
-      // check if the name is not duplicate
-      TestCase tmp = TestCase.findByName(model.name);
-
-      if (tmp == null || tmp.id == tc.id) {
-        // either no such name or it is already this object. so update
+      if (model.version.equals(tdl.version)) {
+        //do nothing, just save
+        tdl.tdl = model.tdl;
         try {
-          tc.update();
-        }catch(Exception ex){
-          Logger.error(ex.getMessage(), ex);
+          TestEngine.describeTdl(tdl);
+        } catch (Exception ex) {
           filledForm.reject(ex.getMessage());
           return badRequest(testCaseEditor.render(filledForm, null, true));
         }
-        Logger.info("Test Case with id " + tc.id + ":" + tc.name
-            + " was updated");
-        return redirect(routes.TestCaseController.viewTestCase(tc.id, false));
+        tdl.update();
+        return redirect(routes.TestCaseController.viewTestCase(tc.id, "mtdl"));
       } else {
-        filledForm.reject("The ID [" + model.name
-            + "] is used by another test case");
-        return badRequest(testCaseEditor.render(filledForm, null, true));
+
+        Tdl newTdl = new Tdl();
+        newTdl.creationDate = new Date();
+        newTdl.version = model.version;
+        newTdl.testCase = tc;
+        newTdl.tdl = model.tdl;
+        newTdl.save();
+
+        try {
+          detectAndSaveParameters(newTdl);
+        } catch (Exception ex) {
+          filledForm.reject(ex.getMessage());
+          return badRequest(testCaseEditor.render(filledForm, null, true));
+        }
+
+
+        return redirect(routes.TestCaseController.viewTestCase(tc.id, "mtdl"));
+      }
+    }
+  }
+
+  public static void detectAndSaveParameters(Tdl newTdl) {
+    Logger.debug("Detect parameters for newTdl");
+    LinkedHashMap<String, Set<SignalSlot>> descriptionMap = TestEngine.describeTdl(newTdl);
+
+    List<WrapperParam> wrapperParamList = new ArrayList<>();
+    for (Map.Entry<String, Set<SignalSlot>> entry : descriptionMap.entrySet()) {
+      //make sure that we are looping on variables.
+      if (!entry.getKey().startsWith("$"))
+        continue;
+
+      WrapperParam wrapperParam;
+      wrapperParam = new WrapperParam();
+      wrapperParam.name = entry.getKey();
+      wrapperParam.signatures = new ArrayList<>();
+      wrapperParam.tdl = newTdl;
+      wrapperParamList.add(wrapperParam);
+
+      Logger.debug("\t" + entry.getKey() + " detected");
+
+      for (SignalSlot signalSlot : entry.getValue()) {
+        ParamSignature ps = new ParamSignature();
+        ps.signature = signalSlot.signature().replaceAll("\\s", "");
+        ps.wrapperParam = wrapperParam;
+        wrapperParam.signatures.add(ps);
       }
 
+      newTdl.parameters.add(wrapperParam);
     }
+
+    Logger.debug("Save parameters");
+    for (WrapperParam wrapperParam : wrapperParamList) {
+      wrapperParam.save();
+      for (ParamSignature signature : wrapperParam.signatures) {
+        signature.save();
+      }
+    }
+    Logger.debug("Detect parameters done");
   }
 
   public static Result doDeleteCase(Long id) {
@@ -201,14 +253,24 @@ public class TestCaseController extends Controller {
     return redirect(routes.AssertionController.getAssertionDetailView(tc.testAssertion.id, "testCases"));
   }
 
-  public static Result viewTestCase(long id, boolean showJobs) {
+  public static Result viewTestCase(long id, String display) {
     TestCase tc = TestCase.findById(id);
     if (tc == null) {
       return badRequest("No test case with id " + id + ".");
     }
-    return ok(testCaseView.render(tc, Application.getLocalUser(session()), showJobs
+    return ok(testCaseView.render(tc, Tdl.getLatestTdl(tc), Application.getLocalUser(session()), display));
+  }
 
-    ));
+  public static Result viewTestCase2(long id, long tdlId, String display) {
+    TestCase tc = TestCase.findById(id);
+    Tdl tdl = Tdl.findById(tdlId);
+    if (tc == null) {
+      return badRequest("No test case with id " + id + ".");
+    }
+    if (tdl == null) {
+      return badRequest("No tdl with id " + id + ".");
+    }
+    return ok(testCaseView.render(tc, tdl, Application.getLocalUser(session()), display));
   }
 
   public static Result doEditCaseField() {

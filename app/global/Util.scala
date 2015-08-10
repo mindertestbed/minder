@@ -1,7 +1,9 @@
 package global
 
+import java.io._
 import java.lang.reflect.Field
 import java.util._
+import java.util.zip.{GZIPInputStream, GZIPOutputStream}
 
 import controllers.Assets
 import editormodels.AssertionEditorModel
@@ -102,5 +104,74 @@ object Util {
   def canAccess(localUser: User, owner: User) : Boolean = {
     println(localUser.email + " vs. " + owner.email)
     localUser.email=="root@minder" || localUser.email==owner.email
+  }
+
+  /**
+   * compress the given byte array
+   *
+   * @param plain
+   * @return
+   */
+  def gzip(plain: Array[Byte]): Array[Byte] = {
+    val bais: ByteArrayInputStream = new ByteArrayInputStream(plain)
+    val baos: ByteArrayOutputStream = new ByteArrayOutputStream
+    gzip(bais, baos)
+    return baos.toByteArray
+  }
+
+  def gunzip(compressed: Array[Byte]): Array[Byte] = {
+    val bais: ByteArrayInputStream = new ByteArrayInputStream(compressed)
+    val baos: ByteArrayOutputStream = new ByteArrayOutputStream
+    gunzip(bais, baos)
+    return baos.toByteArray
+  }
+
+  /**
+   * Compress the given stream as GZIP
+   *
+   * @param inputStream
+   * @param outputStream
+   */
+  def gzip(inputStream: InputStream, outputStream: OutputStream) {
+    try {
+      val gzipOutputStream: GZIPOutputStream = new GZIPOutputStream(outputStream, true)
+      transferData(inputStream, gzipOutputStream)
+      gzipOutputStream.close
+    }
+    catch {
+      case e: Exception => {
+        throw new RuntimeException("GZIP Compression failed")
+      }
+    }
+  }
+
+  /**
+   * Decompress the given stream that contains gzip data
+   *
+   * @param inputStream
+   * @param outputStream
+   */
+  def gunzip(inputStream: InputStream, outputStream: OutputStream) {
+    try {
+      val gzipInputStream: GZIPInputStream = new GZIPInputStream(inputStream)
+      transferData(gzipInputStream, outputStream)
+      gzipInputStream.close
+    }
+    catch {
+      case e: Exception => {
+        throw new RuntimeException("GZIP decompression failed")
+      }
+    }
+  }
+
+  @throws(classOf[Exception])
+  def transferData(gzipInputStream: InputStream, outputStream: OutputStream) {
+    val chunk: Array[Byte] = new Array[Byte](1024)
+    var read: Int = -1
+    while ((({
+      read = gzipInputStream.read(chunk, 0, chunk.length); read
+    })) > 0) {
+      outputStream.write(chunk, 0, read)
+    }
   }
 }

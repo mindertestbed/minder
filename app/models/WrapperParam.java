@@ -21,7 +21,7 @@ public class WrapperParam extends Model {
   public List<ParamSignature> signatures;
 
   @ManyToOne
-  public TestCase testCase;
+  public Tdl tdl;
 
 
   @Override
@@ -52,12 +52,12 @@ public class WrapperParam extends Model {
   public static final Finder<Long, WrapperParam> find = new Finder<>(Long.class,
       WrapperParam.class);
 
-  public static WrapperParam findByTestCaseAndName(TestCase testCase, String str) {
-    return find.where().eq("testCase", testCase).eq("name", str).findUnique();
+  public static WrapperParam findByTdlAndName(Tdl tdl, String str) {
+    return find.where().eq("tdl", tdl).eq("name", str).findUnique();
   }
 
-  public static List<WrapperParam> findByTestCase(TestCase testCase) {
-    return find.where().eq("testCase", testCase).findList();
+  public static List<WrapperParam> findByTestCase(Tdl tdl) {
+    return find.where().eq("tdl", tdl).findList();
   }
 
   public static WrapperParam findById(Long id) {

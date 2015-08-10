@@ -62,7 +62,7 @@ public class UtilClass extends Model {
 
 
       String root = "_" + this.testGroup.id;
-      TdlCompiler.compileUtil(root, root, name, source);
+      TdlCompiler.compileUtil(root, root, testGroup.dependencyString, name, source);
       Ebean.commitTransaction();
     } catch (Exception ex) {
       throw new RuntimeException(ex.getMessage(), ex);
@@ -80,7 +80,7 @@ public class UtilClass extends Model {
 
 
       String root = "_" + this.testGroup.id;
-      TdlCompiler.compileUtil(root, root, name, source);
+      TdlCompiler.compileUtil(root, root, testGroup.dependencyString, name, source);
       Ebean.commitTransaction();
     } catch (Exception ex) {
       throw new RuntimeException(ex.getMessage(), ex);

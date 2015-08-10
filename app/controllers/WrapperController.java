@@ -23,74 +23,6 @@ import static play.data.Form.form;
 public class WrapperController extends Controller {
   public static final Form<WrapperEditorModel> WRAPPER_FORM = form(WrapperEditorModel.class);
 
-  /**
-   * List the actual registered wrappers that provide the same
-   * signal and slots with the parametric wrappers provided in the model
-   *
-   * @param mappedWrapperModel
-   * @return
-   */
-  public static List<String> listOptions(MappedWrapperModel mappedWrapperModel) {
-    // get MappedParam
-    // get the wrapperparam
-    WrapperParam wp = WrapperParam
-        .findById(mappedWrapperModel.wrapperParamId);
-    // get signatures supported by this wp.
-    List<ParamSignature> psList = ParamSignature.getByWrapperParam(wp);
-
-    // create the return list.
-    List<String> listOptions = new ArrayList<>();
-    // List<SignalSlot> TdlCompiler.getSignatures(testCase.tdl,
-    // mappedWrapperModel.name);
-    // we have to list the wrappers that cover all these signatures (might
-    // be more but we don't care)
-    // not an optiomal solution for a huuuuge database. But there won't be
-    // more than 100 wrappers :-)
-    List<Wrapper> all = Wrapper.getAll();
-
-    out:
-    for (Wrapper wrapper : all) {
-      System.out.println("Wrapper " + wrapper.name);
-      // check if all the signatures are covered by the signals or slots
-      // of this wrapper.
-      for (ParamSignature ps : psList) {
-        System.out.print("\t" + ps.signature);
-        boolean included = false;
-        for (TSignal signal : wrapper.signals) {
-          if (ps.signature.equals(signal.signature.replaceAll("\\s",
-              ""))) {
-            included = true;
-            break;
-          }
-        }
-
-        if (!included) {
-          for (TSlot slot : wrapper.slots) {
-            if (ps.signature.equals(slot.signature.replaceAll(
-                "\\s", ""))) {
-              included = true;
-              break;
-            }
-          }
-        }
-
-        if (included)
-          System.out.println(" included");
-        else
-          System.out.println("NOT included");
-        if (!included)
-          continue out;
-      }
-
-      // if we are here, then this wrapper contains all.
-      // so add it to the list.
-      listOptions.add(wrapper.name);
-    }
-
-    return listOptions;
-  }
-
-
   public static Result listTestRuns(Long configurationId) {
     Job rc = Job.findById(configurationId);
     if (rc == null) {
@@ -142,7 +74,7 @@ public class WrapperController extends Controller {
     System.out.println("Wrapper id:" + id);
     Wrapper wr = Wrapper.findById(id);
     if (wr == null) {
-      // it does not exist. error
+      // it does not exist. errort
       return badRequest("Wrapper with id " + id + " does not exist.");
     }
 
@@ -226,7 +158,7 @@ public class WrapperController extends Controller {
 
       Logger.debug("Error message " + tr.errorMessage);
       Job rc = Job.findById(tr.job.id);
-      TestCase tc = TestCase.findById(rc.testCase.id);
+      TestCase tc = TestCase.findById(rc.tdl.testCase.id);
       TestAssertion ta = TestAssertion.findById(tc.testAssertion.id);
       TestGroup tg = TestGroup.findById(ta.testGroup.id);
 
@@ -249,23 +181,21 @@ public class WrapperController extends Controller {
       List<JasperPrint> jasperPrintList = new ArrayList<JasperPrint>();
       jasperPrintList.add(print1);
 
-      if (tr.wrappers != null && tr.wrappers.length() > 0) {
-        JasperReport wrapperReport = JasperCompileManager.compileReport(WrapperController.class.getResourceAsStream("/wrappersReport.jrxml"));
+      if (tr.sutNames != null && tr.sutNames.length() > 0) {
+        JasperReport wrapperReport = JasperCompileManager.compileReport(WrapperController.class.getResourceAsStream("/sutNamesReport.jrxml"));
         values = new HashMap<String, Object>();
-        values.put("wrappers", tr.wrappers);
+        values.put("sutNames", tr.sutNames);
         source = new JREmptyDataSource();
         JasperPrint print2 = JasperFillManager.fillReport(wrapperReport, values, source);
         jasperPrintList.add(print2);
       }
 
-      if (tr.history.systemOutputLog != null && tr.history.systemOutputLog.length() > 0) {
-        JasperReport logReport = JasperCompileManager.compileReport(WrapperController.class.getResourceAsStream("/logReport.jrxml"));
-        values = new HashMap<String, Object>();
-        values.put("log", tr.history.systemOutputLog);
-        source = new JREmptyDataSource();
-        JasperPrint print3 = JasperFillManager.fillReport(logReport, values, source);
-        jasperPrintList.add(print3);
-      }
+      JasperReport logReport = JasperCompileManager.compileReport(WrapperController.class.getResourceAsStream("/logReport.jrxml"));
+      values = new HashMap<String, Object>();
+      values.put("log", tr.history.extractSystemOutputLog());
+      source = new JREmptyDataSource();
+      JasperPrint print3 = JasperFillManager.fillReport(logReport, values, source);
+      jasperPrintList.add(print3);
 
       ByteArrayOutputStream baos = new ByteArrayOutputStream();
       JRPdfExporter exporter = new JRPdfExporter();

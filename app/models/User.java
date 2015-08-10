@@ -103,9 +103,9 @@ public class User extends Model implements Subject {
   }
 
 
-  public boolean isTester(){
-    for (SecurityRole role : roles){
-      if (role.getName().equals(Application.TEST_DESIGNER_ROLE)){
+  public boolean isTester() {
+    for (SecurityRole role : roles) {
+      if (role.getName().equals(Application.TEST_DESIGNER_ROLE)) {
         return true;
       }
     }
@@ -114,9 +114,9 @@ public class User extends Model implements Subject {
   }
 
 
-  public boolean isDeveloper(){
-    for (SecurityRole role : roles){
-      if (role.getName().equals(Application.TEST_DEVELOPER_ROLE)){
+  public boolean isDeveloper() {
+    for (SecurityRole role : roles) {
+      if (role.getName().equals(Application.TEST_DEVELOPER_ROLE)) {
         return true;
       }
     }
@@ -125,11 +125,9 @@ public class User extends Model implements Subject {
   }
 
 
-
-
-  public boolean isObserver(){
-    for (SecurityRole role : roles){
-      if (role.getName().equals(Application.OBSERVER_ROLE)){
+  public boolean isObserver() {
+    for (SecurityRole role : roles) {
+      if (role.getName().equals(Application.OBSERVER_ROLE)) {
         return true;
       }
     }
@@ -323,5 +321,10 @@ public class User extends Model implements Subject {
 
   public static User findById(Long id) {
     return find.byId(id);
+  }
+
+  @Override
+  public String toString() {
+    return email;
   }
 }

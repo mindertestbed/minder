@@ -189,6 +189,9 @@ $(function() {
             <option>xq-dark</option>
             <option>xq-light</option>
           </select>
+            @inputText(
+              frm("version"),
+              '_label -> "Version")
           <br />
           <!-- xtarea(frm("source"), 'class -> "CodeMirror ") -->
             <textarea id="tdl" name="tdl" class = "CodeMirror">@frm("tdl").value </textarea>
@@ -221,15 +224,16 @@ $(function() {
       <div id="accordion1" class="fullh">
       @defining(Wrapper.getAll()){ allWrappers =>
         @for(currentWrapper <- allWrappers){
+          @defining(WrapperVersion.latestByWrapper(currentWrapper)){ lastVersion =>
           <div class="title bevelsmall"><b class="trigger">@currentWrapper.name</b></div>
           <div class="content" style="height:95%">
             <div class="myscroll" style="overflow:auto;">
               <div><b>Signals</b></div>
               <div style="overflow:scroll"> <ul>
-              @for(currentSignal <- currentWrapper.signals){
-                <li id="signal@currentWrapper.id-@currentSignal.id">- @currentSignal.signature</li>
+              @for(currentSignal <- lastVersion.signals){
+                <li id="signal@lastVersion.id-@currentSignal.id">- @currentSignal.signature</li>
                 <script>
-                $("#signal@currentWrapper.id-@currentSignal.id").click(function(){
+                $("#signal@lastVersion.id-@currentSignal.id").click(function(){
                 // get it
                 var editor = $("#tdl").data('CodeMirrorInstance');
                 // from here on the API functions are available to 'myInstance' again.
@@ -247,10 +251,10 @@ $(function() {
               <div><b>Slots</b></div>
               <div style="overflow:scroll">
                 <ul>
-                @for(currentSlot <- currentWrapper.slots){
-                  <li id="slot@currentWrapper.id-@currentSlot.id">- @currentSlot.signature</li>
+                @for(currentSlot <- lastVersion.slots){
+                  <li id="slot@lastVersion.id-@currentSlot.id">- @currentSlot.signature</li>
                   <script>
-                  $("#slot@currentWrapper.id-@currentSlot.id").click(function(){
+                  $("#slot@lastVersion.id-@currentSlot.id").click(function(){
                   // get it
                   var editor = $("#tdl").data('CodeMirrorInstance');
                   // from here on the API functions are available to 'myInstance' again.
@@ -266,6 +270,7 @@ $(function() {
                 </ul></div>
             </div>
           </div>
+          }
         }
       }
       </div>
