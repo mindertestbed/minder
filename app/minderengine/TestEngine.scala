@@ -9,6 +9,7 @@ import models._
 import mtdl._
 import org.apache.log4j.spi.LoggingEvent
 import org.apache.log4j.{Level, AppenderSkeleton, EnhancedPatternLayout}
+import org.interop.xoola.tcpcom.connmanager.server.IClassLoaderProvider
 import play.api.Logger
 
 import scala.collection.JavaConversions._
@@ -17,9 +18,27 @@ import scala.collection.JavaConversions._
  * Created by yerlibilgin on 07/12/14.
  */
 object TestEngine {
+
+
+
   def describe(clsMinderTDL: Class[MinderTdl]): util.List[Rivet] = {
     val minderTDL = clsMinderTDL.getConstructors()(0).newInstance(null, java.lang.Boolean.FALSE).asInstanceOf[MinderTdl]
     minderTDL.SlotDefs
+  }
+
+  var minderTDL : MinderTdl = null
+
+  /**
+   * When Xoola server is initialized, it needs a class loader to deserialize the objects read from the network.
+   * We will provide xoola the minderTDL.getClass.getClassLoader so that it successfully resolves its stuff.
+   * This function will delegate the minderTDL.getClass.getClassLoader to xoola.
+   */
+
+  def getCurrentMTDLClassLoader() : ClassLoader = {
+    if (minderTDL == null)
+       Thread.currentThread().getContextClassLoader;
+    else
+      minderTDL.getClass.getClassLoader
   }
 
   class MyAppender(testProcessWatcher: TestProcessWatcher) extends AppenderSkeleton {
@@ -72,7 +91,7 @@ object TestEngine {
       val wrapperToVersionMap = wrapperMapping.map(entry => (entry._2.wrapperVersion.wrapper.name,
         entry._2.wrapperVersion.version))
       val const = clsMinderTDL.getConstructors()(0)
-      val minderTDL = const.newInstance(newMapping, java.lang.Boolean.TRUE).asInstanceOf[MinderTdl]
+      minderTDL = const.newInstance(newMapping, java.lang.Boolean.TRUE).asInstanceOf[MinderTdl]
       minderTDL.debug = (any: Any) => {
         lgr.debug(any)
       }
@@ -266,6 +285,8 @@ object TestEngine {
     } finally {
       lgr.info("Test Finished")
       lgr.removeAppender(app)
+
+      minderTDL = null;
     }
 
     //   mapMe("A" -> "A".getBytes(), "B" -> "B".getBytes())
