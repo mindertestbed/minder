@@ -31,7 +31,7 @@ libraryDependencies ++= Seq(
   "postgresql" % "postgresql" % "9.1-901-1.jdbc4",
   "org.beybunproject" % "xoola" % "1.0.1",
   "gov.tubitak.minder" % "minder-common" % "0.2.2",
-  "gov.tubitak.minder" %% "minder-tdl" % "0.2.3",
+  "gov.tubitak.minder" %% "minder-tdl" % "0.2.4",
   "com.feth" %%  "play-authenticate" % "0.6.5-SNAPSHOT",
   "be.objectify" %% "deadbolt-java" % "2.3.0-RC1",
   "org.webjars" %% "webjars-play" % "2.3.0",
