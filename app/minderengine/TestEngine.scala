@@ -20,13 +20,12 @@ import scala.collection.JavaConversions._
 object TestEngine {
 
 
-
   def describe(clsMinderTDL: Class[MinderTdl]): util.List[Rivet] = {
     val minderTDL = clsMinderTDL.getConstructors()(0).newInstance(null, java.lang.Boolean.FALSE).asInstanceOf[MinderTdl]
-    minderTDL.SlotDefs
+    minderTDL.RivetDefs
   }
 
-  var minderTDL : MinderTdl = null
+  var minderTDL: MinderTdl = null
 
   /**
    * When Xoola server is initialized, it needs a class loader to deserialize the objects read from the network.
@@ -34,9 +33,9 @@ object TestEngine {
    * This function will delegate the minderTDL.getClass.getClassLoader to xoola.
    */
 
-  def getCurrentMTDLClassLoader() : ClassLoader = {
+  def getCurrentMTDLClassLoader(): ClassLoader = {
     if (minderTDL == null)
-       Thread.currentThread().getContextClassLoader;
+      Thread.currentThread().getContextClassLoader;
     else
       minderTDL.getClass.getClassLoader
   }
@@ -135,7 +134,7 @@ object TestEngine {
 
       try {
         var rivetIndex = 0;
-        for (rivet <- minderTDL.SlotDefs) {
+        for (rivet <- minderTDL.RivetDefs) {
           lgr.info("> " + "RUN RIVET " + rivetIndex)
           //resolve the minder client id. This might as well be resolved to a local built-in wrapper or the null slot.
           val minderClient =
@@ -163,77 +162,88 @@ object TestEngine {
 
           val args = Array.ofDim[Object](rivet.pipes.length)
 
+          //a boolean flag used to see whether a timeout occurred or not
+          var thereIsTimoeut = false;
+
           var signalIndex = 0
-          for (tuple@(label, signature) <- rivet.signalPipeMap.keySet) {
-            val me: MinderSignalRegistry = SessionMap.getObject(userEmail, "signalRegistry")
-            if (me == null) throw new IllegalArgumentException("No MinderSignalRegistry object defined for session " + userEmail)
 
-            //obtain the source signal object
-            val signalList = rivet.signalPipeMap(tuple);
-            if (signalList == null || signalList.isEmpty)
-              throw new IllegalArgumentException("singal list is empty for " + label + "." + signature);
+          try {
+            for (tuple@(label, signature) <- rivet.signalPipeMap.keySet) {
+              val me: MinderSignalRegistry = SessionMap.getObject(userEmail, "signalRegistry")
+              if (me == null) throw new IllegalArgumentException("No MinderSignalRegistry object defined for session " + userEmail)
 
-            val signal = signalList(0).inRef.source;
+              //obtain the source signal object
+              val signalList = rivet.signalPipeMap(tuple);
+              if (signalList == null || signalList.isEmpty)
+                throw new IllegalArgumentException("singal list is empty for " + label + "." + signature);
 
-            val identifier = label + "|" + wrapperToVersionMap(label)
-            lgr.debug("> Wait For Signal:" + identifier + "." + signature)
+              val signal = signalList(0).inRef.source;
 
-            val signalData = me.dequeueSignal(identifier, signature, signal.timeout).asInstanceOf[SignalCallData]
+              val identifier = label + "|" + wrapperToVersionMap(label)
+              lgr.debug("> Wait For Signal:" + identifier + "." + signature)
 
-            //
-            //TODO: instance control ekle ve hata durumlarini ayrica handle et.MTDLde
-            //
-            lgr.debug("< Signal Arrived: " + identifier + "." + signature)
-
-            testProcessWatcher.signalEmitted(rivetIndex, signalIndex, signalData)
-
-            for (paramPipe <- rivet.signalPipeMap(tuple)) {
-              //FIX for BUG-1 : added an if for -1 param
-              if (paramPipe.in != -1) {
-                convertParam(paramPipe.out, paramPipe.execute(signalData.args(paramPipe.in)))
+              val signalData: SignalCallData = try {
+                me.dequeueSignal(identifier, signature, signal.timeout).asInstanceOf[SignalCallData]
+              } catch {
+                case rte: RuntimeException => {
+                  signal.handleTimeout(rte)
+                  thereIsTimoeut = true
+                  throw new BreakException
+                }
               }
+
+              //
+              //
+              //TODO: instance control ekle ve hata durumlarini ayrica handle et.MTDLde
+              //
+              lgr.debug("< Signal Arrived: " + identifier + "." + signature)
+
+              testProcessWatcher.signalEmitted(rivetIndex, signalIndex, signalData)
+
+              for (paramPipe <- rivet.signalPipeMap(tuple)) {
+                //FIX for BUG-1 : added an if for -1 param
+                if (paramPipe.in != -1) {
+                  convertParam(paramPipe.out, paramPipe.execute(signalData.args(paramPipe.in)), args)
+                }
+              }
+
+              signalIndex += 1
             }
-
-            signalIndex += 1
+          } catch {
+            case breakException: BreakException => {
+            }
           }
 
-          lgr.debug("Assign free vars")
+          if (thereIsTimoeut) {
+            //we hit a timeout, skip to the next rivet
+          } else {
+            lgr.debug("Assign free vars")
 
-          for (paramPipe <- rivet.freeVariablePipes) {
-            val any = paramPipe.execute(null)
-            convertParam(paramPipe.out, any)
-          }
-
-          if (rivet.freeVariablePipes.size > 0) {
-            val freeArgs = Array.ofDim[Object](rivet.freeVariablePipes.size);
-            var k = 0;
             for (paramPipe <- rivet.freeVariablePipes) {
-              freeArgs(k) = args(paramPipe.out)
-              k += 1
+              val any = paramPipe.execute(null)
+              convertParam(paramPipe.out, any, args)
             }
-            val signalData2 = new SignalCallData(freeArgs);
-            testProcessWatcher.signalEmitted(rivetIndex, signalIndex, signalData2)
-          }
 
-          lgr.info("> CALL SLOT " + rivet.slot.wrapperId + "." + rivet.slot.signature)
-          rivet.result = minderClient.callSlot(userEmail, rivet.slot.signature, args)
-          lgr.info("< SLOT CALLED " + rivet.slot.wrapperId + "." + rivet.slot.signature)
-
-
-          testProcessWatcher.rivetFinished(rivetIndex)
-          lgr.info("< Rivet finished sucessfully")
-          lgr.info("----------\n")
-
-          def convertParam(out: Int, arg: Any) {
-            if (arg == null) {
-              args(out) = null;
-            } else if (arg.isInstanceOf[Rivet]) {
-              args(out) = arg.asInstanceOf[Rivet].result
-            } else if (arg.isInstanceOf[MinderNull]) {
-              args(out) = null;
-            } else {
-              args(out) = arg.asInstanceOf[AnyRef]
+            if (rivet.freeVariablePipes.size > 0) {
+              val freeArgs = Array.ofDim[Object](rivet.freeVariablePipes.size);
+              var k = 0;
+              for (paramPipe <- rivet.freeVariablePipes) {
+                freeArgs(k) = args(paramPipe.out)
+                k += 1
+              }
+              val signalData2 = new SignalCallData(freeArgs);
+              testProcessWatcher.signalEmitted(rivetIndex, signalIndex, signalData2)
             }
+
+            lgr.info("> CALL SLOT " + rivet.slot.wrapperId + "." + rivet.slot.signature)
+            rivet.result = minderClient.callSlot(userEmail, rivet.slot.signature, args)
+            lgr.info("< SLOT CALLED " + rivet.slot.wrapperId + "." + rivet.slot.signature)
+
+
+            testProcessWatcher.rivetFinished(rivetIndex)
+            lgr.info("< Rivet finished sucessfully")
+            lgr.info("----------\n")
+
           }
 
           rivetIndex += 1
@@ -293,6 +303,18 @@ object TestEngine {
 
   }
 
+  def convertParam(out: Int, arg: Any, args: Array[Object]) {
+    if (arg == null) {
+      args(out) = null;
+    } else if (arg.isInstanceOf[Rivet]) {
+      args(out) = arg.asInstanceOf[Rivet].result
+    } else if (arg.isInstanceOf[MinderNull]) {
+      args(out) = null;
+    } else {
+      args(out) = arg.asInstanceOf[AnyRef]
+    }
+  }
+
   /**
    * Evaluates the whole test case without running it and creates a list of wrappers and their signals-slots.
    *
@@ -317,7 +339,7 @@ object TestEngine {
       }
     }
 
-    val slotDefs = minderTdl.SlotDefs
+    val slotDefs = minderTdl.RivetDefs
 
     val hm: util.LinkedHashMap[String, util.Set[SignalSlot]] = new util.LinkedHashMap()
     val map: collection.mutable.LinkedHashMap[String, util.Set[SignalSlot]] = collection.mutable.LinkedHashMap()

@@ -4,7 +4,7 @@ name := """minder"""
 
 offline := true
 
-version := "1.0.0-Rc2"
+version := "1.0.0-Rc3"
 
 resolvers += "play-authenticate (snapshot)" at "http://joscha.github.io/play-authenticate/repo/snapshots/"
 
@@ -31,7 +31,7 @@ libraryDependencies ++= Seq(
   "postgresql" % "postgresql" % "9.1-901-1.jdbc4",
   "org.beybunproject" % "xoola" % "1.0.1",
   "gov.tubitak.minder" % "minder-common" % "0.2.2",
-  "gov.tubitak.minder" %% "minder-tdl" % "0.2.2",
+  "gov.tubitak.minder" %% "minder-tdl" % "0.2.3",
   "com.feth" %%  "play-authenticate" % "0.6.5-SNAPSHOT",
   "be.objectify" %% "deadbolt-java" % "2.3.0-RC1",
   "org.webjars" %% "webjars-play" % "2.3.0",

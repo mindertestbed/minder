@@ -28,3 +28,5 @@ dependencies
 domibus-debug/domibus.jar
 domibus-debug/domibus.war
 eskiKodlar.7z
+domibus-debug
+*.iml
