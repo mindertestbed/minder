@@ -7,6 +7,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import dependencyutils.DependencyClassLoaderCache;
 import editormodels.GroupEditorModel;
+import global.Global;
 import global.Util;
 import models.TestGroup;
 import models.User;
@@ -30,7 +31,6 @@ import static play.data.Form.form;
 public class GroupController extends Controller {
   public static final Form<GroupEditorModel> TEST_GROUP_FORM = form(GroupEditorModel.class);
 
-
   @Security.Authenticated(Secured.class)
   public static Result getCreateGroupEditorView() {
     return ok(testGroupEditor.render(TEST_GROUP_FORM, null));
@@ -40,7 +40,7 @@ public class GroupController extends Controller {
   public static Result doCreateTestGroup() {
     final Form<GroupEditorModel> filledForm = TEST_GROUP_FORM
         .bindFromRequest();
-    final User localUser = Authentication.getLocalUser(session());
+    final User localUser = Authentication.getLocalUser();
     if (filledForm.hasErrors()) {
       Util.printFormErrors(filledForm);
       return badRequest(testGroupEditor.render(filledForm, null));
@@ -67,13 +67,13 @@ public class GroupController extends Controller {
 
   @Security.Authenticated(Secured.class)
   public static Result editGroupForm(Long id) {
-    final User localUser = Authentication.getLocalUser(session());
+    final User localUser = Authentication.getLocalUser();
     TestGroup tg = TestGroup.findById(id);
     if (tg == null) {
       return badRequest("Test group with id [" + id + "] not found!");
     } else {
 
-      if (!Util.canAccess(Authentication.getLocalUser(session()), tg.owner))
+      if (!Util.canAccess(Authentication.getLocalUser(), tg.owner))
         return badRequest("You don't have permission to modify this resource");
 
       GroupEditorModel tgem = new GroupEditorModel();
@@ -132,7 +132,7 @@ public class GroupController extends Controller {
         User user = (User) fld.get(o);
         System.out.println("UNique " + user.email);
 
-        User localUser = Authentication.getLocalUser(session());
+        User localUser = Authentication.getLocalUser();
 
         if (localUser == null || !localUser.email.equals(user.email)) {
           return badRequest("You don't have the permission to modify this resource");
@@ -168,7 +168,7 @@ public class GroupController extends Controller {
     if (tg == null) {
       return badRequest("Test group with id [" + id + "] not found!");
     } else {
-      if (!Util.canAccess(Authentication.getLocalUser(session()), tg.owner))
+      if (!Util.canAccess(Authentication.getLocalUser(), tg.owner))
         return badRequest("You don't have permission to modify this resource");
 
       try {

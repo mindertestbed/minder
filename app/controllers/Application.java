@@ -1,23 +1,15 @@
 package controllers;
 
-import editormodels.UserLoginEditorModel;
-import global.Util;
 import models.User;
-import play.Logger;
 import play.Routes;
-import play.data.Form;
 import play.mvc.Controller;
-import play.mvc.Http.Session;
 import play.mvc.Result;
-import play.mvc.Results;
 import play.mvc.Security;
 import views.html.*;
 import views.html.rootViews.rootPage;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
-
-import static play.data.Form.form;
 
 public class Application extends Controller {
 
@@ -27,12 +19,12 @@ public class Application extends Controller {
 
   @Security.Authenticated(Secured.class)
   public static Result restrictedObserver() {
-    final User localUser = Authentication.getLocalUser(session());
+    final User localUser = Authentication.getLocalUser();
     return ok(restrictedObserver.render(localUser));
   }
 
   public static Result root(String display) {
-    final User localUser = Authentication.getLocalUser(session());
+    final User localUser = Authentication.getLocalUser();
     System.out.println(localUser.email);
     if (localUser.email.equals("root@minder")) {
       return ok(rootPage.render(display));
@@ -43,7 +35,7 @@ public class Application extends Controller {
 
   @Security.Authenticated(Secured.class)
   public static Result restrictedTestDesigner(String display) {
-    final User localUser = Authentication.getLocalUser(session());
+    final User localUser = Authentication.getLocalUser();
 
     if (!session().containsKey("testPageMode")) {
       session().put("testPageMode", "none");
@@ -53,20 +45,20 @@ public class Application extends Controller {
 
   @Security.Authenticated(Secured.class)
   public static Result createNewTest() {
-    final User localUser = Authentication.getLocalUser(session());
+    final User localUser = Authentication.getLocalUser();
     session().put("testPageMode", "new");
     return ok(restrictedTestDesigner.render(localUser, "designWithGui"));
   }
 
   @Security.Authenticated(Secured.class)
   public static Result restrictedTestDeveloper() {
-    final User localUser = Authentication.getLocalUser(session());
+    final User localUser = Authentication.getLocalUser();
     return ok(restrictedTestDeveloper.render(localUser));
   }
 
   @Security.Authenticated(Secured.class)
   public static Result profile() {
-    final User localUser = Authentication.getLocalUser(session());
+    final User localUser = Authentication.getLocalUser();
     return ok(profile.render(localUser));
   }
 

@@ -1,4 +1,4 @@
-package models;
+package security;
 
 import com.avaje.ebean.annotation.EnumValue;
 

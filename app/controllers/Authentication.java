@@ -20,10 +20,13 @@ public class Authentication extends Controller {
   public static final String FLASH_MESSAGE_KEY = "message";
   public static final String FLASH_ERROR_KEY = "error";
 
-  public static User getLocalUser(final Session session) {
-    final User email = User.findByEmail(session.get("email"));
-    Logger.debug("User found " + email);
-    return email;
+
+  public static User getLocalUser() {
+    String email = session().get("email");
+    if (email == null)
+      return null;
+    User user = User.findByEmail(email);
+    return user;
   }
 
   public static Result login() {

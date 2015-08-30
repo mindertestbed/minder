@@ -3,6 +3,7 @@ package controllers;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import editormodels.UtilClassEditorModel;
+import global.Global;
 import global.Util;
 import models.*;
 import play.Logger;
@@ -10,8 +11,6 @@ import play.data.Form;
 import play.mvc.Controller;
 import play.mvc.Result;
 import play.mvc.Security;
-import views.html.testCaseEditor;
-import views.html.testCaseView;
 import views.html.utilClassEditor;
 import views.html.utilClassView;
 
@@ -64,7 +63,7 @@ public class UtilClassController extends Controller {
         return badRequest(utilClassEditor.render(filledForm, false));
       }
 
-      final User localUser = Authentication.getLocalUser(session());
+      final User localUser = Authentication.getLocalUser();
 
       utilClass = new UtilClass();
       utilClass.name = model.name;

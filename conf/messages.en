@@ -44,6 +44,9 @@ minder.restricted.testobserver=Test Observer can see the results of test runs an
 authenticate.root=Only Root
 authenticate.login.forgot.password = Forgot Password
 minder.password_change=Change Password
+minder.login.password.placeholder=Password
+minder.login.password.repeat=Repeat Password
+minder.user.role=Role
 
 minder.roles.signup.error.chooseatleastonerole = You must choose at least one role.
 

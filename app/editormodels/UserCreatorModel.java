@@ -1,12 +1,11 @@
 package editormodels;
 
-import models.ModelConstants;
 import play.data.validation.Constraints;
 
 /**
 * Created by yerlibilgin on 03/05/15.
 */
-public class UserEditorModel {
+public class UserCreatorModel {
   public Long id;
 
   @Constraints.Email
@@ -16,10 +15,12 @@ public class UserEditorModel {
   @Constraints.Required
   public String name;
 
+  @Constraints.Required
   @Constraints.MinLength(5)
   public String password;
 
 
+  @Constraints.Required
   @Constraints.MinLength(5)
   public String repeatPassword;
 

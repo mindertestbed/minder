@@ -4,6 +4,7 @@ package controllers;
 import com.avaje.ebean.Ebean;
 import com.fasterxml.jackson.databind.JsonNode;
 import editormodels.TestCaseEditorModel;
+import global.Global;
 import global.Util;
 import minderengine.TestEngine;
 import models.*;
@@ -84,7 +85,7 @@ public class TestCaseController extends Controller {
         return badRequest(testCaseEditor.render(filledForm, null, false));
       }
 
-      final User localUser = Authentication.getLocalUser(session());
+      final User localUser = Authentication.getLocalUser();
 
       tc = new TestCase();
       tc.name = model.name;
@@ -125,7 +126,7 @@ public class TestCaseController extends Controller {
       return badRequest("TDL with id [" + tdlId + "] not found!");
     } else {
       tdl.testCase = TestCase.findById(tdl.testCase.id);
-      if (!Util.canAccess(Authentication.getLocalUser(session()), tdl.testCase.owner))
+      if (!Util.canAccess(Authentication.getLocalUser(), tdl.testCase.owner))
         return badRequest("You don't have permission to modify this resource");
 
       TestCaseEditorModel tcModel = new TestCaseEditorModel();
@@ -157,7 +158,7 @@ public class TestCaseController extends Controller {
             + "] does not exist");
         return badRequest(testCaseEditor.render(filledForm, null, true));
       }
-      if (!Util.canAccess(Authentication.getLocalUser(session()), tc.owner))
+      if (!Util.canAccess(Authentication.getLocalUser(), tc.owner))
         return badRequest("You don't have permission to modify this resource");
 
       if (model.version.equals(tdl.version)) {
@@ -242,7 +243,7 @@ public class TestCaseController extends Controller {
     }
 
 
-    if (!Util.canAccess(Authentication.getLocalUser(session()), tc.owner))
+    if (!Util.canAccess(Authentication.getLocalUser(), tc.owner))
       return badRequest("You don't have permission to modify this resource");
 
     try {
@@ -261,7 +262,7 @@ public class TestCaseController extends Controller {
     if (tc == null) {
       return badRequest("No test case with id " + id + ".");
     }
-    return ok(testCaseView.render(tc, Tdl.getLatestTdl(tc), Authentication.getLocalUser(session()), display));
+    return ok(testCaseView.render(tc, Tdl.getLatestTdl(tc), Authentication.getLocalUser(), display));
   }
 
   @Security.Authenticated(Secured.class)
@@ -274,7 +275,7 @@ public class TestCaseController extends Controller {
     if (tdl == null) {
       return badRequest("No tdl with id " + id + ".");
     }
-    return ok(testCaseView.render(tc, tdl, Authentication.getLocalUser(session()), display));
+    return ok(testCaseView.render(tc, tdl, Authentication.getLocalUser(), display));
   }
 
   @Security.Authenticated(Secured.class)

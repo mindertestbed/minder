@@ -1,13 +1,20 @@
 @(tg: TestGroup, display: String = "assertions")
+
 @import java.util.concurrent.atomic.AtomicInteger
 @import global.Util._
+@import authentication._
+@import security.Role
 
 @main(Messages("minder.navigation.restricted.testdesigner"), "restrictedTestDesigner") {
 
     @dialogs()
 
     <h2 style="display:table-cell">Test Group
-        <div id="name@{tg.id}" onclick='showUpdateInputTextDialog(@tg.id, "name", $(this).next(), "/doEditGroupField")' class="hl editable"></div>
+        <div id="name@{tg.id}"
+        @subjectIs(tg.owner) {
+          onclick='showUpdateInputTextDialog(@tg.id, "name", $(this).next(), "/doEditGroupField")'
+        }
+          class="hl editable"></div>
         <input type="hidden" value="@tg.name"/>
         </h2>
 
@@ -20,11 +27,17 @@
         </p>
 
         <h3>Short Description</h3>
-        <div id="shortDescription@{tg.id}" onclick='showUpdateInputTextDialog(@tg.id, "shortDescription", $(this).next(), "/doEditGroupField")' class="editable"></div>
+        <div id="shortDescription@{tg.id}"
+          @subjectIs(tg.owner) {
+            onclick='showUpdateInputTextDialog(@tg.id, "shortDescription", $(this).next(), "/doEditGroupField")'
+          } class="editable"></div>
         <input type="hidden" value="@tg.shortDescription"/>
 
         <h3>Description</h3>
-        <div id="description@{tg.id}" onclick='showUpdateTextAreaDialog(@tg.id, "description", $(this ).next(), "/doEditGroupField")' class="editable"></div>
+        <div id="description@{tg.id}"
+          @subjectIs(tg.owner) {
+            onclick='showUpdateTextAreaDialog(@tg.id, "description", $(this ).next(), "/doEditGroupField")'
+          } class="editable"></div>
         <input type="hidden" value="@tg.description"/>
 
         <script>

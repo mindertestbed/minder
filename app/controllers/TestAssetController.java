@@ -1,5 +1,6 @@
 package controllers;
 
+import global.Global;
 import global.Util;
 import models.ModelConstants;
 import models.TestAsset;
@@ -49,7 +50,7 @@ public class TestAssetController extends Controller {
       return badRequest("Test Group with [" + testGroupId + "] not found");
     }
 
-    User localuser = Authentication.getLocalUser(session());
+    User localuser = Authentication.getLocalUser();
     if (localuser.email.equals("root@minder") || group.owner.email.equals(localuser.email)) {
 
       if (filledForm.hasErrors()) {
@@ -95,7 +96,7 @@ public class TestAssetController extends Controller {
 
   @Security.Authenticated(Secured.class)
   public static Result editAssetForm(Long id) {
-    User localuser = Authentication.getLocalUser(session());
+    User localuser = Authentication.getLocalUser();
 
     TestGroup group = TestGroup.findById(id);
     if (!localuser.email.equals("root@minder") && !group.owner.email.equals(localuser.email)) {
@@ -128,14 +129,14 @@ public class TestAssetController extends Controller {
     } else {
       TestAssetModel model = filledForm.get();
       TestAsset ta = TestAsset.findById(model.id);
-      User localuser = Authentication.getLocalUser(session());
+      User localuser = Authentication.getLocalUser();
       if (!localuser.email.equals("root@minder") && !ta.group.owner.email.equals(localuser.email)) {
         return badRequest("You cant use this resource");
       }
 
 
       //file upload part
-      User localUser = Authentication.getLocalUser(session());
+      User localUser = Authentication.getLocalUser();
       try {
         handleFileUpload(ta.group.id, model.name);
       } catch (Exception ex) {
@@ -166,7 +167,7 @@ public class TestAssetController extends Controller {
         ex.printStackTrace();
         return badRequest(ex.getMessage());
       }
-      User user = Authentication.getLocalUser(session());
+      User user = Authentication.getLocalUser();
 
       new File("assets/_" + ta.group.id + "/" + ta.name).delete();
 
@@ -180,7 +181,7 @@ public class TestAssetController extends Controller {
     if (ta == null) {
       return badRequest("Test asset with id [" + id + "] not found!");
     } else {
-      User user = Authentication.getLocalUser(session());
+      User user = Authentication.getLocalUser();
       response().setContentType("application/x-download");
       response().setHeader("Content-disposition", "attachment; filename=" + ta.name);
       return ok(new File("assets/_" + ta.group.id + "/" + ta.name));

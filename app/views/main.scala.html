@@ -1,6 +1,7 @@
+@import authentication._
+
 @(title: String, nav: String = "")(content: Html)
 
-@import authentication._
 
 <!DOCTYPE html>
 
@@ -30,9 +31,8 @@
                         <ul class="nav navbar-nav">
                             <li class="@("active".when(nav == "restrictedTestDesigner"))"><a href="@routes.Application.restrictedTestDesigner()">@Messages("minder.navigation.restricted.testdesigner")</a></li>
                             <li class="@("active".when(nav == "restrictedTestDeveloper"))"><a href="@routes.Application.restrictedTestDeveloper()">@Messages("minder.navigation.restricted.testdeveloper")</a></li>
-                            <li class="@("active".when(nav == "restrictedObserver"))"><a href="@routes.Application.restrictedObserver()">@Messages("minder.navigation.restricted.observer")</a></li>
 
-                            @defining(Authentication.getLocalUser(session())) { user =>
+                            @defining(Authentication.getLocalUser()) { user =>
                                     @if(user!=null&&user.email=="root@minder") {
                                         <li class="@("active".when(nav == "root"))"><a href="@routes.Application.root()">@Messages("authenticate.root")</a></li>
                                     }
@@ -45,7 +45,7 @@
 
                         @subjectPresentOr{
                             <ul class="nav navbar-nav navbar-right">
-                            @defining(Authentication.getLocalUser(session())) { user =>
+                            @defining(Authentication.getLocalUser()) { user =>
                                 <li class="dropdown">
                                     <a href="#" class="dropdown-toggle" data-toggle="dropdown">
                                         <i class="glyphicon glyphicon-user"></i>@user.name <span class="caret"></span></a>

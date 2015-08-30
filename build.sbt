@@ -2,15 +2,11 @@ organization := "gov.tubitak.minder"
 
 name := """minder"""
 
-offline := true
-
-version := "1.1.0-beta"
-
-resolvers += "play-authenticate (snapshot)" at "http://joscha.github.io/play-authenticate/repo/snapshots/"
-
-resolvers += "play-easymail (snapshot)" at "http://joscha.github.io/play-easymail/repo/snapshots/"
+version := "1.2.0-beta"
 
 lazy val root = (project in file(".")).enablePlugins(PlayJava, PlayEbean)
+
+products in Compile <<= products in Aspectj
 
 resolvers += "Eid public repository" at "http://eidrepo:8081/nexus/content/groups/public/"
 
@@ -51,3 +47,20 @@ resolvers ++= Seq(
   "play-authenticate (release)" at "http://joscha.github.io/play-authenticate/repo/releases/",
   "jasper" at "http://jaspersoft.artifactoryonline.com/jaspersoft/third-party-ce-artifacts/"
 )
+
+import com.typesafe.sbt.SbtAspectj.{ Aspectj, aspectjSettings, compiledClasses }
+import com.typesafe.sbt.SbtAspectj.AspectjKeys.{ binaries, inputs, lintProperties }
+
+aspectjSettings
+
+inputs in Aspectj <+= compiledClasses
+
+binaries in Aspectj <++= update map { report =>
+  report.matching(
+    moduleFilter(organization = "org.springframework", name = "spring-aspects")
+  )
+}
+
+products in Compile <<= products in Aspectj
+
+products in Runtime <<= products in Compile

@@ -1,6 +1,7 @@
 package controllers;
 
 import com.avaje.ebean.Ebean;
+import editormodels.UserCreatorModel;
 import editormodels.UserEditorModel;
 import global.Util;
 import models.*;
@@ -9,8 +10,10 @@ import play.data.Form;
 import play.mvc.Controller;
 import play.mvc.Result;
 import play.mvc.Security;
+import security.Role;
 import views.html.rootViews.userEditor;
 
+import javax.xml.bind.DatatypeConverter;
 import java.util.ArrayList;
 
 import static play.data.Form.form;
@@ -19,31 +22,32 @@ import static play.data.Form.form;
  * Created by yerlibilgin on 03/05/15.
  */
 public class UserController extends Controller {
-  public static final Form<UserEditorModel> USER_FORM = form(UserEditorModel.class);
+  public static final Form<UserEditorModel> USER_EDIT_FORM = form(UserEditorModel.class);
+  public static final Form<UserCreatorModel> USER_CREATE_FORM = form(UserCreatorModel.class);
 
   @Security.Authenticated(Secured.class)
   public static Result getUserEditorView() {
-    User localUser = Authentication.getLocalUser(session());
+    User localUser = Authentication.getLocalUser();
     if (localUser == null || !localUser.email.equals("root@minder")) {
       return badRequest("You don't have the permission for this service");
     }
 
-    return ok(userEditor.render(USER_FORM, true));
+    return ok(userEditor.render(USER_CREATE_FORM, true));
   }
 
   public static Result doCreateUser() {
-    User localUser = Authentication.getLocalUser(session());
+    User localUser = Authentication.getLocalUser();
     if (localUser == null || !localUser.email.equals("root@minder")) {
       return badRequest("You don't have the permission for this service");
     }
-    final Form<UserEditorModel> filledForm = USER_FORM
+    final Form<UserCreatorModel> filledForm = USER_CREATE_FORM
         .bindFromRequest();
 
     if (filledForm.hasErrors()) {
       Util.printFormErrors(filledForm);
       return badRequest(userEditor.render(filledForm, true));
     } else {
-      UserEditorModel model = filledForm.get();
+      UserCreatorModel model = filledForm.get();
       User user = User.findByEmail(model.email);
       if (user != null) {
         filledForm.reject("The group with name [" + user.email
@@ -64,15 +68,15 @@ public class UserController extends Controller {
       user.roles = new ArrayList<>();
 
       if (toBoolean(model.istd)) {
-        user.roles.add(Role.TEST_DEVELOPER);
+        user.roles.add(new DBRole(user, Role.TEST_DEVELOPER));
       }
 
       if (toBoolean(model.ists)) {
-        user.roles.add(Role.TEST_DESIGNER);
+        user.roles.add(new DBRole(user, Role.TEST_DESIGNER));
       }
 
       if (toBoolean(model.isto)) {
-        user.roles.add(Role.TEST_OBSERVER);
+        user.roles.add(new DBRole(user, Role.TEST_OBSERVER));
       }
 
       user.password = Util.sha256(model.password.getBytes());
@@ -89,7 +93,7 @@ public class UserController extends Controller {
 
   @Security.Authenticated(Secured.class)
   public static Result editUserForm(Long id) {
-    User localUser = Authentication.getLocalUser(session());
+    User localUser = Authentication.getLocalUser();
     if (localUser == null || !localUser.email.equals("root@minder")) {
       return badRequest("You don't have the permission for this service");
     }
@@ -107,7 +111,7 @@ public class UserController extends Controller {
       model.isto = user.isObserver() ? "true" : null;
       model.ists = user.isTester() ? "true" : null;
 
-      Form<UserEditorModel> bind = USER_FORM.fill(model);
+      Form<UserEditorModel> bind = USER_EDIT_FORM.fill(model);
 
       return ok(userEditor.render(bind, false));
     }
@@ -115,12 +119,12 @@ public class UserController extends Controller {
 
   @Security.Authenticated(Secured.class)
   public static Result doEditUser() {
-    User localUser = Authentication.getLocalUser(session());
+    User localUser = Authentication.getLocalUser();
     if (localUser == null || !localUser.email.equals("root@minder")) {
       return badRequest("You don't have the permission for this service");
     }
 
-    final Form<UserEditorModel> filledForm = USER_FORM
+    final Form<UserEditorModel> filledForm = USER_EDIT_FORM
         .bindFromRequest();
 
     if (filledForm.hasErrors()) {
@@ -128,54 +132,50 @@ public class UserController extends Controller {
       return badRequest(userEditor.render(filledForm, false));
     } else {
       UserEditorModel model = filledForm.get();
-
-      System.out.println(model.password);
-      System.out.println(model.repeatPassword);
       if (model.password != null && !model.password.equals(model.repeatPassword)) {
         filledForm.reject("Passwords don't match!");
         return badRequest(userEditor.render(filledForm, false));
       }
 
       try {
+        Ebean.beginTransaction();
         User user = User.findById(model.id);
         user.name = model.name;
-        if (model.password != null) {
+
+        DBRole.deleteAllByUser(user);
+        if (model.password != null && model.password.length() >= 5) {
           user.password = Util.sha256(model.password.getBytes());
         }
 
         if (toBoolean(model.istd)) {
-          user.roles.add(Role.TEST_DEVELOPER);
-        } else {
-          user.roles.remove(Role.TEST_DEVELOPER);
+          user.roles.add(new DBRole(user, Role.TEST_DEVELOPER));
         }
 
         if (toBoolean(model.ists)) {
-          user.roles.add(Role.TEST_DESIGNER);
-        } else {
-          user.roles.remove(Role.TEST_DESIGNER);
+          user.roles.add(new DBRole(user, Role.TEST_DESIGNER));
         }
 
         if (toBoolean(model.isto)) {
-          user.roles.add(Role.TEST_OBSERVER);
-        } else {
-          user.roles.remove(Role.TEST_OBSERVER);
+          user.roles.add(new DBRole(user, Role.TEST_OBSERVER));
         }
+
         user.update();
         Logger.info("Done updating user " + user.email);
+        Ebean.commitTransaction();
         return redirect(routes.Application.root("users"));
-
       } catch (Exception ex) {
         Logger.error(ex.getMessage(), ex);
         filledForm.reject(ex.getMessage());
         return badRequest(userEditor.render(filledForm, false));
       } finally {
+        Ebean.endTransaction();
       }
     }
   }
 
   @Security.Authenticated(Secured.class)
   public static Result doDeleteUser(Long id) {
-    User localUser = Authentication.getLocalUser(session());
+    User localUser = Authentication.getLocalUser();
     if (localUser == null || !localUser.email.equals("root@minder")) {
       return badRequest("You don't have the permission for this service");
     }

@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import editormodels.AssertionEditorModel;
 import global.Util;
 import models.PrescriptionLevel;
+import security.Role;
 import models.TestAssertion;
 import models.TestGroup;
 import play.Logger;
@@ -11,6 +12,7 @@ import play.data.Form;
 import play.mvc.Controller;
 import play.mvc.Result;
 import play.mvc.Security;
+import security.AllowedRoles;
 import views.html.assertionDetailView;
 import views.html.testAssertionEditor;
 
@@ -77,7 +79,7 @@ public class AssertionController extends Controller {
       ta.testGroup = tg;
       ta.prescriptionLevel = PrescriptionLevel
           .valueOf(model.prescriptionLevel);
-      ta.owner = Authentication.getLocalUser(session());
+      ta.owner = Authentication.getLocalUser();
 
       ta.save();
 
@@ -97,7 +99,7 @@ public class AssertionController extends Controller {
 
     }
 
-    if (!Util.canAccess(Authentication.getLocalUser(session()), ta.owner))
+    if (!Util.canAccess(Authentication.getLocalUser(), ta.owner))
       return badRequest("You don't have permission to modify this resource");
 
     AssertionEditorModel taModel = new AssertionEditorModel();
@@ -137,7 +139,7 @@ public class AssertionController extends Controller {
         return badRequest(testAssertionEditor.render(filledForm, null));
       }
 
-      if (!Util.canAccess(Authentication.getLocalUser(session()), ta.owner))
+      if (!Util.canAccess(Authentication.getLocalUser(), ta.owner))
         return badRequest("You don't have permission to modify this resource");
 
       ta.taId = model.taId;
@@ -179,7 +181,7 @@ public class AssertionController extends Controller {
           + " does not exist.");
     }
 
-    if (!Util.canAccess(Authentication.getLocalUser(session()), ta.owner))
+    if (!Util.canAccess(Authentication.getLocalUser(), ta.owner))
       return badRequest("You don't have permission to modify this resource");
 
     try {
@@ -193,12 +195,13 @@ public class AssertionController extends Controller {
   }
 
   @Security.Authenticated(Secured.class)
+  @AllowedRoles(Role.TEST_DESIGNER)
   public static Result getAssertionDetailView(Long id, String display) {
     TestAssertion ta = TestAssertion.findById(id);
     if (ta == null) {
       return badRequest("No test assertion with id " + id + ".");
     }
-    return ok(assertionDetailView.render(ta, Authentication.getLocalUser(session()), display));
+    return ok(assertionDetailView.render(ta, Authentication.getLocalUser(), display));
   }
 
 

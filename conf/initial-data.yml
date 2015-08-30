@@ -5,27 +5,45 @@ users:
     name: ROOT
     password: !!binary "WZRHGrsBESr8wYFZ9sx0tPURuZgG2lmzyvWpwXPKz8U="
     roles:
-    - TEST_DESIGNER
-    - TEST_DEVELOPER
-    - TEST_OBSERVER
+    - !!models.DBRole
+        user: *root
+        role: TEST_DESIGNER
+    - !!models.DBRole
+        user: *root
+        role: TEST_DEVELOPER
+    - !!models.DBRole
+        user: *root
+        role: TEST_OBSERVER
     testGroups: []
   - &muhammet !!models.User
     email: myildiz83@gmail.com
     name: Muhammet YILDIZ
     password: !!binary "WZRHGrsBESr8wYFZ9sx0tPURuZgG2lmzyvWpwXPKz8U="
     roles:
-    - TEST_DESIGNER
-    - TEST_DEVELOPER
-    - TEST_OBSERVER
+    - !!models.DBRole
+        user: *muhammet
+        role: TEST_DESIGNER
+    - !!models.DBRole
+        user: *muhammet
+        role: TEST_DEVELOPER
+    - !!models.DBRole
+        user: *muhammet
+        role: TEST_OBSERVER
     testGroups: []
   - &melis !!models.User
     email: cetinkayamelis@gmail.com
     name: Melis Demir
     password: !!binary "WZRHGrsBESr8wYFZ9sx0tPURuZgG2lmzyvWpwXPKz8U="
     roles:
-    - TEST_DESIGNER
-    - TEST_DEVELOPER
-    - TEST_OBSERVER
+    - !!models.DBRole
+        user: *melis
+        role: TEST_DESIGNER
+    - !!models.DBRole
+        user: *melis
+        role: TEST_DEVELOPER
+    - !!models.DBRole
+        user: *melis
+        role: TEST_OBSERVER
     testGroups: []
 #Groups
 groups:

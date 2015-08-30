@@ -4,6 +4,7 @@ import com.avaje.ebean.Model;
 import global.Util;
 import play.data.format.Formats;
 import play.data.validation.Constraints;
+import security.Role;
 
 import javax.persistence.*;
 import java.util.ArrayList;
@@ -28,8 +29,8 @@ public class User extends Model {
   @Formats.DateTime(pattern = "yyyy-MM-dd HH:mm:ss")
   public Date lastLogin;
 
-  @Enumerated(EnumType.STRING)
-  public List<Role> roles;
+  @OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.PERSIST)
+  public List<DBRole> roles;
 
   @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.PERSIST)
   public List<Wrapper> wrappers;
@@ -48,7 +49,7 @@ public class User extends Model {
 
   private static final Finder<Long, User> find = new Finder<>(User.class);
 
-  public List<? extends Role> getRoles() {
+  public List<? extends DBRole> getRoles() {
     return roles;
   }
 
@@ -58,19 +59,27 @@ public class User extends Model {
 
 
   public boolean isTester() {
-    for (Role role : roles) {
-      if (role == Role.TEST_DESIGNER) {
+    for (DBRole role : roles) {
+      if (role.role == Role.TEST_DESIGNER) {
         return true;
       }
     }
-
     return false;
   }
 
 
+  public boolean hasRole(Role role) {
+    for (DBRole role2 : roles) {
+      if (role2.role == role) {
+        return true;
+      }
+    }
+    return false;
+  }
+
   public boolean isDeveloper() {
-    for (Role role : roles) {
-      if (role == Role.TEST_DEVELOPER) {
+    for (DBRole role : roles) {
+      if (role.role == Role.TEST_DEVELOPER) {
         return true;
       }
     }
@@ -79,8 +88,8 @@ public class User extends Model {
 
 
   public boolean isObserver() {
-    for (Role role : roles) {
-      if (role == Role.TEST_OBSERVER) {
+    for (DBRole role : roles) {
+      if (role.role == Role.TEST_OBSERVER) {
         return true;
       }
     }
@@ -96,7 +105,7 @@ public class User extends Model {
     user.roles = new ArrayList<>();
     user.password = Util.sha256(password.getBytes());
     for (Role role : roles) {
-      user.roles.add(role);
+      user.roles.add(new DBRole(user, role));
     }
     user.save();
     return user;

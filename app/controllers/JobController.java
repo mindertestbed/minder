@@ -2,6 +2,7 @@ package controllers;
 
 import com.avaje.ebean.Ebean;
 import editormodels.JobEditorModel;
+import global.Global;
 import global.Util;
 import models.*;
 import play.Logger;
@@ -118,7 +119,7 @@ public class JobController extends Controller {
     Job job = new Job();
     job.name = model.name;
     job.tdl = tdl;
-    job.owner = Authentication.getLocalUser(session());
+    job.owner = Authentication.getLocalUser();
 
     try {
       Ebean.beginTransaction();
@@ -158,7 +159,7 @@ public class JobController extends Controller {
     }
 
 
-    if (!Util.canAccess(Authentication.getLocalUser(session()), rc.owner))
+    if (!Util.canAccess(Authentication.getLocalUser(), rc.owner))
       return badRequest("You don't have permission to modify this resource");
 
 
@@ -181,7 +182,7 @@ public class JobController extends Controller {
       return badRequest("Job with id " + id + " does not exist.");
     }
 
-    if (!Util.canAccess(Authentication.getLocalUser(session()), job.owner))
+    if (!Util.canAccess(Authentication.getLocalUser(), job.owner))
       return badRequest("You don't have permission to modify this resource");
 
 
@@ -204,7 +205,7 @@ public class JobController extends Controller {
   public static Result displayJob(Long id, boolean showHistory) {
     Job rc = Job.findById(id);
 
-    final User localUser = Authentication.getLocalUser(session());
+    final User localUser = Authentication.getLocalUser();
 
     if (rc == null) {
       return badRequest("A Job with id [" + id

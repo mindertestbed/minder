@@ -4,15 +4,14 @@ package controllers
 import java.util.Date
 import java.util.concurrent.LinkedBlockingQueue
 
-import controllers.common.enumeration.{OperationType, TestStatus}
-import minderengine.{MinderWrapperRegistry, MinderSignalRegistry, SessionMap, TestEngine}
+import controllers.common.enumeration.OperationType
+import minderengine.{MinderSignalRegistry, MinderWrapperRegistry, SessionMap}
 import models._
 import mtdl.SignalSlotInfoProvider
 import play.Logger
 import play.api.libs.EventSource
 import play.api.libs.iteratee.Concurrent
 import play.api.mvc._
-import play.mvc.Http
 import views.html._
 
 import scala.collection.JavaConversions._
@@ -187,13 +186,7 @@ object TestEngineController extends Controller {
           if (job == null) {
             BadRequest("A job with id [" + id + "] was not found!")
           } else {
-            //everything is fine. Create a test run and add to queue.
-            // if (jobQueue.contains())
-
-            val java_ctx = play.core.j.JavaHelpers.createJavaContext(request)
-            val java_session = java_ctx.session()
-
-            jobQueue.offer(createTestRunContext(job, Authentication.getLocalUser(java_session)))
+            jobQueue.offer(createTestRunContext(job, Authentication.getLocalUser))
             queueFeedUpdate();
             Ok;
           }
@@ -279,13 +272,10 @@ object TestEngineController extends Controller {
       val runContext = activeRunContext; //take it before its null
 
       if (runContext != null) {
-
-        val java_ctx = play.core.j.JavaHelpers.createJavaContext(request)
-        val java_session = java_ctx.session()
-
-        val user = Authentication.getLocalUser(java_session);
-
-
+        // REMEMBER: if you need to convert scala session to java session
+        // val java_ctx = play.core.j.JavaHelpers.createJavaContext(request)
+        // val java_session = java_ctx.session()
+        val user = Authentication.getLocalUser();
         //only allow root or the runner to do that
         if (user.email == "root@minder" || user.email == runContext.testRun.runner.email) {
           //cancel

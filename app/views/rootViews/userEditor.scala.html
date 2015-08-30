@@ -27,11 +27,8 @@
 
             @_passwordPartial(frm)
 
-            <label>Is Active &nbsp;&nbsp;&nbsp;&nbsp;</label>
-            <input type="checkbox" name="@frm("active").name" value='@frm("active").value'  @if(frm("active").value!=null){checked="checked"}/>
-
             <br />
-            <strong>@Messages("minder.signup.role")</strong>
+            <strong>@Messages("minder.user.role")</strong>
             <table>
                 <tr>
                     <td><i>Test Designer &nbsp;&nbsp;&nbsp;&nbsp;</i></td><td><input type="checkbox" name="ists" value='@frm("ists").value'  @if(frm("ists").value!=null){checked="checked"}/></td>
@@ -60,6 +57,7 @@
                 '_label -> "Name"
             )
 
+           <b style="color:red">Leave Passwords Blank If you don't wanna change them.</b> <br />
             @_passwordPartial(frm)
 
             <label>Is Active &nbsp;&nbsp;&nbsp;&nbsp;</label>

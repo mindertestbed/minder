@@ -1,0 +1,7 @@
+@(role: security.Role)(content: => Html)
+
+@defining(Authentication.getLocalUser) { user =>
+  @if(user != null && user.hasRole(role)) {
+    @content
+  }
+}

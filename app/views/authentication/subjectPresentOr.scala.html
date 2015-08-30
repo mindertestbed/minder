@@ -1,6 +1,6 @@
 @(content: => Html)(content2: => Html)
 
-@if(controllers.Authentication.getLocalUser(session()) != null){
+@if(Authentication.getLocalUser() != null){
   @content
 } else {
   @content2

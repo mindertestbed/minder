@@ -1,6 +1,7 @@
 package controllers;
 
 import editormodels.WrapperEditorModel;
+import global.Global;
 import global.Util;
 import models.*;
 import net.sf.jasperreports.engine.*;
@@ -46,7 +47,7 @@ public class WrapperController extends Controller {
   @Security.Authenticated(Secured.class)
   public static Result doCreateWrapper() {
     final Form<WrapperEditorModel> filledForm = WRAPPER_FORM.bindFromRequest();
-    final User localUser = Authentication.getLocalUser(session());
+    final User localUser = Authentication.getLocalUser();
     if (filledForm.hasErrors()) {
       Util.printFormErrors(filledForm);
       return badRequest(wrapperEditor.render(filledForm, null));
@@ -68,7 +69,7 @@ public class WrapperController extends Controller {
 
       wrapper.save();
 
-      return ok(wrapperLister.render(Authentication.getLocalUser(session())));
+      return ok(wrapperLister.render(Authentication.getLocalUser()));
     }
   }
 
@@ -95,7 +96,7 @@ public class WrapperController extends Controller {
       return badRequest(ex.getMessage());
     }
 
-    return ok(wrapperLister.render(Authentication.getLocalUser(session())));
+    return ok(wrapperLister.render(Authentication.getLocalUser()));
   }
 
   @Security.Authenticated(Secured.class)
@@ -129,7 +130,7 @@ public class WrapperController extends Controller {
       wr.update();
 
       Logger.info("Done updating wrapper " + model.name);
-      return ok(wrapperLister.render(Authentication.getLocalUser(session())));
+      return ok(wrapperLister.render(Authentication.getLocalUser()));
     }
   }
 
