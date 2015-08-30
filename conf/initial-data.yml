@@ -1,22 +1,31 @@
 #Users
 users:
-  - &system !!models.User
-    active: true
+  - &root !!models.User
     email: root@minder
-    emailValidated: true
-    firstName: minder
-    lastLogin: 2014-12-29T07:08:49.850Z
-    lastName: null
-    linkedAccounts:
-    - providerKey: password
-      providerUserId: $2a$10$QoJy1UgFXMjLMJlQ6hAnhe1Y07yoBH0Eucna1OSag2qKWhS79HQg6
-      user: *system
-    name: Muhammet YILDIZ
-    permissions: []
+    name: ROOT
+    password: !!binary "WZRHGrsBESr8wYFZ9sx0tPURuZgG2lmzyvWpwXPKz8U="
     roles:
-    - {id: 1, roleName: observer}
-    - {id: 2, roleName: Test Designer}
-    - {id: 3, roleName: Test Developer}
+    - TEST_DESIGNER
+    - TEST_DEVELOPER
+    - TEST_OBSERVER
+    testGroups: []
+  - &muhammet !!models.User
+    email: myildiz83@gmail.com
+    name: Muhammet YILDIZ
+    password: !!binary "WZRHGrsBESr8wYFZ9sx0tPURuZgG2lmzyvWpwXPKz8U="
+    roles:
+    - TEST_DESIGNER
+    - TEST_DEVELOPER
+    - TEST_OBSERVER
+    testGroups: []
+  - &melis !!models.User
+    email: cetinkayamelis@gmail.com
+    name: Melis Demir
+    password: !!binary "WZRHGrsBESr8wYFZ9sx0tPURuZgG2lmzyvWpwXPKz8U="
+    roles:
+    - TEST_DESIGNER
+    - TEST_DEVELOPER
+    - TEST_OBSERVER
     testGroups: []
 #Groups
 groups:
@@ -25,7 +34,7 @@ groups:
     name: Sample Test Group
     shortDescription:  A sample test group
     dependencyString: null
-    owner: *user
+    owner: *muhammet
     testAssertions:
     - &taSample1 !!models.TestAssertion
         testGroup: *sampleGroup
@@ -36,9 +45,11 @@ groups:
         predicate: the generated books xml conforms to books.xsd
         prescriptionLevel: Mandatory
         shortDescription:  A sample test assertion
+        owner: *muhammet
         testCases:
         - &testCase1 !!models.TestCase
            shortDescription: A tel against books.xsd
+           owner: *muhammet
            tdls:
            - !!models.Tdl
              tdl: sampletdl/xmltest.tdl
@@ -52,13 +63,14 @@ groups:
     name: Sample Test Group2
     shortDescription:  A sample test group
     dependencyString: null
-    owner: *massi
+    owner: *melis
     testAssertions:
     - &taSample2 !!models.TestAssertion
         testGroup: *sampleGroup2
         taId: TASAMPLE2
         normativeSource: The system must generate valid book entries
         target: BOOKS XML
+        owner: *melis
         prerequisites: the sut is connected and ready for testing
         predicate: the generated books xml conforms to books.xsd
         prescriptionLevel: Mandatory
@@ -66,6 +78,7 @@ groups:
         testCases:
         - !!models.TestCase
            shortDescription: A tel against books.xsd
+           owner: *melis
            tdls:
            - !!models.Tdl
               tdl: sampletdl/xmltest.tdl
@@ -76,26 +89,37 @@ groups:
            name: TestCaseSample2
 #wrappers
 wrappers:
-- &xmlGenerator !!models.Wrapper
-  name: xmlGenerator
-  user: *user
+- &xmlContentVerifier !!models.Wrapper
+  name: xml-content-verifier
+  user: *root
   shortDescription: XMl Generator Wrapper
   wrapperVersions:
   - !!models.WrapperVersion
     signals: []
     slots: []
-    version: "0.0.1"
-    creationDate: "2015-02-02 00:00:00"
-    wrapper: *xmlGenerator
-- &xmlValueInitiator  !!models.Wrapper
-  name: xmlValueInitiator
-  shortDescription: XMl Value Initiator Wrapper
-  user: *user
+    version: "1"
+    creationDate: "2015-08-08 00:00:00"
+    wrapper: *xmlContentVerifier
+- &xmlGenerator !!models.Wrapper
+  name: xmlGenerator
+  user: *root
+  shortDescription: XMl Generator Wrapper
   wrapperVersions:
   - !!models.WrapperVersion
     signals: []
     slots: []
-    version: "0.0.1"
+    version: "1"
+    creationDate: "2015-08-08 00:00:00"
+    wrapper: *xmlGenerator
+- &xmlValueInitiator  !!models.Wrapper
+  name: xmlValueInitiator
+  shortDescription: XMl Value wrapper.Initiator Wrapper
+  user: *root
+  wrapperVersions:
+  - !!models.WrapperVersion
+    signals: []
+    slots: []
+    version: "1"
     creationDate: "2015-02-02 00:00:00"
     wrapper: *xmlValueInitiator
 #Operation Types

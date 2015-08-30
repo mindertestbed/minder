@@ -193,7 +193,7 @@ object TestEngineController extends Controller {
             val java_ctx = play.core.j.JavaHelpers.createJavaContext(request)
             val java_session = java_ctx.session()
 
-            jobQueue.offer(createTestRunContext(job, Application.getLocalUser(java_session)))
+            jobQueue.offer(createTestRunContext(job, Authentication.getLocalUser(java_session)))
             queueFeedUpdate();
             Ok;
           }
@@ -283,7 +283,7 @@ object TestEngineController extends Controller {
         val java_ctx = play.core.j.JavaHelpers.createJavaContext(request)
         val java_session = java_ctx.session()
 
-        val user = Application.getLocalUser(java_session);
+        val user = Authentication.getLocalUser(java_session);
 
 
         //only allow root or the runner to do that

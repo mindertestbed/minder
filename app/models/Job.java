@@ -1,7 +1,7 @@
 package models;
 
 import com.avaje.ebean.ExpressionList;
-import play.db.ebean.Model;
+import com.avaje.ebean.Model;
 
 import javax.persistence.*;
 import java.util.List;

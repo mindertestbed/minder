@@ -2,7 +2,7 @@ package models;
 
 import com.avaje.ebean.Ebean;
 import mtdl.TdlCompiler;
-import play.db.ebean.Model;
+import com.avaje.ebean.Model;
 
 import javax.persistence.*;
 import java.util.List;

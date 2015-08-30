@@ -9,6 +9,7 @@ import play.Logger;
 import play.data.Form;
 import play.mvc.Controller;
 import play.mvc.Result;
+import play.mvc.Security;
 import views.html.testCaseEditor;
 import views.html.testCaseView;
 import views.html.utilClassEditor;
@@ -23,6 +24,7 @@ import static play.data.Form.form;
 public class UtilClassController extends Controller {
   public static final Form<UtilClassEditorModel> UTIL_CLASS_FORM = form(UtilClassEditorModel.class);
 
+  @Security.Authenticated(Secured.class)
   public static Result getCreateUtilClassEditorView(Long groupId) {
     TestGroup testGroup = TestGroup.findById(groupId);
     if (testGroup == null) {
@@ -38,8 +40,8 @@ public class UtilClassController extends Controller {
     }
   }
 
+  @Security.Authenticated(Secured.class)
   public static Result doCreateUtilClass() {
-    com.feth.play.module.pa.controllers.Authenticate.noCache(response());
     final Form<UtilClassEditorModel> filledForm = UTIL_CLASS_FORM
         .bindFromRequest();
 
@@ -62,7 +64,7 @@ public class UtilClassController extends Controller {
         return badRequest(utilClassEditor.render(filledForm, false));
       }
 
-      final User localUser = Application.getLocalUser(session());
+      final User localUser = Authentication.getLocalUser(session());
 
       utilClass = new UtilClass();
       utilClass.name = model.name;
@@ -86,6 +88,7 @@ public class UtilClassController extends Controller {
     }
   }
 
+  @Security.Authenticated(Secured.class)
   public static Result getEditCaseEditorView(Long id) {
     UtilClass utilClass = UtilClass.findById(id);
     if (utilClass == null) {
@@ -103,8 +106,8 @@ public class UtilClassController extends Controller {
     }
   }
 
+  @Security.Authenticated(Secured.class)
   public static Result doEditUtilClass() {
-    com.feth.play.module.pa.controllers.Authenticate.noCache(response());
     final Form<UtilClassEditorModel> filledForm = UTIL_CLASS_FORM
         .bindFromRequest();
 
@@ -149,9 +152,8 @@ public class UtilClassController extends Controller {
     }
   }
 
+  @Security.Authenticated(Secured.class)
   public static Result doDeleteUtilClass(Long id) {
-    com.feth.play.module.pa.controllers.Authenticate.noCache(response());
-
     UtilClass uc = UtilClass.findById(id);
     if (uc == null) {
       // it does not exist. error
@@ -168,6 +170,7 @@ public class UtilClassController extends Controller {
     return redirect(routes.GroupController.getGroupDetailView(uc.testGroup.id, "utils"));
   }
 
+  @Security.Authenticated(Secured.class)
   public static Result viewUtilClass(long id) {
     UtilClass uc = UtilClass.findById(id);
     if (uc == null) {
@@ -176,8 +179,8 @@ public class UtilClassController extends Controller {
     return ok(utilClassView.render(uc));
   }
 
+  @Security.Authenticated(Secured.class)
   public static Result doEditUtilClassField() {
-    com.feth.play.module.pa.controllers.Authenticate.noCache(response());
     JsonNode jsonNode = request().body().asJson();
 
     Result res = GroupController.doEditField(UtilClassEditorModel.class, UtilClass.class, jsonNode);

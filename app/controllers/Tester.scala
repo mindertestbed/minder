@@ -55,7 +55,7 @@ object Tester extends Controller {
    * @return
    */
   def runTest(id: Long, userId: Long) = Action { implicit request =>
-    val user = User.find.byId(userId);
+    val user = User.findById(userId);
     val mail = user.email;
 
     val rc = Job.findById(id);
@@ -97,7 +97,7 @@ object Tester extends Controller {
    * @return
    */
   def syncTest(id: Long, userId: Long) = Action { implicit request =>
-    val user = User.find.byId(userId);
+    val user = User.findById(userId);
     val rc = Job.findById(id);
     Logger.debug("SYNC")
 

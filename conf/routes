@@ -13,45 +13,17 @@ GET         /assets/javascript/routes.js           controllers.Application.jsRou
 
 GET         /profile                               controllers.Application.profile
 
-GET         /login                                 controllers.Application.login
-POST        /login                                 controllers.Application.doLogin
-
-GET         /logout                                com.feth.play.module.pa.controllers.Authenticate.logout
-GET         /authenticate/:provider                com.feth.play.module.pa.controllers.Authenticate.authenticate(provider: String)
-
-GET         /signup                                controllers.Application.signup
-POST        /signup                                controllers.Application.doSignup
+GET         /login                                 controllers.Authentication.login
+POST        /login                                 controllers.Authentication.doLogin
+GET         /logout                                controllers.Authentication.doLogout
+GET         /changePassword                        controllers.Authentication.changePassword()
+POST        /changePassword                        controllers.Authentication.doChangePassword()
 
 GET         /getUserEditorView                     controllers.UserController.getUserEditorView
 GET         /editUserForm                          controllers.UserController.editUserForm(id: Long)
 POST        /doCreateUser                          controllers.UserController.doCreateUser
 GET         /doDeleteUser                          controllers.UserController.doDeleteUser(id: Long)
 POST        /doEditUser                            controllers.UserController.doEditUser()
-
-GET         /accounts/unverified                   controllers.Signup.unverified
-GET         /authenticate/:provider/denied         controllers.Signup.oAuthDenied(provider: String)
-
-GET         /accounts/verify/:token                controllers.Signup.verify(token: String)
-GET         /accounts/exists                       controllers.Signup.exists
-
-GET         /accounts/password/reset/:token        controllers.Signup.resetPassword(token: String)
-POST        /accounts/password/reset               controllers.Signup.doResetPassword
-
-GET         /accounts/password/change              controllers.Account.changePassword
-POST        /accounts/password/change              controllers.Account.doChangePassword
-
-GET         /accounts/verify                       controllers.Account.verifyEmail
-
-GET         /accounts/add                          controllers.Account.link
-
-GET         /accounts/link                         controllers.Account.askLink
-POST        /accounts/link                         controllers.Account.doLink
-
-GET         /accounts/merge                        controllers.Account.askMerge
-POST        /accounts/merge                        controllers.Account.doMerge
-
-GET         /login/password/forgot                 controllers.Signup.forgotPassword(email: String ?= "")
-POST        /login/password/forgot                 controllers.Signup.doForgotPassword
 
 # Map static resources from the /public folder to the /assets URL path
 GET         /assets/*file                          controllers.Assets.at(path="/public", file)

@@ -4,7 +4,7 @@ import com.avaje.ebean.Ebean;
 import minderengine.TestEngine;
 import mtdl.SignalSlot;
 import play.Logger;
-import play.db.ebean.Model;
+import com.avaje.ebean.Model;
 
 import javax.persistence.*;
 import java.util.*;

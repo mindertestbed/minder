@@ -4,7 +4,7 @@ import java.util.List;
 
 import javax.persistence.*;
 
-import play.db.ebean.Model;
+import com.avaje.ebean.Model;
 
 @Entity
 @Table(name = "Wrapper")

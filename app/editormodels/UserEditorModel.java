@@ -25,8 +25,6 @@ public class UserEditorModel {
   @Constraints.MinLength(5)
   public String repeatPassword;
 
-  public String active;
-
   public String istd;
 
   public String ists;

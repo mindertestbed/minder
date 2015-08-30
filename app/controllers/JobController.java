@@ -8,6 +8,7 @@ import play.Logger;
 import play.data.Form;
 import play.mvc.Controller;
 import play.mvc.Result;
+import play.mvc.Security;
 import views.html.jobDetailView;
 import views.html.jobEditor;
 import views.html.testRunViewer;
@@ -26,6 +27,7 @@ import static play.data.Form.form;
 public class JobController extends Controller {
   public static final Form<JobEditorModel> JOB_FORM = form(JobEditorModel.class);
 
+  @Security.Authenticated(Secured.class)
   public static Result getCreateJobEditorView(Long tdlId) {
     Tdl tdl = Tdl.findById(tdlId);
     tdl.testCase = TestCase.findById(tdl.testCase.id);
@@ -60,6 +62,7 @@ public class JobController extends Controller {
     return ok(jobEditor.render(JOB_FORM.fill(model), null));
   }
 
+  @Security.Authenticated(Secured.class)
   private static void initWrapperListForModel(Tdl tdl, JobEditorModel model) {
     model.wrapperMappingList = new ArrayList<>();
 
@@ -75,9 +78,8 @@ public class JobController extends Controller {
     });
   }
 
+  @Security.Authenticated(Secured.class)
   public static Result doCreateJob() {
-    com.feth.play.module.pa.controllers.Authenticate.noCache(response());
-
     Form<JobEditorModel> form = JOB_FORM.bindFromRequest();
 
     if (form.hasErrors()) {
@@ -116,7 +118,7 @@ public class JobController extends Controller {
     Job job = new Job();
     job.name = model.name;
     job.tdl = tdl;
-    job.owner = Application.getLocalUser(session());
+    job.owner = Authentication.getLocalUser(session());
 
     try {
       Ebean.beginTransaction();
@@ -145,9 +147,9 @@ public class JobController extends Controller {
     return redirect(routes.TestCaseController.viewTestCase(tdl.testCase.id, "jobs"));
   }
 
-  public static Result doDeleteJob(Long id) {
-    com.feth.play.module.pa.controllers.Authenticate.noCache(response());
 
+  @Security.Authenticated(Secured.class)
+  public static Result doDeleteJob(Long id) {
     Job rc = Job.findById(id);
     if (rc == null) {
       // it does not exist. error
@@ -156,7 +158,7 @@ public class JobController extends Controller {
     }
 
 
-    if (!Util.canAccess(Application.getLocalUser(session()), rc.owner))
+    if (!Util.canAccess(Authentication.getLocalUser(session()), rc.owner))
       return badRequest("You don't have permission to modify this resource");
 
 
@@ -171,6 +173,7 @@ public class JobController extends Controller {
     return redirect(routes.TestCaseController.viewTestCase(rc.tdl.testCase.id, "jobs"));
   }
 
+  @Security.Authenticated(Secured.class)
   public static Result getEditJobEditorView(Long id) {
     Job job = Job.findById(id);
     if (job == null) {
@@ -178,7 +181,7 @@ public class JobController extends Controller {
       return badRequest("Job with id " + id + " does not exist.");
     }
 
-    if (!Util.canAccess(Application.getLocalUser(session()), job.owner))
+    if (!Util.canAccess(Authentication.getLocalUser(session()), job.owner))
       return badRequest("You don't have permission to modify this resource");
 
 
@@ -197,10 +200,11 @@ public class JobController extends Controller {
     return ok(jobEditor.render(fill, null));
   }
 
+  @Security.Authenticated(Secured.class)
   public static Result displayJob(Long id, boolean showHistory) {
     Job rc = Job.findById(id);
 
-    final User localUser = Application.getLocalUser(session());
+    final User localUser = Authentication.getLocalUser(session());
 
     if (rc == null) {
       return badRequest("A Job with id [" + id
@@ -217,6 +221,7 @@ public class JobController extends Controller {
    * @param mappedWrapperModel
    * @return
    */
+  @Security.Authenticated(Secured.class)
   public static List<WrapperVersion> listFittingWrappers(MappedWrapperModel mappedWrapperModel) {
     // get signatures supported by this wp.
     List<ParamSignature> psList = ParamSignature.getByWrapperParam(mappedWrapperModel.wrapperParam);
@@ -275,7 +280,7 @@ public class JobController extends Controller {
     return listOptions;
   }
 
-
+  @Security.Authenticated(Secured.class)
   public static Result viewTestRunHistory(Long testRunId) {
     TestRun tr = TestRun.findById(testRunId);
     if (tr == null) {

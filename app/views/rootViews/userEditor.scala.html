@@ -1,6 +1,8 @@
 @(frm: Form[_], createMode: Boolean = true)
 
     @import helper._
+    @import authentication._
+
     @implicitFieldConstructor = @{
         FieldConstructor(twitterBootstrapBasic.f)
     }
@@ -29,7 +31,7 @@
             <input type="checkbox" name="@frm("active").name" value='@frm("active").value'  @if(frm("active").value!=null){checked="checked"}/>
 
             <br />
-            <strong>@Messages("playauthenticate.signup.role")</strong>
+            <strong>@Messages("minder.signup.role")</strong>
             <table>
                 <tr>
                     <td><i>Test Designer &nbsp;&nbsp;&nbsp;&nbsp;</i></td><td><input type="checkbox" name="ists" value='@frm("ists").value'  @if(frm("ists").value!=null){checked="checked"}/></td>
@@ -66,7 +68,7 @@
             <input type="hidden" name="email" id="email" value='@frm("email").value'/>
 
             <br />
-            <strong>@Messages("playauthenticate.signup.role")</strong>
+            <strong>@Messages("minder.signup.role")</strong>
             <table>
                 <tr>
                     <td><i>Test Designer &nbsp;&nbsp;&nbsp;&nbsp;</i></td><td><input type="checkbox" name="ists" value='@frm("ists").value'  @if(frm("ists").value!=null){checked="checked"}/></td>

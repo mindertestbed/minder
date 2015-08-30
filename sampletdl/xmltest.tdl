@@ -1,20 +1,54 @@
+var bookXsd : Array[Byte] = null
 
-def bookXsd = getAsset("books.xsd")
+//initialize the data, in a rivet
+runAsRivet(()=>{
+  //read the parameter 'xsdName' from the JOB
+  val assetName = getParameter("xsdName")
+  //read the asset and assign it to bookXsd
+  bookXsd = getAsset(assetName).getValue
+})
 
-TestCase = "XMlGeneratorTest"
 
-val rivet1 = "generateBooksData(int)" of "$xmlValueInitiator" shall(
-  map(5 onto 1)
-  )
+//First rivet, wait for the initiator to generate data so that
+//we can later feed it to the xml generator
+//we map '5' as the number of books to be generated.
+//This will trigger a call $initiator.generateBooksData(5)
+val rivet1 ="generateBooksData(int)" of "$initiator" shall(
+  map(5 onto 1))
 
-val rivet2 = "generateXML(byte[])" of "$xmlGenerator" shall(
-  use("initialDataCreated(byte[])" of "$xmlValueInitiator")(
-    mapping(1 onto 1)
-  )
-  )
+//Second rivet, wait for the $initiator to gereate the raw data
+//via the initialDataCreated signal. Then forward
+//the book data to the XML generator where the raw data
+//will be converted to an XML data.
+val rivet2 = "generateXML(byte[])" of "$generator" shall(
+  use("initialDataCreated(byte[])" of "$initiator")(automatically))
 
+//Third, and last rivet
+//Wait for XML generator to generate the XML data and feed it to the
+//built-in xml content verifier.
+//But before that, pipe the XML through a converter function
+//and log its contents.
+//NOTE: we can also perform schema verification via the built in
+//verifyXsd function. But here we have preferred this.
 val rivet3 = "verifyXsd(byte[],byte[])" of "xml-content-verifier" shall(
-  use("xmlProduced(byte[])" of "$xmlGenerator")(
-    mapping(1 onto 2)
+  use("xmlProduced(byte[])" of "$generator")(
+    //map the param#1 of xmlProducer signal to param#2 of verifyXsd.
+    mapping(1 onto 2 using xmlLogger)
   ),
+  //map the bookXsd (as a free value) to param#1 of verifyXsd slot
   map(bookXsd onto 1))
+
+
+/**
+ * This converter does nothing but logging. You may also play with the data
+ * In such a case please do not return the original value (any), but the modified version
+ */
+def xmlLogger(any: Any) : Any ={
+
+  val xmlBytes = any.asInstanceOf[Array[Byte]]
+  INFO("XML Generator Generated XML")
+  INFO(xmlBytes)
+
+  //we didn't change anything, return the original value
+  any
+}

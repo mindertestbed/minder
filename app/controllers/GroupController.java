@@ -1,14 +1,11 @@
 package controllers;
 
-import be.objectify.deadbolt.java.actions.Group;
-import be.objectify.deadbolt.java.actions.Restrict;
 import com.avaje.ebean.Ebean;
 import com.avaje.ebean.Query;
 import com.avaje.ebean.Update;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import dependencyutils.DependencyClassLoaderCache;
-import dependencyutils.DependencyService;
 import editormodels.GroupEditorModel;
 import global.Util;
 import models.TestGroup;
@@ -17,6 +14,7 @@ import play.data.Form;
 import play.libs.Json;
 import play.mvc.Controller;
 import play.mvc.Result;
+import play.mvc.Security;
 import views.html.groupDetailView;
 import views.html.testGroupEditor;
 
@@ -33,17 +31,16 @@ public class GroupController extends Controller {
   public static final Form<GroupEditorModel> TEST_GROUP_FORM = form(GroupEditorModel.class);
 
 
-  @Restrict(@Group(Application.TEST_DESIGNER_ROLE))
+  @Security.Authenticated(Secured.class)
   public static Result getCreateGroupEditorView() {
     return ok(testGroupEditor.render(TEST_GROUP_FORM, null));
   }
 
-  @Restrict(@Group(Application.TEST_DESIGNER_ROLE))
+  @Security.Authenticated(Secured.class)
   public static Result doCreateTestGroup() {
-    com.feth.play.module.pa.controllers.Authenticate.noCache(response());
     final Form<GroupEditorModel> filledForm = TEST_GROUP_FORM
         .bindFromRequest();
-    final User localUser = Application.getLocalUser(session());
+    final User localUser = Authentication.getLocalUser(session());
     if (filledForm.hasErrors()) {
       Util.printFormErrors(filledForm);
       return badRequest(testGroupEditor.render(filledForm, null));
@@ -68,15 +65,15 @@ public class GroupController extends Controller {
     }
   }
 
-  @Restrict(@Group(Application.TEST_DESIGNER_ROLE))
+  @Security.Authenticated(Secured.class)
   public static Result editGroupForm(Long id) {
-    final User localUser = Application.getLocalUser(session());
+    final User localUser = Authentication.getLocalUser(session());
     TestGroup tg = TestGroup.findById(id);
     if (tg == null) {
       return badRequest("Test group with id [" + id + "] not found!");
     } else {
 
-      if (!Util.canAccess(Application.getLocalUser(session()), tg.owner))
+      if (!Util.canAccess(Authentication.getLocalUser(session()), tg.owner))
         return badRequest("You don't have permission to modify this resource");
 
       GroupEditorModel tgem = new GroupEditorModel();
@@ -90,9 +87,8 @@ public class GroupController extends Controller {
     }
   }
 
-  @Restrict(@Group(Application.TEST_DESIGNER_ROLE))
+  @Security.Authenticated(Secured.class)
   public static Result doEditGroupField() {
-    com.feth.play.module.pa.controllers.Authenticate.noCache(response());
     JsonNode jsonNode = request().body().asJson();
 
     Result result = doEditField(GroupEditorModel.class, TestGroup.class, jsonNode);
@@ -106,7 +102,7 @@ public class GroupController extends Controller {
     return result;
   }
 
-  @Restrict(@Group(Application.TEST_DESIGNER_ROLE))
+  @Security.Authenticated(Secured.class)
   public static Result doEditField(Class<?> editorClass, Class<?> cls, JsonNode jsonNode) {
     long id = jsonNode.findPath("id").asInt();
     String field = jsonNode.findPath("field").asText();
@@ -136,7 +132,7 @@ public class GroupController extends Controller {
         User user = (User) fld.get(o);
         System.out.println("UNique " + user.email);
 
-        User localUser = Application.getLocalUser(session());
+        User localUser = Authentication.getLocalUser(session());
 
         if (localUser == null || !localUser.email.equals(user.email)) {
           return badRequest("You don't have the permission to modify this resource");
@@ -166,14 +162,13 @@ public class GroupController extends Controller {
     }
   }
 
-  @Restrict(@Group(Application.TEST_DESIGNER_ROLE))
+  @Security.Authenticated(Secured.class)
   public static Result doDeleteGroup(Long id) {
-    com.feth.play.module.pa.controllers.Authenticate.noCache(response());
     TestGroup tg = TestGroup.findById(id);
     if (tg == null) {
       return badRequest("Test group with id [" + id + "] not found!");
     } else {
-      if (!Util.canAccess(Application.getLocalUser(session()), tg.owner))
+      if (!Util.canAccess(Authentication.getLocalUser(session()), tg.owner))
         return badRequest("You don't have permission to modify this resource");
 
       try {
@@ -186,7 +181,7 @@ public class GroupController extends Controller {
     }
   }
 
-  @Restrict(@Group(Application.TEST_DESIGNER_ROLE))
+  @Security.Authenticated(Secured.class)
   public static Result getGroupDetailView(Long id, String display) {
     TestGroup tg = TestGroup.findById(id);
     if (tg == null) {

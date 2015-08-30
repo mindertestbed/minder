@@ -1,27 +1,27 @@
 
-@main(Messages("playauthenticate.index.title")) {
+@main(Messages("minder.index.title")) {
       <!-- Main jumbotron for a primary marketing message or call to action -->
       <div class="jumbotron">
-        <h1>@Messages("playauthenticate.index.intro")</h1>
-        <p>@Messages("playauthenticate.index.intro_2") <br/>@Messages("playauthenticate.index.intro_3")</p>
+        <h1>@Messages("minder.index.intro")</h1>
+        <p>@Messages("minder.index.intro_2") <br/>@Messages("minder.index.intro_3")</p>
       </div>
 
       <!-- Example row of columns -->
       <div class="row">
         <div class="col-xs-6 col-sm-4">
-          <h2>@Messages("playauthenticate.index.heading.to")</h2>
+          <h2>@Messages("minder.index.heading.to")</h2>
            <p>Test Observers can see the results of test runs and gather test reports.</p>
-          <p><a class="btn" href="@routes.Application.restrictedObserver()">@Messages("playauthenticate.index.details") &raquo;</a></p>
+          <p><a class="btn" href="@routes.Application.restrictedObserver()">@Messages("minder.index.details") &raquo;</a></p>
         </div>
         <div class="col-xs-6 col-sm-4">
-          <h2>@Messages("playauthenticate.index.heading.td")</h2>
+          <h2>@Messages("minder.index.heading.td")</h2>
            <p>Test Developers are domain experts who know the system under test. A TD is responsible to implement the wrapper interface provided by Minder.</p>
-          <p><a class="btn" href="@routes.Application.restrictedTestDeveloper()">@Messages("playauthenticate.index.details") &raquo;</a></p>
+          <p><a class="btn" href="@routes.Application.restrictedTestDeveloper()">@Messages("minder.index.details") &raquo;</a></p>
        </div>
         <div class="col-xs-6 col-sm-4">
-          <h2>@Messages("playauthenticate.index.heading.ts")</h2>
+          <h2>@Messages("minder.index.heading.ts")</h2>
           <p>Test Designers  are responsible to create test scenarios according to the test assertions, which are supposed to be provided by WP6 and WP5.</p>
-          <p><a class="btn" href="@routes.Application.restrictedTestDesigner()">@Messages("playauthenticate.index.details") &raquo;</a></p>
+          <p><a class="btn" href="@routes.Application.restrictedTestDesigner()">@Messages("minder.index.details") &raquo;</a></p>
         </div>
       </div>
     }

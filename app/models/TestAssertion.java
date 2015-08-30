@@ -11,7 +11,7 @@ import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
-import play.db.ebean.Model;
+import com.avaje.ebean.Model;
 
 /**
  * Created by yerlibilgin on 22/12/14.
