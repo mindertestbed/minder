@@ -46,6 +46,9 @@ public class DBRole extends Model {
 
   @Override
   public int hashCode() {
+    if (role == null)
+      return super.hashCode();
+
     return role.hashCode();
   }
 

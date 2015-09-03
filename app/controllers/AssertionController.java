@@ -27,7 +27,7 @@ public class AssertionController extends Controller {
   /*
    * Test Asertion CRUD
    */
-  @Security.Authenticated(Secured.class)
+  @AllowedRoles(Role.TEST_DESIGNER)
   public static Result getCreateAssertionEditorView(Long groupId) {
     TestGroup tg = TestGroup.findById(groupId);
     if (tg == null) {
@@ -41,7 +41,7 @@ public class AssertionController extends Controller {
     }
   }
 
-  @Security.Authenticated(Secured.class)
+  @AllowedRoles(Role.TEST_DESIGNER)
   public static Result doCreateAssertion() {
     final Form<AssertionEditorModel> filledForm = TEST_ASSERTION_FORM
         .bindFromRequest();
@@ -91,7 +91,7 @@ public class AssertionController extends Controller {
     }
   }
 
-  @Security.Authenticated(Secured.class)
+  @AllowedRoles(Role.TEST_DESIGNER)
   public static Result editAssertionForm(Long id) {
     TestAssertion ta = TestAssertion.findById(id);
     if (ta == null) {
@@ -121,7 +121,7 @@ public class AssertionController extends Controller {
     return ok(testAssertionEditor.render(bind, null));
   }
 
-  @Security.Authenticated(Secured.class)
+  @AllowedRoles(Role.TEST_DESIGNER)
   public static Result doEditAssertion() {
     final Form<AssertionEditorModel> filledForm = TEST_ASSERTION_FORM
         .bindFromRequest();
@@ -172,7 +172,7 @@ public class AssertionController extends Controller {
     }
   }
 
-  @Security.Authenticated(Secured.class)
+  @AllowedRoles(Role.TEST_DESIGNER)
   public static Result doDeleteAssertion(Long id) {
     TestAssertion ta = TestAssertion.findById(id);
     if (ta == null) {
@@ -194,8 +194,6 @@ public class AssertionController extends Controller {
     return redirect(controllers.routes.GroupController.getGroupDetailView(ta.testGroup.id, "assertions"));
   }
 
-  @Security.Authenticated(Secured.class)
-  @AllowedRoles(Role.TEST_DESIGNER)
   public static Result getAssertionDetailView(Long id, String display) {
     TestAssertion ta = TestAssertion.findById(id);
     if (ta == null) {
@@ -205,7 +203,7 @@ public class AssertionController extends Controller {
   }
 
 
-  @Security.Authenticated(Secured.class)
+  @AllowedRoles(Role.TEST_DESIGNER)
   public static Result doEditAssertionField() {
     JsonNode jsonNode = request().body().asJson();
 

@@ -1,16 +1,12 @@
 package minderengine
 
-import java.io.ByteArrayInputStream
 import java.lang.reflect.InvocationTargetException
 import java.util
-import java.util.Properties
 
 import models._
 import mtdl._
 import org.apache.log4j.spi.LoggingEvent
-import org.apache.log4j.{Level, AppenderSkeleton, EnhancedPatternLayout}
-import org.interop.xoola.tcpcom.connmanager.server.IClassLoaderProvider
-import play.api.Logger
+import org.apache.log4j.{AppenderSkeleton, EnhancedPatternLayout, Level}
 
 import scala.collection.JavaConversions._
 
@@ -18,8 +14,6 @@ import scala.collection.JavaConversions._
  * Created by yerlibilgin on 07/12/14.
  */
 object TestEngine {
-
-
   def describe(clsMinderTDL: Class[MinderTdl]): util.List[Rivet] = {
     val minderTDL = clsMinderTDL.getConstructors()(0).newInstance(null, java.lang.Boolean.FALSE).asInstanceOf[MinderTdl]
     minderTDL.RivetDefs
@@ -182,8 +176,8 @@ object TestEngine {
               val identifier = label + "|" + wrapperToVersionMap(label)
               lgr.debug("> Wait For Signal:" + identifier + "." + signature)
 
-              val signalData: SignalCallData = try {
-                me.dequeueSignal(identifier, signature, signal.timeout).asInstanceOf[SignalCallData]
+              val signalData: SignalData = try {
+                me.dequeueSignal(identifier, signature, signal.timeout).asInstanceOf[SignalData]
               } catch {
                 case rte: RuntimeException => {
                   signal.handleTimeout(rte)
@@ -192,18 +186,22 @@ object TestEngine {
                 }
               }
 
-              //
-              //
-              //TODO: instance control ekle ve hata durumlarini ayrica handle et.MTDLde
-              //
               lgr.debug("< Signal Arrived: " + identifier + "." + signature)
 
-              testProcessWatcher.signalEmitted(rivetIndex, signalIndex, signalData)
+              if (signalData.isInstanceOf[SignalErrorData]) {
+                lgr.debug("This is an error signal");
+                val signalErrorData = signalData.asInstanceOf[SignalErrorData]
+                throw new RuntimeException("Signal [" + identifier + "." + signature + "] failed [" + signalErrorData.signalFailedException.getMessage,
+                  signalErrorData.signalFailedException)
+              }
+              val signalCallData: SignalCallData = signalData.asInstanceOf[SignalCallData]
+
+              testProcessWatcher.signalEmitted(rivetIndex, signalIndex, signalCallData)
 
               for (paramPipe <- rivet.signalPipeMap(tuple)) {
                 //FIX for BUG-1 : added an if for -1 param
                 if (paramPipe.in != -1) {
-                  convertParam(paramPipe.out, paramPipe.execute(signalData.args(paramPipe.in)), args)
+                  convertParam(paramPipe.out, paramPipe.execute(signalCallData.args(paramPipe.in)), args)
                 }
               }
 
