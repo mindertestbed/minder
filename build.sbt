@@ -2,13 +2,13 @@ organization := "gov.tubitak.minder"
 
 name := """minder"""
 
-version := "1.2.2-beta"
+version := "1.2.0-beta2"
 
 lazy val root = (project in file(".")).enablePlugins(PlayJava, PlayEbean)
 
 products in Compile <<= products in Aspectj
 
-resolvers += "Eid public repository" at "http://eidrepo:8081/nexus/content/groups/public/"
+resolvers += "Eid public repository" at "http://193.140.74.199:8081/nexus/content/groups/public/"
 
 resolvers += Resolver.mavenLocal
 

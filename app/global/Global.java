@@ -25,9 +25,11 @@ import java.util.Map;
 
 public class Global extends GlobalSettings {
   public void onStart(Application app) {
-    initialData();
     TDLClassLoaderProvider.appendExternalClassLoader(Play.classloader(Play.current()));
     TDLClassLoaderProvider.appendExternalClassLoader(ClassLoader.getSystemClassLoader());
+
+    initialData();
+
     BuiltInWrapperRegistry.get().initiate();
     XoolaServer.get().start();
   }

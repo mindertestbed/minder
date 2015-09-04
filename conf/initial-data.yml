@@ -1,50 +1,34 @@
 #Users
 users:
-  - &root !!models.User
-    email: root@minder
-    name: ROOT
-    password: !!binary "WZRHGrsBESr8wYFZ9sx0tPURuZgG2lmzyvWpwXPKz8U="
-    roles:
-    - !!models.DBRole
-        user: *root
-        role: TEST_DESIGNER
-    - !!models.DBRole
-        user: *root
-        role: TEST_DEVELOPER
-    - !!models.DBRole
-        user: *root
-        role: TEST_OBSERVER
-    testGroups: []
-  - &muhammet !!models.User
-    email: myildiz83@gmail.com
-    name: Muhammet YILDIZ
-    password: !!binary "WZRHGrsBESr8wYFZ9sx0tPURuZgG2lmzyvWpwXPKz8U="
-    roles:
-    - !!models.DBRole
-        user: *muhammet
-        role: TEST_DESIGNER
-    - !!models.DBRole
-        user: *muhammet
-        role: TEST_DEVELOPER
-    - !!models.DBRole
-        user: *muhammet
-        role: TEST_OBSERVER
-    testGroups: []
-  - &melis !!models.User
-    email: cetinkayamelis@gmail.com
-    name: Melis Demir
-    password: !!binary "WZRHGrsBESr8wYFZ9sx0tPURuZgG2lmzyvWpwXPKz8U="
-    roles:
-    - !!models.DBRole
-        user: *melis
-        role: TEST_DESIGNER
-    - !!models.DBRole
-        user: *melis
-        role: TEST_DEVELOPER
-    - !!models.DBRole
-        user: *melis
-        role: TEST_OBSERVER
-    testGroups: []
+  - !!models.UserInitiator
+      password: 12345
+      user: &root !!models.User
+        email: root@minder
+        name: ROOT
+        roles:
+        - !!models.DBRole
+            user: *root
+            role: TEST_DESIGNER
+        - !!models.DBRole
+            user: *root
+            role: TEST_DEVELOPER
+        - !!models.DBRole
+            user: *root
+            role: TEST_OBSERVER
+        testGroups: []
+  - !!models.UserInitiator
+      password: 12345
+      user: &tester !!models.User
+        email: tester@minder
+        name: Tester
+        roles:
+        - !!models.DBRole
+            user: *tester
+            role: TEST_DESIGNER
+        - !!models.DBRole
+            user: *tester
+            role: TEST_DEVELOPER
+        testGroups: []
 #Groups
 groups:
 - &sampleGroup !!models.TestGroup
@@ -52,59 +36,30 @@ groups:
     name: Sample Test Group
     shortDescription:  A sample test group
     dependencyString: null
-    owner: *muhammet
+    owner: *tester
     testAssertions:
     - &taSample1 !!models.TestAssertion
         testGroup: *sampleGroup
-        taId: TASAMPLE1
+        taId: TA_XML_01
         normativeSource: The system must generate valid book entries
         target: BOOKS XML
-        prerequisites: the sut is connected and ready for testing
-        predicate: the generated books xml conforms to books.xsd
+        prerequisites: The XML generator system is connected and ready.
+        predicate: The generated books xml conforms to books.xsd
         prescriptionLevel: Mandatory
         shortDescription:  A sample test assertion
-        owner: *muhammet
+        owner: *tester
         testCases:
         - &testCase1 !!models.TestCase
            shortDescription: A tel against books.xsd
-           owner: *muhammet
+           owner: *tester
            tdls:
            - !!models.Tdl
-             tdl: sampletdl/xmltest.tdl
+             tdl: conf/sampletdl/xmltest.tdl
              version: 0.0.1
              creationDate: "2015-02-02 00:00:00"
              testCase: *testCase1
            testAssertion: *taSample1
            name: TestCaseSample1
-- &sampleGroup2 !!models.TestGroup
-    description: A sample test gest assertions and test cases
-    name: Sample Test Group2
-    shortDescription:  A sample test group
-    dependencyString: null
-    owner: *melis
-    testAssertions:
-    - &taSample2 !!models.TestAssertion
-        testGroup: *sampleGroup2
-        taId: TASAMPLE2
-        normativeSource: The system must generate valid book entries
-        target: BOOKS XML
-        owner: *melis
-        prerequisites: the sut is connected and ready for testing
-        predicate: the generated books xml conforms to books.xsd
-        prescriptionLevel: Mandatory
-        shortDescription:  A sample test assertion
-        testCases:
-        - !!models.TestCase
-           shortDescription: A tel against books.xsd
-           owner: *melis
-           tdls:
-           - !!models.Tdl
-              tdl: sampletdl/xmltest.tdl
-              version: 0.0.1
-              creationDate: "2015-02-02 00:00:00"
-              testCase: *testCase1
-           testAssertion: *taSample2
-           name: TestCaseSample2
 #wrappers
 wrappers:
 - &xmlContentVerifier !!models.Wrapper

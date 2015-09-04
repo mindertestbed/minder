@@ -5,6 +5,8 @@ import play.Routes;
 import play.mvc.Controller;
 import play.mvc.Result;
 import play.mvc.Security;
+import security.AllowedRoles;
+import security.Role;
 import views.html.*;
 import views.html.rootViews.rootPage;
 
@@ -25,7 +27,9 @@ public class Application extends Controller {
 
   public static Result root(String display) {
     final User localUser = Authentication.getLocalUser();
-    System.out.println(localUser.email);
+    if (localUser == null)
+      return badRequest("You cannot access this resoruce.");
+
     if (localUser.email.equals("root@minder")) {
       return ok(rootPage.render(display));
     } else {
@@ -33,7 +37,8 @@ public class Application extends Controller {
     }
   }
 
-  @Security.Authenticated(Secured.class)
+
+  @AllowedRoles({Role.TEST_DESIGNER, Role.TEST_OBSERVER})
   public static Result restrictedTestDesigner(String display) {
     final User localUser = Authentication.getLocalUser();
 
@@ -43,20 +48,22 @@ public class Application extends Controller {
     return ok(restrictedTestDesigner.render(localUser, display));
   }
 
-  @Security.Authenticated(Secured.class)
+
+  @AllowedRoles({Role.TEST_DESIGNER})
   public static Result createNewTest() {
     final User localUser = Authentication.getLocalUser();
     session().put("testPageMode", "new");
     return ok(restrictedTestDesigner.render(localUser, "designWithGui"));
   }
 
-  @Security.Authenticated(Secured.class)
+
+  @AllowedRoles({Role.TEST_DEVELOPER, Role.TEST_DESIGNER, Role.TEST_OBSERVER})
   public static Result restrictedTestDeveloper() {
     final User localUser = Authentication.getLocalUser();
     return ok(restrictedTestDeveloper.render(localUser));
   }
 
-  @Security.Authenticated(Secured.class)
+  @AllowedRoles({Role.TEST_DEVELOPER, Role.TEST_DESIGNER, Role.TEST_OBSERVER})
   public static Result profile() {
     final User localUser = Authentication.getLocalUser();
     return ok(profile.render(localUser));

@@ -16,6 +16,8 @@ import play.libs.Json;
 import play.mvc.Controller;
 import play.mvc.Result;
 import play.mvc.Security;
+import security.AllowedRoles;
+import security.Role;
 import views.html.groupDetailView;
 import views.html.testGroupEditor;
 
@@ -181,7 +183,7 @@ public class GroupController extends Controller {
     }
   }
 
-  @Security.Authenticated(Secured.class)
+  @AllowedRoles({Role.TEST_DESIGNER, Role.TEST_OBSERVER})
   public static Result getGroupDetailView(Long id, String display) {
     TestGroup tg = TestGroup.findById(id);
     if (tg == null) {
