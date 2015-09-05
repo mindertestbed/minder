@@ -89,13 +89,7 @@ class TestRunContext(val testRun: TestRun) extends Runnable with TestProcessWatc
    * @param slotDefs
    */
   def describe(slotDefs: util.List[Rivet]): Unit = {
-    slotDefs.foreach { rivet =>
-      if (rivet.freeVariablePipes.length > 0) {
-        totalSteps += 1
-      }
-
-      totalSteps += rivet.signalPipeMap.size
-    }
+    totalSteps = slotDefs.size() * 2; //one rivet call, one rivet finished
   }
 
   def stepUp(): Unit = {
@@ -113,8 +107,12 @@ class TestRunContext(val testRun: TestRun) extends Runnable with TestProcessWatc
     Logger.info("Rivet " + rivetIndex + " finished")
   }
 
-  override def signalEmitted(rivetIndex: Int, signalIndex: Int, signalData: SignalData): Unit = {
+  override def rivetInvoked(rivetIndex: Int): Unit = {
     stepUp()
+    Logger.info("Rivet " + rivetIndex + " finished")
+  }
+
+  override def signalEmitted(rivetIndex: Int, signalIndex: Int, signalData: SignalData): Unit = {
   }
 
   override def finished() {
@@ -127,7 +125,6 @@ class TestRunContext(val testRun: TestRun) extends Runnable with TestProcessWatc
     error = err
     Logger.error(error, t)
     updateRun()
-    stepUp()
   }
 
   override def addLog(log: String): Unit = {

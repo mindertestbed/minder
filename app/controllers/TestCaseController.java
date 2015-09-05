@@ -295,7 +295,7 @@ public class TestCaseController extends Controller {
         return res;
       } catch (Exception ex) {
         Logger.error(ex.getMessage(), ex);
-        return badRequest("Compilation Failed [" + ex.getMessage() + "]");
+        return badRequest("Failed to save the test case [" + ex.getMessage() + "]");
       }
     }
   }

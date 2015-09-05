@@ -7,6 +7,7 @@ import models._
 import mtdl._
 import org.apache.log4j.spi.LoggingEvent
 import org.apache.log4j.{AppenderSkeleton, EnhancedPatternLayout, Level}
+import play.Logger
 
 import scala.collection.JavaConversions._
 
@@ -113,7 +114,11 @@ object TestEngine {
 
       lgr.info("> CALL START TEST ON Wrappers");
       for (wrapperName <- minderTDL.wrapperDefs) {
-        val identifier = wrapperName + "|" + wrapperToVersionMap(wrapperName)
+        val identifier = if (wrapperToVersionMap.contains(wrapperName)) {
+          wrapperName + "|" + wrapperToVersionMap(wrapperName)
+        } else {
+          wrapperName
+        }
         val minderClient = if (BuiltInWrapperRegistry.get().contains(identifier)) {
           BuiltInWrapperRegistry.get().getWrapper(identifier)
         } else {
@@ -130,9 +135,10 @@ object TestEngine {
         var rivetIndex = 0;
         for (rivet <- minderTDL.RivetDefs) {
           lgr.info("> " + "RUN RIVET " + rivetIndex)
+          val rivetWrapperId: String = rivet.slot.wrapperId
           //resolve the minder client id. This might as well be resolved to a local built-in wrapper or the null slot.
           val minderClient =
-            if (rivet.slot.wrapperId == "NULLWRAPPER") {
+            if (rivetWrapperId == "NULLWRAPPER") {
               new IMinderClient {
                 override def callSlot(s: String, s1: String, objects: Array[AnyRef]): AnyRef = {
                   null
@@ -146,7 +152,12 @@ object TestEngine {
               }
 
             } else {
-              val identifier = rivet.slot.wrapperId + "|" + wrapperToVersionMap(rivet.slot.wrapperId)
+              val identifier = if (wrapperToVersionMap.contains(rivetWrapperId)) {
+                rivetWrapperId + "|" + wrapperToVersionMap(rivetWrapperId)
+              } else {
+                rivetWrapperId
+              }
+
               if (BuiltInWrapperRegistry.get().containsWrapper(identifier)) {
                 BuiltInWrapperRegistry.get().getWrapper(identifier)
               } else {
@@ -233,9 +244,10 @@ object TestEngine {
               testProcessWatcher.signalEmitted(rivetIndex, signalIndex, signalData2)
             }
 
-            lgr.info("> CALL SLOT " + rivet.slot.wrapperId + "." + rivet.slot.signature)
+            lgr.info("> CALL SLOT " + rivetWrapperId + "." + rivet.slot.signature)
+            testProcessWatcher.rivetInvoked(rivetIndex);
             rivet.result = minderClient.callSlot(userEmail, rivet.slot.signature, args)
-            lgr.info("< SLOT CALLED " + rivet.slot.wrapperId + "." + rivet.slot.signature)
+            lgr.info("< SLOT CALLED " + rivetWrapperId + "." + rivet.slot.signature)
 
 
             testProcessWatcher.rivetFinished(rivetIndex)
@@ -379,6 +391,8 @@ trait TestProcessWatcher {
   def signalEmitted(rivetIndex: Int, signalIndex: Int, signalData: SignalData): Unit
 
   def rivetFinished(rivetIndex: Int): Unit
+
+  def rivetInvoked(rivetIndex: Int): Unit
 
   def finished(): Unit
 

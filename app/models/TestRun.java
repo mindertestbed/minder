@@ -1,6 +1,9 @@
 package models;
 
+import com.avaje.ebean.Ebean;
 import com.avaje.ebean.Model;
+import com.avaje.ebean.Update;
+import play.Logger;
 
 import javax.persistence.*;
 import java.util.Date;
@@ -72,16 +75,15 @@ public class TestRun extends Model {
 
 
   public static List<TestRun> getRecentRuns(int num) {
-    return find.where().orderBy("date desc").findPagedList(1, 1).getList();
+    return find.where().orderBy("date desc").findPagedList(0, num).getList();
   }
 
   public static int getMaxNumber() {
-    List<TestRun> list = find.where().orderBy("number desc").findPagedList(1, 1).getList();
 
-    if (list.size() == 0)
-      return 0;
-
-    return list.get(0).number;
+    com.avaje.ebean.SqlQuery qu = Ebean.createSqlQuery("Select max(number) from TestRun");
+    Object max = qu.findUnique().get("max");
+    Logger.debug(max + " is max number");
+    return Integer.parseInt(max.toString());
   }
 
   public static void updateUser(User user, User localUser) {

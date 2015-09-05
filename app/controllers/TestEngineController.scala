@@ -167,29 +167,19 @@ object TestEngineController extends Controller {
    */
   def enqueueJob(id: Long) = Action {
     implicit request =>
-      if (jobQueue.size >= 20) {
+      if (jobQueue.size >= 30) {
         BadRequest("The job queue is full.")
       } else {
-        //check if the job is already in queue.
-        var already = false;
-        for (tr <- jobQueue) {
-          if (tr.job != null && tr.job.id == id) {
-            already = true;
-          }
-        }
-        if (already) {
-          BadRequest("The job is already enqueued.")
+        val job = Job.findById(id)
+        if (job == null) {
+          BadRequest("A job with id [" + id + "] was not found!")
         } else {
-
-          val job = Job.findById(id)
-
-          if (job == null) {
-            BadRequest("A job with id [" + id + "] was not found!")
-          } else {
-            jobQueue.offer(createTestRunContext(job, Authentication.getLocalUser))
-            queueFeedUpdate();
-            Ok;
-          }
+          val java_ctx = play.core.j.JavaHelpers.createJavaContext(request)
+          val java_session = java_ctx.session()
+          val user = Authentication.getLocalUser(java_session);
+          jobQueue.offer(createTestRunContext(job, user))
+          queueFeedUpdate();
+          Ok;
         }
       }
   }
@@ -199,11 +189,6 @@ object TestEngineController extends Controller {
    * Update the queue feed with the current active job and queue status
    */
   def queueFeedUpdate(): Unit = {
-    //Json.toJson(jobQueue.map(tr => {
-    //  Map("jobId" -> (tr.job.id + ""), "jobName" -> tr.job.name, "startedBy" -> tr.runner.email, "status" -> tr.status.description,
-    //  "progress" -> (tr.progress + ""))
-    //}))
-
     jobQueueChannel.push(jobQueueList.render().toString())
     jobHistoryChannel.push(jobHistoryList.render().toString())
   }
@@ -273,9 +258,9 @@ object TestEngineController extends Controller {
 
       if (runContext != null) {
         // REMEMBER: if you need to convert scala session to java session
-        // val java_ctx = play.core.j.JavaHelpers.createJavaContext(request)
-        // val java_session = java_ctx.session()
-        val user = Authentication.getLocalUser();
+        val java_ctx = play.core.j.JavaHelpers.createJavaContext(request)
+        val java_session = java_ctx.session()
+        val user = Authentication.getLocalUser(java_session);
         //only allow root or the runner to do that
         if (user.email == "root@minder" || user.email == runContext.testRun.runner.email) {
           //cancel

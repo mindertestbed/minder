@@ -28,6 +28,13 @@ public class Authentication extends Controller {
     User user = User.findByEmail(email);
     return user;
   }
+  public static User getLocalUser(Session session) {
+    String email = session.get("email");
+    if (email == null)
+      return null;
+    User user = User.findByEmail(email);
+    return user;
+  }
 
   public static Result login() {
     return ok(login.render(form(UserLoginEditorModel.class)));

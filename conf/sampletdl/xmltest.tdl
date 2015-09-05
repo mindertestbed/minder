@@ -47,7 +47,7 @@ def xmlLogger(any: Any) : Any ={
 
   val xmlBytes = any.asInstanceOf[Array[Byte]]
   INFO("XML Generator Generated XML")
-  INFO(xmlBytes)
+  INFO(new String(xmlBytes))
 
   //we didn't change anything, return the original value
   any

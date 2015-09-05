@@ -65,7 +65,7 @@ wrappers:
 - &xmlContentVerifier !!models.Wrapper
   name: xml-content-verifier
   user: *root
-  shortDescription: XMl Generator Wrapper
+  shortDescription: XMl Content Verifier
   wrapperVersions:
   - !!models.WrapperVersion
     signals: []
@@ -74,7 +74,7 @@ wrappers:
     creationDate: "2015-08-08 00:00:00"
     wrapper: *xmlContentVerifier
 - &xmlGenerator !!models.Wrapper
-  name: xmlGenerator
+  name: xml-generator
   user: *root
   shortDescription: XMl Generator Wrapper
   wrapperVersions:
@@ -85,8 +85,8 @@ wrappers:
     creationDate: "2015-08-08 00:00:00"
     wrapper: *xmlGenerator
 - &xmlValueInitiator  !!models.Wrapper
-  name: xmlValueInitiator
-  shortDescription: XMl Value wrapper.Initiator Wrapper
+  name: xml-value-initiator
+  shortDescription: XMl Value Initiator Wrapper
   user: *root
   wrapperVersions:
   - !!models.WrapperVersion

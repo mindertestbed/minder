@@ -7,7 +7,7 @@
 
 <div>
     <table  class="padabit">
-        @defining(TestRun.getRecentRuns(20)){ testRunList =>
+        @defining(TestRun.getRecentRuns(40)){ testRunList =>
             @for(testRun <- testRunList){
                 <tr class="@if(testRun.success){goodTestRun} else {badTestRun}" style="border:1px solid #eee;border-radius: 2px">
                     <td style="text-align:left;" class="tabshrink">
