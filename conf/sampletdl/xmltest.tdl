@@ -1,4 +1,4 @@
-var bookXsd : Array[Byte] = null
+var bookXsd:Array[Byte] = null
 
 //initialize the data, in a rivet
 runAsRivet(()=>{
@@ -14,7 +14,7 @@ runAsRivet(()=>{
 //we map '5' as the number of books to be generated.
 //This will trigger a call $initiator.generateBooksData(5)
 val rivet1 ="generateBooksData(int)" of "$initiator" shall(
-  map(5 onto 1))
+  map(5 --> 1))
 
 //Second rivet, wait for the $initiator to gereate the raw data
 //via the initialDataCreated signal. Then forward
@@ -33,10 +33,10 @@ val rivet2 = "generateXML(byte[])" of "$generator" shall(
 val rivet3 = "verifyXsd(byte[],byte[])" of "xml-content-verifier" shall(
   use("xmlProduced(byte[])" of "$generator")(
     //map the param#1 of xmlProducer signal to param#2 of verifyXsd.
-    mapping(1 onto 2 using xmlLogger)
+    mapping(1 --> 2 using xmlLogger)
   ),
   //map the bookXsd (as a free value) to param#1 of verifyXsd slot
-  map(bookXsd onto 1))
+  map(invokeLater(()=>bookXsd) --> 1))
 
 
 /**

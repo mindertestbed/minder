@@ -29,7 +29,7 @@ libraryDependencies ++= Seq(
   "postgresql" % "postgresql" % "9.1-901-1.jdbc4",
   "org.beybunproject" % "xoola" % "1.0.1",
   "gov.tubitak.minder" % "minder-common" % "0.3.1",
-  "gov.tubitak.minder" %% "minder-tdl" % "0.3.4",
+  "gov.tubitak.minder" %% "minder-tdl" % "0.3.5",
   "org.webjars" % "webjars-play_2.11" % "2.4.0-1",
   "org.webjars" % "bootstrap" % "3.3.5",
   "net.sf.saxon" % "Saxon-HE" % "9.6.0-3",
