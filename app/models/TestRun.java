@@ -83,6 +83,9 @@ public class TestRun extends Model {
     com.avaje.ebean.SqlQuery qu = Ebean.createSqlQuery("Select max(number) from TestRun");
     Object max = qu.findUnique().get("max");
     Logger.debug(max + " is max number");
+    if (max == null)
+      return 1;
+    
     return Integer.parseInt(max.toString());
   }
 
