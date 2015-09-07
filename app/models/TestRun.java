@@ -85,7 +85,7 @@ public class TestRun extends Model {
     Logger.debug(max + " is max number");
     if (max == null)
       return 1;
-    
+
     return Integer.parseInt(max.toString());
   }
 
