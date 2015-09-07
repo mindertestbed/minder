@@ -1,0 +1,15 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <!--
+
+    WARNING: This pom is only for uploading minder articats manually to the nexus server. Don't use it for builds. the build is SBT based.
+    -->
+
+    <modelVersion>4.0.0</modelVersion>
+    <groupId>gov.tubitak.minder</groupId>
+    <artifactId>minder-src</artifactId>
+    <version>1.2.0-beta3</version>
+    <name>minder source code</name>
+    <description>minder source code</description>
+</project>
+
