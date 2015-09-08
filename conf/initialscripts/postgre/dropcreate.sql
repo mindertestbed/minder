@@ -38,7 +38,6 @@ drop table if exists WrapperParam cascade;
 
 drop table if exists WrapperVersion cascade;
 
-
 create table dbrole (
   id                        bigserial not null,
   user_id                   bigint,
@@ -97,7 +96,7 @@ create table TSlot (
 create table Tdl (
   id                        bigserial not null,
   test_case_id              bigint,
-  tdl                       varchar(20480) not null,
+  tdl                       TEXT not null,
   version                   varchar(255) not null,
   creation_date             timestamp,
   constraint pk_Tdl primary key (id))
@@ -107,14 +106,14 @@ create table TestAssertion (
   id                        bigserial not null,
   test_group_id             bigint,
   ta_id                     varchar(255) not null,
-  normative_source          varchar(20480) not null,
+  normative_source          TEXT not null,
   target                    varchar(255) not null,
-  prerequisites             varchar(20480),
-  predicate                 varchar(20480) not null,
+  prerequisites             TEXT,
+  predicate                 TEXT not null,
   variables                 varchar(1024),
   tag                       varchar(1024),
-  description               varchar(20480),
-  short_description         varchar(100) not null,
+  description               TEXT,
+  short_description         TEXT not null,
   prescription_level        integer,
   owner_id                  bigint,
   constraint ck_TestAssertion_prescription_level check (prescription_level in (0,1,2)),
@@ -126,8 +125,8 @@ create table TestAsset (
   id                        bigserial not null,
   group_id                  bigint,
   name                      varchar(255) not null,
-  short_description         varchar(100),
-  description               varchar(20480),
+  short_description         TEXT,
+  description               TEXT,
   constraint pk_TestAsset primary key (id))
 ;
 
@@ -135,8 +134,8 @@ create table TestCase (
   id                        bigserial not null,
   test_assertion_id         bigint,
   name                      varchar(255) not null,
-  short_description         varchar(100) not null,
-  description               varchar(20480),
+  short_description         TEXT not null,
+  description               TEXT,
   owner_id                  bigint,
   constraint uq_TestCase_name unique (name),
   constraint pk_TestCase primary key (id))
@@ -146,8 +145,8 @@ create table TestGroup (
   id                        bigserial not null,
   name                      varchar(255) not null,
   owner_id                  bigint,
-  description               varchar(20480),
-  short_description         varchar(100) not null,
+  description               TEXT,
+  short_description         TEXT not null,
   dependency_string         varchar(255),
   constraint uq_TestGroup_name unique (name),
   constraint pk_TestGroup primary key (id))
@@ -160,10 +159,10 @@ create table TestRun (
   runner_id                 bigint,
   history_id                bigint,
   report                    bytea,
-  sut_names                 varchar(51200),
+  sut_names                 TEXT,
   success                   boolean not null,
   number                    integer,
-  error_message             varchar(250),
+  error_message             TEXT,
   constraint uq_TestRun_history_id unique (history_id),
   constraint pk_TestRun primary key (id))
 ;
@@ -203,18 +202,17 @@ create table UtilClass (
   id                        bigserial not null,
   test_group_id             bigint,
   name                      varchar(255) not null,
-  short_description         varchar(100) not null,
-  source                    varchar(20480) not null,
+  short_description         TEXT not null,
+  source                    TEXT not null,
   owner_id                  bigint,
-  constraint uq_UtilClass_name unique (name),
   constraint pk_UtilClass primary key (id))
 ;
 
 create table Wrapper (
   id                        bigserial not null,
   NAME                      varchar(255),
-  short_description         varchar(100) not null,
-  description               varchar(20480),
+  short_description         TEXT not null,
+  description               TEXT,
   user_id                   bigint,
   constraint uq_Wrapper_NAME unique (NAME),
   constraint pk_Wrapper primary key (id))

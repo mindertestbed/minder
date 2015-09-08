@@ -29,10 +29,10 @@ public class TestGroup extends Model {
   public List<UtilClass> utilClasses;
 
 
-  @Column(length = ModelConstants.DESCRIPTION_LENGTH)
+  @Column(length = ModelConstants.DESCRIPTION_LENGTH, columnDefinition = "TEXT")
   public String description;
 
-  @Column(nullable = false, length = ModelConstants.SHORT_DESC_LENGTH)
+  @Column(nullable = false, length = ModelConstants.SHORT_DESC_LENGTH, columnDefinition = "TEXT")
   public String shortDescription;
 
   @Column

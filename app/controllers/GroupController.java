@@ -11,6 +11,7 @@ import global.Global;
 import global.Util;
 import models.TestGroup;
 import models.User;
+import play.Logger;
 import play.data.Form;
 import play.libs.Json;
 import play.mvc.Controller;
@@ -93,13 +94,33 @@ public class GroupController extends Controller {
   public static Result doEditGroupField() {
     JsonNode jsonNode = request().body().asJson();
 
-    Result result = doEditField(GroupEditorModel.class, TestGroup.class, jsonNode);
+    Result result = ok();
+    try {
+      Ebean.beginTransaction();
+      result = doEditField(GroupEditorModel.class, TestGroup.class, jsonNode);
 
-    String field = jsonNode.findPath("field").asText();
+      String field = jsonNode.findPath("field").asText();
 
-    if (field.equals("dependencyString")) {
-      String dependencyString = jsonNode.findPath("newValue").asText();
-      DependencyClassLoaderCache.getDependencyClassLoader(dependencyString);
+      if (field.equals("dependencyString")) {
+        String dependencyString = jsonNode.findPath("newValue").asText();
+        if (dependencyString != null)
+          dependencyString = dependencyString.trim();
+        if (dependencyString == null || dependencyString.length() == 0) {
+          return result; // do nothing
+        } else {
+          try {
+            DependencyClassLoaderCache.getDependencyClassLoader(dependencyString);
+            Ebean.commitTransaction();
+          } catch (Exception ex) {
+            Logger.error(ex.getMessage(), ex);
+            return badRequest("There was a problem with the dependency string.<br /> \n" +
+                "Please make sure that the dependencies are in format:<br />\n " +
+                "groupId:artifactId[:extension[:classifier]]:version]]");
+          }
+        }
+      }
+    } finally {
+      Ebean.endTransaction();
     }
     return result;
   }

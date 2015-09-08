@@ -57,7 +57,7 @@ public class TestCaseController extends Controller {
       testCaseEditorModel.shortDescription = testCaseEditorModel.name;
       Form<TestCaseEditorModel> bind = TEST_CASE_FORM
           .fill(testCaseEditorModel);
-      return ok(testCaseEditor.render(bind, null, false));
+      return ok(testCaseEditor.render(bind, false));
     }
   }
 
@@ -68,7 +68,7 @@ public class TestCaseController extends Controller {
 
     if (filledForm.hasErrors()) {
       Util.printFormErrors(filledForm);
-      return badRequest(testCaseEditor.render(filledForm, null, false));
+      return badRequest(testCaseEditor.render(filledForm, false));
     } else {
       TestCaseEditorModel model = filledForm.get();
 
@@ -76,13 +76,13 @@ public class TestCaseController extends Controller {
       if (tc != null) {
         filledForm.reject("The test case with name [" + tc.name
             + "] already exists");
-        return badRequest(testCaseEditor.render(filledForm, null, false));
+        return badRequest(testCaseEditor.render(filledForm, false));
       }
 
       TestAssertion ta = TestAssertion.findById(model.assertionId);
       if (ta == null) {
         filledForm.reject("No assertion found with id [" + ta.id + "]");
-        return badRequest(testCaseEditor.render(filledForm, null, false));
+        return badRequest(testCaseEditor.render(filledForm, false));
       }
 
       final User localUser = Authentication.getLocalUser();
@@ -106,7 +106,7 @@ public class TestCaseController extends Controller {
       } catch (Exception ex) {
         filledForm.reject("Compilation Failed [" + ex.getMessage() + "]");
         Logger.error(ex.getMessage(), ex);
-        return badRequest(testCaseEditor.render(filledForm, null, false));
+        return badRequest(testCaseEditor.render(filledForm, false));
       } finally {
         Ebean.endTransaction();
       }
@@ -137,7 +137,7 @@ public class TestCaseController extends Controller {
       tcModel.version = tdl.version;
 
       Form<TestCaseEditorModel> bind = TEST_CASE_FORM.fill(tcModel);
-      return ok(testCaseEditor.render(bind, null, true));
+      return ok(testCaseEditor.render(bind, true));
     }
   }
 
@@ -147,7 +147,7 @@ public class TestCaseController extends Controller {
         .bindFromRequest();
     if (filledForm.hasErrors()) {
       Util.printFormErrors(filledForm);
-      return badRequest(testCaseEditor.render(filledForm, null, true));
+      return badRequest(testCaseEditor.render(filledForm, true));
     } else {
       TestCaseEditorModel model = filledForm.get();
 
@@ -156,7 +156,7 @@ public class TestCaseController extends Controller {
       if (tc == null) {
         filledForm.reject("The test case with ID [" + model.id
             + "] does not exist");
-        return badRequest(testCaseEditor.render(filledForm, null, true));
+        return badRequest(testCaseEditor.render(filledForm, true));
       }
       if (!Util.canAccess(Authentication.getLocalUser(), tc.owner))
         return badRequest("You don't have permission to modify this resource");
@@ -168,7 +168,7 @@ public class TestCaseController extends Controller {
           TestEngine.describeTdl(tdl);
         } catch (Exception ex) {
           filledForm.reject(ex.getMessage());
-          return badRequest(testCaseEditor.render(filledForm, null, true));
+          return badRequest(testCaseEditor.render(filledForm, true));
         }
         tdl.update();
         return redirect(routes.TestCaseController.viewTestCase(tc.id, "mtdl"));
@@ -185,7 +185,7 @@ public class TestCaseController extends Controller {
           detectAndSaveParameters(newTdl);
         } catch (Exception ex) {
           filledForm.reject(ex.getMessage());
-          return badRequest(testCaseEditor.render(filledForm, null, true));
+          return badRequest(testCaseEditor.render(filledForm, true));
         }
 
 

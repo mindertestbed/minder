@@ -2,7 +2,7 @@ organization := "gov.tubitak.minder"
 
 name := """minder"""
 
-version := "1.2.0-beta3"
+version := "1.2.0-beta4"
 
 lazy val root = (project in file(".")).enablePlugins(PlayJava, PlayEbean)
 
@@ -27,6 +27,7 @@ libraryDependencies ++= Seq(
   "org.scala-lang" % "scala-actors" % "2.11.7",
   "org.scala-lang.modules" % "scala-xml_2.11" % "1.0.5",
   "postgresql" % "postgresql" % "9.1-901-1.jdbc4",
+  "mysql" % "mysql-connector-java" % "5.1.18",
   "org.beybunproject" % "xoola" % "1.0.1",
   "gov.tubitak.minder" % "minder-common" % "0.3.1",
   "gov.tubitak.minder" %% "minder-tdl" % "0.3.5",

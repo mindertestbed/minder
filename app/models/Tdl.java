@@ -26,7 +26,7 @@ public class Tdl extends Model {
   @Column(nullable = false)
   public TestCase testCase;
 
-  @Column(nullable = false, length = ModelConstants.MAX_TDL_LENGTH)
+  @Column(nullable = false, length = ModelConstants.MAX_TDL_LENGTH, columnDefinition = "TEXT")
   public String tdl;
 
   @Column(nullable = false)

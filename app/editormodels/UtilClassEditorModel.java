@@ -20,6 +20,6 @@ public class UtilClassEditorModel {
   public String shortDescription;
 
   @Constraints.Required
-  public String source;
+  public String tdl;
 
 }

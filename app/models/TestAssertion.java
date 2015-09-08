@@ -29,16 +29,16 @@ public class TestAssertion extends Model {
   @Column(nullable = false, unique = true)
   public String taId;
 
-  @Column(nullable = false, length = ModelConstants.DESCRIPTION_LENGTH)
+  @Column(nullable = false, length = ModelConstants.DESCRIPTION_LENGTH, columnDefinition = "TEXT")
   public String normativeSource;
 
   @Column(nullable = false)
   public String target;
 
-  @Column(length = ModelConstants.DESCRIPTION_LENGTH)
+  @Column(length = ModelConstants.DESCRIPTION_LENGTH, columnDefinition = "TEXT")
   public String prerequisites;
 
-  @Column(nullable = false, length = ModelConstants.DESCRIPTION_LENGTH)
+  @Column(nullable = false, length = ModelConstants.DESCRIPTION_LENGTH, columnDefinition = "TEXT")
   public String predicate;
 
   @Column(length = ModelConstants.K)
@@ -47,10 +47,10 @@ public class TestAssertion extends Model {
   @Column(length = ModelConstants.K)
   public String tag;
 
-  @Column(length = ModelConstants.DESCRIPTION_LENGTH)
+  @Column(length = ModelConstants.DESCRIPTION_LENGTH, columnDefinition = "TEXT")
   public String description;
 
-  @Column(nullable = false, length = ModelConstants.SHORT_DESC_LENGTH)
+  @Column(nullable = false, length = ModelConstants.SHORT_DESC_LENGTH, columnDefinition = "TEXT")
   public String shortDescription;
 
   public PrescriptionLevel prescriptionLevel;

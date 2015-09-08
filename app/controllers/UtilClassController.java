@@ -48,11 +48,15 @@ public class UtilClassController extends Controller {
       Util.printFormErrors(filledForm);
       return badRequest(utilClassEditor.render(filledForm, false));
     } else {
-      UtilClassEditorModel model = filledForm.get();
 
-      UtilClass utilClass = UtilClass.findByName(model.name);
+      UtilClassEditorModel model = filledForm.get();
+      Logger.debug("Creating util class " + model.name);
+
+      UtilClass utilClass = UtilClass.findByGroupIdAndName(model.groupId, model.name);
       if (utilClass != null) {
-        filledForm.reject("Atil class with name [" + utilClass.name
+        Logger.error("A util class with the given name already exists");
+
+        filledForm.reject("A util class with name [" + utilClass.name
             + "] already exists");
         return badRequest(utilClassEditor.render(filledForm, false));
       }
@@ -67,7 +71,7 @@ public class UtilClassController extends Controller {
 
       utilClass = new UtilClass();
       utilClass.name = model.name;
-      utilClass.source = model.source;
+      utilClass.source = model.tdl;
       utilClass.shortDescription = model.shortDescription;
       utilClass.testGroup = tg;
       utilClass.owner = localUser;
@@ -79,9 +83,9 @@ public class UtilClassController extends Controller {
         return badRequest(utilClassEditor.render(filledForm, false));
       }
 
-      utilClass = UtilClass.findByName(utilClass.name);
+      utilClass = UtilClass.findByGroupIdAndName(model.groupId, utilClass.name);
 
-      Logger.info("UtilClass with name " + utilClass.id + ":" + utilClass.name
+      Logger.info("Util class with name " + utilClass.id + ":" + utilClass.name
           + " was created");
       return redirect(routes.GroupController.getGroupDetailView(tg.id, "utils"));
     }
@@ -98,7 +102,7 @@ public class UtilClassController extends Controller {
       ucModel.groupId = utilClass.testGroup.id;
       ucModel.name = utilClass.name;
       ucModel.shortDescription = utilClass.shortDescription;
-      ucModel.source = utilClass.source;
+      ucModel.tdl = utilClass.source;
 
       Form<UtilClassEditorModel> bind = UTIL_CLASS_FORM.fill(ucModel);
       return ok(utilClassEditor.render(bind, true));
@@ -125,10 +129,10 @@ public class UtilClassController extends Controller {
 
       uc.name = model.name;
       uc.shortDescription = model.shortDescription;
-      uc.source = model.source;
+      uc.source = model.tdl;
 
       // check if the name is not duplicate
-      UtilClass tmp = UtilClass.findByName(model.name);
+      UtilClass tmp = UtilClass.findByGroupIdAndName(model.groupId, model.name);
 
       if (tmp == null || tmp.id == uc.id) {
         // either no such name or it is already this object. so update

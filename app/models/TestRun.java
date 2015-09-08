@@ -34,7 +34,7 @@ public class TestRun extends Model {
   @Column(length = ModelConstants.REPORT_LENGTH)
   public byte[] report;
 
-  @Column(length = ModelConstants.LOG_LENGTH)
+  @Column(length = ModelConstants.LOG_LENGTH, columnDefinition = "TEXT")
   public String sutNames;
 
   @Column(nullable = false)
@@ -43,7 +43,7 @@ public class TestRun extends Model {
   @Column
   public int number;
 
-  @Column(length = ModelConstants.ERROR_MESSAGE_LENGTH)
+  @Column(length = ModelConstants.ERROR_MESSAGE_LENGTH, columnDefinition = "TEXT")
   public String errorMessage;
 
   public TestRun() {
