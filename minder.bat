@@ -6,7 +6,7 @@ set SCALA_COMPILER="C:\Program Files (x86)\scala\bin\scalac.bat"
 rem in case of wrong version warnings put in the full path to java
 set JAVA=java
 
-set JVM_OPTS=-Dplay.evolutions.db.default.autoApply=true 
+set JVM_OPTS=-Dplay.evolutions.db.default.autoApply=true -Dplay.evolutions.db.default.autoApplyDowns=true
 
 set HTTP_PORT=9001
 set HTTPS_PORT=9000
@@ -26,6 +26,6 @@ goto :eof
 :there
 
 echo on
-%JAVA% %JVM_OPTS% -DSCALA_COMPILER=%SCALA_COMPILER% -Dapplication.secret=APPLICATION_SECRET -Dhttps.port=%HTTPS_PORT% -Dhttp.port=%HTTP_PORT% -cp "%CP%" play.core.server.ProdServerStart
+%JAVA% -cp "%CP%" %JVM_OPTS% -DSCALA_COMPILER=%SCALA_COMPILER% -Dapplication.secret=%APPLICATION_SECRET% -Dhttps.port=%HTTPS_PORT% -Dhttp.port=%HTTP_PORT% play.core.server.ProdServerStart
 
 pause
