@@ -26,7 +26,6 @@ create table MappedWrapper (
   parameter_id              bigint,
   wrapper_version_id        bigint,
   job_id                    bigint,
-  constraint uq_MappedWrapper_wrapper_version unique (wrapper_version_id),
   constraint pk_MappedWrapper primary key (id))
 ;
 
