@@ -18,7 +18,7 @@ public class MappedWrapper extends Model{
   @ManyToOne
   public WrapperParam parameter;
 
-  @OneToOne
+  @ManyToOne
   public WrapperVersion wrapperVersion;
 
   @ManyToOne

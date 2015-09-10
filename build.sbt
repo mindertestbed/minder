@@ -4,7 +4,7 @@ name := """minder"""
 
 version := "1.2.0-beta4"
 
-lazy val root = (project in file(".")).enablePlugins(PlayJava, PlayEbean)
+lazy val minder = (project in file(".")).enablePlugins(PlayJava, PlayEbean)
 
 products in Compile <<= products in Aspectj
 
@@ -30,7 +30,7 @@ libraryDependencies ++= Seq(
   "mysql" % "mysql-connector-java" % "5.1.18",
   "org.beybunproject" % "xoola" % "1.0.1",
   "gov.tubitak.minder" % "minder-common" % "0.3.1",
-  "gov.tubitak.minder" %% "minder-tdl" % "0.3.5",
+  "gov.tubitak.minder" %% "minder-tdl" % "0.3.6-beta2",
   "org.webjars" % "webjars-play_2.11" % "2.4.0-1",
   "org.webjars" % "bootstrap" % "3.3.5",
   "net.sf.saxon" % "Saxon-HE" % "9.6.0-3",
