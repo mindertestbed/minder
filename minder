@@ -1,6 +1,2 @@
 #!/bin/sh
-pwd
-cd /home/eid/minder/release
-pwd
 bin/minder  -Dhttps.port=9000 -Dhttp.port=9001 -Dapplication.secret="sdf56.hedehodobedebodojkdsfhlgksjdhfglkjsdfhkjsdfg" &
-cd /
