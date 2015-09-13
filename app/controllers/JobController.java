@@ -237,19 +237,26 @@ public class JobController extends Controller {
     // more than 100 wrappers :-)
     List<Wrapper> all = Wrapper.getAll();
 
+    Logger.debug("List Fitting Wrappers");
+    Logger.info("List Fitting Wrappers");
+
     out:
     for (Wrapper wrapper : all) {
       // check if all the signatures are covered by the signals or slots
       // of this wrapper.
       List<WrapperVersion> wrapperVersions = WrapperVersion.getAllByWrapper(wrapper);
       for (WrapperVersion wrapperVersion : wrapperVersions) {
+        Logger.debug("Check " + wrapper.name + "|" + wrapperVersion.version);
         for (ParamSignature ps : psList) {
           boolean included = false;
 
+
+          Logger.debug("\tLook for " + ps.signature);
           for (TSignal signal : wrapperVersion.signals) {
             if (ps.signature.equals(signal.signature.replaceAll("\\s",
                 ""))) {
               included = true;
+              Logger.debug("\t\t" + signal.signature + " HIT");
               break;
             }
           }
@@ -259,24 +266,23 @@ public class JobController extends Controller {
               if (ps.signature.equals(slot.signature.replaceAll(
                   "\\s", ""))) {
                 included = true;
+                Logger.debug("\t\t" + slot.signature + " HIT");
                 break;
               }
             }
           }
 
-          if (included)
-            System.out.println(" included");
-          else
-            System.out.println("NOT included");
           if (!included)
             continue out;
         }
 
         // if we are here, then this wrapper contains all.
         // so add it to the list.
+        Logger.debug(wrapper.name + "|" + wrapperVersion.version + " FITS");
         listOptions.add(wrapperVersion);
       }
     }
+
 
     return listOptions;
   }

@@ -131,18 +131,6 @@ create table TestRun (
   constraint pk_TestRun primary key (id))
 ;
 
-create table TokenAction (
-  id                        bigserial not null,
-  token                     varchar(255),
-  target_user_id            bigint,
-  type                      varchar(2),
-  created                   timestamp,
-  expires                   timestamp,
-  constraint ck_TokenAction_type check (type in ('PR','EV')),
-  constraint uq_TokenAction_token unique (token),
-  constraint pk_TokenAction primary key (id))
-;
-
 create table Users (
   id                        bigserial not null,
   email                     varchar(255),
@@ -235,20 +223,18 @@ alter table TestRun add constraint fk_TestRun_runner_18 foreign key (runner_id) 
 create index ix_TestRun_runner_18 on TestRun (runner_id);
 alter table TestRun add constraint fk_TestRun_history_19 foreign key (history_id) references UserHistory (id);
 create index ix_TestRun_history_19 on TestRun (history_id);
-alter table TokenAction add constraint fk_TokenAction_targetUser_20 foreign key (target_user_id) references Users (id);
-create index ix_TokenAction_targetUser_20 on TokenAction (target_user_id);
-alter table UserHistory add constraint fk_UserHistory_operationType_21 foreign key (operation_type_id) references OperationType (id);
-create index ix_UserHistory_operationType_21 on UserHistory (operation_type_id);
-alter table UtilClass add constraint fk_UtilClass_testGroup_22 foreign key (test_group_id) references TestGroup (id);
-create index ix_UtilClass_testGroup_22 on UtilClass (test_group_id);
-alter table UtilClass add constraint fk_UtilClass_owner_23 foreign key (owner_id) references Users (id);
-create index ix_UtilClass_owner_23 on UtilClass (owner_id);
-alter table Wrapper add constraint fk_Wrapper_user_24 foreign key (user_id) references Users (id);
-create index ix_Wrapper_user_24 on Wrapper (user_id);
-alter table WrapperParam add constraint fk_WrapperParam_tdl_25 foreign key (tdl_id) references Tdl (id);
-create index ix_WrapperParam_tdl_25 on WrapperParam (tdl_id);
-alter table WrapperVersion add constraint fk_WrapperVersion_wrapper_26 foreign key (wrapper_id) references Wrapper (id);
-create index ix_WrapperVersion_wrapper_26 on WrapperVersion (wrapper_id);
+alter table UserHistory add constraint fk_UserHistory_operationType_20 foreign key (operation_type_id) references OperationType (id);
+create index ix_UserHistory_operationType_20 on UserHistory (operation_type_id);
+alter table UtilClass add constraint fk_UtilClass_testGroup_21 foreign key (test_group_id) references TestGroup (id);
+create index ix_UtilClass_testGroup_21 on UtilClass (test_group_id);
+alter table UtilClass add constraint fk_UtilClass_owner_22 foreign key (owner_id) references Users (id);
+create index ix_UtilClass_owner_22 on UtilClass (owner_id);
+alter table Wrapper add constraint fk_Wrapper_user_23 foreign key (user_id) references Users (id);
+create index ix_Wrapper_user_23 on Wrapper (user_id);
+alter table WrapperParam add constraint fk_WrapperParam_tdl_24 foreign key (tdl_id) references Tdl (id);
+create index ix_WrapperParam_tdl_24 on WrapperParam (tdl_id);
+alter table WrapperVersion add constraint fk_WrapperVersion_wrapper_25 foreign key (wrapper_id) references Wrapper (id);
+create index ix_WrapperVersion_wrapper_25 on WrapperVersion (wrapper_id);
 
 
 
@@ -279,8 +265,6 @@ drop table if exists TestCase cascade;
 drop table if exists TestGroup cascade;
 
 drop table if exists TestRun cascade;
-
-drop table if exists TokenAction cascade;
 
 drop table if exists Users cascade;
 
