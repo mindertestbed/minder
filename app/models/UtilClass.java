@@ -2,7 +2,7 @@ package models;
 
 import com.avaje.ebean.Ebean;
 import mtdl.TdlCompiler;
-import play.db.ebean.Model;
+import com.avaje.ebean.Model;
 
 import javax.persistence.*;
 import java.util.List;
@@ -21,13 +21,13 @@ public class UtilClass extends Model {
   @Column(nullable = false)
   public TestGroup testGroup;
 
-  @Column(unique = true, nullable = false)
+  @Column(nullable = false)
   public String name;
 
-  @Column(nullable = false, length = ModelConstants.SHORT_DESC_LENGTH)
+  @Column(nullable = false, length = ModelConstants.SHORT_DESC_LENGTH, columnDefinition = "TEXT")
   public String shortDescription;
 
-  @Column(nullable = false, length = ModelConstants.MAX_TDL_LENGTH)
+  @Column(nullable = false, length = ModelConstants.MAX_TDL_LENGTH, columnDefinition = "TEXT")
   public String source;
 
   @ManyToOne
@@ -87,6 +87,10 @@ public class UtilClass extends Model {
     } finally {
       Ebean.endTransaction();
     }
+  }
+
+  public static UtilClass findByGroupIdAndName(Long groupId, String name) {
+    return find.where().eq("testGroup.id", groupId).eq("name", name).findUnique();
   }
 }
 

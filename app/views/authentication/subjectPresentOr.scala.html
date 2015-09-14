@@ -1,0 +1,7 @@
+@(content: => Html)(content2: => Html)
+
+@if(Authentication.getLocalUser() != null){
+  @content
+} else {
+  @content2
+}

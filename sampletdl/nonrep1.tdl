@@ -1,3 +1,0 @@
-TestCase = "NonRepudiation1"
-
-val rivet1 = "slot0()" of "wrapper0" asIs

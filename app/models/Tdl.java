@@ -2,7 +2,7 @@ package models;
 
 import com.avaje.ebean.Ebean;
 import com.avaje.ebean.SqlQuery;
-import play.db.ebean.Model;
+import com.avaje.ebean.Model;
 
 import javax.persistence.*;
 import java.util.Date;
@@ -26,12 +26,13 @@ public class Tdl extends Model {
   @Column(nullable = false)
   public TestCase testCase;
 
-  @Column(nullable = false, length = ModelConstants.MAX_TDL_LENGTH)
+  @Column(nullable = false, length = ModelConstants.MAX_TDL_LENGTH, columnDefinition = "TEXT")
   public String tdl;
 
   @Column(nullable = false)
   public String version;
 
+  public List<Job> jobs;
   public Date creationDate;
 
 

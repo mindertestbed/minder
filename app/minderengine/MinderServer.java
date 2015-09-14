@@ -36,7 +36,7 @@ public class MinderServer implements IMinderServer {
     if (user == null)
       throw new IllegalArgumentException("No owner defined for session " + sessionId);
 
-    return new UserDTO(user.name, user.firstName, user.lastName, user.email);
+    return new UserDTO(user.name, user.name, null, user.email);
   }
 
   @Override

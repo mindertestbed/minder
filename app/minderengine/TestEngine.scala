@@ -1,16 +1,13 @@
 package minderengine
 
-import java.io.ByteArrayInputStream
 import java.lang.reflect.InvocationTargetException
 import java.util
-import java.util.Properties
 
 import models._
 import mtdl._
 import org.apache.log4j.spi.LoggingEvent
-import org.apache.log4j.{Level, AppenderSkeleton, EnhancedPatternLayout}
-import org.interop.xoola.tcpcom.connmanager.server.IClassLoaderProvider
-import play.api.Logger
+import org.apache.log4j.{AppenderSkeleton, EnhancedPatternLayout, Level}
+import play.Logger
 
 import scala.collection.JavaConversions._
 
@@ -18,8 +15,6 @@ import scala.collection.JavaConversions._
  * Created by yerlibilgin on 07/12/14.
  */
 object TestEngine {
-
-
   def describe(clsMinderTDL: Class[MinderTdl]): util.List[Rivet] = {
     val minderTDL = clsMinderTDL.getConstructors()(0).newInstance(null, java.lang.Boolean.FALSE).asInstanceOf[MinderTdl]
     minderTDL.RivetDefs
@@ -119,7 +114,11 @@ object TestEngine {
 
       lgr.info("> CALL START TEST ON Wrappers");
       for (wrapperName <- minderTDL.wrapperDefs) {
-        val identifier = wrapperName + "|" + wrapperToVersionMap(wrapperName)
+        val identifier = if (wrapperToVersionMap.contains(wrapperName)) {
+          wrapperName + "|" + wrapperToVersionMap(wrapperName)
+        } else {
+          wrapperName
+        }
         val minderClient = if (BuiltInWrapperRegistry.get().contains(identifier)) {
           BuiltInWrapperRegistry.get().getWrapper(identifier)
         } else {
@@ -136,9 +135,10 @@ object TestEngine {
         var rivetIndex = 0;
         for (rivet <- minderTDL.RivetDefs) {
           lgr.info("> " + "RUN RIVET " + rivetIndex)
+          val rivetWrapperId: String = rivet.slot.wrapperId
           //resolve the minder client id. This might as well be resolved to a local built-in wrapper or the null slot.
           val minderClient =
-            if (rivet.slot.wrapperId == "NULLWRAPPER") {
+            if (rivetWrapperId == "NULLWRAPPER") {
               new IMinderClient {
                 override def callSlot(s: String, s1: String, objects: Array[AnyRef]): AnyRef = {
                   null
@@ -152,7 +152,12 @@ object TestEngine {
               }
 
             } else {
-              val identifier = rivet.slot.wrapperId + "|" + wrapperToVersionMap(rivet.slot.wrapperId)
+              val identifier = if (wrapperToVersionMap.contains(rivetWrapperId)) {
+                rivetWrapperId + "|" + wrapperToVersionMap(rivetWrapperId)
+              } else {
+                rivetWrapperId
+              }
+
               if (BuiltInWrapperRegistry.get().containsWrapper(identifier)) {
                 BuiltInWrapperRegistry.get().getWrapper(identifier)
               } else {
@@ -182,8 +187,8 @@ object TestEngine {
               val identifier = label + "|" + wrapperToVersionMap(label)
               lgr.debug("> Wait For Signal:" + identifier + "." + signature)
 
-              val signalData: SignalCallData = try {
-                me.dequeueSignal(identifier, signature, signal.timeout).asInstanceOf[SignalCallData]
+              val signalData: SignalData = try {
+                me.dequeueSignal(identifier, signature, signal.timeout).asInstanceOf[SignalData]
               } catch {
                 case rte: RuntimeException => {
                   signal.handleTimeout(rte)
@@ -192,18 +197,22 @@ object TestEngine {
                 }
               }
 
-              //
-              //
-              //TODO: instance control ekle ve hata durumlarini ayrica handle et.MTDLde
-              //
               lgr.debug("< Signal Arrived: " + identifier + "." + signature)
 
-              testProcessWatcher.signalEmitted(rivetIndex, signalIndex, signalData)
+              if (signalData.isInstanceOf[SignalErrorData]) {
+                lgr.debug("This is an error signal");
+                val signalErrorData = signalData.asInstanceOf[SignalErrorData]
+                throw new RuntimeException("Signal [" + identifier + "." + signature + "] failed [" + signalErrorData.signalFailedException.getMessage,
+                  signalErrorData.signalFailedException)
+              }
+              val signalCallData: SignalCallData = signalData.asInstanceOf[SignalCallData]
+
+              testProcessWatcher.signalEmitted(rivetIndex, signalIndex, signalCallData)
 
               for (paramPipe <- rivet.signalPipeMap(tuple)) {
                 //FIX for BUG-1 : added an if for -1 param
                 if (paramPipe.in != -1) {
-                  convertParam(paramPipe.out, paramPipe.execute(signalData.args(paramPipe.in)), args)
+                  convertParam(paramPipe.out, paramPipe.execute(signalCallData.args(paramPipe.in)), args)
                 }
               }
 
@@ -235,9 +244,10 @@ object TestEngine {
               testProcessWatcher.signalEmitted(rivetIndex, signalIndex, signalData2)
             }
 
-            lgr.info("> CALL SLOT " + rivet.slot.wrapperId + "." + rivet.slot.signature)
+            lgr.info("> CALL SLOT " + rivetWrapperId + "." + rivet.slot.signature)
+            testProcessWatcher.rivetInvoked(rivetIndex);
             rivet.result = minderClient.callSlot(userEmail, rivet.slot.signature, args)
-            lgr.info("< SLOT CALLED " + rivet.slot.wrapperId + "." + rivet.slot.signature)
+            lgr.info("< SLOT CALLED " + rivetWrapperId + "." + rivet.slot.signature)
 
 
             testProcessWatcher.rivetFinished(rivetIndex)
@@ -381,6 +391,8 @@ trait TestProcessWatcher {
   def signalEmitted(rivetIndex: Int, signalIndex: Int, signalData: SignalData): Unit
 
   def rivetFinished(rivetIndex: Int): Unit
+
+  def rivetInvoked(rivetIndex: Int): Unit
 
   def finished(): Unit
 

@@ -1,0 +1,15 @@
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+            targetNamespace="http://mami/library"
+            xmlns:lib="http://mami/library"
+            xmlns:cls="http://mami/class">
+
+    <xsd:import namespace="http://mami/class" schemaLocation="../others/class.xsd"/>
+
+    <xsd:element name="library" type="lib:Library"/>
+
+    <xsd:complexType name="Library">
+        <xsd:sequence>
+            <xsd:element ref="cls:class" maxOccurs="unbounded" minOccurs="0"/>
+        </xsd:sequence>
+    </xsd:complexType>
+</xsd:schema>

@@ -1,6 +1,6 @@
 package models;
 
-import play.db.ebean.Model;
+import com.avaje.ebean.Model;
 
 import javax.persistence.*;
 import java.util.List;
@@ -28,11 +28,14 @@ public class TestGroup extends Model {
   @OneToMany(cascade = CascadeType.ALL,fetch = FetchType.LAZY)
   public List<UtilClass> utilClasses;
 
+  @OneToMany(cascade = CascadeType.ALL,fetch = FetchType.LAZY)
+  public List<TestAsset> testAssets;
 
-  @Column(length = ModelConstants.DESCRIPTION_LENGTH)
+
+  @Column(length = ModelConstants.DESCRIPTION_LENGTH, columnDefinition = "TEXT")
   public String description;
 
-  @Column(nullable = false, length = ModelConstants.SHORT_DESC_LENGTH)
+  @Column(nullable = false, length = ModelConstants.SHORT_DESC_LENGTH, columnDefinition = "TEXT")
   public String shortDescription;
 
   @Column

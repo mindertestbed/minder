@@ -5,12 +5,11 @@ import java.lang.reflect.Field
 import java.util._
 import java.util.zip.{GZIPInputStream, GZIPOutputStream}
 
-import controllers.Assets
-import editormodels.AssertionEditorModel
-import models.{User, PrescriptionLevel}
+import models.{PrescriptionLevel, User}
 import play.Logger
 import play.data.Form
 import play.data.validation.{Constraints, ValidationError}
+import play.mvc.Http
 
 /**
  * Created by yerlibilgin on 02/05/15.
@@ -172,6 +171,37 @@ object Util {
       read = gzipInputStream.read(chunk, 0, chunk.length); read
     })) > 0) {
       outputStream.write(chunk, 0, read)
+    }
+  }
+
+  def sha256(array: Array[Byte]): Array[Byte] = {
+    import java.security.MessageDigest;
+    val md = MessageDigest.getInstance("SHA-256");
+    md.digest(array)
+  }
+
+  def compareArray(array1: Array[Byte], array2: Array[Byte]): Boolean = {
+    if (array1 == null && array2 == null) {
+      true
+    } else if (array1 == null) {
+      false
+    } else if (array2 == null) {
+      false
+    } else {
+      if (array1.length != array2.length)
+        false
+      else {
+        try {
+          for (i <- 0 until array1.length) {
+            if (array1(i) != array2(i))
+              throw new RuntimeException()
+          }
+          true
+        } catch {
+          case _: Throwable =>
+            false
+        }
+      }
     }
   }
 }

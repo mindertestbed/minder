@@ -1,6 +1,6 @@
 package models;
 
-import play.db.ebean.Model;
+import com.avaje.ebean.Model;
 
 import javax.persistence.*;
 import java.util.List;
@@ -18,7 +18,7 @@ public class MappedWrapper extends Model{
   @ManyToOne
   public WrapperParam parameter;
 
-  @OneToOne
+  @ManyToOne
   public WrapperVersion wrapperVersion;
 
   @ManyToOne

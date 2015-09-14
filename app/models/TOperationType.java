@@ -8,7 +8,7 @@ import javax.persistence.Id;
 import javax.persistence.Table;
 
 import controllers.common.enumeration.OperationType;
-import play.db.ebean.Model;
+import com.avaje.ebean.Model;
 
 @Entity
 @Table(name = "OperationType")

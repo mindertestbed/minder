@@ -1,101 +1,167 @@
 #Users
 users:
-  - &system !!models.User
-    active: true
-    email: root@minder
-    emailValidated: true
-    firstName: minder
-    lastLogin: 2014-12-29T07:08:49.850Z
-    lastName: null
-    linkedAccounts:
-    - providerKey: password
-      providerUserId: $2a$10$QoJy1UgFXMjLMJlQ6hAnhe1Y07yoBH0Eucna1OSag2qKWhS79HQg6
-      user: *system
-    name: Muhammet YILDIZ
-    permissions: []
-    roles:
-    - {id: 1, roleName: observer}
-    - {id: 2, roleName: Test Designer}
-    - {id: 3, roleName: Test Developer}
-    testGroups: []
+  - !!models.UserInitiator
+      password: 12345
+      user: &root !!models.User
+        email: root@minder
+        name: ROOT
+        roles:
+        - !!models.DBRole
+            user: *root
+            role: TEST_DESIGNER
+        - !!models.DBRole
+            user: *root
+            role: TEST_DEVELOPER
+        - !!models.DBRole
+            user: *root
+            role: TEST_OBSERVER
+        testGroups: []
+  - !!models.UserInitiator
+      password: 12345
+      user: &tester !!models.User
+        email: tester@minder
+        name: Tester
+        roles:
+        - !!models.DBRole
+            user: *tester
+            role: TEST_DESIGNER
+        - !!models.DBRole
+            user: *tester
+            role: TEST_DEVELOPER
+        testGroups: []
 #Groups
 groups:
 - &sampleGroup !!models.TestGroup
-    description: A sample test gest assertions and test cases
-    name: Sample Test Group
-    shortDescription:  A sample test group
+    description: A sample test group that contains tests that demonstate minder kapabilities
+    name: Showcase
+    shortDescription:  Showcase
     dependencyString: null
-    owner: *user
+    owner: *tester
     testAssertions:
     - &taSample1 !!models.TestAssertion
         testGroup: *sampleGroup
-        taId: TASAMPLE1
+        taId: SampleXmlValidation
         normativeSource: The system must generate valid book entries
-        target: BOOKS XML
-        prerequisites: the sut is connected and ready for testing
-        predicate: the generated books xml conforms to books.xsd
+        target: books xml
+        prerequisites: The XML generator system is connected and ready.
+        predicate: The generated books xml conforms to books.xsd
         prescriptionLevel: Mandatory
-        shortDescription:  A sample test assertion
+        shortDescription:  A sample xml-content-validation test
+        owner: *tester
         testCases:
         - &testCase1 !!models.TestCase
-           shortDescription: A tel against books.xsd
+           shortDescription: Books test
+           owner: *tester
            tdls:
            - !!models.Tdl
-             tdl: sampletdl/xmltest.tdl
+             tdl: conf/initialdata/xmltest.tdl
              version: 0.0.1
              creationDate: "2015-02-02 00:00:00"
              testCase: *testCase1
            testAssertion: *taSample1
            name: TestCaseSample1
-- &sampleGroup2 !!models.TestGroup
-    description: A sample test gest assertions and test cases
-    name: Sample Test Group2
-    shortDescription:  A sample test group
-    dependencyString: null
-    owner: *massi
-    testAssertions:
     - &taSample2 !!models.TestAssertion
-        testGroup: *sampleGroup2
-        taId: TASAMPLE2
-        normativeSource: The system must generate valid book entries
-        target: BOOKS XML
-        prerequisites: the sut is connected and ready for testing
-        predicate: the generated books xml conforms to books.xsd
+        testGroup: *sampleGroup
+        taId: AllSchemaTests
+        normativeSource: All tests should be done
+        target: xml-content-verifier
+        prerequisites:
+        predicate: all schema and schematron tests must succeed
         prescriptionLevel: Mandatory
-        shortDescription:  A sample test assertion
+        shortDescription:  A sample xml-content-validation test
+        owner: *tester
         testCases:
-        - !!models.TestCase
-           shortDescription: A tel against books.xsd
+        - &testCase2 !!models.TestCase
+           shortDescription: All xml verification tests
+           owner: *tester
+           testAssertion: *taSample2
+           name: SchemaHell
            tdls:
            - !!models.Tdl
-              tdl: sampletdl/xmltest.tdl
-              version: 0.0.1
-              creationDate: "2015-02-02 00:00:00"
-              testCase: *testCase1
-           testAssertion: *taSample2
-           name: TestCaseSample2
+             tdl: conf/initialdata/SchemaHell.tdl
+             version: 0.0.1
+             creationDate: "2015-02-02 00:00:00"
+             testCase: *testCase2
+    testAssets:
+    - !!models.TestAsset
+        name: books.xsd
+        group: *sampleGroup
+    - !!models.TestAsset
+        name: keys.sch
+        group: *sampleGroup
+    - !!models.TestAsset
+        name: phases.sch
+        group: *sampleGroup
+    - !!models.TestAsset
+        name: simple-namespaces.sch
+        group: *sampleGroup
+    - !!models.TestAsset
+        name: simple.sch
+        group: *sampleGroup
+    - !!models.TestAsset
+        name: library.jar
+        group: *sampleGroup
+    - !!models.TestAsset
+        name: schematron.jar
+        group: *sampleGroup
+    - !!models.TestAsset
+        name: library.zip
+        group: *sampleGroup
+    - !!models.TestAsset
+        name: schematron.zip
+        group: *sampleGroup
+    - !!models.TestAsset
+        name: sample-book.xml
+        group: *sampleGroup
+    - !!models.TestAsset
+        name: sample-library-invalid.xml
+        group: *sampleGroup
+    - !!models.TestAsset
+        name: sample-library.xml
+        group: *sampleGroup
+    - !!models.TestAsset
+        name: simple-input-invalid.xml
+        group: *sampleGroup
+    - !!models.TestAsset
+        name: simple-input-namespaces-invalid.xml
+        group: *sampleGroup
+    - !!models.TestAsset
+        name: simple-input.xml
+        group: *sampleGroup
+
 #wrappers
 wrappers:
+- &xmlContentVerifier !!models.Wrapper
+  name: xml-content-verifier
+  user: *root
+  shortDescription: XMl Content Verifier
+  wrapperVersions:
+  - !!models.WrapperVersion
+    signals: []
+    slots: []
+    version: "1"
+    creationDate: "2015-08-08 00:00:00"
+    wrapper: *xmlContentVerifier
 - &xmlGenerator !!models.Wrapper
-  name: xmlGenerator
-  user: *user
+  name: xml-generator
+  user: *root
   shortDescription: XMl Generator Wrapper
   wrapperVersions:
   - !!models.WrapperVersion
     signals: []
     slots: []
-    version: "0.0.1"
-    creationDate: "2015-02-02 00:00:00"
+    version: "1"
+    creationDate: "2015-08-08 00:00:00"
     wrapper: *xmlGenerator
 - &xmlValueInitiator  !!models.Wrapper
-  name: xmlValueInitiator
+  name: xml-value-initiator
   shortDescription: XMl Value Initiator Wrapper
-  user: *user
+  user: *root
   wrapperVersions:
   - !!models.WrapperVersion
     signals: []
     slots: []
-    version: "0.0.1"
+    version: "1"
     creationDate: "2015-02-02 00:00:00"
     wrapper: *xmlValueInitiator
 #Operation Types

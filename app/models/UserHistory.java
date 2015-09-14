@@ -2,7 +2,7 @@ package models;
 
 import javax.persistence.*;
 
-import play.db.ebean.Model;
+import com.avaje.ebean.Model;
 
 import java.io.UnsupportedEncodingException;
 

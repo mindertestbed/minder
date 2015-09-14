@@ -4,8 +4,6 @@
 
 </div>
 
-<label>Job Queue</label>
-
 @defining(TestEngineController.activeRunContext){ activeRunContext =>
     @if(activeRunContext != null){
         <div class="fullw" style="padding:10px;">
@@ -25,8 +23,15 @@
                 </td></tr></table>
             </div>
         </div>
+    } else{
+        <div style="overflow: hidden; height:50px;"><img style="position: relative; top:0" src="@routes.Assets.at("/images/sleeping.png")"
+          alt="http://www.cliparthut.com/clip-arts/481/people-sleeping-clip-art-481711.jpeg" height="70" width="250"></div>
     }
 }
+
+<br />
+
+<label>Job Queue</label>
 
 @defining(TestEngineController.jobQueue) { queue =>
 @if(queue.isEmpty){

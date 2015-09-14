@@ -1,5 +1,8 @@
+@import authentication.subjectHasRoleOr
+@import security.Role
+
 @(job: Job, showHistory: Boolean = true, localUser: models.User = null)
-    @main(Messages("playauthenticate.navigation.restricted.testdesigner"), "restrictedTestDesigner") {
+    @main(Messages("minder.navigation.restricted.testdesigner"), "restrictedTestDesigner") {
         @dialogs()
 
         <script>
@@ -73,9 +76,14 @@
 
         <div class="indent">
             <table  class="section"><tr><td>
+                @subjectHasRoleOr(Role.TEST_DESIGNER){
                 <button id="enqueue" type="button" onclick='simpleAjaxGet("mainDialog", "/enqueueJob?id=@{job.id}", "Enqueue Job", "Enqueue job [@{job.name}]?")'>
                     Enqueue Job <img src="@routes.Assets.at("/images/running-64.png")" height="16px"/>
                 </button>
+                }{
+
+                }
+
                 <button type="button" onclick='window.location="/restrictedTestDesigner?display=jobQueue"'>
                     Show Running Jobs <img src="@routes.Assets.at("/images/rules-64.png")" height="16px"/>
                 </button></td></tr>

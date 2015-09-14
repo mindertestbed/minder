@@ -1,6 +1,7 @@
 package controllers;
 
 import editormodels.WrapperEditorModel;
+import global.Global;
 import global.Util;
 import models.*;
 import net.sf.jasperreports.engine.*;
@@ -10,10 +11,17 @@ import play.Logger;
 import play.data.Form;
 import play.mvc.Controller;
 import play.mvc.Result;
-import views.html.*;
+import play.mvc.Security;
+import views.html.testRunLister;
+import views.html.wrapperEditor;
+import views.html.wrapperEditor2;
+import views.html.wrapperLister;
 
 import java.io.ByteArrayOutputStream;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import static play.data.Form.form;
 
@@ -23,6 +31,7 @@ import static play.data.Form.form;
 public class WrapperController extends Controller {
   public static final Form<WrapperEditorModel> WRAPPER_FORM = form(WrapperEditorModel.class);
 
+  @Security.Authenticated(Secured.class)
   public static Result listTestRuns(Long configurationId) {
     Job rc = Job.findById(configurationId);
     if (rc == null) {
@@ -35,10 +44,10 @@ public class WrapperController extends Controller {
 
   }
 
+  @Security.Authenticated(Secured.class)
   public static Result doCreateWrapper() {
-    com.feth.play.module.pa.controllers.Authenticate.noCache(response());
     final Form<WrapperEditorModel> filledForm = WRAPPER_FORM.bindFromRequest();
-    final User localUser = Application.getLocalUser(session());
+    final User localUser = Authentication.getLocalUser();
     if (filledForm.hasErrors()) {
       Util.printFormErrors(filledForm);
       return badRequest(wrapperEditor.render(filledForm, null));
@@ -60,17 +69,17 @@ public class WrapperController extends Controller {
 
       wrapper.save();
 
-      return ok(wrapperLister.render(Application.getLocalUser(session())));
+      return ok(wrapperLister.render(Authentication.getLocalUser()));
     }
   }
 
+  @Security.Authenticated(Secured.class)
   public static Result createNewWrapperForm() {
     return ok(wrapperEditor.render(WRAPPER_FORM, null));
   }
 
+  @Security.Authenticated(Secured.class)
   public static Result doDeleteWrapper(Long id) {
-    com.feth.play.module.pa.controllers.Authenticate.noCache(response());
-
     System.out.println("Wrapper id:" + id);
     Wrapper wr = Wrapper.findById(id);
     if (wr == null) {
@@ -87,9 +96,10 @@ public class WrapperController extends Controller {
       return badRequest(ex.getMessage());
     }
 
-    return ok(wrapperLister.render(Application.getLocalUser(session())));
+    return ok(wrapperLister.render(Authentication.getLocalUser()));
   }
 
+  @Security.Authenticated(Secured.class)
   public static Result editWrapperForm(Long id) {
     Wrapper wr = Wrapper.find.byId(id);
     if (wr == null) {
@@ -106,11 +116,9 @@ public class WrapperController extends Controller {
     }
   }
 
+  @Security.Authenticated(Secured.class)
   public static Result doEditWrapper() {
-    com.feth.play.module.pa.controllers.Authenticate.noCache(response());
-
-    final Form<WrapperEditorModel> filledForm = WRAPPER_FORM
-        .bindFromRequest();
+    final Form<WrapperEditorModel> filledForm = WRAPPER_FORM.bindFromRequest();
 
     if (filledForm.hasErrors()) {
       Util.printFormErrors(filledForm);
@@ -122,12 +130,11 @@ public class WrapperController extends Controller {
       wr.update();
 
       Logger.info("Done updating wrapper " + model.name);
-      return ok(wrapperLister.render(Application
-          .getLocalUser(session())));
+      return ok(wrapperLister.render(Authentication.getLocalUser()));
     }
   }
 
-
+  @Security.Authenticated(Secured.class)
   public static Result viewReport(Long testRunId, String type) {
     TestRun tr = TestRun.findById(testRunId);
     if (tr == null)
@@ -146,6 +153,7 @@ public class WrapperController extends Controller {
     return ok(data);
   }
 
+  @Security.Authenticated(Secured.class)
   private static byte[] toPdf(byte[] data, TestRun tr) {
     try {
       JasperReport report = JasperCompileManager.compileReport(WrapperController.class.getResourceAsStream("/taReport.jrxml"));

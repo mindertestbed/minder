@@ -1,17 +1,18 @@
 package controllers;
 
-import be.objectify.deadbolt.java.actions.Group;
-import be.objectify.deadbolt.java.actions.Restrict;
 import com.fasterxml.jackson.databind.JsonNode;
 import editormodels.AssertionEditorModel;
 import global.Util;
 import models.PrescriptionLevel;
+import security.Role;
 import models.TestAssertion;
 import models.TestGroup;
 import play.Logger;
 import play.data.Form;
 import play.mvc.Controller;
 import play.mvc.Result;
+import play.mvc.Security;
+import security.AllowedRoles;
 import views.html.assertionDetailView;
 import views.html.testAssertionEditor;
 
@@ -26,7 +27,7 @@ public class AssertionController extends Controller {
   /*
    * Test Asertion CRUD
    */
-  @Restrict(@Group(Application.TEST_DESIGNER_ROLE))
+  @AllowedRoles(Role.TEST_DESIGNER)
   public static Result getCreateAssertionEditorView(Long groupId) {
     TestGroup tg = TestGroup.findById(groupId);
     if (tg == null) {
@@ -40,9 +41,8 @@ public class AssertionController extends Controller {
     }
   }
 
-  @Restrict(@Group(Application.TEST_DESIGNER_ROLE))
+  @AllowedRoles(Role.TEST_DESIGNER)
   public static Result doCreateAssertion() {
-    com.feth.play.module.pa.controllers.Authenticate.noCache(response());
     final Form<AssertionEditorModel> filledForm = TEST_ASSERTION_FORM
         .bindFromRequest();
 
@@ -79,7 +79,7 @@ public class AssertionController extends Controller {
       ta.testGroup = tg;
       ta.prescriptionLevel = PrescriptionLevel
           .valueOf(model.prescriptionLevel);
-      ta.owner = Application.getLocalUser(session());
+      ta.owner = Authentication.getLocalUser();
 
       ta.save();
 
@@ -91,7 +91,7 @@ public class AssertionController extends Controller {
     }
   }
 
-  @Restrict(@Group(Application.TEST_DESIGNER_ROLE))
+  @AllowedRoles(Role.TEST_DESIGNER)
   public static Result editAssertionForm(Long id) {
     TestAssertion ta = TestAssertion.findById(id);
     if (ta == null) {
@@ -99,7 +99,7 @@ public class AssertionController extends Controller {
 
     }
 
-    if (!Util.canAccess(Application.getLocalUser(session()), ta.owner))
+    if (!Util.canAccess(Authentication.getLocalUser(), ta.owner))
       return badRequest("You don't have permission to modify this resource");
 
     AssertionEditorModel taModel = new AssertionEditorModel();
@@ -121,9 +121,8 @@ public class AssertionController extends Controller {
     return ok(testAssertionEditor.render(bind, null));
   }
 
-  @Restrict(@Group(Application.TEST_DESIGNER_ROLE))
+  @AllowedRoles(Role.TEST_DESIGNER)
   public static Result doEditAssertion() {
-    com.feth.play.module.pa.controllers.Authenticate.noCache(response());
     final Form<AssertionEditorModel> filledForm = TEST_ASSERTION_FORM
         .bindFromRequest();
 
@@ -140,7 +139,7 @@ public class AssertionController extends Controller {
         return badRequest(testAssertionEditor.render(filledForm, null));
       }
 
-      if (!Util.canAccess(Application.getLocalUser(session()), ta.owner))
+      if (!Util.canAccess(Authentication.getLocalUser(), ta.owner))
         return badRequest("You don't have permission to modify this resource");
 
       ta.taId = model.taId;
@@ -173,10 +172,8 @@ public class AssertionController extends Controller {
     }
   }
 
-  @Restrict(@Group(Application.TEST_DESIGNER_ROLE))
+  @AllowedRoles(Role.TEST_DESIGNER)
   public static Result doDeleteAssertion(Long id) {
-    com.feth.play.module.pa.controllers.Authenticate.noCache(response());
-
     TestAssertion ta = TestAssertion.findById(id);
     if (ta == null) {
       // it does not exist. error
@@ -184,7 +181,7 @@ public class AssertionController extends Controller {
           + " does not exist.");
     }
 
-    if (!Util.canAccess(Application.getLocalUser(session()), ta.owner))
+    if (!Util.canAccess(Authentication.getLocalUser(), ta.owner))
       return badRequest("You don't have permission to modify this resource");
 
     try {
@@ -197,20 +194,17 @@ public class AssertionController extends Controller {
     return redirect(controllers.routes.GroupController.getGroupDetailView(ta.testGroup.id, "assertions"));
   }
 
-  @Restrict(@Group(Application.TEST_DESIGNER_ROLE))
   public static Result getAssertionDetailView(Long id, String display) {
     TestAssertion ta = TestAssertion.findById(id);
     if (ta == null) {
       return badRequest("No test assertion with id " + id + ".");
     }
-    return ok(assertionDetailView.render(ta, Application.getLocalUser(session()), display));
+    return ok(assertionDetailView.render(ta, Authentication.getLocalUser(), display));
   }
 
 
-  @Restrict(@Group(Application.TEST_DESIGNER_ROLE))
+  @AllowedRoles(Role.TEST_DESIGNER)
   public static Result doEditAssertionField() {
-    com.feth.play.module.pa.controllers.Authenticate.noCache(response());
-
     JsonNode jsonNode = request().body().asJson();
 
     return GroupController.doEditField(AssertionEditorModel.class, TestAssertion.class, jsonNode);

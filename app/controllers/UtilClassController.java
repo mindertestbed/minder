@@ -3,14 +3,14 @@ package controllers;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import editormodels.UtilClassEditorModel;
+import global.Global;
 import global.Util;
 import models.*;
 import play.Logger;
 import play.data.Form;
 import play.mvc.Controller;
 import play.mvc.Result;
-import views.html.testCaseEditor;
-import views.html.testCaseView;
+import play.mvc.Security;
 import views.html.utilClassEditor;
 import views.html.utilClassView;
 
@@ -23,6 +23,7 @@ import static play.data.Form.form;
 public class UtilClassController extends Controller {
   public static final Form<UtilClassEditorModel> UTIL_CLASS_FORM = form(UtilClassEditorModel.class);
 
+  @Security.Authenticated(Secured.class)
   public static Result getCreateUtilClassEditorView(Long groupId) {
     TestGroup testGroup = TestGroup.findById(groupId);
     if (testGroup == null) {
@@ -38,8 +39,8 @@ public class UtilClassController extends Controller {
     }
   }
 
+  @Security.Authenticated(Secured.class)
   public static Result doCreateUtilClass() {
-    com.feth.play.module.pa.controllers.Authenticate.noCache(response());
     final Form<UtilClassEditorModel> filledForm = UTIL_CLASS_FORM
         .bindFromRequest();
 
@@ -47,11 +48,15 @@ public class UtilClassController extends Controller {
       Util.printFormErrors(filledForm);
       return badRequest(utilClassEditor.render(filledForm, false));
     } else {
-      UtilClassEditorModel model = filledForm.get();
 
-      UtilClass utilClass = UtilClass.findByName(model.name);
+      UtilClassEditorModel model = filledForm.get();
+      Logger.debug("Creating util class " + model.name);
+
+      UtilClass utilClass = UtilClass.findByGroupIdAndName(model.groupId, model.name);
       if (utilClass != null) {
-        filledForm.reject("Atil class with name [" + utilClass.name
+        Logger.error("A util class with the given name already exists");
+
+        filledForm.reject("A util class with name [" + utilClass.name
             + "] already exists");
         return badRequest(utilClassEditor.render(filledForm, false));
       }
@@ -62,11 +67,11 @@ public class UtilClassController extends Controller {
         return badRequest(utilClassEditor.render(filledForm, false));
       }
 
-      final User localUser = Application.getLocalUser(session());
+      final User localUser = Authentication.getLocalUser();
 
       utilClass = new UtilClass();
       utilClass.name = model.name;
-      utilClass.source = model.source;
+      utilClass.source = model.tdl;
       utilClass.shortDescription = model.shortDescription;
       utilClass.testGroup = tg;
       utilClass.owner = localUser;
@@ -78,14 +83,15 @@ public class UtilClassController extends Controller {
         return badRequest(utilClassEditor.render(filledForm, false));
       }
 
-      utilClass = UtilClass.findByName(utilClass.name);
+      utilClass = UtilClass.findByGroupIdAndName(model.groupId, utilClass.name);
 
-      Logger.info("UtilClass with name " + utilClass.id + ":" + utilClass.name
+      Logger.info("Util class with name " + utilClass.id + ":" + utilClass.name
           + " was created");
       return redirect(routes.GroupController.getGroupDetailView(tg.id, "utils"));
     }
   }
 
+  @Security.Authenticated(Secured.class)
   public static Result getEditCaseEditorView(Long id) {
     UtilClass utilClass = UtilClass.findById(id);
     if (utilClass == null) {
@@ -96,15 +102,15 @@ public class UtilClassController extends Controller {
       ucModel.groupId = utilClass.testGroup.id;
       ucModel.name = utilClass.name;
       ucModel.shortDescription = utilClass.shortDescription;
-      ucModel.source = utilClass.source;
+      ucModel.tdl = utilClass.source;
 
       Form<UtilClassEditorModel> bind = UTIL_CLASS_FORM.fill(ucModel);
       return ok(utilClassEditor.render(bind, true));
     }
   }
 
+  @Security.Authenticated(Secured.class)
   public static Result doEditUtilClass() {
-    com.feth.play.module.pa.controllers.Authenticate.noCache(response());
     final Form<UtilClassEditorModel> filledForm = UTIL_CLASS_FORM
         .bindFromRequest();
 
@@ -123,10 +129,10 @@ public class UtilClassController extends Controller {
 
       uc.name = model.name;
       uc.shortDescription = model.shortDescription;
-      uc.source = model.source;
+      uc.source = model.tdl;
 
       // check if the name is not duplicate
-      UtilClass tmp = UtilClass.findByName(model.name);
+      UtilClass tmp = UtilClass.findByGroupIdAndName(model.groupId, model.name);
 
       if (tmp == null || tmp.id == uc.id) {
         // either no such name or it is already this object. so update
@@ -149,9 +155,8 @@ public class UtilClassController extends Controller {
     }
   }
 
+  @Security.Authenticated(Secured.class)
   public static Result doDeleteUtilClass(Long id) {
-    com.feth.play.module.pa.controllers.Authenticate.noCache(response());
-
     UtilClass uc = UtilClass.findById(id);
     if (uc == null) {
       // it does not exist. error
@@ -168,6 +173,7 @@ public class UtilClassController extends Controller {
     return redirect(routes.GroupController.getGroupDetailView(uc.testGroup.id, "utils"));
   }
 
+  @Security.Authenticated(Secured.class)
   public static Result viewUtilClass(long id) {
     UtilClass uc = UtilClass.findById(id);
     if (uc == null) {
@@ -176,8 +182,8 @@ public class UtilClassController extends Controller {
     return ok(utilClassView.render(uc));
   }
 
+  @Security.Authenticated(Secured.class)
   public static Result doEditUtilClassField() {
-    com.feth.play.module.pa.controllers.Authenticate.noCache(response());
     JsonNode jsonNode = request().body().asJson();
 
     Result res = GroupController.doEditField(UtilClassEditorModel.class, UtilClass.class, jsonNode);

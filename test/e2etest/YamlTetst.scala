@@ -11,12 +11,12 @@ import org.specs2.runner._
 import org.yaml.snakeyaml.Yaml
 import org.yaml.snakeyaml.constructor.CustomClassLoaderConstructor
 import play.api.test._
-import play.db.ebean.Model
+import com.avaje.ebean.Model
 
 import scala.collection.JavaConversions._
 
 /**
- * This class performs an end-to-end
+ * This class performs an end-to-endTes
  * test case running a predefined TDL where
  * an xml-value-initiator, an xml-generator, a content verifier
  * and a reporting tool are used.

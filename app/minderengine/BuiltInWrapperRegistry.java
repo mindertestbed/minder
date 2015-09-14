@@ -41,11 +41,11 @@ public class BuiltInWrapperRegistry extends HashMap<String, BuiltInWrapper> {
   /**
    * Registers a new built-in wrapper into the system.
    *
-   * @param label
+   * @param identifier label|version
    * @param builtInWrapper
    */
-  public void registerWrapper(String label, BuiltInWrapper builtInWrapper) {
-    this.put(label, builtInWrapper);
+  public void registerWrapper(String identifier, BuiltInWrapper builtInWrapper) {
+
     //register the signals-slots to the MinderWrapperRegistry
     //send the information to the server
     HashSet<MethodContainer> keys = new HashSet();
@@ -58,6 +58,15 @@ public class BuiltInWrapperRegistry extends HashMap<String, BuiltInWrapper> {
 
     //check the database and create the wrapper if it does not exist.
     //MinderWrapperRegistry does the job of writing signal-slots
+
+    int indexOfBar = identifier.indexOf('|');
+    if (indexOfBar == -1){
+      throw new RuntimeException("A built-in wrapper has to have a version [" + identifier + "] is invalid");
+    }
+
+    String label = identifier.substring(0, indexOfBar);
+    this.put(identifier, builtInWrapper);
+    this.put(label, builtInWrapper);
     models.Wrapper wr = Wrapper.findByName(label);
     if (wr == null) {
       wr = new Wrapper();
@@ -66,9 +75,11 @@ public class BuiltInWrapperRegistry extends HashMap<String, BuiltInWrapper> {
       //the user is system
       wr.user = User.findByEmail("root@minder");
       wr.save();
+
+      //we don't register version, as the actual Minder Wrapper Registry will do
     }
 
-    MinderWrapperRegistry.get().updateWrapper(label, keys);
+    MinderWrapperRegistry.get().updateWrapper(identifier, keys);
   }
 
   public void initiate() {

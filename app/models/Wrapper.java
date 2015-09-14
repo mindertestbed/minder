@@ -4,7 +4,7 @@ import java.util.List;
 
 import javax.persistence.*;
 
-import play.db.ebean.Model;
+import com.avaje.ebean.Model;
 
 @Entity
 @Table(name = "Wrapper")
@@ -21,11 +21,11 @@ public class Wrapper extends Model {
   public String name;
 
 
-  @Column(nullable = false, length = ModelConstants.SHORT_DESC_LENGTH)
+  @Column(nullable = false, length = ModelConstants.SHORT_DESC_LENGTH, columnDefinition = "TEXT")
   public String shortDescription;
 
 
-  @Column(length = ModelConstants.DESCRIPTION_LENGTH)
+  @Column(length = ModelConstants.DESCRIPTION_LENGTH, columnDefinition = "TEXT")
   public String description;
 
   @ManyToOne

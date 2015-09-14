@@ -8,7 +8,7 @@
 }
 
 
-@main(Messages("playauthenticate.navigation.restricted.testdesigner"), "restrictedTestDesigner") {
+@main(Messages("minder.navigation.restricted.testdesigner"), "restrictedTestDesigner") {
 
   @dialogs()
 
@@ -61,7 +61,7 @@
 <script>
 
 $(function() {
-	var textArea = document.getElementById("source");
+	var textArea = document.getElementById("tdl");
   var editor = CodeMirror.fromTextArea(textArea, {
       lineNumbers: true,
       lineWrapping: true,
@@ -73,7 +73,7 @@ $(function() {
   });
 
     // store it
-    $("#source").data('CodeMirrorInstance', editor);
+    $("#tdl").data('CodeMirrorInstance', editor);
 
     editor.on("change", function(cm, change) {
       textArea.value = editor.getDoc().getValue();
@@ -125,7 +125,7 @@ $(function() {
             <button type="reset">Reset</button>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
             <button type="button" onclick="history.back ( )">Cancel</button></div>
 
-          <div class="fcborder fullh"> <label>Tdl</label><br/>
+          <div class="fcborder fullh"> <label>Code</label><br/>
             @if(frm.hasGlobalErrors) {
               <p id="error" class="alert alert-danger" style='font-family:"Monaco", "Courier New", "monospace"'></p>
               <xmp id="source" style="display: none">@frm.globalError.message</xmp>
@@ -176,12 +176,12 @@ $(function() {
           </select>
           <br />
           <!-- xtarea(frm("source"), 'class -> "CodeMirror ") -->
-            <textarea id="source" name="source" class = "CodeMirror">@frm("source").value </textarea>
-              @defining(if(frm("source").value == null){""}else{frm("source").value}){ str =>
+            <textarea id="tdl" name="tdl" class = "CodeMirror">@frm("tdl").value </textarea>
+              @defining(if(frm("tdl").value == null){""}else{frm("tdl").value}){ str =>
                 @defining(str.toString.split("\\\n").length) { len =>
                     <script>
                       $(function(){
-                        var editor = $("#source").data('CodeMirrorInstance');
+                        var editor = $("#tdl").data('CodeMirrorInstance');
 
                         var nls = "";
                         for(i = @len; i < 20; i++){

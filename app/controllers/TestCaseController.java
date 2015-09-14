@@ -4,6 +4,7 @@ package controllers;
 import com.avaje.ebean.Ebean;
 import com.fasterxml.jackson.databind.JsonNode;
 import editormodels.TestCaseEditorModel;
+import global.Global;
 import global.Util;
 import minderengine.TestEngine;
 import models.*;
@@ -12,6 +13,7 @@ import play.Logger;
 import play.data.Form;
 import play.mvc.Controller;
 import play.mvc.Result;
+import play.mvc.Security;
 import views.html.testCaseEditor;
 import views.html.testCaseView;
 
@@ -26,7 +28,7 @@ import static play.data.Form.form;
 public class TestCaseController extends Controller {
   public static final Form<TestCaseEditorModel> TEST_CASE_FORM = form(TestCaseEditorModel.class);
 
-
+  @Security.Authenticated(Secured.class)
   public static Result getCreateCaseEditorView(Long assertionId) {
     TestAssertion ta = TestAssertion.findById(assertionId);
     if (ta == null) {
@@ -55,18 +57,18 @@ public class TestCaseController extends Controller {
       testCaseEditorModel.shortDescription = testCaseEditorModel.name;
       Form<TestCaseEditorModel> bind = TEST_CASE_FORM
           .fill(testCaseEditorModel);
-      return ok(testCaseEditor.render(bind, null, false));
+      return ok(testCaseEditor.render(bind, false));
     }
   }
 
+  @Security.Authenticated(Secured.class)
   public static Result doCreateCase() {
-    com.feth.play.module.pa.controllers.Authenticate.noCache(response());
     final Form<TestCaseEditorModel> filledForm = TEST_CASE_FORM
         .bindFromRequest();
 
     if (filledForm.hasErrors()) {
       Util.printFormErrors(filledForm);
-      return badRequest(testCaseEditor.render(filledForm, null, false));
+      return badRequest(testCaseEditor.render(filledForm, false));
     } else {
       TestCaseEditorModel model = filledForm.get();
 
@@ -74,16 +76,16 @@ public class TestCaseController extends Controller {
       if (tc != null) {
         filledForm.reject("The test case with name [" + tc.name
             + "] already exists");
-        return badRequest(testCaseEditor.render(filledForm, null, false));
+        return badRequest(testCaseEditor.render(filledForm, false));
       }
 
       TestAssertion ta = TestAssertion.findById(model.assertionId);
       if (ta == null) {
         filledForm.reject("No assertion found with id [" + ta.id + "]");
-        return badRequest(testCaseEditor.render(filledForm, null, false));
+        return badRequest(testCaseEditor.render(filledForm, false));
       }
 
-      final User localUser = Application.getLocalUser(session());
+      final User localUser = Authentication.getLocalUser();
 
       tc = new TestCase();
       tc.name = model.name;
@@ -104,7 +106,7 @@ public class TestCaseController extends Controller {
       } catch (Exception ex) {
         filledForm.reject("Compilation Failed [" + ex.getMessage() + "]");
         Logger.error(ex.getMessage(), ex);
-        return badRequest(testCaseEditor.render(filledForm, null, false));
+        return badRequest(testCaseEditor.render(filledForm, false));
       } finally {
         Ebean.endTransaction();
       }
@@ -117,13 +119,14 @@ public class TestCaseController extends Controller {
     }
   }
 
+  @Security.Authenticated(Secured.class)
   public static Result getEditCaseEditorView(Long tdlId) {
     Tdl tdl = Tdl.findById(tdlId);
     if (tdl == null) {
       return badRequest("TDL with id [" + tdlId + "] not found!");
     } else {
       tdl.testCase = TestCase.findById(tdl.testCase.id);
-      if (!Util.canAccess(Application.getLocalUser(session()), tdl.testCase.owner))
+      if (!Util.canAccess(Authentication.getLocalUser(), tdl.testCase.owner))
         return badRequest("You don't have permission to modify this resource");
 
       TestCaseEditorModel tcModel = new TestCaseEditorModel();
@@ -134,17 +137,17 @@ public class TestCaseController extends Controller {
       tcModel.version = tdl.version;
 
       Form<TestCaseEditorModel> bind = TEST_CASE_FORM.fill(tcModel);
-      return ok(testCaseEditor.render(bind, null, true));
+      return ok(testCaseEditor.render(bind, true));
     }
   }
 
+  @Security.Authenticated(Secured.class)
   public static Result doEditCase() {
-    com.feth.play.module.pa.controllers.Authenticate.noCache(response());
     final Form<TestCaseEditorModel> filledForm = TEST_CASE_FORM
         .bindFromRequest();
     if (filledForm.hasErrors()) {
       Util.printFormErrors(filledForm);
-      return badRequest(testCaseEditor.render(filledForm, null, true));
+      return badRequest(testCaseEditor.render(filledForm, true));
     } else {
       TestCaseEditorModel model = filledForm.get();
 
@@ -153,9 +156,9 @@ public class TestCaseController extends Controller {
       if (tc == null) {
         filledForm.reject("The test case with ID [" + model.id
             + "] does not exist");
-        return badRequest(testCaseEditor.render(filledForm, null, true));
+        return badRequest(testCaseEditor.render(filledForm, true));
       }
-      if (!Util.canAccess(Application.getLocalUser(session()), tc.owner))
+      if (!Util.canAccess(Authentication.getLocalUser(), tc.owner))
         return badRequest("You don't have permission to modify this resource");
 
       if (model.version.equals(tdl.version)) {
@@ -165,7 +168,7 @@ public class TestCaseController extends Controller {
           TestEngine.describeTdl(tdl);
         } catch (Exception ex) {
           filledForm.reject(ex.getMessage());
-          return badRequest(testCaseEditor.render(filledForm, null, true));
+          return badRequest(testCaseEditor.render(filledForm, true));
         }
         tdl.update();
         return redirect(routes.TestCaseController.viewTestCase(tc.id, "mtdl"));
@@ -182,7 +185,7 @@ public class TestCaseController extends Controller {
           detectAndSaveParameters(newTdl);
         } catch (Exception ex) {
           filledForm.reject(ex.getMessage());
-          return badRequest(testCaseEditor.render(filledForm, null, true));
+          return badRequest(testCaseEditor.render(filledForm, true));
         }
 
 
@@ -191,6 +194,7 @@ public class TestCaseController extends Controller {
     }
   }
 
+  @Security.Authenticated(Secured.class)
   public static void detectAndSaveParameters(Tdl newTdl) {
     Logger.debug("Detect parameters for newTdl");
     LinkedHashMap<String, Set<SignalSlot>> descriptionMap = TestEngine.describeTdl(newTdl);
@@ -230,9 +234,8 @@ public class TestCaseController extends Controller {
     Logger.debug("Detect parameters done");
   }
 
+  @Security.Authenticated(Secured.class)
   public static Result doDeleteCase(Long id) {
-    com.feth.play.module.pa.controllers.Authenticate.noCache(response());
-
     TestCase tc = TestCase.findById(id);
     if (tc == null) {
       // it does not exist. error
@@ -240,7 +243,7 @@ public class TestCaseController extends Controller {
     }
 
 
-    if (!Util.canAccess(Application.getLocalUser(session()), tc.owner))
+    if (!Util.canAccess(Authentication.getLocalUser(), tc.owner))
       return badRequest("You don't have permission to modify this resource");
 
     try {
@@ -253,14 +256,16 @@ public class TestCaseController extends Controller {
     return redirect(routes.AssertionController.getAssertionDetailView(tc.testAssertion.id, "testCases"));
   }
 
+  @Security.Authenticated(Secured.class)
   public static Result viewTestCase(long id, String display) {
     TestCase tc = TestCase.findById(id);
     if (tc == null) {
       return badRequest("No test case with id " + id + ".");
     }
-    return ok(testCaseView.render(tc, Tdl.getLatestTdl(tc), Application.getLocalUser(session()), display));
+    return ok(testCaseView.render(tc, Tdl.getLatestTdl(tc), Authentication.getLocalUser(), display));
   }
 
+  @Security.Authenticated(Secured.class)
   public static Result viewTestCase2(long id, long tdlId, String display) {
     TestCase tc = TestCase.findById(id);
     Tdl tdl = Tdl.findById(tdlId);
@@ -270,11 +275,11 @@ public class TestCaseController extends Controller {
     if (tdl == null) {
       return badRequest("No tdl with id " + id + ".");
     }
-    return ok(testCaseView.render(tc, tdl, Application.getLocalUser(session()), display));
+    return ok(testCaseView.render(tc, tdl, Authentication.getLocalUser(), display));
   }
 
+  @Security.Authenticated(Secured.class)
   public static Result doEditCaseField() {
-    com.feth.play.module.pa.controllers.Authenticate.noCache(response());
     JsonNode jsonNode = request().body().asJson();
 
     Result res = GroupController.doEditField(TestCaseEditorModel.class, TestCase.class, jsonNode);
@@ -290,7 +295,7 @@ public class TestCaseController extends Controller {
         return res;
       } catch (Exception ex) {
         Logger.error(ex.getMessage(), ex);
-        return badRequest("Compilation Failed [" + ex.getMessage() + "]");
+        return badRequest("Failed to save the test case [" + ex.getMessage() + "]");
       }
     }
   }

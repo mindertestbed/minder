@@ -1,91 +1,47 @@
 package global;
 
-import com.feth.play.module.pa.PlayAuthenticate;
-import com.feth.play.module.pa.PlayAuthenticate.Resolver;
-import com.feth.play.module.pa.exceptions.AccessDeniedException;
-import com.feth.play.module.pa.exceptions.AuthException;
+import com.avaje.ebean.Model;
+import controllers.TestCaseController;
 import minderengine.BuiltInWrapperRegistry;
-import mtdl.ReflectionUtils;
 import minderengine.XoolaServer;
 import models.*;
 import mtdl.TDLClassLoaderProvider;
+import org.beybunproject.xmlContentVerifier.utils.Utils;
 import org.yaml.snakeyaml.Yaml;
 import org.yaml.snakeyaml.constructor.CustomClassLoaderConstructor;
 import play.Application;
 import play.GlobalSettings;
 import play.Logger;
 import play.api.Play;
-import play.db.ebean.Model;
-import play.mvc.Call;
+import play.mvc.Http;
 import scala.io.BufferedSource;
 import scala.io.Source;
 
-import java.io.*;
-import java.util.*;
-
-import controllers.*;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.util.Base64;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
 
 public class Global extends GlobalSettings {
   public void onStart(Application app) {
-    PlayAuthenticate.setResolver(new Resolver() {
-      @Override
-      public Call login() {
-        // Your login page
-        return routes.Application.login();
-      }
-
-      @Override
-      public Call afterAuth() {
-        // The owner will be redirected to this page after authentication
-        // if no original URL was saved
-        return routes.Application.index();
-      }
-
-      @Override
-      public Call afterLogout() {
-        return routes.Application.index();
-      }
-
-      @Override
-      public Call auth(final String provider) {
-        // You can provide your own authentication implementation,
-        // however the default should be sufficient for most cases
-        return com.feth.play.module.pa.controllers.routes.Authenticate
-            .authenticate(provider);
-      }
-
-      @Override
-      public Call askMerge() {
-        return routes.Account.askMerge();
-      }
-
-      @Override
-      public Call askLink() {
-        return routes.Account.askLink();
-      }
-
-      @Override
-      public Call onException(final AuthException e) {
-        if (e instanceof AccessDeniedException) {
-          return routes.Signup
-              .oAuthDenied(((AccessDeniedException) e)
-                  .getProviderKey());
-        }
-
-        // more custom problem handling here...
-        return super.onException(e);
-      }
-    });
-
-    initialData();
     TDLClassLoaderProvider.appendExternalClassLoader(Play.classloader(Play.current()));
     TDLClassLoaderProvider.appendExternalClassLoader(ClassLoader.getSystemClassLoader());
+
+    initialData();
+
     BuiltInWrapperRegistry.get().initiate();
     XoolaServer.get().start();
   }
 
+  public static void main(String[] args) {
+    System.out.println(Base64.getEncoder().encodeToString(Util.sha256("12345".getBytes())));
+  }
+
   private void initialData() {
-    if (User.find.findRowCount() == 0) {
+    if (User.findRowCount() == 0) {
       System.out.println("Adding sample data");
       try {
         Yaml yaml = new Yaml(new CustomClassLoaderConstructor(Play.classloader(Play.current())));
@@ -104,7 +60,8 @@ public class Global extends GlobalSettings {
 
             if (model instanceof TestGroup) {
               TestGroup group = (TestGroup) model;
-              group.save();
+
+              System.out.println("ID: " + group.id);
               for (TestAssertion assertion : group.testAssertions) {
                 assertion.save();
                 for (TestCase tcase : assertion.testCases) {
@@ -118,6 +75,17 @@ public class Global extends GlobalSettings {
                     TestCaseController.detectAndSaveParameters(tdl);
                   }
                 }
+              }
+
+              for (TestAsset asset : group.testAssets) {
+                FileInputStream fis = new FileInputStream("conf/initialdata/" + asset.name);
+                byte []assetBytes = Utils.readStream(fis);
+                fis.close();
+                final String groupAssetRoot = "assets/_" + group.id + "/";
+                new File(groupAssetRoot).mkdirs();
+                FileOutputStream fos = new FileOutputStream(groupAssetRoot + asset.name);
+                fos.write(assetBytes);
+                fos.close();
               }
             }
           }

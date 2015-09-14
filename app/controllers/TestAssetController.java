@@ -1,5 +1,6 @@
 package controllers;
 
+import global.Global;
 import global.Util;
 import models.ModelConstants;
 import models.TestAsset;
@@ -11,6 +12,7 @@ import play.data.validation.Constraints;
 import play.mvc.Controller;
 import play.mvc.Http;
 import play.mvc.Result;
+import play.mvc.Security;
 import views.html.*;
 
 import java.io.*;
@@ -38,8 +40,8 @@ public class TestAssetController extends Controller {
     public String description;
   }
 
+  @Security.Authenticated(Secured.class)
   public static Result doCreateTestAsset(Long testGroupId) {
-    com.feth.play.module.pa.controllers.Authenticate.noCache(response());
     final Form<TestAssetModel> filledForm = TEST_ASSET_FORM.bindFromRequest();
 
     TestGroup group = TestGroup.findById(testGroupId);
@@ -48,7 +50,7 @@ public class TestAssetController extends Controller {
       return badRequest("Test Group with [" + testGroupId + "] not found");
     }
 
-    User localuser = Application.getLocalUser(session());
+    User localuser = Authentication.getLocalUser();
     if (localuser.email.equals("root@minder") || group.owner.email.equals(localuser.email)) {
 
       if (filledForm.hasErrors()) {
@@ -87,13 +89,14 @@ public class TestAssetController extends Controller {
     }
   }
 
+  @Security.Authenticated(Secured.class)
   public static Result createNewAssetForm() {
     return ok(testAssetEditor.render(TEST_ASSET_FORM, null));
   }
 
-
+  @Security.Authenticated(Secured.class)
   public static Result editAssetForm(Long id) {
-    User localuser = Application.getLocalUser(session());
+    User localuser = Authentication.getLocalUser();
 
     TestGroup group = TestGroup.findById(id);
     if (!localuser.email.equals("root@minder") && !group.owner.email.equals(localuser.email)) {
@@ -116,9 +119,8 @@ public class TestAssetController extends Controller {
     }
   }
 
+  @Security.Authenticated(Secured.class)
   public static Result doEditAsset() {
-    com.feth.play.module.pa.controllers.Authenticate.noCache(response());
-
     final Form<TestAssetModel> filledForm = TEST_ASSET_FORM.bindFromRequest();
 
     if (filledForm.hasErrors()) {
@@ -127,14 +129,14 @@ public class TestAssetController extends Controller {
     } else {
       TestAssetModel model = filledForm.get();
       TestAsset ta = TestAsset.findById(model.id);
-      User localuser = Application.getLocalUser(session());
+      User localuser = Authentication.getLocalUser();
       if (!localuser.email.equals("root@minder") && !ta.group.owner.email.equals(localuser.email)) {
         return badRequest("You cant use this resource");
       }
 
 
       //file upload part
-      User localUser = Application.getLocalUser(session());
+      User localUser = Authentication.getLocalUser();
       try {
         handleFileUpload(ta.group.id, model.name);
       } catch (Exception ex) {
@@ -153,8 +155,8 @@ public class TestAssetController extends Controller {
     }
   }
 
+  @Security.Authenticated(Secured.class)
   public static Result doDeleteAsset(Long id) {
-    com.feth.play.module.pa.controllers.Authenticate.noCache(response());
     TestAsset ta = TestAsset.findById(id);
     if (ta == null) {
       return badRequest("Test asset with id [" + id + "] not found!");
@@ -165,7 +167,7 @@ public class TestAssetController extends Controller {
         ex.printStackTrace();
         return badRequest(ex.getMessage());
       }
-      User user = Application.getLocalUser(session());
+      User user = Authentication.getLocalUser();
 
       new File("assets/_" + ta.group.id + "/" + ta.name).delete();
 
@@ -173,13 +175,13 @@ public class TestAssetController extends Controller {
     }
   }
 
+  @Security.Authenticated(Secured.class)
   public static Result downloadAsset(Long id) {
-    com.feth.play.module.pa.controllers.Authenticate.noCache(response());
     TestAsset ta = TestAsset.findById(id);
     if (ta == null) {
       return badRequest("Test asset with id [" + id + "] not found!");
     } else {
-      User user = Application.getLocalUser(session());
+      User user = Authentication.getLocalUser();
       response().setContentType("application/x-download");
       response().setHeader("Content-disposition", "attachment; filename=" + ta.name);
       return ok(new File("assets/_" + ta.group.id + "/" + ta.name));

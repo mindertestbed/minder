@@ -1,6 +1,6 @@
 package models;
 
-import play.db.ebean.Model;
+import com.avaje.ebean.Model;
 
 import javax.persistence.*;
 import java.util.List;
@@ -29,10 +29,10 @@ public class TestAsset extends Model{
   private static final Finder<Long, TestAsset> find = new Finder<>(Long.class,
       TestAsset.class);
 
-  @Column(length = ModelConstants.SHORT_DESC_LENGTH)
+  @Column(length = ModelConstants.SHORT_DESC_LENGTH, columnDefinition = "TEXT")
   public String shortDescription;
 
-  @Column(length = ModelConstants.DESCRIPTION_LENGTH)
+  @Column(length = ModelConstants.DESCRIPTION_LENGTH, columnDefinition = "TEXT")
   public String description;
 
   public static List<TestAsset> findByGroup(TestGroup group){

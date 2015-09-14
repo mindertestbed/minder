@@ -48,8 +48,8 @@ public class MinderWrapperRegistry extends Observable implements ISignalSlotInfo
 
     String versionString = "NA";
     String label = identifier;
-    if (identifier.contains("|")){
-      String []tmp = identifier.split("\\|");
+    if (identifier.contains("|")) {
+      String[] tmp = identifier.split("\\|");
       label = tmp[0];
       versionString = tmp[1];
     }
@@ -100,8 +100,13 @@ public class MinderWrapperRegistry extends Observable implements ISignalSlotInfo
       Ebean.endTransaction();
     }
 
-    wrapperMap.put(label + "|" + versionString, methodMap);
+    if (versionString.equals("NA")) {
+      wrapperMap.put(label, methodMap);
+    } else {
+      wrapperMap.put(label + "|" + versionString, methodMap);
+    }
     onlineWrappers.add(version.id);
+    wrapperMap.put(label, methodMap);
   }
 
   public List<String> getAllLabels() {
@@ -142,7 +147,7 @@ public class MinderWrapperRegistry extends Observable implements ISignalSlotInfo
     int index = identifier.indexOf('|');
     String name = identifier;
     String versionString = "NA";
-    if (index > 0){
+    if (index > 0) {
       name = identifier.substring(0, index);
       versionString = identifier.substring(index + 1);
     }

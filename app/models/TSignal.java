@@ -2,7 +2,7 @@ package models;
 
 import com.avaje.ebean.Ebean;
 import com.avaje.ebean.SqlUpdate;
-import play.db.ebean.Model;
+import com.avaje.ebean.Model;
 
 import javax.persistence.Entity;
 import javax.persistence.Id;

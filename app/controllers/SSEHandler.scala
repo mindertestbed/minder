@@ -4,7 +4,7 @@ import java.util
 import java.util.{Observable, Observer}
 
 import minderengine.MinderWrapperRegistry
-import models.{WrapperVersion, Job, Wrapper}
+import models.{Job, WrapperVersion}
 import play.api.libs.EventSource
 import play.api.libs.concurrent.Execution.Implicits._
 import play.api.libs.iteratee.{Concurrent, Enumeratee}

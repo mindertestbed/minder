@@ -1,4 +1,0 @@
-TestCase = "AS42"
-
-var rivet1 = "rivet3" from "AS41"
-var rivet2 = "rivet4" from "AS41"

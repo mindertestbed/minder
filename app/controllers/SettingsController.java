@@ -5,6 +5,7 @@ import org.interop.xoola.core.XoolaProperty;
 import play.data.Form;
 import play.mvc.Controller;
 import play.mvc.Result;
+import play.mvc.Security;
 
 import static play.data.Form.form;
 
@@ -17,10 +18,9 @@ public class SettingsController extends Controller {
   public static class SettingsModel{
     public long timeout;
   }
-
+  
+  @Security.Authenticated(Secured.class)
   public static Result updateSettings() {
-    com.feth.play.module.pa.controllers.Authenticate.noCache(response());
-
     Form<SettingsModel> form = form(SettingsModel.class).bindFromRequest();
     SettingsModel model = form.get();
     System.out.println(model.timeout);

@@ -16,16 +16,12 @@ public class UserEditorModel {
   @Constraints.Required
   public String name;
 
-  @Constraints.Required
   @Constraints.MinLength(5)
   public String password;
 
 
-  @Constraints.Required
   @Constraints.MinLength(5)
   public String repeatPassword;
-
-  public String active;
 
   public String istd;
 
