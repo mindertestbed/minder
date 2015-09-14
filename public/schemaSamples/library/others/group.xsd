@@ -1,0 +1,17 @@
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+            targetNamespace="http://mami/group"
+            xmlns:bks="http://mami/book"
+            xmlns:grp="http://mami/group"
+        >
+
+    <xsd:import schemaLocation="../book.xsd" namespace="http://mami/book" />
+    <xsd:complexType name="Group">
+        <xsd:sequence>
+            <xsd:element ref="bks:book"
+                         minOccurs="0"
+                         maxOccurs="unbounded"/>
+        </xsd:sequence>
+    </xsd:complexType>
+
+    <xsd:element name="group" type="grp:Group" />
+</xsd:schema>

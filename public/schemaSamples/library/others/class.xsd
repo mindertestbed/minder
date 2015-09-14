@@ -1,0 +1,15 @@
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+            targetNamespace="http://mami/class"
+            xmlns:grp="http://mami/group"
+            xmlns:cls="http://mami/class">
+
+    <xsd:import namespace="http://mami/group" schemaLocation="group.xsd"/>
+
+    <xsd:complexType name="Class">
+        <xsd:sequence>
+            <xsd:element ref="grp:group" minOccurs="0" maxOccurs="unbounded"/>
+        </xsd:sequence>
+    </xsd:complexType>
+
+    <xsd:element name="class" type="cls:Class"/>
+</xsd:schema>

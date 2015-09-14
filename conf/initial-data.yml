@@ -32,34 +32,103 @@ users:
 #Groups
 groups:
 - &sampleGroup !!models.TestGroup
-    description: A sample test gest assertions and test cases
-    name: Sample Test Group
-    shortDescription:  A sample test group
+    description: A sample test group that contains tests that demonstate minder kapabilities
+    name: Showcase
+    shortDescription:  Showcase
     dependencyString: null
     owner: *tester
     testAssertions:
     - &taSample1 !!models.TestAssertion
         testGroup: *sampleGroup
-        taId: TA_XML_01
+        taId: SampleXmlValidation
         normativeSource: The system must generate valid book entries
-        target: BOOKS XML
+        target: books xml
         prerequisites: The XML generator system is connected and ready.
         predicate: The generated books xml conforms to books.xsd
         prescriptionLevel: Mandatory
-        shortDescription:  A sample test assertion
+        shortDescription:  A sample xml-content-validation test
         owner: *tester
         testCases:
         - &testCase1 !!models.TestCase
-           shortDescription: A tel against books.xsd
+           shortDescription: Books test
            owner: *tester
            tdls:
            - !!models.Tdl
-             tdl: conf/sampletdl/xmltest.tdl
+             tdl: conf/initialdata/xmltest.tdl
              version: 0.0.1
              creationDate: "2015-02-02 00:00:00"
              testCase: *testCase1
            testAssertion: *taSample1
            name: TestCaseSample1
+    - &taSample2 !!models.TestAssertion
+        testGroup: *sampleGroup
+        taId: AllSchemaTests
+        normativeSource: All tests should be done
+        target: xml-content-verifier
+        prerequisites:
+        predicate: all schema and schematron tests must succeed
+        prescriptionLevel: Mandatory
+        shortDescription:  A sample xml-content-validation test
+        owner: *tester
+        testCases:
+        - &testCase2 !!models.TestCase
+           shortDescription: All xml verification tests
+           owner: *tester
+           testAssertion: *taSample2
+           name: SchemaHell
+           tdls:
+           - !!models.Tdl
+             tdl: conf/initialdata/SchemaHell.tdl
+             version: 0.0.1
+             creationDate: "2015-02-02 00:00:00"
+             testCase: *testCase2
+    testAssets:
+    - !!models.TestAsset
+        name: books.xsd
+        group: *sampleGroup
+    - !!models.TestAsset
+        name: keys.sch
+        group: *sampleGroup
+    - !!models.TestAsset
+        name: phases.sch
+        group: *sampleGroup
+    - !!models.TestAsset
+        name: simple-namespaces.sch
+        group: *sampleGroup
+    - !!models.TestAsset
+        name: simple.sch
+        group: *sampleGroup
+    - !!models.TestAsset
+        name: library.jar
+        group: *sampleGroup
+    - !!models.TestAsset
+        name: schematron.jar
+        group: *sampleGroup
+    - !!models.TestAsset
+        name: library.zip
+        group: *sampleGroup
+    - !!models.TestAsset
+        name: schematron.zip
+        group: *sampleGroup
+    - !!models.TestAsset
+        name: sample-book.xml
+        group: *sampleGroup
+    - !!models.TestAsset
+        name: sample-library-invalid.xml
+        group: *sampleGroup
+    - !!models.TestAsset
+        name: sample-library.xml
+        group: *sampleGroup
+    - !!models.TestAsset
+        name: simple-input-invalid.xml
+        group: *sampleGroup
+    - !!models.TestAsset
+        name: simple-input-namespaces-invalid.xml
+        group: *sampleGroup
+    - !!models.TestAsset
+        name: simple-input.xml
+        group: *sampleGroup
+
 #wrappers
 wrappers:
 - &xmlContentVerifier !!models.Wrapper

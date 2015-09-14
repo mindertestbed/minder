@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<doc>
+    <title>Book title</title>
+    <isbn>12345678901</isbn>
+    <chapter id="c1">
+        <title>chapter title</title>
+        <para>Chapter content</para>
+    </chapter>
+
+    <chapter id="c2">
+        <title>chapter title</title>
+        <para>xx</para>
+        <para>yy</para>
+        <para>zz</para>
+    </chapter>
+
+    <chapter id="c3">
+        <title>chapter title</title>
+        <para>first child of chapter</para>
+        <para>xx</para>
+        <para>yy</para>
+        <para>zz</para>
+    </chapter>
+</doc>

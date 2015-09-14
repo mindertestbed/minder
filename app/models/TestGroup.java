@@ -28,6 +28,9 @@ public class TestGroup extends Model {
   @OneToMany(cascade = CascadeType.ALL,fetch = FetchType.LAZY)
   public List<UtilClass> utilClasses;
 
+  @OneToMany(cascade = CascadeType.ALL,fetch = FetchType.LAZY)
+  public List<TestAsset> testAssets;
+
 
   @Column(length = ModelConstants.DESCRIPTION_LENGTH, columnDefinition = "TEXT")
   public String description;

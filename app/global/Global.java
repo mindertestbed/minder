@@ -6,6 +6,7 @@ import minderengine.BuiltInWrapperRegistry;
 import minderengine.XoolaServer;
 import models.*;
 import mtdl.TDLClassLoaderProvider;
+import org.beybunproject.xmlContentVerifier.utils.Utils;
 import org.yaml.snakeyaml.Yaml;
 import org.yaml.snakeyaml.constructor.CustomClassLoaderConstructor;
 import play.Application;
@@ -18,6 +19,7 @@ import scala.io.Source;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.util.Base64;
 import java.util.Date;
 import java.util.List;
@@ -58,7 +60,8 @@ public class Global extends GlobalSettings {
 
             if (model instanceof TestGroup) {
               TestGroup group = (TestGroup) model;
-              group.save();
+
+              System.out.println("ID: " + group.id);
               for (TestAssertion assertion : group.testAssertions) {
                 assertion.save();
                 for (TestCase tcase : assertion.testCases) {
@@ -72,6 +75,17 @@ public class Global extends GlobalSettings {
                     TestCaseController.detectAndSaveParameters(tdl);
                   }
                 }
+              }
+
+              for (TestAsset asset : group.testAssets) {
+                FileInputStream fis = new FileInputStream("conf/initialdata/" + asset.name);
+                byte []assetBytes = Utils.readStream(fis);
+                fis.close();
+                final String groupAssetRoot = "assets/_" + group.id + "/";
+                new File(groupAssetRoot).mkdirs();
+                FileOutputStream fos = new FileOutputStream(groupAssetRoot + asset.name);
+                fos.write(assetBytes);
+                fos.close();
               }
             }
           }

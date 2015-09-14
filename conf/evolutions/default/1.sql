@@ -136,7 +136,7 @@ create table Users (
   email                     varchar(255),
   name                      varchar(255),
   password                  bytea,
-  last_login                timestamp,
+  LLLL                      timestamp,
   constraint uq_Users_email unique (email),
   constraint pk_Users primary key (id))
 ;

@@ -1,0 +1,49 @@
+<?xml version="1.0"?>
+
+<lib:library
+        xmlns:lib="http://mami/library"
+        xmlns:grp="http://mami/group"
+        xmlns:bk="http://mami/book"
+        xmlns:cls="http://mami/class">
+    <cls:class>
+        <grp:group>
+            <bk:book id="bk001">
+                <author>Writer</author>
+                <title>The First Book</title>
+                <genre>Fiction</genre>
+                <price>44.95</price>
+                <pub_date>2000-10-01</pub_date>
+                <review>An amazing story of nothing.</review>
+            </bk:book>
+
+            <bk:book id="bk002">
+                <author>Poet</author>
+                <title>The Poet's First Poem</title>
+                <genre>Poem</genre>
+                <price>24.95</price>
+                <pub_date>2000-10-01</pub_date>
+                <review>Least poetic poems.</review>
+            </bk:book>
+        </grp:group>
+
+        <grp:group>
+            <bk:book id="bk003">
+                <author>Antonie</author>
+                <title>The First Book</title>
+                <genre>Fiction</genre>
+                <price>44.95</price>
+                <pub_date>2000-10-01</pub_date>
+                <review>An amazing story of nothing.</review>
+            </bk:book>
+
+            <bk:book id="bk004">
+                <author>Necip</author>
+                <title>The Poet's First Poem</title>
+                <genre>Poem</genre>
+                <price>24.95</price>
+                <pub_date>2000-10-01</pub_date>
+                <review>Least poetic poems.</review>
+            </bk:book>
+        </grp:group>
+    </cls:class>
+</lib:library>
