@@ -1,6 +1,4 @@
-@(ta: TestAssertion, localUser: models.User = null)
-@import java.util.concurrent.atomic.AtomicInteger
-@import global.Util._;
+@(ta: TestAssertion, localUser: models.User = null);
 <div class="indent">
     <h3>Short Description</h3>
     <div id="shortDescription@{ta.id}" onclick='showUpdateInputTextDialog(@ta.id, "shortDescription", $(this).next(), "/doEditAssertionField")' class="editable"></div>

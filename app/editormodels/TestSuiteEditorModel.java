@@ -1,12 +1,16 @@
 package editormodels;
 
+import controllers.MappedWrapperModel;
 import models.ModelConstants;
+import models.Tdl;
 import play.data.validation.Constraints;
 
+import java.util.List;
+
 /**
-* Created by yerlibilgin on 03/05/15.
-*/
-public class GroupEditorModel {
+ * Created by yerlibilgin on 03/05/15.
+ */
+public class TestSuiteEditorModel {
   public Long id;
 
   @Constraints.Required
@@ -17,9 +21,13 @@ public class GroupEditorModel {
   @Constraints.MaxLength(ModelConstants.SHORT_DESC_LENGTH)
   public String shortDescription;
 
+  @Constraints.Required
   @Constraints.MaxLength(ModelConstants.DESCRIPTION_LENGTH)
   public String description;
 
-  @Constraints.MaxLength(ModelConstants.DESCRIPTION_LENGTH)
-  public String dependencyString;
+  public List<MappedWrapperModel> wrapperMappingList;
+
+  public List<Tdl> tdlList;
+
+  public String mtdlParameters;
 }

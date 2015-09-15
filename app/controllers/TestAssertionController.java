@@ -21,7 +21,7 @@ import static play.data.Form.form;
 /**
  * Created by yerlibilgin on 03/05/15.
  */
-public class AssertionController extends Controller {
+public class TestAssertionController extends Controller {
   public static final Form<AssertionEditorModel> TEST_ASSERTION_FORM = form(AssertionEditorModel.class);
 
   /*

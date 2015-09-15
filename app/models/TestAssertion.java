@@ -57,13 +57,12 @@ public class TestAssertion extends Model {
 
   @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
   public List<TestCase> testCases;
-
-  private static final Finder<Long, TestAssertion> find = new Finder<>(
-      Long.class, TestAssertion.class);
-
   @ManyToOne
   @Column(nullable = false)
   public User owner;
+
+  private static final Finder<Long, TestAssertion> find = new Finder<>(TestAssertion.class);
+
 
   public static List<TestAssertion> findByGroup(TestGroup group) {
     return find.where().eq("testGroup", group).setOrderBy("taId").findList();

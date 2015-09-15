@@ -58,6 +58,11 @@
                         <a href="/getGroupDetailView?id=@{tg.id}&display=assertions">Test Assertions</a>
                     </h4>
                 </td>
+                <td class='@choose(display, "suites") tabshrink'>
+                    <h4>
+                        <a href="/getGroupDetailView?id=@{tg.id}&display=suites">Test Suites</a>
+                    </h4>
+                </td>
                 <td class="@choose(display, "assets") tabshrink">
                     <h4>
                         <a href="/getGroupDetailView?id=@{tg.id}&display=assets">Test Assets</a></h4>
@@ -114,6 +119,9 @@
                     }
                 </table>
                 }
+            }
+            case "suites" => {
+                @testSuite.testSuiteLister(tg)
             }
             case "assets" => {
                 @testAssetLister(tg)

@@ -9,7 +9,7 @@
         @dialogs()
 
         <h2>Create New Test Assertion</h2>
-        @helper.form(action = routes.AssertionController.doCreateAssertion()) {
+        @helper.form(action = routes.TestAssertionController.doCreateAssertion()) {
 
             @if(frm.hasGlobalErrors) {
                 <p class="alert alert-danger">
