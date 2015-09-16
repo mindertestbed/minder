@@ -27,7 +27,6 @@ public class User extends Model {
   public byte[] password;
 
   @Formats.DateTime(pattern = "yyyy-MM-dd HH:mm:ss")
-  @Column(name = "LLLL")
   public Date lastLogin;
 
   @OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.PERSIST)
