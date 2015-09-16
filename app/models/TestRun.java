@@ -70,7 +70,7 @@ public class TestRun extends Model {
 
 
   public static List<TestRun> findByJob(Long id) {
-    return findByJob(Job.findById(id));
+    return find.where().eq("job_id", id).orderBy("date desc").findList();
   }
 
 
@@ -79,7 +79,6 @@ public class TestRun extends Model {
   }
 
   public static int getMaxNumber() {
-
     com.avaje.ebean.SqlQuery qu = Ebean.createSqlQuery("Select max(number) from TestRun");
     Object max = qu.findUnique().get("max");
     Logger.debug(max + " is max number");

@@ -98,7 +98,10 @@ GET         /enqueueJob                            controllers.TestEngineControl
 GET         /cancelJob                             controllers.TestEngineController.cancelJob(index: Int)
 GET         /cancelActiveJob                       controllers.TestEngineController.cancelActiveJob
 
-
+POST         /doEditTestSuiteField                 controllers.TestSuiteController.doEditTestSuiteField
+GET          /getTestSuiteDetailView               controllers.TestSuiteController.getTestSuiteDetailView(id: Long, display: String)
+GET          /createTestSuite                      controllers.TestSuiteController.getCreateTestSuiteView(groupId: Long)
+POST         /createTestSuite                      controllers.TestSuiteController.doCreateTestSuite
 
 
 GET         /getCreateUtilClassEditorView          controllers.UtilClassController.getCreateUtilClassEditorView(groupId: Long)

@@ -136,6 +136,14 @@ public class JobController extends Controller {
       job.mappedWrappers = mappedWrappers;
       job.mtdlParameters = model.mtdlParameters;
       job.save();
+      SuiteJob sj = new SuiteJob();
+      sj.name = "Ali";
+      sj.tdl = tdl;
+      sj.owner = job.owner;
+      sj.mappedWrappers = mappedWrappers;
+      sj.mtdlParameters = model.mtdlParameters;
+      sj.testSuite = TestSuite.findById(1L);
+      sj.save();
       Ebean.commitTransaction();
     } catch (Exception ex) {
       ex.printStackTrace();

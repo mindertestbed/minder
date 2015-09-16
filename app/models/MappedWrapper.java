@@ -10,7 +10,7 @@ import java.util.List;
  */
 @Entity
 @Table(name = "MappedWrapper")
-public class MappedWrapper extends Model{
+public class MappedWrapper extends Model {
   @Id
   public Long id;
 
@@ -23,23 +23,20 @@ public class MappedWrapper extends Model{
 
   @ManyToOne
   @Column(nullable = false)
-  public Job job;
+  public AbstractJob job;
 
-  public static final Finder<Long, MappedWrapper> find = new Finder<>(Long.class,
-      MappedWrapper.class);
+  public static final Finder<Long, MappedWrapper> find = new Finder<>(MappedWrapper.class);
 
   public static MappedWrapper findById(Long id) {
     return find.byId(id);
   }
 
-  public static List<MappedWrapper> findByJob(Job rc){
+  public static List<MappedWrapper> findByJob(AbstractJob rc) {
     return find.where().eq("job", rc).orderBy("id").findList();
   }
 
-  public static void deleteByJob(Job rc) {
-    for (MappedWrapper mw : find.where().eq("job", rc).findList()) {
-      mw.delete();
-    }
+  public static void deleteByJob(AbstractJob rc) {
+    find.where().eq("job", rc).findList().forEach(models.MappedWrapper::delete);
   }
 
   public static List<MappedWrapper> findByWrapperParam(WrapperParam wrapperParam) {

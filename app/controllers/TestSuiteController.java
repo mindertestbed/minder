@@ -1,19 +1,18 @@
 package controllers;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import editormodels.AssertionEditorModel;
+import editormodels.TestSuiteEditorModel;
 import global.Util;
-import models.PrescriptionLevel;
-import models.TestAssertion;
 import models.TestGroup;
+import models.TestSuite;
 import play.Logger;
 import play.data.Form;
 import play.mvc.Controller;
 import play.mvc.Result;
 import security.AllowedRoles;
 import security.Role;
-import views.html.assertionDetailView;
-import views.html.testAssertionEditor;
+import views.html.testSuite.testSuiteDetailView;
+import views.html.testSuite.testSuiteEditor;
 
 import static play.data.Form.form;
 
@@ -21,162 +20,115 @@ import static play.data.Form.form;
  * Created by yerlibilgin on 03/05/15.
  */
 public class TestSuiteController extends Controller {
-  public static final Form<TestSuiteEditorModel> TEST_ASSERTION_FORM = form(TestSuiteEditorModel.class);
+  public static final Form<TestSuiteEditorModel> TEST_SUITE_FORM = form(TestSuiteEditorModel.class);
 
   /*
    * Test Asertion CRUD
    */
   @AllowedRoles(Role.TEST_DESIGNER)
-  public static Result getCreateAssertionEditorView(Long groupId) {
+  public static Result getCreateTestSuiteView(Long groupId) {
     TestGroup tg = TestGroup.findById(groupId);
     if (tg == null) {
       return badRequest("Test group with id [" + groupId + "] not found!");
     } else {
-      AssertionEditorModel testAssertionEditorModel = new AssertionEditorModel();
-      testAssertionEditorModel.groupId = groupId;
-      Form<AssertionEditorModel> bind = TEST_ASSERTION_FORM
-          .fill(testAssertionEditorModel);
-      return ok(testAssertionEditor.render(bind, null));
+      TestSuiteEditorModel testSuiteEditorModel = new TestSuiteEditorModel();
+      testSuiteEditorModel.groupId = groupId;
+      Form<TestSuiteEditorModel> bind = TEST_SUITE_FORM
+          .fill(testSuiteEditorModel);
+      return ok(testSuiteEditor.render(bind));
     }
   }
 
   @AllowedRoles(Role.TEST_DESIGNER)
-  public static Result doCreateAssertion() {
-    final Form<AssertionEditorModel> filledForm = TEST_ASSERTION_FORM
+  public static Result doCreateTestSuite() {
+    final Form<TestSuiteEditorModel> filledForm = TEST_SUITE_FORM
         .bindFromRequest();
 
     if (filledForm.hasErrors()) {
       Util.printFormErrors(filledForm);
-      return badRequest(testAssertionEditor.render(filledForm, null));
+      return badRequest(testSuiteEditor.render(filledForm));
     } else {
-      AssertionEditorModel model = filledForm.get();
-
-      TestAssertion ta = TestAssertion.findByTaId(model.taId);
-      if (ta != null) {
-        filledForm.reject("The test assertion with ID [" + ta.taId
-            + "] already exists");
-        return badRequest(testAssertionEditor.render(filledForm, null));
-      }
+      TestSuiteEditorModel model = filledForm.get();
 
       TestGroup tg = TestGroup.findById(model.groupId);
 
       if (tg == null) {
         filledForm.reject("No group found with id [" + tg.id + "]");
-        return badRequest(testAssertionEditor.render(filledForm, null));
+        return badRequest(testSuiteEditor.render(filledForm));
       }
 
-      ta = new TestAssertion();
-      ta.taId = model.taId;
-      ta.normativeSource = model.normativeSource;
-      ta.predicate = model.predicate;
-      ta.prerequisites = model.prerequisites;
-      ta.target = model.target;
-      ta.variables = model.variables;
-      ta.tag = model.tag;
-      ta.description = model.description;
-      ta.shortDescription = model.shortDescription;
-      ta.testGroup = tg;
-      ta.prescriptionLevel = PrescriptionLevel
-          .valueOf(model.prescriptionLevel);
-      ta.owner = Authentication.getLocalUser();
-
-      ta.save();
-
-      ta = TestAssertion.findByTaId(ta.taId);
-
-      Logger.info("Assertion with id " + ta.id + ":" + ta.taId
-          + " was created");
-      return redirect(routes.GroupController.getGroupDetailView(tg.id, "assertions"));
+      TestSuite ts = new TestSuite();
+      ts.name = model.name;
+      ts.description = model.description;
+      ts.shortDescription = model.shortDescription;
+      ts.testGroup = tg;
+      ts.mtdlParameters = model.mtdlParameters;
+      ts.owner = Authentication.getLocalUser();
+      ts.save();
+      Logger.debug("TestSuite with id " + ts.id + " was created");
+      return redirect(routes.GroupController.getGroupDetailView(tg.id, "suites"));
     }
   }
 
   @AllowedRoles(Role.TEST_DESIGNER)
-  public static Result editAssertionForm(Long id) {
-    TestAssertion ta = TestAssertion.findById(id);
-    if (ta == null) {
-      return badRequest("Test assertion with id [" + id + "] not found!");
+  public static Result editTestSuiteForm(Long id) {
+    TestSuite ts = TestSuite.findById(id);
+    if (ts == null) {
+      return badRequest("Test TestSuite with id [" + id + "] not found!");
 
     }
 
-    if (!Util.canAccess(Authentication.getLocalUser(), ta.owner))
+    if (!Util.canAccess(Authentication.getLocalUser(), ts.owner))
       return badRequest("You don't have permission to modify this resource");
 
-    AssertionEditorModel taModel = new AssertionEditorModel();
-    taModel.id = id;
-    taModel.taId = ta.taId;
-    taModel.normativeSource = ta.normativeSource;
-    taModel.target = ta.target;
-    taModel.predicate = ta.predicate;
-    taModel.prerequisites = ta.prerequisites;
-    taModel.variables = ta.variables;
-    taModel.tag = ta.tag;
-    taModel.description = ta.description;
-    taModel.shortDescription = ta.shortDescription;
-    taModel.groupId = ta.testGroup.id;
-    taModel.prescriptionLevel = ta.prescriptionLevel.name();
+    TestSuiteEditorModel tsModel = new TestSuiteEditorModel();
+    tsModel.id = id;
+    tsModel.name = ts.name;
+    tsModel.description = ts.description;
+    tsModel.shortDescription = ts.shortDescription;
+    tsModel.groupId = ts.testGroup.id;
+    tsModel.mtdlParameters = ts.mtdlParameters;
 
-    Form<AssertionEditorModel> bind = TEST_ASSERTION_FORM
-        .fill(taModel);
-    return ok(testAssertionEditor.render(bind, null));
+    Form<TestSuiteEditorModel> bind = TEST_SUITE_FORM
+        .fill(tsModel);
+    return ok(testSuiteEditor.render(bind));
   }
 
   @AllowedRoles(Role.TEST_DESIGNER)
-  public static Result doEditAssertion() {
-    final Form<AssertionEditorModel> filledForm = TEST_ASSERTION_FORM
+  public static Result doEditTestSuite() {
+    final Form<TestSuiteEditorModel> filledForm = TEST_SUITE_FORM
         .bindFromRequest();
 
     if (filledForm.hasErrors()) {
       Util.printFormErrors(filledForm);
-      return badRequest(testAssertionEditor.render(filledForm, null));
+      return badRequest(testSuiteEditor.render(filledForm));
     } else {
-      AssertionEditorModel model = filledForm.get();
+      TestSuiteEditorModel model = filledForm.get();
 
-      TestAssertion ta = TestAssertion.findById(model.id);
-      if (ta == null) {
-        filledForm.reject("The test assertion with ID [" + model.id
+      TestSuite testSuite = TestSuite.findById(model.id);
+      if (testSuite == null) {
+        filledForm.reject("The test TestSuite with ID [" + model.id
             + "] does not exist");
-        return badRequest(testAssertionEditor.render(filledForm, null));
+        return badRequest(testSuiteEditor.render(filledForm));
       }
 
-      if (!Util.canAccess(Authentication.getLocalUser(), ta.owner))
+      if (!Util.canAccess(Authentication.getLocalUser(), testSuite.owner))
         return badRequest("You don't have permission to modify this resource");
 
-      ta.taId = model.taId;
-      ta.normativeSource = model.normativeSource;
-      ta.predicate = model.predicate;
-      ta.prerequisites = model.prerequisites;
-      ta.target = model.target;
-      ta.variables = model.variables;
-      ta.tag = model.tag;
-      ta.description = model.description;
-      ta.shortDescription = model.shortDescription;
-      ta.prescriptionLevel = PrescriptionLevel
-          .valueOf(model.prescriptionLevel);
-
-      // check if the name is not duplicate
-      TestAssertion tmp = TestAssertion.findByTaId(model.taId);
-
-      if (tmp == null || tmp.id == ta.id) {
-        // either no such taId or it is already this object. so update
-        ta.update();
-        Logger.info("Assertion with id " + ta.id + ":" + ta.taId
-            + " was updated");
-        return redirect(routes.GroupController.getGroupDetailView(ta.testGroup.id, "assertions"));
-      } else {
-        filledForm.reject("The ID [" + model.taId
-            + "] is used by another test assertion");
-        return badRequest(testAssertionEditor.render(filledForm, null));
-      }
-
+      testSuite.name = model.name;
+      testSuite.description = model.description;
+      testSuite.shortDescription = model.shortDescription;
+      testSuite.mtdlParameters = model.mtdlParameters;
+      return redirect(routes.TestSuiteController.getTestSuiteDetailView(testSuite.id, "jobs"));
     }
   }
 
   @AllowedRoles(Role.TEST_DESIGNER)
-  public static Result doDeleteAssertion(Long id) {
-    TestAssertion ta = TestAssertion.findById(id);
+  public static Result doDeleteTestSuite(Long id) {
+    TestSuite ta = TestSuite.findById(id);
     if (ta == null) {
       // it does not exist. error
-      return badRequest("Test assertion with id " + id
+      return badRequest("Test TestSuite with id " + id
           + " does not exist.");
     }
 
@@ -190,23 +142,23 @@ public class TestSuiteController extends Controller {
       Logger.error(ex.getMessage(), ex);
       return badRequest(ex.getMessage());
     }
-    return redirect(routes.GroupController.getGroupDetailView(ta.testGroup.id, "assertions"));
+    return redirect(routes.GroupController.getGroupDetailView(ta.testGroup.id, "suites"));
   }
 
-  public static Result getAssertionDetailView(Long id, String display) {
-    TestAssertion ta = TestAssertion.findById(id);
-    if (ta == null) {
-      return badRequest("No test assertion with id " + id + ".");
+  public static Result getTestSuiteDetailView(Long id, String display) {
+    TestSuite testSuite = TestSuite.findById(id);
+    if (testSuite == null) {
+      return badRequest("No test TestSuite with id " + id + ".");
     }
-    return ok(assertionDetailView.render(ta, Authentication.getLocalUser(), display));
+    return redirect(routes.TestSuiteController.getTestSuiteDetailView(testSuite.id, "jobs"));
   }
 
 
   @AllowedRoles(Role.TEST_DESIGNER)
-  public static Result doEditAssertionField() {
+  public static Result doEditTestSuiteField() {
     JsonNode jsonNode = request().body().asJson();
 
-    return GroupController.doEditField(AssertionEditorModel.class, TestAssertion.class, jsonNode);
+    return GroupController.doEditField(TestSuiteEditorModel.class, TestSuite.class, jsonNode);
   }
 
 

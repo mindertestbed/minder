@@ -115,7 +115,7 @@ public class TestCaseController extends Controller {
 
       Logger.info("Test Case with name " + tc.id + ":" + tc.name
           + " was created");
-      return redirect(routes.AssertionController.getAssertionDetailView(ta.id, "testCases"));
+      return redirect(routes.TestAssertionController.getAssertionDetailView(ta.id, "testCases"));
     }
   }
 
@@ -253,7 +253,7 @@ public class TestCaseController extends Controller {
       Logger.error(ex.getMessage(), ex);
       return badRequest(ex.getMessage());
     }
-    return redirect(routes.AssertionController.getAssertionDetailView(tc.testAssertion.id, "testCases"));
+    return redirect(routes.TestAssertionController.getAssertionDetailView(tc.testAssertion.id, "testCases"));
   }
 
   @Security.Authenticated(Secured.class)

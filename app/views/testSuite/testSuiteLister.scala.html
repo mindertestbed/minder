@@ -3,7 +3,7 @@
 
 @if(tg.testSuites.size() == 0){
   <p>No Test Sutes yet</p>
-  @createButton("/getCreateTestSuiteEditorView?groupId="+tg.id, Messages("restrictedTestPage.createTestSuite"))
+  @createButton("/createTestSuite?groupId="+tg.id, Messages("restrictedTestPage.createTestSuite"))
 } else {
   <table class="shaded">
     @createFirstRow {
@@ -27,7 +27,7 @@
     }
 
     @createLastRow(3){
-      @createButton("/getCreateTestSuiteEditorView?groupId="+tg.id, Messages("restrictedTestPage.createTestSuite"))
+      @createButton("/createTestSuite?groupId="+tg.id, Messages("restrictedTestPage.createTestSuite"))
     }
   </table>
 }

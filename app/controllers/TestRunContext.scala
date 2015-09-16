@@ -23,7 +23,8 @@ class TestRunContext(val testRun: TestRun) extends Runnable with TestProcessWatc
   val mappedWrappers = MappedWrapper.findByJob(testRun.job)
   var sutNames: java.util.Set[String] = null;
   var error = ""
-  val job = Job.findById(testRun.job.id);
+  var job: AbstractJob = Job.findById(testRun.job.id)
+  if (job == null) job = SuiteJob.findById(testRun.job.id)
   val user = testRun.runner;
   val tdl = Tdl.findById(job.tdl.id);
   val testCase = TestCase.findById(tdl.testCase.id)
@@ -34,7 +35,7 @@ class TestRunContext(val testRun: TestRun) extends Runnable with TestProcessWatc
 
   val packageRoot = "_" + testGroup.id;
   val packagePath = packageRoot + "/_" + testCase.id;
-  val cls = TdlCompiler.compileTdl(packageRoot, packagePath, testGroup.dependencyString, testCase.name, source = tdl.tdl, version=tdl.version);
+  val cls = TdlCompiler.compileTdl(packageRoot, packagePath, testGroup.dependencyString, testCase.name, source = tdl.tdl, version = tdl.version);
   val logStringBuilder = new StringBuilder;
   val reportLogBuilder = new StringBuilder;
   var status = TestStatus.PENDING
@@ -62,7 +63,7 @@ class TestRunContext(val testRun: TestRun) extends Runnable with TestProcessWatc
     mappedWrapper.parameter = WrapperParam.findById(mappedWrapper.parameter.id);
     mappedWrapper.wrapperVersion = WrapperVersion.findById(mappedWrapper.wrapperVersion.id);
     mappedWrapper.wrapperVersion.wrapper = Wrapper.findById(mappedWrapper.wrapperVersion.wrapper.id);
-    variableWrapperMapping.put(mappedWrapper.parameter.name,mappedWrapper)
+    variableWrapperMapping.put(mappedWrapper.parameter.name, mappedWrapper)
   }
 
 

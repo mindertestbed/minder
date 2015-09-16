@@ -13,8 +13,7 @@ import play.mvc.Controller;
 import play.mvc.Result;
 import play.mvc.Security;
 import security.AllowedRoles;
-import views.html.assertionDetailView;
-import views.html.testAssertionEditor;
+import views.html.testAssertion.*;
 
 import static play.data.Form.form;
 

@@ -1,4 +1,4 @@
-@(ta: TestAssertion, localUser: models.User = null);
+@(ta: TestAssertion, localUser: models.User = null)
 <div class="indent">
     <h3>Short Description</h3>
     <div id="shortDescription@{ta.id}" onclick='showUpdateInputTextDialog(@ta.id, "shortDescription", $(this).next(), "/doEditAssertionField")' class="editable"></div>

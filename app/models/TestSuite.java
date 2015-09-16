@@ -24,6 +24,12 @@ public class TestSuite extends Model {
   @Column(length = ModelConstants.DESCRIPTION_LENGTH, columnDefinition = "TEXT")
   public String description;
 
+  /**
+   * If there is a parameter matching here, it will be used for the tests
+   * if the child TDL job defines its own parameter, it will override this
+   */
+  public String mtdlParameters;
+
   @ManyToOne
   @Column(nullable = false)
   public User owner;
@@ -33,15 +39,14 @@ public class TestSuite extends Model {
   public TestGroup testGroup;
 
 
-  @OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
-  public List<MappedWrapper> mappedWrappers;
-
-  @ManyToMany
-  @Column
-  public List<Tdl> tdls;
+  @OneToMany
+  public List<SuiteJob> jobs;
 
   private static final Finder<Long, TestSuite> find = new Finder<>(TestSuite.class);
 
+  public static TestSuite findById(Long id){
+    return find.byId(id);
+  }
 
   public static List<TestSuite> findByGroup(TestGroup group) {
     return find.where().eq("testGroup", group).setOrderBy("id").findList();

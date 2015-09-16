@@ -2,6 +2,7 @@ package editormodels;
 
 import controllers.MappedWrapperModel;
 import models.ModelConstants;
+import models.SuiteJob;
 import models.Tdl;
 import play.data.validation.Constraints;
 
@@ -25,9 +26,9 @@ public class TestSuiteEditorModel {
   @Constraints.MaxLength(ModelConstants.DESCRIPTION_LENGTH)
   public String description;
 
-  public List<MappedWrapperModel> wrapperMappingList;
+  public List<JobEditorModel> jobList;
 
-  public List<Tdl> tdlList;
+  public Long groupId;
 
   public String mtdlParameters;
 }
