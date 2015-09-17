@@ -1,0 +1,78 @@
+@(ts: TestSuite, display: String = "jobs")
+@import java.util.concurrent.atomic.AtomicInteger
+@import global.Util._;
+@import views.html.util._
+
+@main(Messages("minder.navigation.restricted.testdesigner"), "restrictedTestDesigner") {
+
+  @dialogs()
+
+  <script>
+      $(function(){
+        bindValues($("#name@{ts.id}"))
+        bindValues($("#shortDescription@{ts.id}"))
+        bindValues($("#mtdlParameters@{ts.id}"))
+        bindValues($("#description@{ts.id}"))
+      });
+  </script>
+  <h2>Test Suite
+    <div id="name@{ts.id}" onclick='showUpdateInputTextDialog(@ts.id, "name", $(this).next(), "/doEditTestSuiteField")' class="hl editable"></div>
+    <input type="hidden" value="@ts.name"/>
+  </h2>
+
+
+
+  <div class="indent">
+    <h3>Short Description</h3>
+    <div id="shortDescription@{ts.id}" onclick='showUpdateInputTextDialog(@ts.id, "shortDescription", $(this).next(), "/doEditTestSuiteField")' class="editable"></div>
+    <input type="hidden" value="@ts.shortDescription"/>
+
+    <h3>Author</h3>
+    <p>
+    @ts.owner.email
+    </p>
+
+
+    <h3>MTDL Parameters</h3>
+    <div id="mtdlParameters@{ts.id}" onclick='showUpdateTextAreaDialog(@ts.id, "mtdlParameters", $(this).next(), "/doEditTestSuiteField")' class="editable"></div>
+    <input type="hidden" value="@ts.mtdlParameters"/>
+
+
+    <h3>Detailed Description</h3>
+    <div id="description@{ts.id}" onclick='showUpdateTextAreaDialog(@ts.id, "description", $(this ).next(), "/doEditTestSuiteField")' class="editable"></div>
+    <input type="hidden" value="@ts.description"/>
+<hr />
+
+    <table style="width:100%;">
+      <tr>
+        <td style="width:10px;border-bottom:1px solid gray;">&nbsp;</td>
+        <td>
+          <table>
+            <tr>
+              <td class='@choose(display, "details") tabshrink'>
+                <h4>
+                  <a href="/getTestSuiteDetailView?id=@ts.id&display=jobs">Jobs</a>
+                </h4>
+              </td>
+              <td class="@choose(display, "testCases") tabshrink">
+                <h4>
+                  <a href="/getTestSuiteDetailView?id=@ts.id&display=runs">Test Runs</a>
+                </h4>
+              </td>
+            </tr>
+          </table>
+        </td>
+        <td class="tabexpand">&nbsp;</td>
+      </tr>
+    </table>
+
+    @display match {
+      case "jobs" => {
+        JOBS
+      }
+      case "runs" => {
+        RUNS
+      }
+    }
+</div>
+}

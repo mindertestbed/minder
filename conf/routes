@@ -78,8 +78,8 @@ GET         /runTest                               controllers.Tester.runTest(id
 GET         /syncTest                              controllers.Tester.syncTest(id: Long, userId: Long)
 
 #test run listing
-GET         /listTestRunsForm                      controllers.WrapperController.listTestRuns(configurationId: Long)
-GET         /viewReport                            controllers.WrapperController.viewReport(testRunId: Long, type: String)
+GET         /listTestRunsForm                      controllers.JobController.listTestRuns(configurationId: Long)
+GET         /viewReport                            controllers.JobController.viewReport(testRunId: Long, type: String)
 
 #Wrappers
 GET         /createNewWrapperForm                  controllers.WrapperController.createNewWrapperForm

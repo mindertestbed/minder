@@ -120,7 +120,7 @@ create table TestGroup (
 
 create table TestRun (
   id                        bigserial not null,
-  abstract_job_id           bigint not null,
+  suite_job_id              bigint not null,
   job_id                    bigint,
   date                      timestamp,
   runner_id                 bigint,
@@ -234,8 +234,8 @@ alter table TestCase add constraint fk_TestCase_owner_16 foreign key (owner_id) 
 create index ix_TestCase_owner_16 on TestCase (owner_id);
 alter table TestGroup add constraint fk_TestGroup_owner_17 foreign key (owner_id) references Users (id);
 create index ix_TestGroup_owner_17 on TestGroup (owner_id);
-alter table TestRun add constraint fk_TestRun_abstract_job_18 foreign key (abstract_job_id) references abstract_job (id);
-create index ix_TestRun_abstract_job_18 on TestRun (abstract_job_id);
+alter table TestRun add constraint fk_TestRun_abstract_job_18 foreign key (suite_job_id) references abstract_job (id);
+create index ix_TestRun_abstract_job_18 on TestRun (suite_job_id);
 alter table TestRun add constraint fk_TestRun_job_19 foreign key (job_id) references abstract_job (id);
 create index ix_TestRun_job_19 on TestRun (job_id);
 alter table TestRun add constraint fk_TestRun_runner_20 foreign key (runner_id) references Users (id);

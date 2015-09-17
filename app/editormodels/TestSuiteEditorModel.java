@@ -22,7 +22,6 @@ public class TestSuiteEditorModel {
   @Constraints.MaxLength(ModelConstants.SHORT_DESC_LENGTH)
   public String shortDescription;
 
-  @Constraints.Required
   @Constraints.MaxLength(ModelConstants.DESCRIPTION_LENGTH)
   public String description;
 

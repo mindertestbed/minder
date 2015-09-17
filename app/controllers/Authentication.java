@@ -12,7 +12,8 @@ import play.mvc.Results;
 import play.mvc.Security;
 import views.html.authentication.login;
 import views.html.index;
-import views.html.restrictedTestDesigner;
+import views.html.testDesigner.restrictedTestDesigner;
+import views.html.authentication.*;
 
 import static play.data.Form.form;
 

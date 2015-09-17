@@ -4,16 +4,15 @@ import com.fasterxml.jackson.databind.JsonNode;
 import editormodels.AssertionEditorModel;
 import global.Util;
 import models.PrescriptionLevel;
-import security.Role;
 import models.TestAssertion;
 import models.TestGroup;
 import play.Logger;
 import play.data.Form;
 import play.mvc.Controller;
 import play.mvc.Result;
-import play.mvc.Security;
 import security.AllowedRoles;
-import views.html.testAssertion.*;
+import security.Role;
+import views.html.testDesigner.testAssertion.*;
 
 import static play.data.Form.form;
 
@@ -36,7 +35,7 @@ public class TestAssertionController extends Controller {
       testAssertionEditorModel.groupId = groupId;
       Form<AssertionEditorModel> bind = TEST_ASSERTION_FORM
           .fill(testAssertionEditorModel);
-      return ok(testAssertionEditor.render(bind, null));
+      return ok(testAssertionEditor.render(bind));
     }
   }
 
@@ -47,7 +46,7 @@ public class TestAssertionController extends Controller {
 
     if (filledForm.hasErrors()) {
       Util.printFormErrors(filledForm);
-      return badRequest(testAssertionEditor.render(filledForm, null));
+      return badRequest(testAssertionEditor.render(filledForm));
     } else {
       AssertionEditorModel model = filledForm.get();
 
@@ -55,14 +54,14 @@ public class TestAssertionController extends Controller {
       if (ta != null) {
         filledForm.reject("The test assertion with ID [" + ta.taId
             + "] already exists");
-        return badRequest(testAssertionEditor.render(filledForm, null));
+        return badRequest(testAssertionEditor.render(filledForm));
       }
 
       TestGroup tg = TestGroup.findById(model.groupId);
 
       if (tg == null) {
         filledForm.reject("No group found with id [" + tg.id + "]");
-        return badRequest(testAssertionEditor.render(filledForm, null));
+        return badRequest(testAssertionEditor.render(filledForm));
       }
 
       ta = new TestAssertion();
@@ -117,7 +116,7 @@ public class TestAssertionController extends Controller {
 
     Form<AssertionEditorModel> bind = TEST_ASSERTION_FORM
         .fill(taModel);
-    return ok(testAssertionEditor.render(bind, null));
+    return ok(testAssertionEditor.render(bind));
   }
 
   @AllowedRoles(Role.TEST_DESIGNER)
@@ -127,7 +126,7 @@ public class TestAssertionController extends Controller {
 
     if (filledForm.hasErrors()) {
       Util.printFormErrors(filledForm);
-      return badRequest(testAssertionEditor.render(filledForm, null));
+      return badRequest(testAssertionEditor.render(filledForm));
     } else {
       AssertionEditorModel model = filledForm.get();
 
@@ -135,7 +134,7 @@ public class TestAssertionController extends Controller {
       if (ta == null) {
         filledForm.reject("The test assertion with ID [" + model.id
             + "] does not exist");
-        return badRequest(testAssertionEditor.render(filledForm, null));
+        return badRequest(testAssertionEditor.render(filledForm));
       }
 
       if (!Util.canAccess(Authentication.getLocalUser(), ta.owner))
@@ -165,7 +164,7 @@ public class TestAssertionController extends Controller {
       } else {
         filledForm.reject("The ID [" + model.taId
             + "] is used by another test assertion");
-        return badRequest(testAssertionEditor.render(filledForm, null));
+        return badRequest(testAssertionEditor.render(filledForm));
       }
 
     }
@@ -198,7 +197,7 @@ public class TestAssertionController extends Controller {
     if (ta == null) {
       return badRequest("No test assertion with id " + id + ".");
     }
-    return ok(assertionDetailView.render(ta, Authentication.getLocalUser(), display));
+    return ok(assertionDetailView.render(ta, display));
   }
 
 

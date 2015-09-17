@@ -1,0 +1,20 @@
+@(localUser: models.User = null)
+
+@import wrapper._
+
+@main(Messages("minder.restricted.testdeveloper"), "restrictedTestDeveloper") {
+
+<h3 class="explanation"><img src="@routes.Assets.at("/images/about-64.png")" height="24px"/></h3>
+<p>
+  @Messages("minder.restricted.testdeveloper")
+</p>
+
+
+<div class="fullh">
+  <b>Wrappers</b>
+
+  <div id="tabs-1" class="fullh">
+    @wrapperManager()
+  </div>
+</div>
+}

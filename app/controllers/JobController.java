@@ -2,23 +2,20 @@ package controllers;
 
 import com.avaje.ebean.Ebean;
 import editormodels.JobEditorModel;
-import global.Global;
 import global.Util;
 import models.*;
+import net.sf.jasperreports.engine.*;
+import net.sf.jasperreports.engine.export.JRPdfExporter;
+import net.sf.jasperreports.engine.export.JRPdfExporterParameter;
 import play.Logger;
 import play.data.Form;
 import play.mvc.Controller;
 import play.mvc.Result;
 import play.mvc.Security;
-import views.html.jobDetailView;
-import views.html.jobEditor;
-import views.html.testRunViewer;
+import views.html.testDesigner.job.*;
 
-
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
+import java.io.ByteArrayOutputStream;
+import java.util.*;
 
 import static play.data.Form.form;
 
@@ -27,6 +24,20 @@ import static play.data.Form.form;
  */
 public class JobController extends Controller {
   public static final Form<JobEditorModel> JOB_FORM = form(JobEditorModel.class);
+
+
+  @Security.Authenticated(Secured.class)
+  public static Result listTestRuns(Long configurationId) {
+    Job rc = Job.findById(configurationId);
+    if (rc == null) {
+      return badRequest("Job with id [" + configurationId
+          + "] not found!");
+    } else {
+
+      return ok(testRunLister.render(configurationId));
+    }
+
+  }
 
   @Security.Authenticated(Secured.class)
   public static Result getCreateJobEditorView(Long tdlId) {
@@ -60,7 +71,7 @@ public class JobController extends Controller {
     //
     initWrapperListForModel(tdl, model);
 
-    return ok(jobEditor.render(JOB_FORM.fill(model), null));
+    return ok(jobEditor.render(JOB_FORM.fill(model)));
   }
 
   @Security.Authenticated(Secured.class)
@@ -85,7 +96,7 @@ public class JobController extends Controller {
 
     if (form.hasErrors()) {
       Util.printFormErrors(form);
-      return badRequest(jobEditor.render(form, null));
+      return badRequest(jobEditor.render(form));
     }
 
     JobEditorModel model = form.get();
@@ -96,7 +107,7 @@ public class JobController extends Controller {
 
     if (existing != null) {
       form.reject("A Job with the name [" + model.name + "] already exists");
-      return badRequest(jobEditor.render(form, null));
+      return badRequest(jobEditor.render(form));
     }
 
     // check the parameters.
@@ -104,14 +115,14 @@ public class JobController extends Controller {
       for (MappedWrapperModel mappedWrapper : model.wrapperMappingList) {
         if (mappedWrapper.wrapperVersion == null) {
           form.reject("You have to fill all parameters");
-          return badRequest(jobEditor.render(form, null));
+          return badRequest(jobEditor.render(form));
         }
       }
     } else {
       if (tdl.parameters.size() > 0) {
         initWrapperListForModel(tdl, model);
         form.reject("You have to fill all parameters");
-        return badRequest(jobEditor.render(form, null));
+        return badRequest(jobEditor.render(form));
       }
     }
 
@@ -136,21 +147,21 @@ public class JobController extends Controller {
       job.mappedWrappers = mappedWrappers;
       job.mtdlParameters = model.mtdlParameters;
       job.save();
-      SuiteJob sj = new SuiteJob();
+      /*SuiteJob sj = new SuiteJob();
       sj.name = "Ali";
       sj.tdl = tdl;
       sj.owner = job.owner;
       sj.mappedWrappers = mappedWrappers;
       sj.mtdlParameters = model.mtdlParameters;
       sj.testSuite = TestSuite.findById(1L);
-      sj.save();
+      sj.save();*/
       Ebean.commitTransaction();
     } catch (Exception ex) {
       ex.printStackTrace();
       Ebean.endTransaction();
 
       form.reject(ex.getMessage());
-      return badRequest(jobEditor.render(form, null));
+      return badRequest(jobEditor.render(form));
     }
 
     return redirect(routes.TestCaseController.viewTestCase(tdl.testCase.id, "jobs"));
@@ -206,7 +217,7 @@ public class JobController extends Controller {
 
     Form<?> fill = JOB_FORM.fill(jobEditorModel);
 
-    return ok(jobEditor.render(fill, null));
+    return ok(jobEditor.render(fill));
   }
 
   @Security.Authenticated(Secured.class)
@@ -305,5 +316,91 @@ public class JobController extends Controller {
     }
   }
 
+  @Security.Authenticated(Secured.class)
+  public static Result viewReport(Long testRunId, String type) {
+    TestRun tr = TestRun.findById(testRunId);
+    if (tr == null)
+      return badRequest("A test run with id " + testRunId + " was not found");
+    response().setContentType("application/x-download");
+    String fileName = tr.id + ".report";
+    byte[] data = tr.report;
+    if ("pdf".equals(type)) {
+      //
+      fileName += ".pdf";
+      data = toPdf(data, tr);
+    } else {
+      fileName += ".xml";
+    }
+    response().setHeader("Content-disposition", "attachment; filename=" + fileName);
+    return ok(data);
+  }
 
+
+
+  @Security.Authenticated(Secured.class)
+  private static byte[] toPdf(byte[] data, TestRun tr) {
+    try {
+      JasperReport report = JasperCompileManager.compileReport(WrapperController.class.getResourceAsStream("/taReport.jrxml"));
+      Map<String, Object> values = new HashMap<String, Object>();
+      values.put("user", tr.history.email);
+      values.put("email", tr.history.email);
+      values.put("result", tr.success);
+      values.put("date", tr.date);
+      values.put("errorMessage", tr.errorMessage);
+
+      Logger.debug("Error message " + tr.errorMessage);
+      Job rc = Job.findById(tr.job.id);
+      TestCase tc = TestCase.findById(rc.tdl.testCase.id);
+      TestAssertion ta = TestAssertion.findById(tc.testAssertion.id);
+      TestGroup tg = TestGroup.findById(ta.testGroup.id);
+
+      values.put("testGroup", tg.name);
+      values.put("testCase", tc.name);
+      values.put("job", rc.name);
+
+      values.put("taId", ta.taId);
+      values.put("taNormativeSource", ta.normativeSource);
+      values.put("taDescription", ta.shortDescription);
+      values.put("taTarget", ta.target);
+      values.put("taPredicate", ta.predicate);
+      values.put("taPrerequisite", ta.prerequisites);
+      values.put("taPrescription", ta.prescriptionLevel.toString());
+      values.put("taVariable", ta.variables);
+      values.put("taTag", ta.tag);
+
+      JRDataSource source = new JREmptyDataSource();
+      JasperPrint print1 = JasperFillManager.fillReport(report, values, source);
+      List<JasperPrint> jasperPrintList = new ArrayList<JasperPrint>();
+      jasperPrintList.add(print1);
+
+      if (tr.sutNames != null && tr.sutNames.length() > 0) {
+        JasperReport wrapperReport = JasperCompileManager.compileReport(WrapperController.class.getResourceAsStream("/sutNamesReport.jrxml"));
+        values = new HashMap<String, Object>();
+        values.put("sutNames", tr.sutNames);
+        source = new JREmptyDataSource();
+        JasperPrint print2 = JasperFillManager.fillReport(wrapperReport, values, source);
+        jasperPrintList.add(print2);
+      }
+
+      JasperReport logReport = JasperCompileManager.compileReport(WrapperController.class.getResourceAsStream("/logReport.jrxml"));
+      values = new HashMap<String, Object>();
+      values.put("log", tr.history.extractSystemOutputLog());
+      source = new JREmptyDataSource();
+      JasperPrint print3 = JasperFillManager.fillReport(logReport, values, source);
+      jasperPrintList.add(print3);
+
+      ByteArrayOutputStream baos = new ByteArrayOutputStream();
+      JRPdfExporter exporter = new JRPdfExporter();
+      //Add the list as a Parameter
+      exporter.setParameter(JRExporterParameter.JASPER_PRINT_LIST, jasperPrintList);
+      //this will make a bookmark in the exported PDF for each of the reports
+      exporter.setParameter(JRPdfExporterParameter.IS_CREATING_BATCH_MODE_BOOKMARKS, Boolean.TRUE);
+      exporter.setParameter(JRExporterParameter.OUTPUT_STREAM, baos);
+      exporter.exportReport();
+      return baos.toByteArray();
+    } catch (Exception ex) {
+      ex.printStackTrace();
+      return "Invalid".getBytes();
+    }
+  }
 }

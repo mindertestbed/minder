@@ -4,7 +4,6 @@ package controllers;
 import com.avaje.ebean.Ebean;
 import com.fasterxml.jackson.databind.JsonNode;
 import editormodels.TestCaseEditorModel;
-import global.Global;
 import global.Util;
 import minderengine.TestEngine;
 import models.*;
@@ -14,8 +13,7 @@ import play.data.Form;
 import play.mvc.Controller;
 import play.mvc.Result;
 import play.mvc.Security;
-import views.html.testCaseEditor;
-import views.html.testCaseView;
+import views.html.testDesigner.testCase.*;
 
 import java.util.*;
 

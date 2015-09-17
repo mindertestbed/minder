@@ -19,8 +19,7 @@ import play.mvc.Result;
 import play.mvc.Security;
 import security.AllowedRoles;
 import security.Role;
-import views.html.groupDetailView;
-import views.html.testGroupEditor;
+import views.html.testDesigner.group.*;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
@@ -36,7 +35,7 @@ public class GroupController extends Controller {
 
   @Security.Authenticated(Secured.class)
   public static Result getCreateGroupEditorView() {
-    return ok(testGroupEditor.render(TEST_GROUP_FORM, null));
+    return ok(testGroupEditor.render(TEST_GROUP_FORM));
   }
 
   @Security.Authenticated(Secured.class)
@@ -46,14 +45,14 @@ public class GroupController extends Controller {
     final User localUser = Authentication.getLocalUser();
     if (filledForm.hasErrors()) {
       Util.printFormErrors(filledForm);
-      return badRequest(testGroupEditor.render(filledForm, null));
+      return badRequest(testGroupEditor.render(filledForm));
     } else {
       GroupEditorModel model = filledForm.get();
 
       TestGroup group = TestGroup.findByName(model.name);
       if (group != null) {
         filledForm.reject("The group with name [" + group.name + "] already exists");
-        return badRequest(testGroupEditor.render(filledForm, null));
+        return badRequest(testGroupEditor.render(filledForm));
       }
 
       group = new TestGroup();
@@ -86,7 +85,7 @@ public class GroupController extends Controller {
       tgem.description = tg.description;
       Form<GroupEditorModel> bind = TEST_GROUP_FORM.fill(tgem);
 
-      return ok(testGroupEditor.render(bind, null));
+      return ok(testGroupEditor.render(bind));
     }
   }
 

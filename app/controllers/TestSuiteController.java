@@ -11,8 +11,7 @@ import play.mvc.Controller;
 import play.mvc.Result;
 import security.AllowedRoles;
 import security.Role;
-import views.html.testSuite.testSuiteDetailView;
-import views.html.testSuite.testSuiteEditor;
+import views.html.testDesigner.testSuite.*;
 
 import static play.data.Form.form;
 
