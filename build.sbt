@@ -30,7 +30,7 @@ libraryDependencies ++= Seq(
   "mysql" % "mysql-connector-java" % "5.1.18",
   "org.beybunproject" % "xoola" % "1.0.1",
   "gov.tubitak.minder" % "minder-common" % "0.3.1",
-  "gov.tubitak.minder" %% "minder-tdl" % "0.3.6-RC2",
+  "gov.tubitak.minder" %% "minder-tdl" % "0.3.6-RC9" exclude("org.apache.httpcomponents", "httpclient") ,
   "org.webjars" % "webjars-play_2.11" % "2.4.0-1",
   "org.webjars" % "bootstrap" % "3.3.5",
   "net.sf.jasperreports" % "jasperreports" % "6.0.0",
