@@ -15,7 +15,7 @@
         bindValues($("#description@{ts.id}"))
       });
   </script>
-  <h2>Test Suite
+  <h2>@Messages("testSuite.TestSuite")
     <div id="name@{ts.id}" onclick='showUpdateInputTextDialog(@ts.id, "name", $(this).next(), "/doEditTestSuiteField")' class="hl editable"></div>
     <input type="hidden" value="@ts.name"/>
   </h2>
@@ -68,7 +68,7 @@
 
     @display match {
       case "jobs" => {
-        JOBS
+        @testSuiteJobList(ts)
       }
       case "runs" => {
         RUNS

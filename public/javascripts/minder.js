@@ -483,7 +483,7 @@ function deleteWithDialog2(action, dialog, title, category, item) {
             location.reload()
           },
           error: function (jqXHR, textStatus, errorMessage) {
-            alert(jqXHR.responseText);
+            showError(jqXHR.responseText);
           }
         });
 

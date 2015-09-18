@@ -149,7 +149,7 @@ public class TestSuiteController extends Controller {
     if (testSuite == null) {
       return badRequest("No test TestSuite with id " + id + ".");
     }
-    return redirect(routes.TestSuiteController.getTestSuiteDetailView(testSuite.id, "jobs"));
+    return ok(testSuiteDetailView.render(testSuite, display));
   }
 
 

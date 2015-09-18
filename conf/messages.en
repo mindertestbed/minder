@@ -1,3 +1,9 @@
+#Words
+Author=Author
+Name=Name
+Date=Date
+
+
 # Override default Play's validation messages
 
 # --- Constraints
@@ -84,3 +90,11 @@ minder.navigation.restricted.testdesigner=Test Designers
 minder.navigation.restricted.testdeveloper=Test Developers
 minder.navigation.testdesigner.createtestcase=Create a Test Case
 minder.navigation.signup=Sign up
+
+testSuite.noTestSuiteYet=No Test Suite Yet
+testSuite.testSuiteName=Test Suite Name
+testSuite.shortDescription=Short Description
+testSuite.Delete=Delete Test Suite
+testSuite.testSuite=test suite
+testSuite.TestSuite=Test Suite
+

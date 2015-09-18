@@ -102,6 +102,7 @@ POST         /doEditTestSuiteField                 controllers.TestSuiteControll
 GET          /getTestSuiteDetailView               controllers.TestSuiteController.getTestSuiteDetailView(id: Long, display: String)
 GET          /createTestSuite                      controllers.TestSuiteController.getCreateTestSuiteView(groupId: Long)
 POST         /createTestSuite                      controllers.TestSuiteController.doCreateTestSuite
+GET          /doDeleteTestSuite                    controllers.TestSuiteController.doDeleteTestSuite(id: Long)
 
 
 GET         /getCreateUtilClassEditorView          controllers.UtilClassController.getCreateUtilClassEditorView(groupId: Long)

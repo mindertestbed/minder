@@ -120,7 +120,6 @@ create table TestGroup (
 
 create table TestRun (
   id                        bigserial not null,
-  suite_job_id              bigint not null,
   job_id                    bigint,
   date                      timestamp,
   runner_id                 bigint,
@@ -234,30 +233,28 @@ alter table TestCase add constraint fk_TestCase_owner_16 foreign key (owner_id) 
 create index ix_TestCase_owner_16 on TestCase (owner_id);
 alter table TestGroup add constraint fk_TestGroup_owner_17 foreign key (owner_id) references Users (id);
 create index ix_TestGroup_owner_17 on TestGroup (owner_id);
-alter table TestRun add constraint fk_TestRun_abstract_job_18 foreign key (suite_job_id) references abstract_job (id);
-create index ix_TestRun_abstract_job_18 on TestRun (suite_job_id);
-alter table TestRun add constraint fk_TestRun_job_19 foreign key (job_id) references abstract_job (id);
-create index ix_TestRun_job_19 on TestRun (job_id);
-alter table TestRun add constraint fk_TestRun_runner_20 foreign key (runner_id) references Users (id);
-create index ix_TestRun_runner_20 on TestRun (runner_id);
-alter table TestRun add constraint fk_TestRun_history_21 foreign key (history_id) references UserHistory (id);
-create index ix_TestRun_history_21 on TestRun (history_id);
-alter table TestSuite add constraint fk_TestSuite_owner_22 foreign key (owner_id) references Users (id);
-create index ix_TestSuite_owner_22 on TestSuite (owner_id);
-alter table TestSuite add constraint fk_TestSuite_testGroup_23 foreign key (test_group_id) references TestGroup (id);
-create index ix_TestSuite_testGroup_23 on TestSuite (test_group_id);
-alter table UserHistory add constraint fk_UserHistory_operationType_24 foreign key (operation_type_id) references OperationType (id);
-create index ix_UserHistory_operationType_24 on UserHistory (operation_type_id);
-alter table UtilClass add constraint fk_UtilClass_testGroup_25 foreign key (test_group_id) references TestGroup (id);
-create index ix_UtilClass_testGroup_25 on UtilClass (test_group_id);
-alter table UtilClass add constraint fk_UtilClass_owner_26 foreign key (owner_id) references Users (id);
-create index ix_UtilClass_owner_26 on UtilClass (owner_id);
-alter table Wrapper add constraint fk_Wrapper_user_27 foreign key (user_id) references Users (id);
-create index ix_Wrapper_user_27 on Wrapper (user_id);
-alter table WrapperParam add constraint fk_WrapperParam_tdl_28 foreign key (tdl_id) references Tdl (id);
-create index ix_WrapperParam_tdl_28 on WrapperParam (tdl_id);
-alter table WrapperVersion add constraint fk_WrapperVersion_wrapper_29 foreign key (wrapper_id) references Wrapper (id);
-create index ix_WrapperVersion_wrapper_29 on WrapperVersion (wrapper_id);
+alter table TestRun add constraint fk_TestRun_job_18 foreign key (job_id) references abstract_job (id);
+create index ix_TestRun_job_18 on TestRun (job_id);
+alter table TestRun add constraint fk_TestRun_runner_19 foreign key (runner_id) references Users (id);
+create index ix_TestRun_runner_19 on TestRun (runner_id);
+alter table TestRun add constraint fk_TestRun_history_20 foreign key (history_id) references UserHistory (id);
+create index ix_TestRun_history_20 on TestRun (history_id);
+alter table TestSuite add constraint fk_TestSuite_owner_21 foreign key (owner_id) references Users (id);
+create index ix_TestSuite_owner_21 on TestSuite (owner_id);
+alter table TestSuite add constraint fk_TestSuite_testGroup_22 foreign key (test_group_id) references TestGroup (id);
+create index ix_TestSuite_testGroup_22 on TestSuite (test_group_id);
+alter table UserHistory add constraint fk_UserHistory_operationType_23 foreign key (operation_type_id) references OperationType (id);
+create index ix_UserHistory_operationType_23 on UserHistory (operation_type_id);
+alter table UtilClass add constraint fk_UtilClass_testGroup_24 foreign key (test_group_id) references TestGroup (id);
+create index ix_UtilClass_testGroup_24 on UtilClass (test_group_id);
+alter table UtilClass add constraint fk_UtilClass_owner_25 foreign key (owner_id) references Users (id);
+create index ix_UtilClass_owner_25 on UtilClass (owner_id);
+alter table Wrapper add constraint fk_Wrapper_user_26 foreign key (user_id) references Users (id);
+create index ix_Wrapper_user_26 on Wrapper (user_id);
+alter table WrapperParam add constraint fk_WrapperParam_tdl_27 foreign key (tdl_id) references Tdl (id);
+create index ix_WrapperParam_tdl_27 on WrapperParam (tdl_id);
+alter table WrapperVersion add constraint fk_WrapperVersion_wrapper_28 foreign key (wrapper_id) references Wrapper (id);
+create index ix_WrapperVersion_wrapper_28 on WrapperVersion (wrapper_id);
 
 
 
