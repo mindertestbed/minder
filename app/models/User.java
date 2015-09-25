@@ -27,7 +27,6 @@ public class User extends Model {
   public byte[] password;
 
   @Formats.DateTime(pattern = "yyyy-MM-dd HH:mm:ss")
-  @Column(name = "last_login")
   public Date lastLogin;
 
   @OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.PERSIST)
@@ -46,7 +45,7 @@ public class User extends Model {
   public List<TestCase> testCases;
 
   @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.PERSIST, mappedBy = "owner")
-  public List<Job> jobs;
+  public List<AbstractJob> jobs;
 
   private static final Finder<Long, User> find = new Finder<>(User.class);
 

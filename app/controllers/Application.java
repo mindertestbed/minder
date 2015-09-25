@@ -8,7 +8,11 @@ import play.mvc.Security;
 import security.AllowedRoles;
 import security.Role;
 import views.html.*;
+import views.html.authentication.profile;
 import views.html.rootViews.rootPage;
+import views.html.testDesigner.restrictedTestDesigner;
+import views.html.testDeveloper.restrictedTestDeveloper;
+import views.html.testObserver.restrictedObserver;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -37,7 +41,6 @@ public class Application extends Controller {
     }
   }
 
-
   @AllowedRoles({Role.TEST_DESIGNER, Role.TEST_OBSERVER})
   public static Result restrictedTestDesigner(String display) {
     final User localUser = Authentication.getLocalUser();
@@ -45,7 +48,7 @@ public class Application extends Controller {
     if (!session().containsKey("testPageMode")) {
       session().put("testPageMode", "none");
     }
-    return ok(restrictedTestDesigner.render(localUser, display));
+    return ok(restrictedTestDesigner.render(display));
   }
 
 
@@ -53,7 +56,7 @@ public class Application extends Controller {
   public static Result createNewTest() {
     final User localUser = Authentication.getLocalUser();
     session().put("testPageMode", "new");
-    return ok(restrictedTestDesigner.render(localUser, "designWithGui"));
+    return ok(restrictedTestDesigner.render("designWithGui"));
   }
 
 

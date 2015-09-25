@@ -1,0 +1,63 @@
+@(frm: Form[_])
+
+@import views.html.helper._
+@import views.html.util._
+
+@implicitFieldConstructor = @{ FieldConstructor(twitterBootstrapBasic.f) }
+
+
+@main(Messages("minder.navigation.restricted.testdesigner"), "restrictedTestDesigner") {
+
+    @dialogs()
+
+<script>
+  $(function(){
+    $( "#rc1@{frm("id").value}" ).tabs();
+  });
+</script>
+
+
+    <h2>New Job</h2>
+    @helper.form(action = routes.JobController.doCreateJob(), 'class -> "fullh") {
+@if(frm.hasGlobalErrors) {
+<p class="alert alert-danger">
+  @frm.globalError.message
+</p>
+}
+
+<div class="fullh" id="rc1@frm("id").value">
+      @inputText(
+      frm("name"),
+      '_label -> "Job name"
+      )
+
+    @textarea(frm("mtdlParameters"), 'rows -> 5, '_label -> "Parameters", '_style -> "height:auto;")
+
+    @repeat(frm("wrapperMappingList"), min=0){ field =>
+        @defining(field.value.get){ str =>
+          @defining(MappedWrapperModel.parse(str)){ entry =>
+          <label for="@field.name" class="control-label">@entry.wrapperParam.name</label>:
+          <select id="@entry.wrapperParam.id" name="@field.name" class="form-control" style="width:350px;">
+            @for(wrapperVersion <- JobController.listFittingWrappers(entry)) {
+                <option value="@entry.toJsonWith(wrapperVersion)"
+                    @if(entry.wrapperVersion==wrapperVersion){selected="selected" }>@{wrapperVersion.wrapper.name+" ("+wrapperVersion.version+")"}</option>
+            }
+          </select>
+          }
+        }
+      }
+
+    <br />
+    <button type="submit">Create</button>&nbsp;
+    <button type="reset">Reset</button>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+    <button type="button" onclick="history.back ( )">Cancel</button>
+
+    <input type="hidden" name="id" id="id" value='@frm("id").value'/>
+    <input type="hidden" name="tdlID" id="tdlID" value='@frm("tdlID").value'/>
+    <input type="hidden" name="obsolete" id="obsolete" value='@frm("obsolete").value'/>
+    <input type="hidden" name="tdl" id="tdl" value='@frm("tdl").value'/>
+
+    </div>
+</div>
+}
+}

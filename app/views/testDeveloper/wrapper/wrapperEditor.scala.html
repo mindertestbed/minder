@@ -1,0 +1,22 @@
+@(frm: Form[_])
+
+@import helper._
+@implicitFieldConstructor = @{ FieldConstructor(views.html.util.twitterBootstrapBasic.f) }
+
+@if(frm.hasGlobalErrors) {
+<p class="alert alert-danger">
+  @frm.globalError.message
+</p>
+}
+
+@inputText(
+frm("name"),
+'_label -> "Wrapper Name"
+)
+
+@inputText(
+        frm("shortDescription"),
+        '_label -> "Short Description"
+        )
+
+<input type="hidden" name="id" id="id" value='@frm("id").value' />

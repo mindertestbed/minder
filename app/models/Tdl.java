@@ -32,15 +32,16 @@ public class Tdl extends Model {
   @Column(nullable = false)
   public String version;
 
-  public List<Job> jobs;
+  @OneToMany
+  public List<AbstractJob> jobs;
+
   public Date creationDate;
 
 
   @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
   public List<WrapperParam> parameters;
 
-  private static final Finder<Long, Tdl> find = new Finder<>(Long.class,
-      Tdl.class);
+  private static final Finder<Long, Tdl> find = new Finder<>(Tdl.class);
 
   public static Tdl getLatestTdl(TestCase testCase) {
     final List<Tdl> list = findByTestCase(testCase);
@@ -51,7 +52,7 @@ public class Tdl extends Model {
     return list.get(0);
   }
 
-  public static List<Tdl> findByTestCase(TestCase testCase){
+  public static List<Tdl> findByTestCase(TestCase testCase) {
     return find.where().eq("testCase", testCase).orderBy().desc("creationDate").findList();
   }
 

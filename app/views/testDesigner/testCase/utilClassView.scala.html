@@ -1,0 +1,88 @@
+@(utilClass: UtilClass)
+@import views.html.util._
+
+@main(Messages("minder.navigation.restricted.testdesigner"), "restrictedTestDesigner") {
+    @dialogs()
+
+    <h2>Util Class
+        <div id="name@{utilClass.id}" onclick='showUpdateInputTextDialog(@utilClass.id, "name", $(this).next(), "/doEditUtilClassField")' class="hl editable"></div>
+        <input type="hidden" value="@utilClass.name"/>
+    </h2>
+
+    <div class="indent">
+        <h3>Short Description</h3>
+        <div id="shortDescription@{utilClass.id}" onclick='showUpdateInputTextDialog(@utilClass.id, "shortDescription", $(this).next(), "/doEditUtilClassField")' class="editable"></div>
+        <input type="hidden" value="@utilClass.shortDescription"/>
+
+        <table class="section fullw" style="border-top:1px solid gray; margin-top:0;">
+            <tr>
+                <td>
+                    <br />
+                    <div><input type="button" onclick='window.location="/getEditUtilClassEditorView?id=@{utilClass.id}"' value="         Edit         "/> &nbsp;&nbsp;&nbsp;&nbsp;
+                            Theme: <select id="select">
+                            <option>default</option>
+                            <option>3024-day</option>
+                            <option>3024-night</option>
+                            <option selected>ambiance</option>
+                            <option>base16-dark</option>
+                            <option>base16-light</option>
+                            <option>blackboard</option>
+                            <option>cobalt</option>
+                            <option>eclipse</option>
+                            <option>elegant</option>
+                            <option>erlang-dark</option>
+                            <option>lesser-dark</option>
+                            <option>mbo</option>
+                            <option>mdn-like</option>
+                            <option>midnight</option>
+                            <option>monokai</option>
+                            <option>neat</option>
+                            <option>neo</option>
+                            <option>night</option>
+                            <option>paraiso-dark</option>
+                            <option>paraiso-light</option>
+                            <option>pastel-on-dark</option>
+                            <option>rubyblue</option>
+                            <option>solarized dark</option>
+                            <option>solarized light</option>
+                            <option>the-matrix</option>
+                            <option>tomorrow-night-eighties</option>
+                            <option>twilight</option>
+                            <option>vibrant-ink</option>
+                            <option>xq-dark</option>
+                            <option>xq-light</option>
+                        </select>
+                        </div>
+                        <form>
+                        <textarea id="code" name="code" class="CodeMirror fullw">@utilClass.source</textarea>
+                        </form>
+                            <script>
+                            var editor = CodeMirror.fromTextArea(document.getElementById("code"), {
+                                lineWrapping: true,
+                                lineNumbers: true,
+                                styleActiveLine: true,
+                                readOnly: true,
+                                viewportMargin: Infinity,
+                                mode: {name: "text/x-scala", globalVars: true},
+                                theme: "ambiance"
+                            });
+
+                            $( "#select" ).change(function() {
+                            $( "#select option:selected" ).each(function() {
+                            editor.setOption("theme", $( this ).text());
+                            });
+                            });
+                            </script>
+                </td>
+            </tr>
+        </table>
+    </div>
+    <br />
+
+    <script>
+    $(function(){
+    bindValues($("#name@{utilClass.id}"))
+    bindValues($("#shortDescription@{utilClass.id}"))
+    })
+    </script>
+}

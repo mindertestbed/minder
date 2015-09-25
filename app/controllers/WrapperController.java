@@ -1,27 +1,17 @@
 package controllers;
 
 import editormodels.WrapperEditorModel;
-import global.Global;
 import global.Util;
-import models.*;
-import net.sf.jasperreports.engine.*;
-import net.sf.jasperreports.engine.export.JRPdfExporter;
-import net.sf.jasperreports.engine.export.JRPdfExporterParameter;
+import models.User;
+import models.Wrapper;
 import play.Logger;
 import play.data.Form;
 import play.mvc.Controller;
 import play.mvc.Result;
 import play.mvc.Security;
-import views.html.testRunLister;
-import views.html.wrapperEditor;
-import views.html.wrapperEditor2;
-import views.html.wrapperLister;
-
-import java.io.ByteArrayOutputStream;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import views.html.testDeveloper.wrapper.wrapperEditor;
+import views.html.testDeveloper.wrapper.wrapperEditor2;
+import views.html.testDeveloper.wrapper.wrapperLister;
 
 import static play.data.Form.form;
 
@@ -32,25 +22,12 @@ public class WrapperController extends Controller {
   public static final Form<WrapperEditorModel> WRAPPER_FORM = form(WrapperEditorModel.class);
 
   @Security.Authenticated(Secured.class)
-  public static Result listTestRuns(Long configurationId) {
-    Job rc = Job.findById(configurationId);
-    if (rc == null) {
-      return badRequest("Job with id [" + configurationId
-          + "] not found!");
-    } else {
-
-      return ok(testRunLister.render(configurationId, null));
-    }
-
-  }
-
-  @Security.Authenticated(Secured.class)
   public static Result doCreateWrapper() {
     final Form<WrapperEditorModel> filledForm = WRAPPER_FORM.bindFromRequest();
     final User localUser = Authentication.getLocalUser();
     if (filledForm.hasErrors()) {
       Util.printFormErrors(filledForm);
-      return badRequest(wrapperEditor.render(filledForm, null));
+      return badRequest(wrapperEditor.render(filledForm));
     } else {
       WrapperEditorModel model = filledForm.get();
 
@@ -58,7 +35,7 @@ public class WrapperController extends Controller {
       if (wrapper != null) {
         filledForm.reject("The wrapper with name [" + wrapper.name
             + "] already exists");
-        return badRequest(wrapperEditor.render(filledForm, null));
+        return badRequest(wrapperEditor.render(filledForm));
       }
 
       wrapper = new Wrapper();
@@ -69,13 +46,13 @@ public class WrapperController extends Controller {
 
       wrapper.save();
 
-      return ok(wrapperLister.render(Authentication.getLocalUser()));
+      return ok(wrapperLister.render());
     }
   }
 
   @Security.Authenticated(Secured.class)
   public static Result createNewWrapperForm() {
-    return ok(wrapperEditor.render(WRAPPER_FORM, null));
+    return ok(wrapperEditor.render(WRAPPER_FORM));
   }
 
   @Security.Authenticated(Secured.class)
@@ -96,7 +73,7 @@ public class WrapperController extends Controller {
       return badRequest(ex.getMessage());
     }
 
-    return ok(wrapperLister.render(Authentication.getLocalUser()));
+    return ok(wrapperLister.render());
   }
 
   @Security.Authenticated(Secured.class)
@@ -112,7 +89,7 @@ public class WrapperController extends Controller {
 
       Form<WrapperEditorModel> bind = WRAPPER_FORM
           .fill(wrModel);
-      return ok(wrapperEditor2.render(bind, null));
+      return ok(wrapperEditor2.render(bind));
     }
   }
 
@@ -130,93 +107,7 @@ public class WrapperController extends Controller {
       wr.update();
 
       Logger.info("Done updating wrapper " + model.name);
-      return ok(wrapperLister.render(Authentication.getLocalUser()));
-    }
-  }
-
-  @Security.Authenticated(Secured.class)
-  public static Result viewReport(Long testRunId, String type) {
-    TestRun tr = TestRun.findById(testRunId);
-    if (tr == null)
-      return badRequest("A test run with id " + testRunId + " was not found");
-    response().setContentType("application/x-download");
-    String fileName = tr.id + ".report";
-    byte[] data = tr.report;
-    if ("pdf".equals(type)) {
-      //
-      fileName += ".pdf";
-      data = toPdf(data, tr);
-    } else {
-      fileName += ".xml";
-    }
-    response().setHeader("Content-disposition", "attachment; filename=" + fileName);
-    return ok(data);
-  }
-
-  @Security.Authenticated(Secured.class)
-  private static byte[] toPdf(byte[] data, TestRun tr) {
-    try {
-      JasperReport report = JasperCompileManager.compileReport(WrapperController.class.getResourceAsStream("/taReport.jrxml"));
-      Map<String, Object> values = new HashMap<String, Object>();
-      values.put("user", tr.history.email);
-      values.put("email", tr.history.email);
-      values.put("result", tr.success);
-      values.put("date", tr.date);
-      values.put("errorMessage", tr.errorMessage);
-
-      Logger.debug("Error message " + tr.errorMessage);
-      Job rc = Job.findById(tr.job.id);
-      TestCase tc = TestCase.findById(rc.tdl.testCase.id);
-      TestAssertion ta = TestAssertion.findById(tc.testAssertion.id);
-      TestGroup tg = TestGroup.findById(ta.testGroup.id);
-
-      values.put("testGroup", tg.name);
-      values.put("testCase", tc.name);
-      values.put("job", rc.name);
-
-      values.put("taId", ta.taId);
-      values.put("taNormativeSource", ta.normativeSource);
-      values.put("taDescription", ta.shortDescription);
-      values.put("taTarget", ta.target);
-      values.put("taPredicate", ta.predicate);
-      values.put("taPrerequisite", ta.prerequisites);
-      values.put("taPrescription", ta.prescriptionLevel.toString());
-      values.put("taVariable", ta.variables);
-      values.put("taTag", ta.tag);
-
-      JRDataSource source = new JREmptyDataSource();
-      JasperPrint print1 = JasperFillManager.fillReport(report, values, source);
-      List<JasperPrint> jasperPrintList = new ArrayList<JasperPrint>();
-      jasperPrintList.add(print1);
-
-      if (tr.sutNames != null && tr.sutNames.length() > 0) {
-        JasperReport wrapperReport = JasperCompileManager.compileReport(WrapperController.class.getResourceAsStream("/sutNamesReport.jrxml"));
-        values = new HashMap<String, Object>();
-        values.put("sutNames", tr.sutNames);
-        source = new JREmptyDataSource();
-        JasperPrint print2 = JasperFillManager.fillReport(wrapperReport, values, source);
-        jasperPrintList.add(print2);
-      }
-
-      JasperReport logReport = JasperCompileManager.compileReport(WrapperController.class.getResourceAsStream("/logReport.jrxml"));
-      values = new HashMap<String, Object>();
-      values.put("log", tr.history.extractSystemOutputLog());
-      source = new JREmptyDataSource();
-      JasperPrint print3 = JasperFillManager.fillReport(logReport, values, source);
-      jasperPrintList.add(print3);
-
-      ByteArrayOutputStream baos = new ByteArrayOutputStream();
-      JRPdfExporter exporter = new JRPdfExporter();
-      //Add the list as a Parameter
-      exporter.setParameter(JRExporterParameter.JASPER_PRINT_LIST, jasperPrintList);
-      //this will make a bookmark in the exported PDF for each of the reports
-      exporter.setParameter(JRPdfExporterParameter.IS_CREATING_BATCH_MODE_BOOKMARKS, Boolean.TRUE);
-      exporter.setParameter(JRExporterParameter.OUTPUT_STREAM, baos);
-      exporter.exportReport();
-      return baos.toByteArray();
-    } catch (Exception ex) {
-      ex.printStackTrace();
-      return "Invalid".getBytes();
+      return ok(wrapperLister.render());
     }
   }
 }

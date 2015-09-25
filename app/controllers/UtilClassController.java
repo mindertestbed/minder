@@ -3,16 +3,17 @@ package controllers;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import editormodels.UtilClassEditorModel;
-import global.Global;
 import global.Util;
-import models.*;
+import models.TestGroup;
+import models.User;
+import models.UtilClass;
 import play.Logger;
 import play.data.Form;
 import play.mvc.Controller;
 import play.mvc.Result;
 import play.mvc.Security;
-import views.html.utilClassEditor;
-import views.html.utilClassView;
+import views.html.testDesigner.testCase.utilClassEditor;
+import views.html.testDesigner.testCase.utilClassView;
 
 import static play.data.Form.form;
 

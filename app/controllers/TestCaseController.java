@@ -4,7 +4,6 @@ package controllers;
 import com.avaje.ebean.Ebean;
 import com.fasterxml.jackson.databind.JsonNode;
 import editormodels.TestCaseEditorModel;
-import global.Global;
 import global.Util;
 import minderengine.TestEngine;
 import models.*;
@@ -14,8 +13,7 @@ import play.data.Form;
 import play.mvc.Controller;
 import play.mvc.Result;
 import play.mvc.Security;
-import views.html.testCaseEditor;
-import views.html.testCaseView;
+import views.html.testDesigner.testCase.*;
 
 import java.util.*;
 
@@ -115,7 +113,7 @@ public class TestCaseController extends Controller {
 
       Logger.info("Test Case with name " + tc.id + ":" + tc.name
           + " was created");
-      return redirect(routes.AssertionController.getAssertionDetailView(ta.id, "testCases"));
+      return redirect(routes.TestAssertionController.getAssertionDetailView(ta.id, "testCases"));
     }
   }
 
@@ -253,7 +251,7 @@ public class TestCaseController extends Controller {
       Logger.error(ex.getMessage(), ex);
       return badRequest(ex.getMessage());
     }
-    return redirect(routes.AssertionController.getAssertionDetailView(tc.testAssertion.id, "testCases"));
+    return redirect(routes.TestAssertionController.getAssertionDetailView(tc.testAssertion.id, "testCases"));
   }
 
   @Security.Authenticated(Secured.class)

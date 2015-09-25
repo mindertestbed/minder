@@ -20,7 +20,7 @@ public class TestRun extends Model {
 
   @ManyToOne
   @Column(nullable = false)
-  public Job job;
+  public AbstractJob job;
 
   public Date date;
 
@@ -50,7 +50,7 @@ public class TestRun extends Model {
 
   }
 
-  public TestRun(Job job, User runner) {
+  public TestRun(AbstractJob job, User runner) {
     this.job = job;
     this.runner = runner;
     this.date = new Date();
@@ -64,13 +64,13 @@ public class TestRun extends Model {
     return byId;
   }
 
-  public static List<TestRun> findByJob(Job rc) {
+  public static List<TestRun> findByJob(AbstractJob rc) {
     return find.where().eq("job", rc).orderBy("date desc").findList();
   }
 
 
   public static List<TestRun> findByJob(Long id) {
-    return findByJob(Job.findById(id));
+    return find.where().eq("job_id", id).orderBy("date desc").findList();
   }
 
 
@@ -79,7 +79,6 @@ public class TestRun extends Model {
   }
 
   public static int getMaxNumber() {
-
     com.avaje.ebean.SqlQuery qu = Ebean.createSqlQuery("Select max(number) from TestRun");
     Object max = qu.findUnique().get("max");
     Logger.debug(max + " is max number");
