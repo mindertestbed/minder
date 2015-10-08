@@ -35,8 +35,7 @@ public class TestCase extends Model {
   @Column(nullable = false)
   public User owner;
 
-  private static final Finder<Long, TestCase> find = new Finder<>(Long.class,
-      TestCase.class);
+  private static final Finder<Long, TestCase> find = new Finder<>(TestCase.class);
 
   @OneToMany
   public List<Tdl> tdls;

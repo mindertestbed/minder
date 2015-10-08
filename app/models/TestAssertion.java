@@ -57,6 +57,7 @@ public class TestAssertion extends Model {
 
   @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
   public List<TestCase> testCases;
+
   @ManyToOne
   @Column(nullable = false)
   public User owner;

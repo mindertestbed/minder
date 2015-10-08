@@ -115,5 +115,3 @@ POST        /doEditUtilClassField                controllers.UtilClassController
 
 POST        /updateSettings                      controllers.SettingsController.updateSettings
 
-GET         /rest/*action                        rest.controllers.RestController.getAction(action)
-POST        /rest/*action                        rest.controllers.RestController.postAction(action)

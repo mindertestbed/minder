@@ -1,0 +1,41 @@
+@import views.html.util._
+
+@(testSuite: TestSuite, frm: Form[_])
+
+@import helper._
+@implicitFieldConstructor = @{
+    FieldConstructor(twitterBootstrapBasic.f)
+}
+
+@helper.form(action = routes.TestSuiteController.doCreateTestSuite()) {
+    @if(frm.hasGlobalErrors) {
+        <p class="alert alert-danger">
+        @frm.globalError.message
+        </p>
+    }
+    @inputText(
+        frm("name"),
+        '_label -> "Test Suite Name"
+    )
+
+    @inputText(
+        frm("shortDescription"),
+        '_label -> "Short Description"
+    )
+
+    @textarea(
+        frm("mtdlParameters"),'rows -> 2,
+      '_label -> "MTDL Parameters"
+    )
+
+    @textarea(frm("description"), 'rows -> 2, '_label -> "Description")
+
+    <input type="hidden" name="id" id="id" value='@frm("id").value' />
+    <input type="hidden" name="groupId" id="groupId" value='@frm("groupId").value' />
+
+    <br />
+    <button type="submit">Create</button>&nbsp;
+    <button type="reset">Reset</button>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+    <button type="button" onclick="history.back ( )">Cancel</button>
+}
+
