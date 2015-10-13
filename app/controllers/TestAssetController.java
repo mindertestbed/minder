@@ -14,6 +14,7 @@ import play.mvc.Http;
 import play.mvc.Result;
 import play.mvc.Security;
 import views.html.testDesigner.group.*;
+import views.html.testDesigner.group.childViews.testAssetList;
 
 import java.io.*;
 
@@ -82,10 +83,10 @@ public class TestAssetController extends Controller {
 
         asset.save();
 
-        return redirect(controllers.routes.GroupController.getGroupDetailView(group.id, "assets"));
+        return ok(testAssetList.render(group));
       }
     } else {
-      return badRequest("You cant use this resource");
+      return badRequest("You can't use this resource");
     }
   }
 
@@ -98,15 +99,17 @@ public class TestAssetController extends Controller {
   public static Result editAssetForm(Long id) {
     User localuser = Authentication.getLocalUser();
 
-    TestGroup group = TestGroup.findById(id);
-    if (!localuser.email.equals("root@minder") && !group.owner.email.equals(localuser.email)) {
-      return badRequest("You cant use this resource");
-    }
-
     TestAsset ta = TestAsset.findById(id);
     if (ta == null) {
       return badRequest("Test asset with id [" + id + "] not found!");
     } else {
+
+
+      TestGroup group = TestGroup.findById(ta.group.id);
+      if (!localuser.email.equals("root@minder") && !group.owner.email.equals(localuser.email)) {
+        return badRequest("You cant use this resource");
+      }
+
       TestAssetModel tgem = new TestAssetModel();
       tgem.id = ta.id;
       tgem.name = ta.name;
@@ -151,7 +154,7 @@ public class TestAssetController extends Controller {
 
       Logger.info("Done updating test asset " + ta.name + ":" + ta.id);
 
-      return redirect(controllers.routes.GroupController.getGroupDetailView(ta.group.id, "assets"));
+      return ok(testAssetList.render(ta.group));
     }
   }
 
@@ -171,7 +174,7 @@ public class TestAssetController extends Controller {
 
       new File("assets/_" + ta.group.id + "/" + ta.name).delete();
 
-      return redirect(controllers.routes.GroupController.getGroupDetailView(ta.group.id, "assets"));
+      return ok(testAssetList.render(ta.group));
     }
   }
 

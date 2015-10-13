@@ -59,4 +59,8 @@ public class Tdl extends Model {
   public static Tdl findById(Long tdlId) {
     return find.byId(tdlId);
   }
+
+  public static List<Tdl>  listByTestCase(TestCase testCase) {
+    return find.where().eq("testCase", testCase).orderBy().desc("creationDate").findList();
+  }
 }

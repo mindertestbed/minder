@@ -57,5 +57,7 @@ public class TestCase extends Model {
   public static List<TestCase> listByTestAssertionId(Long assertionId) {
     return find.where().eq("testAssertion.id", assertionId).findList();
   }
-
+  public static List<TestCase> listByTestAssertion(TestAssertion assertion) {
+    return find.where().eq("testAssertion", assertion).findList();
+  }
 }

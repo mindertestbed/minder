@@ -1,34 +1,3 @@
-function minderAccordion(selector) {
-  var ogl = selector + " > div";
-  //hide the contents
-  $(ogl + ".content").hide();
-
-  var titles = $(ogl + ".title");
-
-  var triggers = $(ogl + ".title .trigger");
-
-  triggers.each(function (index) {
-    $(this).addClass('hand');
-  });
-
-  triggers.click(function () {
-    //get the parent that has class title.
-    var parent = $(this).closest('.title');
-
-    var nxt = parent.next();
-    if (parent.hasClass("closed")) {
-      nxt.slideUp();
-      titles.slideDown();
-      parent.removeClass("closed");
-    } else {
-      parent.addClass("closed");
-      titles.slideUp();
-      parent.slideDown();
-      nxt.slideDown();
-    }
-  });
-}
-
 function executeScripts(target) {
   target.find("script").each(function (i) {
     eval($(this).text());
@@ -104,7 +73,6 @@ function createMultipartFormDialog(elm, sourceUrl, action, dialogId, titl, targe
   var frm = $("#" + dialogId + " > form");
   elm.on('click', function (event) {
     event.stopPropagation();
-
     var dialog = $("#" + dialogId).dialog({
       autoOpen: false,
       height: h,
@@ -113,12 +81,8 @@ function createMultipartFormDialog(elm, sourceUrl, action, dialogId, titl, targe
       modal: true,
       buttons: {
         "Ok": function () {
-
           var processedData = new FormData(frm[0]);
-
-
-          frm[0].innerHTML = "<div align='center'><i>Sending Data...</i></div>"
-
+          frm.html("<div align='center'><i>Sending Data...</i></div>")
           $.ajax({
             type: frm.attr('method'),
             url: frm.attr('action'),
@@ -126,12 +90,11 @@ function createMultipartFormDialog(elm, sourceUrl, action, dialogId, titl, targe
             contentType: false,
             processData: false,
             success: function (data) {
-              target[0].innerHTML = data;
-              executeScripts(target);
+              target.html(data);
               dialog.dialog("close");
             },
             error: function (jqXHR, textStatus, errorMessage) {
-              frm[0].innerHTML = jqXHR.responseText;
+              frm.html(jqXHR.responseText);
               frm[0].reset();
             }
           });
@@ -181,11 +144,10 @@ function deleteWithDialog(elm, action, dialog, title, category, item, target) {
             type: 'GET',
             url: action,
             success: function (data) {
-              target[0].innerHTML = data;
-              executeScripts(target);
+              target.html(data);
             },
             error: function (jqXHR, textStatus, errorMessage) {
-              alert(jqXHR.responseText);
+              showError(jqXHR.responseText);
             }
           });
 
@@ -217,229 +179,6 @@ function showError(data) {
     }
   });
   dialog[0].innerHTML = data;
-}
-
-function createJob(testCaseId) {
-  $.ajax({
-    type: 'GET',
-    url: '/getCreateJobEditorView?tdlID=' + testCaseId,
-    success: function (data) {
-      showCreateDialog(testCaseId, data)
-    },
-    error: function (jqXHR, textStatus, errorMessage) {
-      showError(jqXHR.responseText);
-    }
-  });
-}
-
-function showCreateDialog(testCaseId, data) {
-  var frm = $('#mainForm');
-  frm[0].innerHTML = data;
-  executeScripts(frm);
-  var search = "#rcRoot" + testCaseId;
-  var parr = $(search);
-
-  var dialog = $('#mainDialog').dialog({
-    autoOpen: false,
-    height: 500,
-    width: 800,
-    title: 'Create Job',
-    modal: true,
-    buttons: {
-      "Create": function () {
-        $.ajax({
-          type: 'post',
-          url: '/doCreateJob',
-          data: frm.serialize(),
-          success: function (data) {
-            parr[0].innerHTML = data;
-            executeScripts(parr);
-            dialog.dialog("close");
-          },
-          error: function (jqXHR, textStatus, errorMessage) {
-            frm[0].innerHTML = jqXHR.responseText;
-            executeScripts(frm);
-          }
-        });
-      },
-      Cancel: function () {
-        dialog.dialog("close");
-      }
-    }
-  });
-
-  dialog.dialog("open", 'Create Job');
-}
-
-function editJob(testCaseId, id, name) {
-  //perform ajax to get the edit form
-  $.ajax({
-    type: 'GET',
-    url: '/getEditJobEditorView?id=' + id,
-    success: function (data) {
-      showEditDialog(testCaseId, id, data, name)
-    },
-    error: function (jqXHR, textStatus, errorMessage) {
-      showError(jqXHR.responseText);
-    }
-  });
-}
-
-function showEditDialog(testCaseId, id, data, title) {
-  var form = $("#mainForm");
-  form[0].innerHTML = data;
-  executeScripts(form);
-  var parent = $("#rcRoot" + testCaseId).parent();
-
-  var dialog = $("#mainDialog").dialog({
-    autoOpen: false,
-    height: 600,
-    width: 1100,
-    title: 'Job' + title,
-    modal: true,
-    buttons: {
-      "Save": function () {
-        $.ajax({
-          type: 'post',
-          url: '/doEditJob',
-          data: form.serialize(),
-          success: function (data) {
-            parent[0].innerHTML = data;
-            executeScripts(parent);
-            dialog.dialog("close");
-          },
-          error: function (jqXHR, textStatus, errorMessage) {
-            form[0].innerHTML = jqXHR.responseText;
-            form[0].reset();
-          }
-        });
-      },
-      Cancel: function () {
-        dialog.dialog("close");
-      }
-    },
-    close: function () {
-      form[0].reset();
-    }
-  });
-
-  dialog.dialog("open", title);
-}
-
-
-function displayJob(id, name, userId) {
-  //perform ajax to get the run dialog
-  $.ajax({
-    type: 'GET',
-    url: '/displayJob?id=' + id,
-    success: function (data) {
-      showRunDialog(id, data, name, userId)
-    },
-    error: function (jqXHR, textStatus, errorMessage) {
-      showError(jqXHR.responseText);
-    }
-  });
-}
-
-function showRunDialog(jobId, data, title, userId) {
-  var runDialog = $("#runDialog");
-  runDialog[0].innerHTML = data
-  executeScripts(runDialog);
-
-  //here we have the handle to the inner table where the test status is shown.
-  //we will update it during the test.
-  //see: jobDetailView>div #testStatus.
-  var targetStatusDiv = $('#testStatus')
-
-  var dialog = runDialog.dialog({
-    autoOpen: false,
-    height: 650,
-    width: 1200,
-    title: 'Job ' + title,
-    modal: true,
-    buttons: {
-      "Run": function () {
-        runTest(runDialog, jobId, targetStatusDiv, userId)
-      },
-      "Close": function () {
-        dialog.dialog("close");
-      }
-    }
-  });
-
-  dialog.dialog("open", title);
-}
-
-function runTest(runDialog, jobId, targetStatusDiv, userId) {
-  $.ajax({
-    type: 'GET',
-    url: '/runTest?id=' + jobId + '&userId=' + userId,
-    success: function (data) {
-      targetStatusDiv[0].innerHTML = data;
-      executeScripts(targetStatusDiv);
-      if (data.indexOf("TEST_STATUS:1") != -1 || data.indexOf("TEST_STATUS:0") != -1) {
-        syncTest(runDialog, jobId, targetStatusDiv, userId);
-      }
-    },
-    error: function (jqXHR, textStatus, errorMessage) {
-      showError(jqXHR.responseText);
-    }
-  });
-}
-
-function syncTest(runDialog, jobId, targetStatusDiv, userId) {
-  setTimeout(function () {
-    $.ajax({
-      type: 'GET',
-      url: '/syncTest?id=' + jobId + '&userId=' + userId,
-      success: function (data) {
-        targetStatusDiv[0].innerHTML = data;
-        executeScripts(targetStatusDiv);
-        if (data.indexOf("TEST_STATUS:1") != -1 || data.indexOf("TEST_STATUS:0") != -1) {
-          syncTest(runDialog, jobId, targetStatusDiv, userId);
-        }
-      },
-      error: function (jqXHR, textStatus, errorMessage) {
-        showError(jqXHR.responseText);
-      }
-    });
-  }, 500);
-}
-
-
-function deleteJob(testCaseId, idd, name) {
-  var parent = $("#rcRoot" + testCaseId).parent();
-  var deleteDialog = $("#dialog-confirm").dialog({
-    resizable: false,
-    height: 200,
-    width: "50%",
-    title: 'Delete Job',
-    autoOpen: false,
-    modal: true,
-    buttons: {
-      "Delete": function () {
-        $.ajax({
-          type: 'GET',
-          url: '/doDeleteJob?id=' + idd,
-          success: function (data) {
-            parent[0].innerHTML = data;
-            executeScripts(parent);
-          },
-          error: function (jqXHR, textStatus, errorMessage) {
-            showError(jqXHR.responseText);
-          }
-        });
-        $(this).dialog("close");
-      },
-      Cancel: function () {
-        $(this).dialog("close");
-      }
-    }
-  });
-
-  deleteDialog.find("span.itemtype")[0].innerHTML = 'Job';
-  deleteDialog.find("span.itemname")[0].innerHTML = name;
-  deleteDialog.dialog("open");
 }
 
 function showReportDialog(dialogId, id) {
@@ -501,7 +240,7 @@ function deleteWithDialog2(action, dialog, title, category, item) {
 }
 
 
-function simpleAjaxGet(dialogId, url, title, message){
+function simpleAjaxGet(dialogId, url, title, message) {
   var dlgSel = $("#" + dialogId)
   dlgSel[0].innerHTML = message
 
@@ -511,17 +250,17 @@ function simpleAjaxGet(dialogId, url, title, message){
     modal: true,
     buttons: {
       "Ok": function () {
-          $.ajax({
-            type: 'GET',
-            url: url,
-            success: function (data) {
-              dialog.dialog("close");
-            },
-            error: function (jqXHR, textStatus, errorMessage) {
-              showError(jqXHR.responseText)
-              dialog.dialog("close");
-            }
-          });
+        $.ajax({
+          type: 'GET',
+          url: url,
+          success: function (data) {
+            dialog.dialog("close");
+          },
+          error: function (jqXHR, textStatus, errorMessage) {
+            showError(jqXHR.responseText)
+            dialog.dialog("close");
+          }
+        });
       },
       Cancel: function () {
         dialog.dialog("close");
@@ -532,72 +271,143 @@ function simpleAjaxGet(dialogId, url, title, message){
   dialog.dialog("open", title);
 }
 
-function ajaxCancelJob(index, name){
+/**
+ * Added function for play ajax navigation
+ */
+function ajaxRouteGet(playAjaxObject, params, successTarget, failTarget) {
+  if (!isArray(params))
+    params = [params];
 
-  var dlgSel = $("#canceldiv")
-  dlgSel[0].innerHTML = 'The job with [' + name + '] will be removed from the queue. <br />Do you want to continue?';
+  if (typeof successTarget === 'undefined' || successTarget === null) {
+    showError("The success function cannot be empty")
+    return;
+  }
 
-  var dialog = dlgSel.dialog({
-    autoOpen: false,
-    title: 'Remove Job From the Queue',
-    modal: true,
-    buttons: {
-      "Ok": function () {
-        $.ajax({
-          type: 'GET',
-          url: '/cancelJob?index='+index,
-          success: function (data) {
-            dialog.dialog("close");
-          },
-          error: function (jqXHR, textStatus, errorMessage) {
-            showError(jqXHR.responseText)
-            dialog.dialog("close");
-          }
-        });
-      },
-      Cancel: function () {
-        dialog.dialog("close");
+  var successFunctionDelegate = successTarget;
+  //if the user provided a JQuery object, then use its html function
+  if (!isFunction(successTarget)) {
+    //is it a dialog
+    if (typeof successTarget.repaint === 'function') {
+      //yes
+      successTarget.repaint("")
+      spin(successTarget.contentPane[0])
+      successFunctionDelegate = function (data) {
+        successTarget.contentPane[0].spinner.stop()
+        successTarget.repaint(data)
+      }
+    } else if (typeof successTarget.html === 'function') {
+      //no its not a dialog, but it has a html() function
+      spin(successTarget[0])
+      successFunctionDelegate = function (data) {
+        successTarget[0].spinner.stop()
+        successTarget.html(data)
+      }
+    } else {
+      showError("The success function parameter must be either a function, a closable dialog or an object that has 'html()' function")
+      return;
+    }
+  }
+
+  playAjaxObject.apply(null, params).ajax()
+    .done(
+    function (data) {
+      successFunctionDelegate(data)
+    })
+    .fail(
+    function (data) {
+      if (typeof failTarget === 'undefined' || failTarget === null) {
+        showError(data.responseText)
+      } else {
+        failTarget(data.responseText);
       }
     }
-  });
-
-  dialog.dialog("open");
-
+  )
 }
 
 
-function ajaxCancelActiveJob(name){
-
-  var dlgSel = $("#canceldiv")
-  dlgSel[0].innerHTML = 'The job [' + name +
-  '] is running. <br /> It might be waiting for manual interaction. <br />' +
-  'Are you still sure that you want to cancel it?';
-
-  var dialog = dlgSel.dialog({
-    autoOpen: false,
-    title: 'Cancel Active Job',
-    modal: true,
-    buttons: {
-      "Ok": function () {
-        $.ajax({
-          type: 'GET',
-          url: '/cancelActiveJob',
-          success: function (data) {
-            dialog.dialog("close");
-          },
-          error: function (jqXHR, textStatus, errorMessage) {
-            showError(jqXHR.responseText)
-            dialog.dialog("close");
-          }
-        });
-      },
-      Cancel: function () {
-        dialog.dialog("close");
-      }
-    }
-  });
-
-  dialog.dialog("open");
-
+//check if my object is an array or not
+function isArray(myObject) {
+  return myObject.constructor.toString().indexOf("Array") > -1;
 }
 
+
+//check if my object is a function
+function isFunction(myObject) {
+  return myObject.constructor.toString().indexOf("Function") > -1;
+}
+
+//check if my object is a jquery object
+function isJQuery(myObject) {
+  return myObject.constructor.toString().indexOf("return new jQuery.fn.init") > -1;
+}
+
+
+function decorateAsClosable(target, title, close) {
+  //check if I am already closable
+  if (target.hasClass('closable')) return target[0].closableObject;
+
+  target.empty();
+  target.append(
+    '<table class="header"><tr><td class="tabexpandNoBorder">' +
+    '<div style="padding-left:10px;">' +
+    title + '</div></td>' +
+    '<td class="tabshrink closableButton"><h4><a href="#" style="padding: 10px;" onclick="closeClosableParent(event, this);">' +
+    'X' +
+    '</a></hd></td></tr></table>')
+
+  target.addClass('closable')
+  target.addClass('bevel2')
+  target.append('<div class="paddedContentPane"></div>');
+  target.contentPane = target.children().last();
+  target.repaint = function(data){
+    target.contentPane.html(data)
+  };
+  target[0].closeFunction = close;
+}
+
+
+function closeClosableParent(event, theLink) {
+  event.preventDefult();
+  event.stopPropogation();
+  var theParent = $(theLink).parents(".closable");
+  theParent.hide();
+  if (theParent[0].closeFunction != null) {
+    theParent[0].closeFunction();
+  }
+}
+
+function loadingDiv() {
+  return '<div align="center">Loading...</div>';
+}
+
+/**
+ * This function takes a NON JQUERY elemnt. So if you will
+ * provde a JQUERY object please do this: target[0]
+ * @param target
+ */
+function spin(target) {
+  var opts = {
+    lines: 13 // The number of lines to draw
+    , length: 28 // The length of each line
+    , width: 14 // The line thickness
+    , radius: 42 // The radius of the inner circle
+    , scale: 0.5 // Scales overall size of the spinner
+    , corners: 1 // Corner roundness (0..1)
+    , color: '#000' // #rgb or #rrggbb or array of colors
+    , opacity: 0.25 // Opacity of the lines
+    , rotate: 0 // The rotation offset
+    , direction: 1 // 1: clockwise, -1: counterclockwise
+    , speed: 1 // Rounds per second
+    , trail: 60 // Afterglow percentage
+    , fps: 20 // Frames per second when using setTimeout() as a fallback for CSS
+    , zIndex: 2e9 // The z-index (defaults to 2000000000)
+    , className: 'spinner' // The CSS class to assign to the spinner
+    , top: '50%' // Top position relative to parent
+    , left: '50%' // Left position relative to parent
+    , shadow: false // Whether to render a shadow
+    , hwaccel: false // Whether to use hardware acceleration
+    , position: 'absolute' // Element positioning
+  }
+
+  target.spinner = new Spinner(opts).spin(target);
+}

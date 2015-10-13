@@ -1,0 +1,15 @@
+@(list: java.util.List[Tdl])
+  @import scala.collection.JavaConversions._
+  @*
+  This template is responsible of rendering the TDL's that have been
+  submitted in the list parameters in a tabular, selectable way
+  *@
+  <table class="datatable">
+    <tr><th>Version</th><th>Test Case</th><th>Test Assertion ID</th></tr>
+  @for(tdl <- list) {
+    <tr>
+      <td class="hollow">@tdl.version</td><td>@tdl.testCase.name</td><td>@tdl.testCase.testAssertion.taId</td><td class="hollow">&nbsp;</td>
+    </tr>
+  }
+
+  </table>

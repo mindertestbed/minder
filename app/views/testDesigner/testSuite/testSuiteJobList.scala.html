@@ -1,8 +1,0 @@
-@(ts: TestSuite)
-@import java.util.concurrent.atomic.AtomicInteger
-@import global.Util._;
-@import views.html.util._
-
- @for(suiteJob <- SuiteJob.getAllByTestSuite(ts)){
-  @suiteJob.name <br />
-}

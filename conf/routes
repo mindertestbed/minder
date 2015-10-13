@@ -36,6 +36,13 @@ GET         /editGroupForm                       controllers.GroupController.edi
 GET         /doDeleteGroup                       controllers.GroupController.doDeleteGroup(id: Long)
 GET         /getGroupDetailView                  controllers.GroupController.getGroupDetailView(id: Long, display : String ?= "details")
 POST        /doEditGroupField                    controllers.GroupController.doEditGroupField()
+GET         /renderDetails                       controllers.GroupController.renderDetails(id: Long)
+GET         /renderTestAssertionList             controllers.GroupController.renderTestAssertionList(id: Long)
+GET         /renderTestSuites                    controllers.GroupController.renderTestSuites(id: Long)
+GET         /renderTestAssets                    controllers.GroupController.renderTestAssets(id: Long)
+GET         /renderUtilClasses                   controllers.GroupController.renderUtilClasses(id: Long)
+GET         /renderDependencies                  controllers.GroupController.renderDependencies(id: Long)
+
 
 #test assertion management
 GET         /getCreateAssertionEditorView        controllers.TestAssertionController.getCreateAssertionEditorView(groupId: Long)
@@ -103,7 +110,11 @@ GET         /getTestSuiteDetailView              controllers.TestSuiteController
 GET         /createTestSuite                     controllers.TestSuiteController.getCreateTestSuiteView(groupId: Long)
 POST        /createTestSuite                     controllers.TestSuiteController.doCreateTestSuite
 GET         /doDeleteTestSuite                   controllers.TestSuiteController.doDeleteTestSuite(id: Long)
-
+GET         /listAvailableTdlsForSuite           controllers.TestSuiteController.listAvailableTdlsForSuite(testSuiteId: Long)
+GET         /renderJoblistView                   controllers.TestSuiteController.renderJoblistView(id: Long)
+GET         /renderTestRunListView               controllers.TestSuiteController.renderTestRunListView(id: Long)
+GET         /renderDetailView                    controllers.TestSuiteController.renderDetailView(id: Long)
+GET         /renderTdlList                       controllers.TestSuiteController.renderTdlList(id: Long)
 
 GET         /getCreateUtilClassEditorView        controllers.UtilClassController.getCreateUtilClassEditorView(groupId: Long)
 POST        /doCreateUtilClass                   controllers.UtilClassController.doCreateUtilClass
@@ -115,3 +126,8 @@ POST        /doEditUtilClassField                controllers.UtilClassController
 
 POST        /updateSettings                      controllers.SettingsController.updateSettings
 
+######### REEEEEESSSTTT
+GET         /rest/login                          rest.controllers.LoginController.login
+POST        /rest/login                          rest.controllers.LoginController.doLogin
+
+##-------------

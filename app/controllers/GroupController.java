@@ -20,6 +20,7 @@ import play.mvc.Security;
 import security.AllowedRoles;
 import security.Role;
 import views.html.testDesigner.group.*;
+import views.html.testDesigner.group.childViews.*;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
@@ -209,8 +210,34 @@ public class GroupController extends Controller {
     if (tg == null) {
       return badRequest("No job with id " + id + ".");
     }
-    return ok(groupDetailView.render(tg, display));
+    return ok(mainView.render(tg, display));
   }
 
 
+  @AllowedRoles({Role.TEST_DESIGNER, Role.TEST_OBSERVER})
+  public static Result renderTestAssertionList(long id) {
+    return ok(testAssertionList.render(TestGroup.findById(id)));
+  }
+
+
+  @AllowedRoles({Role.TEST_DESIGNER, Role.TEST_OBSERVER})
+  public static Result renderTestSuites(long id) {
+    return ok(testSuiteList.render(TestGroup.findById(id)));
+  }
+  @AllowedRoles(Role.TEST_DESIGNER)
+  public static Result renderTestAssets(long id) {
+    return ok(testAssetList.render(TestGroup.findById(id)));
+  }
+  @AllowedRoles(Role.TEST_DESIGNER)
+  public static Result renderUtilClasses(long id) {
+    return ok(utilClassList.render(TestGroup.findById(id)));
+  }
+  @AllowedRoles(Role.TEST_DESIGNER)
+  public static Result renderDependencies(long id) {
+    return ok(dependencies.render(TestGroup.findById(id)));
+  }
+  @AllowedRoles(Role.TEST_DESIGNER)
+  public static Result renderDetails(long id) {
+    return ok(details.render(TestGroup.findById(id)));
+  }
 }

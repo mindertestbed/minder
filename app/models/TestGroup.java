@@ -60,7 +60,6 @@ public class TestGroup extends Model {
   }
 
   public static TestGroup findById(Long id){
-
     TestGroup byId = find.byId(id);
     byId.owner = User.findById(byId.owner.id);
     return byId;

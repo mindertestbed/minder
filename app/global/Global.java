@@ -36,10 +36,6 @@ public class Global extends GlobalSettings {
     XoolaServer.get().start();
   }
 
-  public static void main(String[] args) {
-    System.out.println(Base64.getEncoder().encodeToString(Util.sha256("12345".getBytes())));
-  }
-
   private void initialData() {
     if (User.findRowCount() == 0) {
       System.out.println("Adding sample data");

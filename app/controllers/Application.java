@@ -75,7 +75,20 @@ public class Application extends Controller {
   public static Result jsRoutes() {
     return ok(
         Routes.javascriptRouter("jsRoutes",
-            routes.javascript.Authentication.login()))
+            routes.javascript.Authentication.login(),
+            routes.javascript.TestSuiteController.listAvailableTdlsForSuite(),
+            routes.javascript.TestSuiteController.getTestSuiteDetailView(),
+            routes.javascript.TestSuiteController.renderJoblistView(),
+            routes.javascript.TestSuiteController.renderTestRunListView(),
+            routes.javascript.TestSuiteController.renderDetailView(),
+            routes.javascript.TestSuiteController.renderTdlList(),
+            routes.javascript.GroupController.renderDetails(),
+            routes.javascript.GroupController.renderTestAssertionList(),
+            routes.javascript.GroupController.renderTestSuites(),
+            routes.javascript.GroupController.renderTestAssets(),
+            routes.javascript.GroupController.renderUtilClasses(),
+            routes.javascript.GroupController.renderDependencies()
+        ))
         .as("text/javascript");
   }
 

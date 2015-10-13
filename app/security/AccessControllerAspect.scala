@@ -12,7 +12,7 @@ class AccessControllerAspect {
     val myClass: Class[_] = pjp.getStaticPart().getSignature().getDeclaringType();
 
     try {
-
+      Thread.sleep(500)
       val user = Authentication.getLocalUser
       if (user == null) {
         play.mvc.Results.redirect(routes.Authentication.login);
