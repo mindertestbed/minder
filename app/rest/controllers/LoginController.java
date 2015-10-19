@@ -76,6 +76,7 @@ public class LoginController extends Controller {
             return unauthorized(Constants.RESULT_UNAUTHORIZED);
         }else if(Utils.isNonceExpired(Utils.getIssueTime(clientRequest.get("nonce")))){
             Utils.removeFromCurrentNonces(clientRequest.get("nonce"));
+            response().setHeader("stale", "true");
             return unauthorized(Constants.RESULT_UNAUTHORIZED);
         }else if(!Utils.getRealmValue(clientRequest.get("nonce")).equals(clientRequest.get("realm"))){
             return unauthorized(Constants.RESULT_UNAUTHORIZED);
