@@ -155,6 +155,19 @@ create table Users (
   constraint pk_Users primary key (id))
 ;
 
+create table UserAuthentication (
+  id                        bigserial not null,
+  user_id                   bigint,
+  realm                     varchar(255),
+  server_nonce              varchar(255),
+  client_nonce              varchar(255),
+  requested_uri             varchar(255),
+  issue_time                timestamp,
+  expiry_time               timestamp,
+  request_counter           integer,
+  constraint pk_UserAuthentication primary key (id))
+;
+
 create table UserHistory (
   id                        bigserial not null,
   email                     varchar(255),
@@ -243,18 +256,20 @@ alter table TestSuite add constraint fk_TestSuite_owner_21 foreign key (owner_id
 create index ix_TestSuite_owner_21 on TestSuite (owner_id);
 alter table TestSuite add constraint fk_TestSuite_testGroup_22 foreign key (test_group_id) references TestGroup (id);
 create index ix_TestSuite_testGroup_22 on TestSuite (test_group_id);
-alter table UserHistory add constraint fk_UserHistory_operationType_23 foreign key (operation_type_id) references OperationType (id);
-create index ix_UserHistory_operationType_23 on UserHistory (operation_type_id);
-alter table UtilClass add constraint fk_UtilClass_testGroup_24 foreign key (test_group_id) references TestGroup (id);
-create index ix_UtilClass_testGroup_24 on UtilClass (test_group_id);
-alter table UtilClass add constraint fk_UtilClass_owner_25 foreign key (owner_id) references Users (id);
-create index ix_UtilClass_owner_25 on UtilClass (owner_id);
-alter table Wrapper add constraint fk_Wrapper_user_26 foreign key (user_id) references Users (id);
-create index ix_Wrapper_user_26 on Wrapper (user_id);
-alter table WrapperParam add constraint fk_WrapperParam_tdl_27 foreign key (tdl_id) references Tdl (id);
-create index ix_WrapperParam_tdl_27 on WrapperParam (tdl_id);
-alter table WrapperVersion add constraint fk_WrapperVersion_wrapper_28 foreign key (wrapper_id) references Wrapper (id);
-create index ix_WrapperVersion_wrapper_28 on WrapperVersion (wrapper_id);
+alter table UserAuthentication add constraint fk_UserAuthentication_user_23 foreign key (user_id) references Users (id);
+create index ix_UserAuthentication_user_23 on UserAuthentication (user_id);
+alter table UserHistory add constraint fk_UserHistory_operationType_24 foreign key (operation_type_id) references OperationType (id);
+create index ix_UserHistory_operationType_24 on UserHistory (operation_type_id);
+alter table UtilClass add constraint fk_UtilClass_testGroup_25 foreign key (test_group_id) references TestGroup (id);
+create index ix_UtilClass_testGroup_25 on UtilClass (test_group_id);
+alter table UtilClass add constraint fk_UtilClass_owner_26 foreign key (owner_id) references Users (id);
+create index ix_UtilClass_owner_26 on UtilClass (owner_id);
+alter table Wrapper add constraint fk_Wrapper_user_27 foreign key (user_id) references Users (id);
+create index ix_Wrapper_user_27 on Wrapper (user_id);
+alter table WrapperParam add constraint fk_WrapperParam_tdl_28 foreign key (tdl_id) references Tdl (id);
+create index ix_WrapperParam_tdl_28 on WrapperParam (tdl_id);
+alter table WrapperVersion add constraint fk_WrapperVersion_wrapper_29 foreign key (wrapper_id) references Wrapper (id);
+create index ix_WrapperVersion_wrapper_29 on WrapperVersion (wrapper_id);
 
 
 
@@ -289,6 +304,8 @@ drop table if exists TestRun cascade;
 drop table if exists TestSuite cascade;
 
 drop table if exists Users cascade;
+
+drop table if exists UserAuthentication cascade;
 
 drop table if exists UserHistory cascade;
 

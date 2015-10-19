@@ -180,6 +180,12 @@ object Util {
     md.digest(array)
   }
 
+  def md5(array: Array[Byte]): Array[Byte] = {
+    import java.security.MessageDigest;
+    val md = MessageDigest.getInstance("MD5");
+    md.digest(array)
+  }
+
   def compareArray(array1: Array[Byte], array2: Array[Byte]): Boolean = {
     if (array1 == null && array2 == null) {
       true
