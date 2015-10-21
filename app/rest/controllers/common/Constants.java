@@ -1,7 +1,8 @@
 package rest.controllers.common;
 
 /**
- * Created by melis on 15/10/15.
+ * @author: Melis Ozgur Cetinkaya Demir
+ * @date: 15/10/15.
  */
 public class Constants {
     public static final String MINDER_REALM = "test@minder.gov.tr";

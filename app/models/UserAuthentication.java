@@ -6,17 +6,17 @@ import com.avaje.ebean.SqlUpdate;
 import play.Logger;
 import play.data.format.Formats;
 import rest.controllers.common.Constants;
-import rest.controllers.common.Utils;
+import rest.controllers.common.RestUtils;
 
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import java.util.Date;
-import java.util.List;
 
 /**
- * Created by melis on 13/10/15.
+ * @author: Melis Ozgur Cetinkaya Demir
+ * @date: 1/10/15.
  */
 @Entity
 @Table(name = "UserAuthentication")
@@ -30,17 +30,12 @@ public class UserAuthentication extends Model {
     public Long id;
 
     @ManyToOne
-    User user;
+    public User user;
 
-    String realm;
+    public String realm;
 
     /*nonce: server side, which is generated in each authentication request*/
-    String serverNonce;
-
-    /*cnonce:client side, which is generated in each request*/
-    String clientNonce;
-
-    String requestedURI;
+    public String serverNonce;
 
     /*nonce issue Time */
     @Formats.DateTime(pattern = Constants.DATE_FORMAT)
@@ -51,27 +46,32 @@ public class UserAuthentication extends Model {
     public Date expiryTime;
 
     /*nc:request counter*/
-    int requestCounter;
+    public int requestCounter;
 
     private static final Finder<Long, UserAuthentication> find = new Finder<>(UserAuthentication.class);
 
 
-    public static UserAuthentication create(String userEmail, String realm, String serverNonce, String clientNonce,String requestedURI, int requestCounter) {
+    public static UserAuthentication create(String userEmail, String realm, String serverNonce, int requestCounter) {
         final UserAuthentication userAuthentication = new UserAuthentication();
         userAuthentication.user = User.findByEmail(userEmail);
         userAuthentication.serverNonce = serverNonce;
-        userAuthentication.clientNonce = clientNonce;
         userAuthentication.requestCounter = requestCounter;
-        userAuthentication.requestedURI= requestedURI;
         userAuthentication.realm = realm;
         userAuthentication.issueTime = new Date();
 
         long issueTimeInMilis=userAuthentication.issueTime.getTime();
         long totalTimeToValidity = issueTimeInMilis + Constants.NONCE_VALIDITY_MILISECONDS;
-        userAuthentication.expiryTime = Utils.getDate(totalTimeToValidity);
+        userAuthentication.expiryTime = RestUtils.getDate(totalTimeToValidity);
 
         userAuthentication.save();
         return userAuthentication;
+    }
+
+    public static void update(String serverNonce, int newRequestCounter) {
+        final UserAuthentication userAuthentication = findByServerNonce(serverNonce);
+        userAuthentication.requestCounter = newRequestCounter;
+
+        userAuthentication.update();
     }
 
     public static UserAuthentication findByUserEmail(final String userEmail) {
@@ -80,23 +80,25 @@ public class UserAuthentication extends Model {
         return find.where().eq("user",user).findUnique();
     }
 
-    public static List<UserAuthentication> findByServerNonceAndRealm(final String realm,final String serverNonce) {
+    public static UserAuthentication findByServerNonceAndRealm(final String realm,final String serverNonce) {
+        return find.where().eq("serverNonce", serverNonce).eq("realm",realm).findUnique();
+    }
 
-        return find.where().eq("serverNonce", serverNonce).eq("realm",realm).findList();
+    public static UserAuthentication findByServerNonce(final String serverNonce) {
+
+        return find.where().eq("serverNonce", serverNonce).findUnique();
     }
 
     public void updateAuthenticationRecord(String realm, String serverNonce, String userEmail, String clientNonce,String requestedURI,int requestCounter) {
-        UserAuthentication userAuthentication =  findByServerNonceAndRealm(realm,serverNonce).get(0);
+        UserAuthentication userAuthentication =  findByServerNonceAndRealm(realm,serverNonce);
 
         userAuthentication.user = User.findByEmail(userEmail);
-        userAuthentication.clientNonce = clientNonce;
-        userAuthentication.requestedURI = requestedURI;
         userAuthentication.requestCounter = requestCounter;
         userAuthentication.issueTime = new Date();
 
         long issueTimeInMilis=userAuthentication.issueTime.getTime();
         long totalTimeToValidity = issueTimeInMilis + Constants.NONCE_VALIDITY_MILISECONDS;
-        userAuthentication.expiryTime = Utils.getDate(totalTimeToValidity);
+        userAuthentication.expiryTime = RestUtils.getDate(totalTimeToValidity);
 
         userAuthentication.save();
     }

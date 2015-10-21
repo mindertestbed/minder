@@ -1,6 +1,9 @@
 package rest.controllers.common;
 
 import global.Util;
+import models.User;
+import models.UserAuthentication;
+import play.mvc.Http;
 import rest.controllers.LoginToken;
 import rest.controllers.common.enumeration.MethodType;
 
@@ -15,10 +18,69 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
- * Created by melis on 15/10/15.
+ * @author: Melis Ozgur Cetinkaya Demir
+ * @date: 15/10/15.
  */
-public class Utils {
+public class RestUtils {
     private static HashMap<String,LoginToken> currentServerNonces = new HashMap<String,LoginToken>();
+
+    public static boolean verifyAuthentication(Http.Request request){
+        System.out.println("verifyAuthentication");
+        String authorizationData = String.valueOf(request.getHeader("Authorization"));
+        System.out.println("authorizationData");
+
+        /*
+        *  Parse client request
+        */
+        HashMap<String,String> clientRequest = RestUtils.createHashMapOfClientRequest(authorizationData);
+        System.out.println("Validation Processes Started:");
+
+        UserAuthentication userAuthentication = UserAuthentication.findByServerNonceAndRealm(clientRequest.get("realm"), clientRequest.get("nonce"));
+        if(null == userAuthentication){
+            System.out.println("1");
+            return false;
+        }
+
+
+        /*
+        * Check the request counter: Since it is the fist request, just checking whether it is 1 or not is enough.
+        */
+        int nc  = Integer.parseInt(clientRequest.get("nc"));
+        int ncInDB = userAuthentication.requestCounter;
+        ncInDB = ncInDB + 1;
+
+        if (ncInDB != nc) {
+            System.out.println("Request counters are not compatible:" + ncInDB + " " + nc);
+            return false;
+        }
+        System.out.println("Request Counter checked!");
+
+
+        /*
+        *  Check the response value
+        */
+        User user = User.findByEmail(clientRequest.get("username"));
+        if(null == user){
+            return false;
+        }
+        System.out.println("User checked!");
+
+        if(!RestUtils.validateResponseValue(clientRequest.get("response"),
+                clientRequest.get("username"), user.password, clientRequest.get("realm"),
+                MethodType.POST, clientRequest.get("uri"), clientRequest.get("nonce"),
+                clientRequest.get("cnonce"), clientRequest.get("nc"))){
+
+            return false;
+        }
+        System.out.println("Response checked!");
+
+        /*
+        * Update nc for the User Auth
+        */
+        UserAuthentication.update(clientRequest.get("nonce"), ncInDB);
+
+        return true;
+    }
 
     public static String generateNonce(){
         Random ranGen = new SecureRandom();

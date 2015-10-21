@@ -160,8 +160,6 @@ create table UserAuthentication (
   user_id                   bigint,
   realm                     varchar(255),
   server_nonce              varchar(255),
-  client_nonce              varchar(255),
-  requested_uri             varchar(255),
   issue_time                timestamp,
   expiry_time               timestamp,
   request_counter           integer,

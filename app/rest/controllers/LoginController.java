@@ -6,13 +6,13 @@ import models.UserAuthentication;
 import play.mvc.Controller;
 import play.mvc.Result;
 import rest.controllers.common.Constants;
-import rest.controllers.common.Utils;
+import rest.controllers.common.RestUtils;
 import rest.controllers.common.enumeration.MethodType;
 
 import java.util.HashMap;
 
 /**
- * @author: yerlibilgin
+ * @author: Melis Ozgur Cetinkaya Demir
  * @date: 13/10/15.
  */
 public class LoginController extends Controller {
@@ -24,16 +24,17 @@ public class LoginController extends Controller {
      * @return 401 Unauthorized
      */
     public static Result login() {
+        System.out.println("L1");
         /// TODO:check the ACCEPT-TYPE header,
         // if the clients wants application/xml then send xml
         // if  ... ... . .... . application/json then send json
 
-        String generatedNonce = Utils.generateNonce();//"488E54E5CBA86B7E094B1C8DD6D53602";
+        String generatedNonce = "488E54E5CBA86B7E094B1C8DD6D53602";//Utils.generateNonce();
         LoginToken loginToken = new LoginToken(generatedNonce,Constants.MINDER_REALM);
-        Utils.addToCurrentNonces(generatedNonce,loginToken);
+        RestUtils.addToCurrentNonces(generatedNonce, loginToken);
 
         String contentType = "text/html";//application/json...
-        String authInitHeader = Utils.prepareAuthenticateInitHeader(generatedNonce, Constants.MINDER_REALM);
+        String authInitHeader = RestUtils.prepareAuthenticateInitHeader(generatedNonce, Constants.MINDER_REALM);
         response().setContentType(contentType);
         response().setHeader(WWW_AUTHENTICATE, authInitHeader);
 
@@ -47,16 +48,14 @@ public class LoginController extends Controller {
      * @return 200 Success
      */
     public static Result doLogin() {
-        /// TODO:check the ACCEPT-TYPE header,
-        // if the clients wants application/xml then send xml
-        // if  ... ... . .... . application/json then send json
+        System.out.println("L2");
         String authorizationData = request().getHeader(AUTHORIZATION);
 
         //System.out.println(authorizationData);
         /*
           Parse client request
         */
-        HashMap<String,String> clientRequest = Utils.createHashMapOfClientRequest(authorizationData);
+        HashMap<String,String> clientRequest = RestUtils.createHashMapOfClientRequest(authorizationData);
 
         System.out.println("Validation Processes Started:");
         /*
@@ -72,13 +71,13 @@ public class LoginController extends Controller {
         /*
         * Check whether this is registered nonce in server side.
         * */
-        if(!Utils.doesKeyExist(clientRequest.get("nonce"))){
+        if(!RestUtils.doesKeyExist(clientRequest.get("nonce"))){
             return unauthorized(Constants.RESULT_UNAUTHORIZED);
-        }else if(Utils.isNonceExpired(Utils.getIssueTime(clientRequest.get("nonce")))){
-            Utils.removeFromCurrentNonces(clientRequest.get("nonce"));
+        }else if(RestUtils.isNonceExpired(RestUtils.getIssueTime(clientRequest.get("nonce")))){
+            RestUtils.removeFromCurrentNonces(clientRequest.get("nonce"));
             response().setHeader("stale", "true");
             return unauthorized(Constants.RESULT_UNAUTHORIZED);
-        }else if(!Utils.getRealmValue(clientRequest.get("nonce")).equals(clientRequest.get("realm"))){
+        }else if(!RestUtils.getRealmValue(clientRequest.get("nonce")).equals(clientRequest.get("realm"))){
             return unauthorized(Constants.RESULT_UNAUTHORIZED);
         }
         System.out.println("Nonce and realm checked");
@@ -95,7 +94,7 @@ public class LoginController extends Controller {
         String nc = clientRequest.get("nc");
         int checkedNC = Integer.parseInt(nc);
         if (1 != checkedNC){
-            Utils.removeFromCurrentNonces(Utils.getRealmValue(clientRequest.get("nonce")));
+            RestUtils.removeFromCurrentNonces(RestUtils.getRealmValue(clientRequest.get("nonce")));
             return unauthorized(Constants.RESULT_UNAUTHORIZED);
         }
         System.out.println("Request Counter checked!");
@@ -103,8 +102,8 @@ public class LoginController extends Controller {
         /*
           Check the response value
          */
-        if(!Utils.validateResponseValue(clientRequest.get("response"),
-                clientRequest.get("username"), user.password,clientRequest.get("realm"),
+        if(!RestUtils.validateResponseValue(clientRequest.get("response"),
+                clientRequest.get("username"), user.password, clientRequest.get("realm"),
                 MethodType.POST, clientRequest.get("uri"), clientRequest.get("nonce"),
                 clientRequest.get("cnonce"), clientRequest.get("nc"))){
 
@@ -116,8 +115,7 @@ public class LoginController extends Controller {
         * Create new User Auth
         * */
         UserAuthentication.create(clientRequest.get("username"),clientRequest.get("realm"),
-                clientRequest.get("nonce"),clientRequest.get("cnonce"),clientRequest.get("uri"),
-                checkedNC);
+                clientRequest.get("nonce"),checkedNC);
 
         System.out.println("Validation Processes Finished!");
 
@@ -125,5 +123,11 @@ public class LoginController extends Controller {
         return ok(Constants.RESULT_SUCCESS);
 
     }
+
+    public static Result list() {
+        System.out.println("list");
+        return ok(Constants.RESULT_SUCCESS);
+    }
+
 
 }

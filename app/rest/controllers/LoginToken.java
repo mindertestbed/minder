@@ -1,11 +1,12 @@
 package rest.controllers;
 
-import rest.controllers.common.Utils;
+import rest.controllers.common.RestUtils;
 
 import java.util.Date;
 
 /**
- * Created by melis on 16/10/15.
+ * @author: Melis Ozgur Cetinkaya Demir
+ * @date: 16/10/15.
  */
 public class LoginToken {
     private String nonce;
@@ -27,6 +28,6 @@ public class LoginToken {
     public LoginToken(String nonce, String realm) {
         this.nonce = nonce;
         this.realm = realm;
-        this.issueTime = Utils.getCurrentDate();
+        this.issueTime = RestUtils.getCurrentDate();
     }
 }
