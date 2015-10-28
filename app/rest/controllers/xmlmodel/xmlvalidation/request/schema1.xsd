@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<xs:schema version="1.0" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+
+  <xs:element name="validationRequest" type="validationRequest"/>
+
+  <xs:complexType name="validationRequest">
+    <xs:sequence>
+      <xs:element name="schema" type="xs:base64Binary"/>
+      <xs:element name="schemaType" type="xs:string"/>
+      <xs:element name="schemaSubType" type="xs:string"/>
+      <xs:element name="pathToSchema" type="xs:string"/>
+      <xs:element name="document" type="xs:base64Binary"/>
+    </xs:sequence>
+  </xs:complexType>
+</xs:schema>
+

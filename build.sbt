@@ -2,7 +2,7 @@ organization := "gov.tubitak.minder"
 
 name := """minder"""
 
-version := "1.3.0-beta1"
+version := "1.3.0-beta2"
 
 lazy val minder = (project in file(".")).enablePlugins(PlayJava, PlayEbean)
 
@@ -30,12 +30,15 @@ libraryDependencies ++= Seq(
   "mysql" % "mysql-connector-java" % "5.1.18",
   "org.beybunproject" % "xoola" % "1.0.1",
   "gov.tubitak.minder" % "minder-common" % "0.3.1",
-  "gov.tubitak.minder" %% "minder-tdl" % "0.3.6-RC9-004",
+  "gov.tubitak.minder" %% "minder-tdl" % "0.3.6",
   "org.webjars" % "webjars-play_2.11" % "2.4.0-1",
   "org.webjars" % "bootstrap" % "3.3.5",
   "net.sf.jasperreports" % "jasperreports" % "6.0.0",
   "net.sourceforge.barbecue" % "barbecue" % "1.5-beta1",
-  "org.codehaus.groovy" % "groovy" % "2.3.9"
+  "org.codehaus.groovy" % "groovy" % "2.3.9",
+  "org.glassfish" % "javax.json" % "1.0.4",
+  "org.eclipse.persistence" % "eclipselink" % "2.6.1"
+
 )
 
 resolvers ++= Seq(
@@ -48,8 +51,8 @@ resolvers ++= Seq(
   "jasper" at "http://jaspersoft.artifactoryonline.com/jaspersoft/third-party-ce-artifacts/"
 )
 
-import com.typesafe.sbt.SbtAspectj.{ Aspectj, aspectjSettings, compiledClasses }
-import com.typesafe.sbt.SbtAspectj.AspectjKeys.{ binaries, inputs, lintProperties }
+import com.typesafe.sbt.SbtAspectj.AspectjKeys.{binaries, inputs}
+import com.typesafe.sbt.SbtAspectj.{Aspectj, aspectjSettings, compiledClasses}
 
 aspectjSettings
 

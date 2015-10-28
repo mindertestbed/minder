@@ -6,6 +6,9 @@ import models.UserAuthentication;
 import play.mvc.Http;
 import rest.controllers.LoginToken;
 import rest.controllers.common.enumeration.MethodType;
+import rest.controllers.restbodyprocessor.IRestContentProcessor;
+import rest.controllers.restbodyprocessor.JSONContentProcessor;
+import rest.controllers.restbodyprocessor.XMLContentProcessor;
 
 import java.security.SecureRandom;
 import java.text.DateFormat;
@@ -273,4 +276,14 @@ public class RestUtils {
         return null;
     }
 
+    public static IRestContentProcessor createContentProcessor(String contentType, play.mvc.Http.RequestBody body) {
+        switch (contentType){
+            case "text/xml":
+                return new XMLContentProcessor(body);
+            case "text/json":
+                return new JSONContentProcessor(body);
+        }
+
+        return null;
+    }
 }
