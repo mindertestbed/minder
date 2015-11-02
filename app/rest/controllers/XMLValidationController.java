@@ -5,54 +5,99 @@ import org.beybunproject.xmlContentVerifier.Schema;
 import play.mvc.Controller;
 import play.mvc.Result;
 import rest.controllers.common.RestUtils;
+import rest.controllers.contentvalidation.verifier.ISchemaVerifier;
+import rest.controllers.contentvalidation.verifier.SchematronVerifier;
+import rest.controllers.contentvalidation.verifier.XSDVerifier;
+import rest.controllers.contentvalidation.xml.request.ValidationRequest;
 import rest.controllers.restbodyprocessor.IRestContentProcessor;
 import rest.controllers.xmlmodel.response.MinderResponse;
-import rest.controllers.xmlmodel.xmlvalidation.request.ValidationRequest;
-import rest.controllers.xmlmodel.xmlvalidation.request.verifier.ISchemaVerifier;
-import rest.controllers.xmlmodel.xmlvalidation.request.verifier.SchematronVerifier;
-import rest.controllers.xmlmodel.xmlvalidation.request.verifier.XMLVerifier;
 
+import java.net.MalformedURLException;
+import java.text.ParseException;
 import java.util.Arrays;
 
 import static rest.controllers.common.Constants.*;
 
 /**
+ * This class provides Minder server side REST service for Schema and Schematron validation for XML files.
+ * The schema/schematron may be given in 4 different ways
+ * <li>PLAIN: directly given schema/schmatron file as byte array<li/>
+ * <li>URL: the url of a schema/schmatron as String<li/>
+ * <li>ZIP: a zip file which contains specific schemas/schematrons. In this case, you must also provide the relative path of the root
+ * schema/schematron. <li/>
+ * <li>JAR: a jar file which contains specific schemas/schematrons. In this case, you must also provide the relative path of the root
+ * schema/schematron. <li/>
+ *
  * @author: Melis Ozgur Cetinkaya Demir
  * @date: 22/10/15.
  */
 public class XMLValidationController extends Controller {
 
+    /**
+     * This method receives an authenticated rest request for content validation. First, it creates related content processor according
+     * to the content type (XML, JSON etc) of the request.
+     * Content processor parses the request message and returns the ValidationRequest object (Content Processor is generic and
+     * actually unaware of the ValidationRequest class.).
+     * <p>
+     * The validationrequest is processed in private checkValidation method, which fills MinderResponse object.
+     * <p>
+     * After receiving the MinderResponse, content processor prepare REST response according to the request's content type(XML or JSON).
+     * <p>
+     * At last, method returns REST response to the client.
+     */
     public static Result validateContent() {
-        //TODO her şeyi throw yap burada yakala ki nok gönderelim
+        MinderResponse minderResponse = new MinderResponse();
 
         /*
         * Handling the request message
         * */
-        IRestContentProcessor contentProcessor = RestUtils.createContentProcessor(request().getHeader(CONTENT_TYPE), request().body());
-        ValidationRequest validationRequest = (ValidationRequest) contentProcessor.parseRequest(ValidationRequest.class.getName());
+        IRestContentProcessor contentProcessor = null;
+        try {
+            contentProcessor = RestUtils.createContentProcessor(request().getHeader(CONTENT_TYPE), request().body());
+        } catch (IllegalArgumentException e) {
+            return badRequest(e.getMessage());
+        }
+
+        ValidationRequest validationRequest = null;
+        try {
+            validationRequest = (ValidationRequest) contentProcessor.parseRequest(ValidationRequest.class.getName());
+        } catch (ParseException e) {
+            return internalServerError(e.getMessage());
+
+        }
+
 
         /*
         * Calling Minder's built-in XML content verifier
         */
-        MinderResponse minderResponse = new MinderResponse();
-        checkValidation(minderResponse,validationRequest);
+        checkValidation(minderResponse, validationRequest);
 
         /*
         * Preparing response
         * */
-        //TODO nok ver
-        String responseValue = contentProcessor.prepareResponse(MinderResponse.class.getName(), minderResponse);
+        String responseValue = null;
+        try {
+            responseValue = contentProcessor.prepareResponse(MinderResponse.class.getName(), minderResponse);
+        } catch (ParseException e) {
+            return internalServerError(e.getMessage());
+        }
         System.out.println("responseValue:" + responseValue);
 
         return ok(responseValue);
     }
 
 
-    private static MinderResponse checkValidation(MinderResponse minderResponse,ValidationRequest validationRequest) {
+    /**
+     * This method is called by validateContent method to call Minder's built-in content validation functions.
+     * <p>
+     * It creates the ISchemaVerifier object according to the schema type: XSD or schematron. A Schema verifier hides the
+     * details of schema and schematron validations and prevents many "if-then-else"s by using polymorphism and interface.
+     */
+    private static MinderResponse checkValidation(MinderResponse minderResponse, ValidationRequest validationRequest) {
         ISchemaVerifier schemaVerifier = null;
         switch (validationRequest.getSchemaType()) {
             case TYPE_XSD:
-                schemaVerifier = new XMLVerifier();
+                schemaVerifier = new XSDVerifier();
                 break;
             case TYPE_SCHEMATRON:
                 schemaVerifier = new SchematronVerifier();
@@ -74,18 +119,18 @@ public class XMLValidationController extends Controller {
 
                 case SUB_TYPE_PLAIN:
                     schema = schemaVerifier.getSchema(validationRequest.getSchema());
-                    minderResponse.setDescription(schemaVerifier.verify(schema,validationRequest.getDocument()));
+                    minderResponse.setDescription(schemaVerifier.verify(schema, validationRequest.getDocument()));
                     minderResponse.setResult(schemaVerifier.getPositiveResult());
                     return minderResponse;
 
                 case SUB_TYPE_ZIP:
                     schema = schemaVerifier.getSchema(validationRequest.getPathToSchema(), validationRequest.getSchema(), ArchiveType.ZIP);
-                    minderResponse.setDescription(schemaVerifier.verify(schema,validationRequest.getDocument()));
+                    minderResponse.setDescription(schemaVerifier.verify(schema, validationRequest.getDocument()));
                     minderResponse.setResult(schemaVerifier.getPositiveResult());
                     return minderResponse;
 
                 case SUB_TYPE_URL:
-                    minderResponse.setDescription(schemaVerifier.verify(Arrays.toString(validationRequest.getSchema()),validationRequest.getDocument()));
+                    minderResponse.setDescription(schemaVerifier.verify(Arrays.toString(validationRequest.getSchema()), validationRequest.getDocument()));
                     minderResponse.setResult(schemaVerifier.getPositiveResult());
                     return minderResponse;
 
@@ -95,11 +140,15 @@ public class XMLValidationController extends Controller {
                     return minderResponse;
 
             }
-        }catch(Exception e){
-                minderResponse.setResult(FAILURE);
-                minderResponse.setDescription("Exception received:" + e.getMessage());
-                return minderResponse;
+        } catch (RuntimeException e) {
+            minderResponse.setResult(FAILURE);
+            minderResponse.setDescription("Exception in content validation:" + e.getMessage());
+            return minderResponse;
+        } catch (MalformedURLException e) {
+            minderResponse.setResult(FAILURE);
+            minderResponse.setDescription("Exception in content validation:" + e.getMessage());
+            return minderResponse;
         }
-
     }
+
 }

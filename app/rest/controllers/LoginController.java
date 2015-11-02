@@ -8,10 +8,24 @@ import play.mvc.Result;
 import rest.controllers.common.Constants;
 import rest.controllers.common.RestUtils;
 import rest.controllers.common.enumeration.MethodType;
+import rest.controllers.login.LoginToken;
+import rest.controllers.restbodyprocessor.IRestContentProcessor;
+import rest.controllers.xmlmodel.response.MinderResponse;
 
+import java.text.ParseException;
 import java.util.HashMap;
 
 /**
+ * This class provides the login mechanism, which is based on Digest based authentication, for Minder REST services.
+ * Each client must authenticate the Minder by calling login method prior to call any rest service. If an unauthorized request
+ * received by Minder, the client is redirected to the login method and forced to authenticate first.
+ *
+ * Login mechanism for a rest client:
+ * 1. call rest/login service
+ * 2. Minder will return a realm and a generated nonce with the response code 401 unauthorized.
+ * 3. Client prepares Authenticate header according to the Digest Based Authentication standard and calls doLogin method.
+ * 4. Minder returns to Client with the response code 200.
+ *
  * @author: Melis Ozgur Cetinkaya Demir
  * @date: 13/10/15.
  */
@@ -19,26 +33,39 @@ public class LoginController extends Controller {
 
     /**
      * 1.Client requests to authenticate the Minder
-     * 2.Minder returns realm and nonce to Client with the response code 401.
+     * 2.Minder returns realm and nonce in header with the tag "Authenticate" to Client with the response code 401.
+     *
      *
      * @return 401 Unauthorized
      */
     public static Result login() {
-        System.out.println("L1");
-        /// TODO:check the ACCEPT-TYPE header,
-        // if the clients wants application/xml then send xml
-        // if  ... ... . .... . application/json then send json
+        IRestContentProcessor contentProcessor = null;
+        try{
+            contentProcessor = RestUtils.createContentProcessor(request().getHeader(CONTENT_TYPE));
+        }catch (IllegalArgumentException e){
+            return badRequest(e.getMessage());
+        }
 
-        String generatedNonce = "488E54E5CBA86B7E094B1C8DD6D53602";//Utils.generateNonce();
+        MinderResponse minderResponse = new MinderResponse();
+        minderResponse.setResult(Constants.AUTHENTICATION);
+
+
+        String generatedNonce = "488E54E5CBA86B7E094B1C8DD6D53602";//RestUtils.generateNonce();
         LoginToken loginToken = new LoginToken(generatedNonce,Constants.MINDER_REALM);
         RestUtils.addToCurrentNonces(generatedNonce, loginToken);
 
-        String contentType = "text/html";//application/json...
         String authInitHeader = RestUtils.prepareAuthenticateInitHeader(generatedNonce, Constants.MINDER_REALM);
-        response().setContentType(contentType);
+        response().setContentType(request().getHeader(CONTENT_TYPE));
         response().setHeader(WWW_AUTHENTICATE, authInitHeader);
 
-        return unauthorized(Constants.RESULT_FIRST_UNAUTHORIZED);
+        minderResponse.setDescription(Constants.RESULT_FIRST_UNAUTHORIZED);
+        String responseValue = null;
+        try {
+            responseValue = contentProcessor.prepareResponse(MinderResponse.class.getName(), minderResponse);
+        } catch (ParseException e) {
+            return internalServerError(e.getMessage());
+        }
+        return unauthorized(responseValue);
     }
 
     /**
@@ -48,12 +75,20 @@ public class LoginController extends Controller {
      * @return 200 Success
      */
     public static Result doLogin() {
-        System.out.println("L2");
+        IRestContentProcessor contentProcessor = null;
+        try{
+            contentProcessor = RestUtils.createContentProcessor(request().getHeader(CONTENT_TYPE));
+        }catch (IllegalArgumentException e){
+            return badRequest(e.getMessage());
+        }
+
+        MinderResponse minderResponse = new MinderResponse();
+        minderResponse.setResult(Constants.AUTHENTICATION);
+
         String authorizationData = request().getHeader(AUTHORIZATION);
 
-        //System.out.println(authorizationData);
         /*
-          Parse client request
+        * Parse client request
         */
         HashMap<String,String> clientRequest = RestUtils.createHashMapOfClientRequest(authorizationData);
 
@@ -73,10 +108,12 @@ public class LoginController extends Controller {
         * */
         if(!RestUtils.doesKeyExist(clientRequest.get("nonce"))){
             return unauthorized(Constants.RESULT_UNAUTHORIZED);
+
         }else if(RestUtils.isNonceExpired(RestUtils.getIssueTime(clientRequest.get("nonce")))){
             RestUtils.removeFromCurrentNonces(clientRequest.get("nonce"));
             response().setHeader("stale", "true");
             return unauthorized(Constants.RESULT_UNAUTHORIZED);
+
         }else if(!RestUtils.getRealmValue(clientRequest.get("nonce")).equals(clientRequest.get("realm"))){
             return unauthorized(Constants.RESULT_UNAUTHORIZED);
         }
@@ -120,14 +157,17 @@ public class LoginController extends Controller {
         System.out.println("Validation Processes Finished!");
 
         System.out.print(authorizationData);
-        return ok(Constants.RESULT_SUCCESS);
+
+
+        minderResponse.setDescription(Constants.RESULT_SUCCESS);
+        String responseValue = null;
+        try {
+            responseValue = contentProcessor.prepareResponse(MinderResponse.class.getName(), minderResponse);
+        } catch (ParseException e) {
+            return internalServerError(e.getMessage());
+        }
+        return ok(responseValue);
 
     }
-
-    public static Result list() {
-        System.out.println("list");
-        return ok(Constants.RESULT_SUCCESS);
-    }
-
 
 }

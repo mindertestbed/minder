@@ -4,7 +4,7 @@ import global.Util;
 import models.User;
 import models.UserAuthentication;
 import play.mvc.Http;
-import rest.controllers.LoginToken;
+import rest.controllers.login.LoginToken;
 import rest.controllers.common.enumeration.MethodType;
 import rest.controllers.restbodyprocessor.IRestContentProcessor;
 import rest.controllers.restbodyprocessor.JSONContentProcessor;
@@ -21,6 +21,8 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
+ * Utility class of Minder's rest web services.
+ *
  * @author: Melis Ozgur Cetinkaya Demir
  * @date: 15/10/15.
  */
@@ -276,14 +278,22 @@ public class RestUtils {
         return null;
     }
 
-    public static IRestContentProcessor createContentProcessor(String contentType, play.mvc.Http.RequestBody body) {
-        switch (contentType){
-            case "text/xml":
-                return new XMLContentProcessor(body);
-            case "text/json":
-                return new JSONContentProcessor(body);
-        }
+    public static IRestContentProcessor createContentProcessor(String contentType, play.mvc.Http.RequestBody body) throws IllegalArgumentException{
+        if(contentType.contains("text/xml") || contentType.contains("application/xml"))
+            return new XMLContentProcessor();
+        else if(contentType.contains("text/json") || contentType.contains("application/json"))
+            return new JSONContentProcessor();
 
-        return null;
+        throw new IllegalArgumentException("Content type is not defined. The defined types are text/xml and text/json. The received type is "+contentType);
+    }
+
+    public static IRestContentProcessor createContentProcessor(String contentType) throws IllegalArgumentException{
+        if(contentType.contains("text/xml") || contentType.contains("application/xml"))
+            return new XMLContentProcessor();
+        else if(contentType.contains("text/json") || contentType.contains("application/json"))
+            return new JSONContentProcessor();
+
+        throw new IllegalArgumentException("Content type is not defined. The defined types are text/xml and text/json. The received type is "+contentType);
+
     }
 }

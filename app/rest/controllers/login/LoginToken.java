@@ -1,10 +1,12 @@
-package rest.controllers;
+package rest.controllers.login;
 
 import rest.controllers.common.RestUtils;
 
 import java.util.Date;
 
 /**
+ * This structure holds the current generated which resides in the hash map currentServerNonces(See RestUtils class.)
+ *
  * @author: Melis Ozgur Cetinkaya Demir
  * @date: 16/10/15.
  */

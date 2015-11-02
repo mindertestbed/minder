@@ -1,13 +1,20 @@
 package rest.controllers.common;
 
 /**
+ * Collected constants of Minder's rest web services.
+ *
  * @author: Melis Ozgur Cetinkaya Demir
  * @date: 15/10/15.
  */
-public class Constants {
+public final class Constants {
+    public static final String CLIENT_EXCEPTION = "CLIENT_EXCEPTION";
+    public static final String SERVER_EXCEPTION = "SERVER_EXCEPTION";
+
+
     public static final String SUCCESS = "SUCCESS";
     public static final String FAILURE = "FAILURE";
     public static final String UNDEFINED = "UNDEFINED";
+    public static final String AUTHENTICATION = "AUTHENTICATION";
 
     public static final String MINDER_REALM = "test@minder.gov.tr";
     public static final String AUTHORIZATION_DIGEST = "Digest";
@@ -16,36 +23,9 @@ public class Constants {
     public static final String NONCE_VALIDITY_IN_DB = "1 HOUR"; //300000miliseconds eq. to 300 seconds or 5 min.
 
 
-    public static final String RESULT_FIRST_UNAUTHORIZED = "<html>\n" +
-            "  <head>\n" +
-            "    <meta charset=\"UTF-8\" />\n" +
-            "    <title>Error</title>\n" +
-            "  </head>\n" +
-            "  <body>\n" +
-            "    <h1>401 Unauthorized</h1>\n" +
-            "  </body>\n" +
-            "</html>";
-
-
-    public static final String RESULT_UNAUTHORIZED = "<html>\n" +
-            "  <head>\n" +
-            "    <meta charset=\"UTF-8\" />\n" +
-            "    <title>Error</title>\n" +
-            "  </head>\n" +
-            "  <body>\n" +
-            "    <h1>401 Unauthorized: Make authentication request first.</h1>\n" +
-            "  </body>\n" +
-            "</html>";
-
-    public static final String RESULT_SUCCESS = "<html>\n" +
-            "  <head>\n" +
-            "    <meta charset=\"UTF-8\" />\n" +
-            "    <title>Success</title>\n" +
-            "  </head>\n" +
-            "  <body>\n" +
-            "    <h1>200 Success</h1>\n" +
-            "  </body>\n" +
-            "</html>";
+    public static final String RESULT_FIRST_UNAUTHORIZED = "401 Unauthorized";
+    public static final String RESULT_UNAUTHORIZED = "401 Unauthorized: Make authentication request first";
+    public static final String RESULT_SUCCESS = "200 Success";
 
 
     /*
@@ -59,4 +39,8 @@ public class Constants {
     public static final String SUB_TYPE_JAR = "JAR";
 
 
+    private Constants(){
+        //This prevents even the native class from calling this actor.
+        throw new AssertionError();
+    }
 }

@@ -13,10 +13,15 @@ import javax.xml.bind.Unmarshaller;
 import javax.xml.transform.stream.StreamSource;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.text.ParseException;
 import java.util.HashMap;
 import java.util.Map;
 
 /**
+ * The JSON content processor parse a request body or prepare a response body according using the JAXB JSON
+ * marshaller/unmarshaller. It has a generic structure which is unaware of the marshalling/unmarshalling class.
+ *
+ *
  * @author: Melis Ozgur Cetinkaya Demir
  * @date: 16/10/15.
  */
@@ -35,7 +40,7 @@ public class JSONContentProcessor implements IRestContentProcessor {
     }
 
     @Override
-    public String prepareResponse(String className, Object o) {
+    public String prepareResponse(String className, Object o) throws ParseException {
         try {
             JAXBContext jaxbContext = JAXBContext.newInstance(Class.forName(className));
             Marshaller marshaller = jaxbContext.createMarshaller();
@@ -49,17 +54,14 @@ public class JSONContentProcessor implements IRestContentProcessor {
             return byteArrayOutputStream.toString();
 
         }catch (JAXBException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+            throw new ParseException("Error occured during the parsing of request's XML body. The details of the exception "+e.toString(),0);
         } catch (ClassNotFoundException e) {
-            e.printStackTrace();
+            throw new ParseException("Error occured during the parsing of request's XML body. The details of the exception "+e.toString(),0);
         }
-
-        return null;
     }
 
     @Override
-    public Object parseRequest(String className) {
+    public Object parseRequest(String className) throws ParseException{
         try {
             Map<String, Object> jaxbProperties = new HashMap<String, Object>(2);
             JAXBContext jaxbContext = JAXBContext.newInstance(Class.forName(className));
@@ -71,12 +73,10 @@ public class JSONContentProcessor implements IRestContentProcessor {
             return  unmarshaller.unmarshal(json, Class.forName(className)).getValue();
 
         } catch (JAXBException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+            throw new ParseException("Error occured during the parsing of request's XML body. The details of the exception "+e.toString(),0);
         } catch (ClassNotFoundException e) {
-            e.printStackTrace();
+            throw new ParseException("Error occured during the parsing of request's XML body. The details of the exception "+e.toString(),0);
         }
-        return null;
     }
 
 }

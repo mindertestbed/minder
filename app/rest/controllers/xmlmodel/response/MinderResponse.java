@@ -4,11 +4,6 @@ package rest.controllers.xmlmodel.response;
 import javax.xml.bind.annotation.*;
 
 /**
- * @author: Melis Ozgur Cetinkaya Demir
- * @date: 22/10/15.
- */
-
-/**
  * <p>Java class for minderResponse complex type.
  * 
  * <p>The following schema fragment specifies the expected content contained within this class.
@@ -25,7 +20,9 @@ import javax.xml.bind.annotation.*;
  *   &lt;/complexContent>
  * &lt;/complexType>
  * </pre>
- * 
+ *
+ * @author: Melis Ozgur Cetinkaya Demir
+ * @date: 22/10/15.
  * 
  */
 @XmlAccessorType(XmlAccessType.FIELD)
