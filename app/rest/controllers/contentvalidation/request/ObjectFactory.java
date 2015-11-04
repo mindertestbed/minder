@@ -1,5 +1,5 @@
 
-package rest.controllers.contentvalidation.xml.request;
+package rest.controllers.contentvalidation.request;
 
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.annotation.XmlElementDecl;
