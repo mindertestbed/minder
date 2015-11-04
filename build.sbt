@@ -37,7 +37,8 @@ libraryDependencies ++= Seq(
   "net.sourceforge.barbecue" % "barbecue" % "1.5-beta1",
   "org.codehaus.groovy" % "groovy" % "2.3.9",
   "org.glassfish" % "javax.json" % "1.0.4",
-  "org.eclipse.persistence" % "eclipselink" % "2.6.1"
+  "org.eclipse.persistence" % "eclipselink" % "2.6.1",
+  "gov.tubitak.minder" % "minder-gitb-bridge-common" % "0.0.1-SNAPSHOT"
 
 )
 
