@@ -1,23 +1,31 @@
 package rest.controllers;
 
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.List;
+import java.util.Set;
 
-import minderengine.TestEngine;
 import models.Tdl;
 import models.TestAssertion;
 import models.TestCase;
 import models.TestGroup;
+import models.Wrapper;
 import models.WrapperParam;
+import models.WrapperVersion;
 import mtdl.MinderTdl;
 import mtdl.TdlCompiler;
 import mtdl.Rivet;
 
+import com.gitb.core.v1.Actor;
 import com.gitb.core.v1.Metadata;
 import com.gitb.core.v1.Roles;
 import com.gitb.core.v1.TestRole;
 import com.gitb.core.v1.TestRoleEnumeration;
 import com.gitb.tbs.v1.BasicRequest;
+import com.gitb.tbs.v1.GetActorDefinitionRequest;
+import com.gitb.tbs.v1.GetActorDefinitionResponse;
 import com.gitb.tbs.v1.GetTestCaseDefinitionResponse;
 import com.gitb.tpl.v1.DecisionStep;
 import com.gitb.tpl.v1.MessagingStep;
@@ -29,9 +37,12 @@ import play.mvc.Controller;
 import play.mvc.Result;
 import rest.controllers.common.RestUtils;
 import rest.controllers.restbodyprocessor.IRestContentProcessor;
+import scala.collection.JavaConversions;
 
 public class GitbTestbedController extends Controller {
 
+	public static SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSXXX");
+	
 	public static Result getTestCaseDefinition() {
 		/*
 		 * Handling the request message
@@ -43,6 +54,7 @@ public class GitbTestbedController extends Controller {
 			return badRequest(e.getMessage());
 		}
 
+		//Converting to http body to BasicRequest object
 		BasicRequest basicRequest = null;
 		try {
 			basicRequest = (BasicRequest) contentProcessor.parseRequest(BasicRequest.class.getName());
@@ -50,54 +62,77 @@ public class GitbTestbedController extends Controller {
 			return internalServerError(e.getMessage());
 		}
 		
-		String tcId = basicRequest.getTcId();
+		//tcId parameter matches tdl id.
+		Tdl tdl = Tdl.findById(Long.parseLong(basicRequest.getTcId()));
+		TestCase minderTestCase = TestCase.findById(tdl.testCase.id);
 		
-		TestCase minderTestCase = TestCase.findById(Long.parseLong(tcId));
-		List<Tdl> list = Tdl.findByTestCase(minderTestCase);
-
-	    if (list.size() == 0)
-	      return internalServerError("TDL not exist.");;
-
-	    Tdl newestTdl = list.get(0);
-	    Tdl oldestTdl = list.get(list.size()-1);
-	    List<WrapperParam> wrapperParams = WrapperParam.findByTestCase(newestTdl);
+		//checks $wrapper existence. these wappers are not applicable with gitb
+		List<WrapperParam> wrapperParams = WrapperParam.findByTestCase(tdl);
+		if(wrapperParams != null && !wrapperParams.isEmpty())
+			return internalServerError("This testcase is not compatible with GITB");
 		
 	    GetTestCaseDefinitionResponse serviceResponse = new GetTestCaseDefinitionResponse();
 		
 	    com.gitb.tpl.v1.TestCase gitbTestCase = new com.gitb.tpl.v1.TestCase(); 
 	    
+	    //sets metadata
 	    Metadata metadata = new Metadata();
-		metadata.setName(minderTestCase.name);
-		metadata.setVersion(newestTdl.version);
+		metadata.setName(minderTestCase.name + "_" + tdl.id);
+		metadata.setVersion(tdl.version);
 		metadata.setAuthors(minderTestCase.owner.name);
-		metadata.setDescription(minderTestCase.description);
-		metadata.setPublished(oldestTdl.creationDate.toString());
-		metadata.setLastModified(newestTdl.creationDate.toString());
+		metadata.setDescription(minderTestCase.shortDescription);
+		metadata.setPublished(dateFormat.format(tdl.creationDate));
+		metadata.setLastModified(dateFormat.format(tdl.creationDate));
 		
 		gitbTestCase.setMetadata(metadata);
 		
-		Roles actors = new Roles();
-		for (WrapperParam wrapperParam : wrapperParams) {
-			TestRole testRole = new TestRole();
-			testRole.setId(wrapperParam.id.toString());
-			testRole.setName(wrapperParam.name.toString());
-			testRole.setRole(TestRoleEnumeration.SUT);
-			actors.getActor().add(testRole);
-		}
-		
-		gitbTestCase.setActors(actors);
-		
+		//preliminary is not supported so that set null
 		gitbTestCase.setPreliminary(new Preliminary());
 		
-		Sequence sequence = new Sequence();
-		
+		//compiles tdl script and interprets it
 		TestAssertion testAssertion = TestAssertion.findById(minderTestCase.testAssertion.id);		
 		TestGroup testGroup = TestGroup.findById(testAssertion.testGroup.id);  
 		String packageRoot = "_" + testGroup.id;  
 		String packagePath = packageRoot + "/_" + minderTestCase.id;  
-		Class<MinderTdl> cls = TdlCompiler.compileTdl(packageRoot, packagePath, testGroup.dependencyString, minderTestCase.name, newestTdl.tdl, newestTdl.version);
-		List<Rivet> rivets = TestEngine.describe(cls);
+		Class<MinderTdl> cls = TdlCompiler.compileTdl(packageRoot, packagePath, testGroup.dependencyString, minderTestCase.name, tdl.tdl, tdl.version);
 		
+		//initializes MinderTdl class
+		MinderTdl minderTdl = null;
+		try {
+			Constructor<MinderTdl> minderConstructor = (Constructor<MinderTdl>) cls.getConstructors()[0];
+			minderTdl = minderConstructor.newInstance(null, java.lang.Boolean.FALSE);
+			if(minderTdl == null)
+				return internalServerError("Cannot get wrapperdefs.");
+		} catch (InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException e1) {
+			return internalServerError(e1.toString());
+		}
+			
+		//get wrappers from tdl. minder wrapper is equal to gitb actor 
+		Set<String> wrapperDefs = JavaConversions.setAsJavaSet(minderTdl.wrapperDefs());
+		Roles actors = new Roles();
+		
+		//set actors
+		for (String wrapperDef : wrapperDefs) {
+			if(!wrapperDef.contains("$") && !wrapperDef.equals("NULLWRAPPER"))
+			{
+				Wrapper wrapper = Wrapper.findByName(wrapperDef);
+				WrapperVersion wrapperVersion = WrapperVersion.findById(wrapper.id);
+				TestRole testRole = new TestRole();
+				testRole.setId(wrapperVersion.id.toString());
+				//TODO:endpoind set et.
+				testRole.setName(wrapper.name);
+				testRole.setRole(TestRoleEnumeration.SUT);
+				actors.getActor().add(testRole);
+			}
+		}
+		
+		gitbTestCase.setActors(actors);
+		
+		//get rivets
+		Sequence sequence = new Sequence();
+		List<Rivet> rivets = minderTdl.RivetDefs();
+		
+		//get sequences from rivets and set
 		for (Rivet rivet : rivets) {
 			TestStep testStep = null;
 			switch (rivet.tplStepType()) {
@@ -120,9 +155,11 @@ public class GitbTestbedController extends Controller {
 			sequence.getMsgOrDecisionOrLoop().add(testStep);
 		}
 		
+		
 		gitbTestCase.setSteps(sequence);
 		
-		gitbTestCase.setId(String.valueOf(minderTestCase.id));
+		//set test case id
+		gitbTestCase.setId(basicRequest.getTcId());
 		
 		serviceResponse.setTestcase(gitbTestCase);
 				
@@ -152,14 +189,49 @@ public class GitbTestbedController extends Controller {
 			return badRequest(e.getMessage());
 		}
 
-//		ValidationRequest validationRequest = null;
-//		try {
-//			validationRequest = (ValidationRequest) contentProcessor
-//					.parseRequest(ValidationRequest.class.getName());
-//		} catch (ParseException e) {
-//			return internalServerError(e.getMessage());
-//
-//		}
+		GetActorDefinitionRequest actorDefinitionRequest = null;
+		try {
+			actorDefinitionRequest = (GetActorDefinitionRequest) contentProcessor
+					.parseRequest(GetActorDefinitionRequest.class.getName());
+		} catch (ParseException e) {
+			return internalServerError(e.getMessage());
+
+		}
+		
+		String actorId = actorDefinitionRequest.getActorId();
+		
+		WrapperParam expectedWrapper = WrapperParam.findById(Long.parseLong(actorId));
+		
+		String tcId = actorDefinitionRequest.getTcId();
+		
+		TestCase minderTestCase = TestCase.findById(Long.parseLong(tcId));
+		List<Tdl> list = Tdl.findByTestCase(minderTestCase);
+
+	    if (list.size() == 0)
+	      return internalServerError("TDL not exist.");;
+
+	    Tdl newestTdl = list.get(0);
+	    List<WrapperParam> wrapperParams = WrapperParam.findByTestCase(newestTdl);
+	    
+	    WrapperParam actualParam = null;
+	    for (WrapperParam wrapperParam : wrapperParams) {
+			if(wrapperParam.id.longValue() == expectedWrapper.id.longValue())
+			{
+				actualParam = wrapperParam;
+				break;
+			}
+		}
+	    
+	    if(actualParam == null)	    
+	    	return internalServerError("Given actor id is not existed: " + expectedWrapper.id.longValue());
+	    
+	    GetActorDefinitionResponse actorDefinitionResponse = new GetActorDefinitionResponse();
+	    Actor actor = new Actor();
+	    actor.setId(expectedWrapper.id.toString());
+	    //actor.setDesc(expectedWrapper.);
+	    
+	    //actorDefinitionResponse.setActor(value);
+		
 		String responseValue = null;
 		
 		System.out.println("responseValue:" + responseValue);
