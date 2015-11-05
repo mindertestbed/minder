@@ -36,7 +36,7 @@ libraryDependencies ++= Seq(
   "net.sf.jasperreports" % "jasperreports" % "6.0.0",
   "net.sourceforge.barbecue" % "barbecue" % "1.5-beta1",
   "org.codehaus.groovy" % "groovy" % "2.3.9",
-  "org.glassfish" % "javax.json" % "1.0.4"
+  "gov.tubitak.minder" % "minder-gitb-bridge-common" % "0.0.1-SNAPSHOT"
 )
 
 resolvers ++= Seq(

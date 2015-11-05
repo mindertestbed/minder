@@ -121,4 +121,13 @@ GET         /rest/login                          rest.controllers.LoginControlle
 POST        /rest/login                          rest.controllers.LoginController.doLogin
 POST        /rest/validatecontent                rest.controllers.XMLValidationController.validateContent
 
+#GITB Testbed Rest Services
+POST        /rest/testbed/getTestCaseDefinition  rest.controllers.GitbTestbedController.getTestCaseDefinition()
+POST        /rest/testbed/getActorDefinition     rest.controllers.GitbTestbedController.getActorDefinition()
+POST        /rest/testbed/initiate               rest.controllers.GitbTestbedController.initiate()
+POST        /rest/testbed/configure              rest.controllers.GitbTestbedController.configure()
+POST        /rest/testbed/start                  rest.controllers.GitbTestbedController.start()
+POST        /rest/testbed/stop                   rest.controllers.GitbTestbedController.stop()
+
+
 ##-------------
