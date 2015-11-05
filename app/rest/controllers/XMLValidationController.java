@@ -8,7 +8,7 @@ import rest.controllers.common.RestUtils;
 import rest.controllers.contentvalidation.verifier.ISchemaVerifier;
 import rest.controllers.contentvalidation.verifier.SchematronVerifier;
 import rest.controllers.contentvalidation.verifier.XSDVerifier;
-import rest.controllers.contentvalidation.xml.request.ValidationRequest;
+import rest.controllers.contentvalidation.request.ValidationRequest;
 import rest.controllers.restbodyprocessor.IRestContentProcessor;
 import rest.controllers.xmlmodel.response.MinderResponse;
 

@@ -50,7 +50,7 @@ public class LoginController extends Controller {
         minderResponse.setResult(Constants.AUTHENTICATION);
 
 
-        String generatedNonce = "488E54E5CBA86B7E094B1C8DD6D53602";//RestUtils.generateNonce();
+        String generatedNonce = RestUtils.generateNonce();
         LoginToken loginToken = new LoginToken(generatedNonce,Constants.MINDER_REALM);
         RestUtils.addToCurrentNonces(generatedNonce, loginToken);
 
