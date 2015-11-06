@@ -7,6 +7,8 @@ import java.text.SimpleDateFormat;
 import java.util.List;
 import java.util.Set;
 
+import models.GitbEndpoint;
+import models.GitbParameter;
 import models.Tdl;
 import models.TestAssertion;
 import models.TestCase;
@@ -19,10 +21,14 @@ import mtdl.TdlCompiler;
 import mtdl.Rivet;
 
 import com.gitb.core.v1.Actor;
+import com.gitb.core.v1.ConfigurationType;
+import com.gitb.core.v1.Endpoint;
 import com.gitb.core.v1.Metadata;
+import com.gitb.core.v1.Parameter;
 import com.gitb.core.v1.Roles;
 import com.gitb.core.v1.TestRole;
 import com.gitb.core.v1.TestRoleEnumeration;
+import com.gitb.core.v1.UsageEnumeration;
 import com.gitb.tbs.v1.BasicRequest;
 import com.gitb.tbs.v1.GetActorDefinitionRequest;
 import com.gitb.tbs.v1.GetActorDefinitionResponse;
@@ -117,11 +123,33 @@ public class GitbTestbedController extends Controller {
 			{
 				Wrapper wrapper = Wrapper.findByName(wrapperDef);
 				WrapperVersion wrapperVersion = WrapperVersion.findById(wrapper.id);
+				
 				TestRole testRole = new TestRole();
 				testRole.setId(wrapperVersion.id.toString());
-				//TODO:endpoind set et.
 				testRole.setName(wrapper.name);
 				testRole.setRole(TestRoleEnumeration.SUT);
+				
+				List<GitbEndpoint> gitbEndpoints = wrapperVersion.gitbEndpoints;
+				//set all endpoints
+				for (GitbEndpoint gitbEndpoint : gitbEndpoints) {
+					Endpoint endpoint = new Endpoint();
+					endpoint.setName(gitbEndpoint.name);
+					endpoint.setDesc(gitbEndpoint.description);
+					
+					List<GitbParameter> gitbParameters = gitbEndpoint.params;
+					
+					for (GitbParameter gitbParameter : gitbParameters) {
+						Parameter parameter = new Parameter();
+						parameter.setName(gitbParameter.name);
+						parameter.setDesc(gitbParameter.description);
+						parameter.setValue(gitbParameter.value);
+						parameter.setKind(ConfigurationType.valueOf(gitbParameter.kind.toString()));
+						parameter.setUse(UsageEnumeration.valueOf(gitbParameter.use.toString()));
+						endpoint.getConfig().add(parameter);
+					}
+					testRole.getEndpoint().add(endpoint);
+				}
+				
 				actors.getActor().add(testRole);
 			}
 		}
