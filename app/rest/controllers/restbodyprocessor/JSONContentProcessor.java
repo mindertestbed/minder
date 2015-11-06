@@ -1,6 +1,7 @@
 package rest.controllers.restbodyprocessor;
 
 import com.fasterxml.jackson.databind.JsonNode;
+
 import play.libs.Json;
 import play.mvc.Http;
 
@@ -47,5 +48,10 @@ public class JSONContentProcessor implements IRestContentProcessor {
             throw new ParseException("Error occured during the parsing of request's XML body. The details of the exception "+e.toString(),0);
         }
     }
+
+	@Override
+	public String getContentType() {
+		return "application/json";
+	}
 
 }
