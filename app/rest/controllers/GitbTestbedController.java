@@ -228,34 +228,11 @@ public class GitbTestbedController extends Controller {
 		
 		String actorId = actorDefinitionRequest.getActorId();
 		
-		WrapperParam expectedWrapper = WrapperParam.findById(Long.parseLong(actorId));
-		
-		String tcId = actorDefinitionRequest.getTcId();
-		
-		TestCase minderTestCase = TestCase.findById(Long.parseLong(tcId));
-		List<Tdl> list = Tdl.findByTestCase(minderTestCase);
-
-	    if (list.size() == 0)
-	      return internalServerError("TDL not exist.");;
-
-	    Tdl newestTdl = list.get(0);
-	    List<WrapperParam> wrapperParams = WrapperParam.findByTestCase(newestTdl);
-	    
-	    WrapperParam actualParam = null;
-	    for (WrapperParam wrapperParam : wrapperParams) {
-			if(wrapperParam.id.longValue() == expectedWrapper.id.longValue())
-			{
-				actualParam = wrapperParam;
-				break;
-			}
-		}
-	    
-	    if(actualParam == null)	    
-	    	return internalServerError("Given actor id is not existed: " + expectedWrapper.id.longValue());
+		WrapperVersion wrapperVersion = WrapperVersion.findById(Long.valueOf(actorId));
 	    
 	    GetActorDefinitionResponse actorDefinitionResponse = new GetActorDefinitionResponse();
 	    Actor actor = new Actor();
-	    actor.setId(expectedWrapper.id.toString());
+	    //actor.setId(expectedWrapper.id.toString());
 	    //actor.setDesc(expectedWrapper.);
 	    
 	    //actorDefinitionResponse.setActor(value);
