@@ -24,6 +24,12 @@ public interface IRestContentProcessor {
     * Fills the String body.
     * */
     public Object parseRequest(String className) throws ParseException;
+    
+    /**
+     * 
+     * @return the content type that will be set to response
+     */
+    public String getContentType();
 
 
 }

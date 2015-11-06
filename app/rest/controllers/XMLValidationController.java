@@ -83,6 +83,7 @@ public class XMLValidationController extends Controller {
         }
         System.out.println("responseValue:" + responseValue);
 
+        response().setContentType(contentProcessor.getContentType());
         return ok(responseValue);
     }
 

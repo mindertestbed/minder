@@ -5,6 +5,7 @@ import play.mvc.Http;
 import javax.xml.bind.*;
 import javax.xml.transform.Source;
 import javax.xml.transform.stream.StreamSource;
+
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.text.ParseException;
@@ -74,6 +75,11 @@ public class XMLContentProcessor implements IRestContentProcessor {
             throw new ParseException("Error occured during the parsing of request's XML body. The details of the exception "+e.toString(),0);
         }
     }
+
+	@Override
+	public String getContentType() {
+		return "application/xml";
+	}
 
 
 }
