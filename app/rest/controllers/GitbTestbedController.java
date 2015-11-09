@@ -117,40 +117,42 @@ public class GitbTestbedController extends Controller {
 		Set<String> wrapperDefs = JavaConversions.setAsJavaSet(minderTdl.wrapperDefs());
 		Roles actors = new Roles();
 		
-		//set actors
+		//get wrappers
 		for (String wrapperDef : wrapperDefs) {
 			if(!wrapperDef.contains("$") && !wrapperDef.equals("NULLWRAPPER"))
 			{
 				Wrapper wrapper = Wrapper.findByName(wrapperDef);
-				WrapperVersion wrapperVersion = WrapperVersion.findById(wrapper.id);
-				
-				TestRole testRole = new TestRole();
-				testRole.setId(wrapperVersion.id.toString());
-				testRole.setName(wrapper.name);
-				testRole.setRole(TestRoleEnumeration.SUT);
-				
-				List<GitbEndpoint> gitbEndpoints = wrapperVersion.gitbEndpoints;
-				//set all endpoints
-				for (GitbEndpoint gitbEndpoint : gitbEndpoints) {
-					Endpoint endpoint = new Endpoint();
-					endpoint.setName(gitbEndpoint.name);
-					endpoint.setDesc(gitbEndpoint.description);
+				List<WrapperVersion> wrapperVersions = WrapperVersion.getAllByWrapper(wrapper);
+				//set all wrapper versions as actor
+				for (WrapperVersion wrapperVersion : wrapperVersions) {
+					TestRole testRole = new TestRole();
+					testRole.setId(wrapperVersion.id.toString());
+					testRole.setName(wrapper.name + "_" + wrapperVersion.version);
+					testRole.setRole(TestRoleEnumeration.SUT);
 					
-					List<GitbParameter> gitbParameters = gitbEndpoint.params;
-					
-					for (GitbParameter gitbParameter : gitbParameters) {
-						Parameter parameter = new Parameter();
-						parameter.setName(gitbParameter.name);
-						parameter.setDesc(gitbParameter.description);
-						parameter.setValue(gitbParameter.value);
-						parameter.setKind(ConfigurationType.valueOf(gitbParameter.kind.toString()));
-						parameter.setUse(UsageEnumeration.valueOf(gitbParameter.use.toString()));
-						endpoint.getConfig().add(parameter);
+					List<GitbEndpoint> gitbEndpoints = wrapperVersion.gitbEndpoints;
+					//set all endpoints
+					for (GitbEndpoint gitbEndpoint : gitbEndpoints) {
+						Endpoint endpoint = new Endpoint();
+						endpoint.setName(gitbEndpoint.name);
+						endpoint.setDesc(gitbEndpoint.description);
+						
+						List<GitbParameter> gitbParameters = gitbEndpoint.params;
+						
+						for (GitbParameter gitbParameter : gitbParameters) {
+							Parameter parameter = new Parameter();
+							parameter.setName(gitbParameter.name);
+							parameter.setDesc(gitbParameter.description);
+							parameter.setValue(gitbParameter.value);
+							parameter.setKind(ConfigurationType.valueOf(gitbParameter.kind.toString()));
+							parameter.setUse(UsageEnumeration.valueOf(gitbParameter.use.toString()));
+							endpoint.getConfig().add(parameter);
+						}
+						testRole.getEndpoint().add(endpoint);
 					}
-					testRole.getEndpoint().add(endpoint);
+					
+					actors.getActor().add(testRole);
 				}
-				
-				actors.getActor().add(testRole);
 			}
 		}
 		
@@ -226,23 +228,50 @@ public class GitbTestbedController extends Controller {
 
 		}
 		
-		String actorId = actorDefinitionRequest.getActorId();
-		
-		WrapperVersion wrapperVersion = WrapperVersion.findById(Long.valueOf(actorId));
+		//TODO: check if getting wrapper lazy 
+		WrapperVersion wrapperVersion = WrapperVersion.findById(Long.parseLong(actorDefinitionRequest.getActorId()));
+		Wrapper wrapper = Wrapper.findById(wrapperVersion.wrapper.id);
 	    
-	    GetActorDefinitionResponse actorDefinitionResponse = new GetActorDefinitionResponse();
+	    GetActorDefinitionResponse serviceResponse = new GetActorDefinitionResponse();
 	    Actor actor = new Actor();
-	    //actor.setId(expectedWrapper.id.toString());
-	    //actor.setDesc(expectedWrapper.);
+	    actor.setId(wrapperVersion.id.toString());
+	    actor.setName(wrapper.name + "_" + wrapperVersion.version);
+		
+		List<GitbEndpoint> gitbEndpoints = wrapperVersion.gitbEndpoints;
+		//set all endpoints
+		for (GitbEndpoint gitbEndpoint : gitbEndpoints) {
+			Endpoint endpoint = new Endpoint();
+			endpoint.setName(gitbEndpoint.name);
+			endpoint.setDesc(gitbEndpoint.description);
+			
+			List<GitbParameter> gitbParameters = gitbEndpoint.params;
+			
+			for (GitbParameter gitbParameter : gitbParameters) {
+				Parameter parameter = new Parameter();
+				parameter.setName(gitbParameter.name);
+				parameter.setDesc(gitbParameter.description);
+				parameter.setValue(gitbParameter.value);
+				parameter.setKind(ConfigurationType.valueOf(gitbParameter.kind.toString()));
+				parameter.setUse(UsageEnumeration.valueOf(gitbParameter.use.toString()));
+				endpoint.getConfig().add(parameter);
+			}
+			actor.getEndpoint().add(endpoint);
+		}
 	    
-	    //actorDefinitionResponse.setActor(value);
+		serviceResponse.setActor(actor);
 		
 		String responseValue = null;
 		
+		try {
+            responseValue = contentProcessor.prepareResponse(GetActorDefinitionResponse.class.getName(), serviceResponse);
+        } catch (ParseException e) {
+            return internalServerError(e.getMessage());
+        }
 		System.out.println("responseValue:" + responseValue);
 
 		return ok("responseValue");
 	}
+	
 
 	public static Result initiate() {
 
