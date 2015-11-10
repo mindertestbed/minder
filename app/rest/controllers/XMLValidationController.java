@@ -2,6 +2,7 @@ package rest.controllers;
 
 import org.beybunproject.xmlContentVerifier.ArchiveType;
 import org.beybunproject.xmlContentVerifier.Schema;
+
 import play.mvc.Controller;
 import play.mvc.Result;
 import rest.controllers.common.RestUtils;
@@ -47,6 +48,14 @@ public class XMLValidationController extends Controller {
      */
     public static Result validateContent() {
         MinderResponse minderResponse = new MinderResponse();
+        
+        String[] parts = request().body().toString().split("Some\\(");
+        if(parts.length >0){
+            String[] parts2 = parts[1].split("\\)\\,");
+            if(parts2.length >0){
+            	System.out.println("request body:" + parts2[0]);
+            }
+        }
 
         /*
         * Handling the request message
@@ -131,7 +140,8 @@ public class XMLValidationController extends Controller {
                     return minderResponse;
 
                 case SUB_TYPE_URL:
-                    minderResponse.setDescription(schemaVerifier.verify(Arrays.toString(validationRequest.getSchema()), validationRequest.getDocument()));
+                	String schemaUrl = new String(validationRequest.getSchema());
+                    minderResponse.setDescription(schemaVerifier.verify(schemaUrl, validationRequest.getDocument()));
                     minderResponse.setResult(schemaVerifier.getPositiveResult());
                     return minderResponse;
 
