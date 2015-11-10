@@ -4,11 +4,14 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
 import models.GitbEndpoint;
+import models.GitbJob;
 import models.GitbParameter;
+import models.MappedWrapper;
 import models.Tdl;
 import models.TestAssertion;
 import models.TestCase;
@@ -20,6 +23,7 @@ import mtdl.MinderTdl;
 import mtdl.TdlCompiler;
 import mtdl.Rivet;
 
+import com.avaje.ebean.Ebean;
 import com.gitb.core.v1.Actor;
 import com.gitb.core.v1.ConfigurationType;
 import com.gitb.core.v1.Endpoint;
@@ -29,16 +33,19 @@ import com.gitb.core.v1.Roles;
 import com.gitb.core.v1.TestRole;
 import com.gitb.core.v1.TestRoleEnumeration;
 import com.gitb.core.v1.UsageEnumeration;
+import com.gitb.tbs.v1.BasicCommand;
 import com.gitb.tbs.v1.BasicRequest;
 import com.gitb.tbs.v1.GetActorDefinitionRequest;
 import com.gitb.tbs.v1.GetActorDefinitionResponse;
 import com.gitb.tbs.v1.GetTestCaseDefinitionResponse;
+import com.gitb.tbs.v1.InitiateResponse;
 import com.gitb.tpl.v1.DecisionStep;
 import com.gitb.tpl.v1.MessagingStep;
 import com.gitb.tpl.v1.Preliminary;
 import com.gitb.tpl.v1.Sequence;
 import com.gitb.tpl.v1.TestStep;
 
+import controllers.Authentication;
 import play.mvc.Controller;
 import play.mvc.Result;
 import rest.controllers.common.RestUtils;
@@ -117,40 +124,42 @@ public class GitbTestbedController extends Controller {
 		Set<String> wrapperDefs = JavaConversions.setAsJavaSet(minderTdl.wrapperDefs());
 		Roles actors = new Roles();
 		
-		//set actors
+		//get wrappers
 		for (String wrapperDef : wrapperDefs) {
 			if(!wrapperDef.contains("$") && !wrapperDef.equals("NULLWRAPPER"))
 			{
 				Wrapper wrapper = Wrapper.findByName(wrapperDef);
-				WrapperVersion wrapperVersion = WrapperVersion.findById(wrapper.id);
-				
-				TestRole testRole = new TestRole();
-				testRole.setId(wrapperVersion.id.toString());
-				testRole.setName(wrapper.name);
-				testRole.setRole(TestRoleEnumeration.SUT);
-				
-				List<GitbEndpoint> gitbEndpoints = wrapperVersion.gitbEndpoints;
-				//set all endpoints
-				for (GitbEndpoint gitbEndpoint : gitbEndpoints) {
-					Endpoint endpoint = new Endpoint();
-					endpoint.setName(gitbEndpoint.name);
-					endpoint.setDesc(gitbEndpoint.description);
+				List<WrapperVersion> wrapperVersions = WrapperVersion.getAllByWrapper(wrapper);
+				//set all wrapper versions as actor
+				for (WrapperVersion wrapperVersion : wrapperVersions) {
+					TestRole testRole = new TestRole();
+					testRole.setId(wrapperVersion.id.toString());
+					testRole.setName(wrapper.name + "_" + wrapperVersion.version);
+					testRole.setRole(TestRoleEnumeration.SUT);
 					
-					List<GitbParameter> gitbParameters = gitbEndpoint.params;
-					
-					for (GitbParameter gitbParameter : gitbParameters) {
-						Parameter parameter = new Parameter();
-						parameter.setName(gitbParameter.name);
-						parameter.setDesc(gitbParameter.description);
-						parameter.setValue(gitbParameter.value);
-						parameter.setKind(ConfigurationType.valueOf(gitbParameter.kind.toString()));
-						parameter.setUse(UsageEnumeration.valueOf(gitbParameter.use.toString()));
-						endpoint.getConfig().add(parameter);
+					List<GitbEndpoint> gitbEndpoints = wrapperVersion.gitbEndpoints;
+					//set all endpoints
+					for (GitbEndpoint gitbEndpoint : gitbEndpoints) {
+						Endpoint endpoint = new Endpoint();
+						endpoint.setName(gitbEndpoint.name);
+						endpoint.setDesc(gitbEndpoint.description);
+						
+						List<GitbParameter> gitbParameters = gitbEndpoint.params;
+						
+						for (GitbParameter gitbParameter : gitbParameters) {
+							Parameter parameter = new Parameter();
+							parameter.setName(gitbParameter.name);
+							parameter.setDesc(gitbParameter.description);
+							parameter.setValue(gitbParameter.value);
+							parameter.setKind(ConfigurationType.valueOf(gitbParameter.kind.toString()));
+							parameter.setUse(UsageEnumeration.valueOf(gitbParameter.use.toString()));
+							endpoint.getConfig().add(parameter);
+						}
+						testRole.getEndpoint().add(endpoint);
 					}
-					testRole.getEndpoint().add(endpoint);
+					
+					actors.getActor().add(testRole);
 				}
-				
-				actors.getActor().add(testRole);
 			}
 		}
 		
@@ -226,23 +235,50 @@ public class GitbTestbedController extends Controller {
 
 		}
 		
-		String actorId = actorDefinitionRequest.getActorId();
-		
-		WrapperVersion wrapperVersion = WrapperVersion.findById(Long.valueOf(actorId));
+		//TODO: check if getting wrapper lazy 
+		WrapperVersion wrapperVersion = WrapperVersion.findById(Long.parseLong(actorDefinitionRequest.getActorId()));
+		Wrapper wrapper = Wrapper.findById(wrapperVersion.wrapper.id);
 	    
-	    GetActorDefinitionResponse actorDefinitionResponse = new GetActorDefinitionResponse();
+	    GetActorDefinitionResponse serviceResponse = new GetActorDefinitionResponse();
 	    Actor actor = new Actor();
-	    //actor.setId(expectedWrapper.id.toString());
-	    //actor.setDesc(expectedWrapper.);
+	    actor.setId(wrapperVersion.id.toString());
+	    actor.setName(wrapper.name + "_" + wrapperVersion.version);
+		
+		List<GitbEndpoint> gitbEndpoints = wrapperVersion.gitbEndpoints;
+		//set all endpoints
+		for (GitbEndpoint gitbEndpoint : gitbEndpoints) {
+			Endpoint endpoint = new Endpoint();
+			endpoint.setName(gitbEndpoint.name);
+			endpoint.setDesc(gitbEndpoint.description);
+			
+			List<GitbParameter> gitbParameters = gitbEndpoint.params;
+			
+			for (GitbParameter gitbParameter : gitbParameters) {
+				Parameter parameter = new Parameter();
+				parameter.setName(gitbParameter.name);
+				parameter.setDesc(gitbParameter.description);
+				parameter.setValue(gitbParameter.value);
+				parameter.setKind(ConfigurationType.valueOf(gitbParameter.kind.toString()));
+				parameter.setUse(UsageEnumeration.valueOf(gitbParameter.use.toString()));
+				endpoint.getConfig().add(parameter);
+			}
+			actor.getEndpoint().add(endpoint);
+		}
 	    
-	    //actorDefinitionResponse.setActor(value);
+		serviceResponse.setActor(actor);
 		
 		String responseValue = null;
 		
+		try {
+            responseValue = contentProcessor.prepareResponse(GetActorDefinitionResponse.class.getName(), serviceResponse);
+        } catch (ParseException e) {
+            return internalServerError(e.getMessage());
+        }
 		System.out.println("responseValue:" + responseValue);
 
 		return ok("responseValue");
 	}
+	
 
 	public static Result initiate() {
 
@@ -256,17 +292,56 @@ public class GitbTestbedController extends Controller {
 			return badRequest(e.getMessage());
 		}
 
-//		ValidationRequest validationRequest = null;
-//		try {
-//			validationRequest = (ValidationRequest) contentProcessor
-//					.parseRequest(ValidationRequest.class.getName());
-//		} catch (ParseException e) {
-//			return internalServerError(e.getMessage());
-//
-//		}
+		//Converting to http body to BasicRequest object
+		BasicRequest basicRequest = null;
+		try {
+			basicRequest = (BasicRequest) contentProcessor.parseRequest(BasicRequest.class.getName());
+		} catch (ParseException e) {
+			return internalServerError(e.getMessage());
+		}
+		
+		//tcId parameter matches tdl id.
+		Tdl tdl = Tdl.findById(Long.parseLong(basicRequest.getTcId()));
+		TestCase minderTestCase = TestCase.findById(tdl.testCase.id);
+		
+		if(tdl != null)
+			return internalServerError("Gitb test case not existed.");
+		
+		GitbJob gitbJob = GitbJob.findByTdl(tdl);
+		
+		//if job is not existed, create one
+		if(gitbJob == null)
+		{
+			gitbJob.name = minderTestCase.name + "_" + tdl.version + "_job";
+			gitbJob.tdl = tdl;
+			gitbJob.owner = Authentication.getLocalUser();
+		
+		 try {
+		      Ebean.beginTransaction();
+		      List<MappedWrapper> mappedWrappers = new ArrayList<>();
+		      gitbJob.mappedWrappers = mappedWrappers;
+		      gitbJob.mtdlParameters = "";
+		      gitbJob.save();
+		      Ebean.commitTransaction();
+		 } catch (Exception ex) {
+		      ex.printStackTrace();
+		      Ebean.endTransaction();
+		      return internalServerError(ex.getMessage());
+		    }
+		}
+		
+		InitiateResponse serviceResponse = new InitiateResponse();
+		
+		serviceResponse.setTcInstanceId(String.valueOf(gitbJob.id));
 		
 		String responseValue = null;
 
+		try {
+            responseValue = contentProcessor.prepareResponse(InitiateResponse.class.getName(), serviceResponse);
+        } catch (ParseException e) {
+            return internalServerError(e.getMessage());
+        }
+		
 		System.out.println("responseValue:" + responseValue);
 
 		return ok("responseValue");
@@ -311,14 +386,16 @@ public class GitbTestbedController extends Controller {
 			return badRequest(e.getMessage());
 		}
 
-//		ValidationRequest validationRequest = null;
-//		try {
-//			validationRequest = (ValidationRequest) contentProcessor
-//					.parseRequest(ValidationRequest.class.getName());
-//		} catch (ParseException e) {
-//			return internalServerError(e.getMessage());
-//
-//		}
+		BasicCommand basicCommand = null;
+		try {
+			basicCommand = (BasicCommand) contentProcessor
+					.parseRequest(BasicCommand.class.getName());
+		} catch (ParseException e) {
+			return internalServerError(e.getMessage());
+
+		}
+		
+		GitbJob gitbJob = GitbJob.findById(Long.valueOf(basicCommand.getTcInstanceId()));
 		
 		String responseValue = null;
 
@@ -339,14 +416,16 @@ public class GitbTestbedController extends Controller {
 			return badRequest(e.getMessage());
 		}
 
-//		ValidationRequest validationRequest = null;
-//		try {
-//			validationRequest = (ValidationRequest) contentProcessor
-//					.parseRequest(ValidationRequest.class.getName());
-//		} catch (ParseException e) {
-//			return internalServerError(e.getMessage());
-//
-//		}
+		BasicCommand basicCommand = null;
+		try {
+			basicCommand = (BasicCommand) contentProcessor
+					.parseRequest(BasicCommand.class.getName());
+		} catch (ParseException e) {
+			return internalServerError(e.getMessage());
+
+		}
+		
+		GitbJob gitbJob = GitbJob.findById(Long.valueOf(basicCommand.getTcInstanceId()));
 		
 		String responseValue = null;
 
