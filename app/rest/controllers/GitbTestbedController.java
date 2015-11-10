@@ -4,11 +4,14 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
 import models.GitbEndpoint;
+import models.GitbJob;
 import models.GitbParameter;
+import models.MappedWrapper;
 import models.Tdl;
 import models.TestAssertion;
 import models.TestCase;
@@ -20,6 +23,7 @@ import mtdl.MinderTdl;
 import mtdl.TdlCompiler;
 import mtdl.Rivet;
 
+import com.avaje.ebean.Ebean;
 import com.gitb.core.v1.Actor;
 import com.gitb.core.v1.ConfigurationType;
 import com.gitb.core.v1.Endpoint;
@@ -29,16 +33,19 @@ import com.gitb.core.v1.Roles;
 import com.gitb.core.v1.TestRole;
 import com.gitb.core.v1.TestRoleEnumeration;
 import com.gitb.core.v1.UsageEnumeration;
+import com.gitb.tbs.v1.BasicCommand;
 import com.gitb.tbs.v1.BasicRequest;
 import com.gitb.tbs.v1.GetActorDefinitionRequest;
 import com.gitb.tbs.v1.GetActorDefinitionResponse;
 import com.gitb.tbs.v1.GetTestCaseDefinitionResponse;
+import com.gitb.tbs.v1.InitiateResponse;
 import com.gitb.tpl.v1.DecisionStep;
 import com.gitb.tpl.v1.MessagingStep;
 import com.gitb.tpl.v1.Preliminary;
 import com.gitb.tpl.v1.Sequence;
 import com.gitb.tpl.v1.TestStep;
 
+import controllers.Authentication;
 import play.mvc.Controller;
 import play.mvc.Result;
 import rest.controllers.common.RestUtils;
@@ -285,17 +292,56 @@ public class GitbTestbedController extends Controller {
 			return badRequest(e.getMessage());
 		}
 
-//		ValidationRequest validationRequest = null;
-//		try {
-//			validationRequest = (ValidationRequest) contentProcessor
-//					.parseRequest(ValidationRequest.class.getName());
-//		} catch (ParseException e) {
-//			return internalServerError(e.getMessage());
-//
-//		}
+		//Converting to http body to BasicRequest object
+		BasicRequest basicRequest = null;
+		try {
+			basicRequest = (BasicRequest) contentProcessor.parseRequest(BasicRequest.class.getName());
+		} catch (ParseException e) {
+			return internalServerError(e.getMessage());
+		}
+		
+		//tcId parameter matches tdl id.
+		Tdl tdl = Tdl.findById(Long.parseLong(basicRequest.getTcId()));
+		TestCase minderTestCase = TestCase.findById(tdl.testCase.id);
+		
+		if(tdl != null)
+			return internalServerError("Gitb test case not existed.");
+		
+		GitbJob gitbJob = GitbJob.findByTdl(tdl);
+		
+		//if job is not existed, create one
+		if(gitbJob == null)
+		{
+			gitbJob.name = minderTestCase.name + "_" + tdl.version + "_job";
+			gitbJob.tdl = tdl;
+			gitbJob.owner = Authentication.getLocalUser();
+		
+		 try {
+		      Ebean.beginTransaction();
+		      List<MappedWrapper> mappedWrappers = new ArrayList<>();
+		      gitbJob.mappedWrappers = mappedWrappers;
+		      gitbJob.mtdlParameters = "";
+		      gitbJob.save();
+		      Ebean.commitTransaction();
+		 } catch (Exception ex) {
+		      ex.printStackTrace();
+		      Ebean.endTransaction();
+		      return internalServerError(ex.getMessage());
+		    }
+		}
+		
+		InitiateResponse serviceResponse = new InitiateResponse();
+		
+		serviceResponse.setTcInstanceId(String.valueOf(gitbJob.id));
 		
 		String responseValue = null;
 
+		try {
+            responseValue = contentProcessor.prepareResponse(InitiateResponse.class.getName(), serviceResponse);
+        } catch (ParseException e) {
+            return internalServerError(e.getMessage());
+        }
+		
 		System.out.println("responseValue:" + responseValue);
 
 		return ok("responseValue");
@@ -340,14 +386,16 @@ public class GitbTestbedController extends Controller {
 			return badRequest(e.getMessage());
 		}
 
-//		ValidationRequest validationRequest = null;
-//		try {
-//			validationRequest = (ValidationRequest) contentProcessor
-//					.parseRequest(ValidationRequest.class.getName());
-//		} catch (ParseException e) {
-//			return internalServerError(e.getMessage());
-//
-//		}
+		BasicCommand basicCommand = null;
+		try {
+			basicCommand = (BasicCommand) contentProcessor
+					.parseRequest(BasicCommand.class.getName());
+		} catch (ParseException e) {
+			return internalServerError(e.getMessage());
+
+		}
+		
+		GitbJob gitbJob = GitbJob.findById(Long.valueOf(basicCommand.getTcInstanceId()));
 		
 		String responseValue = null;
 
@@ -368,14 +416,16 @@ public class GitbTestbedController extends Controller {
 			return badRequest(e.getMessage());
 		}
 
-//		ValidationRequest validationRequest = null;
-//		try {
-//			validationRequest = (ValidationRequest) contentProcessor
-//					.parseRequest(ValidationRequest.class.getName());
-//		} catch (ParseException e) {
-//			return internalServerError(e.getMessage());
-//
-//		}
+		BasicCommand basicCommand = null;
+		try {
+			basicCommand = (BasicCommand) contentProcessor
+					.parseRequest(BasicCommand.class.getName());
+		} catch (ParseException e) {
+			return internalServerError(e.getMessage());
+
+		}
+		
+		GitbJob gitbJob = GitbJob.findById(Long.valueOf(basicCommand.getTcInstanceId()));
 		
 		String responseValue = null;
 
