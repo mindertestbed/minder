@@ -31,6 +31,9 @@ public class WrapperVersion extends Model {
 
   @OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
   public List<TSlot> slots;
+  
+  @OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+  public List<GitbEndpoint> gitbEndpoints;
 
 
   public static final Finder<Long, WrapperVersion> find = new Finder<>(Long.class,
