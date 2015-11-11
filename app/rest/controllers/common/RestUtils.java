@@ -296,4 +296,6 @@ public class RestUtils {
         throw new IllegalArgumentException("Content type is not defined. The defined types are text/xml and text/json. The received type is "+contentType);
 
     }
+
+
 }

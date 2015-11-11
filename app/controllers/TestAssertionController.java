@@ -1,6 +1,7 @@
 package controllers;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import controllers.common.enumeration.Utils;
 import editormodels.AssertionEditorModel;
 import global.Util;
 import models.PrescriptionLevel;
@@ -205,7 +206,7 @@ public class TestAssertionController extends Controller {
   public static Result doEditAssertionField() {
     JsonNode jsonNode = request().body().asJson();
 
-    return GroupController.doEditField(AssertionEditorModel.class, TestAssertion.class, jsonNode);
+    return Utils.doEditField(AssertionEditorModel.class, TestAssertion.class, jsonNode,Authentication.getLocalUser());
   }
 
 

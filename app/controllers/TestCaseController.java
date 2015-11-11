@@ -3,6 +3,7 @@ package controllers;
 
 import com.avaje.ebean.Ebean;
 import com.fasterxml.jackson.databind.JsonNode;
+import controllers.common.enumeration.Utils;
 import editormodels.TestCaseEditorModel;
 import global.Util;
 import minderengine.TestEngine;
@@ -280,7 +281,7 @@ public class TestCaseController extends Controller {
   public static Result doEditCaseField() {
     JsonNode jsonNode = request().body().asJson();
 
-    Result res = GroupController.doEditField(TestCaseEditorModel.class, TestCase.class, jsonNode);
+    Result res = Utils.doEditField(TestCaseEditorModel.class, TestCase.class, jsonNode,Authentication.getLocalUser());
 
     if (res.toScala().header().status() == BAD_REQUEST) {
       return res;
