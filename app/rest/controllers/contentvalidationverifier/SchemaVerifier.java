@@ -1,4 +1,4 @@
-package rest.controllers.contentvalidation.verifier;
+package rest.controllers.contentvalidationverifier;
 
 import org.beybunproject.xmlContentVerifier.ArchiveType;
 import org.beybunproject.xmlContentVerifier.Schema;

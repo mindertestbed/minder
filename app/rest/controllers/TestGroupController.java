@@ -14,9 +14,10 @@ import play.mvc.Result;
 import rest.controllers.common.Constants;
 import rest.controllers.common.JsonNodeStructure;
 import rest.controllers.common.RestUtils;
-import rest.controllers.response.MinderResponse;
 import rest.controllers.restbodyprocessor.IRestContentProcessor;
-import rest.controllers.testgroup.DependencyString;
+import rest.models.RestDependencyString;
+import rest.models.RestMinderResponse;
+import rest.models.RestTestGroup;
 
 import java.text.ParseException;
 import java.util.HashMap;
@@ -28,30 +29,22 @@ import java.util.HashMap;
  * @date: 10/11/15.
  */
 public class TestGroupController extends Controller {
-
     /**
-     * This method receives JSON or XML request which includes groupId and dependecy string, and apply both add/edit/delete
-     * operations.
-     * The XSD for the client request is given in rest/testgroup/DependencyString.xsd
+     * This method receives JSON or XML request which includes test group information and creates a new test group.
+     * The XSD for the client request is given in rest/models/xsd/resttestgroup.xsd
      *
      * The sample JSON request:
-     * {"groupId":1,"value":"junit:junit:4.12"}
+     * {"groupName":"ValidationTests","shortDescription":"content validation","description":"A sample test group that contains tests that demonstrate minder capabilities"}
      *
      *
      * The sample produced response by Minder (with the status code 200in the header):
-     * {"result":"SUCCESS","description":"200 Success"}
+     * {"result":"SUCCESS","description":"Test group created!"}
      *
-     * The format for the maven dependecies:
-     * "groupId:artifactId[:extension[:classifier]]:version]]"
+     * Group name and short description is required, whereas, description is optional.
      *
-     * You may give more than one dependency in the "value" section by seperatin them with "\n".
-     * Eg. {"groupId":1,"value":"junit:junit:4.12\ncom.typesafe.play:play-java-ws_2.11:2.4.2"}
-     *
-     * To delete a dependency string, simple assign the value as "".
-     * Eg. {"groupId":1,"value":""}
      */
-    public static Result editDependency() {
-        MinderResponse minderResponse = new MinderResponse();
+    public static Result addTestGroup() {
+        RestMinderResponse minderResponse = new RestMinderResponse();
 
         /*
         * Parse client request and get user
@@ -73,9 +66,95 @@ public class TestGroupController extends Controller {
             return badRequest(e.getCause().toString());
         }
 
-        DependencyString dependencyString = null;
+        RestTestGroup restTestGroup = null;
         try {
-            dependencyString = (DependencyString) contentProcessor.parseRequest(DependencyString.class.getName());
+            restTestGroup = (RestTestGroup) contentProcessor.parseRequest(RestTestGroup.class.getName());
+        } catch (ParseException e) {
+            return internalServerError(e.getCause().toString());
+        }
+
+        //Creating the new test group
+        TestGroup group = TestGroup.findByName(restTestGroup.getGroupName());
+        if (group != null) {
+            return badRequest("The group with name [" + group.name + "] already exists");
+        }
+
+        group = new TestGroup();
+        group.owner = user;
+        group.shortDescription = restTestGroup.getShortDescription();
+        group.description = restTestGroup.getDescription();
+        group.name = restTestGroup.getGroupName();
+        group.dependencyString = "";
+
+        group.save();
+
+        //
+        minderResponse.setResult(Constants.SUCCESS);
+        minderResponse.setDescription("Test group created!");
+
+        /*
+        * Preparing response
+        * */
+        String responseValue = null;
+        try {
+            responseValue = contentProcessor.prepareResponse(RestMinderResponse.class.getName(), minderResponse);
+        } catch (ParseException e) {
+            return internalServerError(e.getMessage());
+        }
+        System.out.println("responseValue:" + responseValue);
+
+        response().setContentType(contentProcessor.getContentType());
+        return ok(responseValue);
+    }
+
+
+    /**
+     * This method receives JSON or XML request which includes groupId and dependecy string, and apply both add/edit/delete
+     * operations.
+     * The XSD for the client request is given in rest/models/xsd/dependencystring.xsd
+     *
+     * The sample JSON request:
+     * {"groupId":1,"value":"junit:junit:4.12"}
+     *
+     *
+     * The sample produced response by Minder (with the status code 200in the header):
+     * {"result":"SUCCESS","description":"200 Success"}
+     *
+     * The format for the maven dependecies:
+     * "groupId:artifactId[:extension[:classifier]]:version]]"
+     *
+     * You may give more than one dependency in the "value" section by seperatin them with "\n".
+     * Eg. {"groupId":1,"value":"junit:junit:4.12\ncom.typesafe.play:play-java-ws_2.11:2.4.2"}
+     *
+     * To delete a dependency string, simple assign the value as "".
+     * Eg. {"groupId":1,"value":""}
+     */
+    public static Result editDependency() {
+        RestMinderResponse minderResponse = new RestMinderResponse();
+
+        /*
+        * Parse client request and get user
+        */
+        String authorizationData = request().getHeader(AUTHORIZATION);
+        HashMap<String, String> clientRequest = RestUtils.createHashMapOfClientRequest(authorizationData);
+        User user = User.findByEmail(clientRequest.get("username"));
+        if (null == user) {
+            return unauthorized(Constants.RESULT_UNAUTHORIZED);
+        }
+
+        /*
+        * Handling the request message
+        * */
+        IRestContentProcessor contentProcessor = null;
+        try {
+            contentProcessor = RestUtils.createContentProcessor(request().getHeader(CONTENT_TYPE), request().body());
+        } catch (IllegalArgumentException e) {
+            return badRequest(e.getCause().toString());
+        }
+
+        RestDependencyString dependencyString = null;
+        try {
+            dependencyString = (RestDependencyString) contentProcessor.parseRequest(RestDependencyString.class.getName());
         } catch (ParseException e) {
             return internalServerError(e.getCause().toString());
         }
@@ -112,7 +191,7 @@ public class TestGroupController extends Controller {
         * */
         String responseValue = null;
         try {
-            responseValue = contentProcessor.prepareResponse(MinderResponse.class.getName(), minderResponse);
+            responseValue = contentProcessor.prepareResponse(RestMinderResponse.class.getName(), minderResponse);
         } catch (ParseException e) {
             return internalServerError(e.getMessage());
         }
@@ -138,7 +217,7 @@ public class TestGroupController extends Controller {
      *
      */
     public static Result getDependency() {
-        MinderResponse minderResponse = new MinderResponse();
+        RestMinderResponse minderResponse = new RestMinderResponse();
 
         /*
         * Parse client request and get user
@@ -160,9 +239,9 @@ public class TestGroupController extends Controller {
             return badRequest(e.getCause().toString());
         }
 
-        DependencyString dependencyString = null;
+        RestDependencyString dependencyString = null;
         try {
-            dependencyString = (DependencyString) contentProcessor.parseRequest(DependencyString.class.getName());
+            dependencyString = (RestDependencyString) contentProcessor.parseRequest(RestDependencyString.class.getName());
         } catch (ParseException e) {
             return internalServerError(e.getCause().toString());
         }
@@ -189,7 +268,7 @@ public class TestGroupController extends Controller {
         * */
         String responseValue = null;
         try {
-            responseValue = contentProcessor.prepareResponse(MinderResponse.class.getName(), minderResponse);
+            responseValue = contentProcessor.prepareResponse(RestMinderResponse.class.getName(), minderResponse);
         } catch (ParseException e) {
             return internalServerError(e.getMessage());
         }

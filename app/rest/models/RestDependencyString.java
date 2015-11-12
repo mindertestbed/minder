@@ -1,4 +1,4 @@
-package rest.controllers.testgroup;
+package rest.models;
 
 import javax.xml.bind.annotation.*;
 
@@ -29,7 +29,7 @@ import javax.xml.bind.annotation.*;
         "value"
 })
 @XmlRootElement(name = "dependencyString")
-public class DependencyString {
+public class RestDependencyString {
 
     @XmlElement(required = true)
     protected String groupId;
