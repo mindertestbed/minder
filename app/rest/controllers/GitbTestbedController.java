@@ -213,6 +213,7 @@ public class GitbTestbedController extends Controller {
         }
 		System.out.println("responseValue:" + responseValue);
 
+		response().setContentType(contentProcessor.getContentType());
 		return ok(responseValue);
 	}
 
@@ -278,7 +279,8 @@ public class GitbTestbedController extends Controller {
         }
 		System.out.println("responseValue:" + responseValue);
 
-		return ok("responseValue");
+		response().setContentType(contentProcessor.getContentType());
+		return ok(responseValue);
 	}
 	
 
@@ -355,7 +357,8 @@ public class GitbTestbedController extends Controller {
 		
 		System.out.println("responseValue:" + responseValue);
 
-		return ok("responseValue");
+		response().setContentType(contentProcessor.getContentType());
+		return ok(responseValue);
 	}
 
 	public static Result configure() {
@@ -382,7 +385,8 @@ public class GitbTestbedController extends Controller {
 
 		System.out.println("responseValue:" + responseValue);
 
-		return ok("responseValue");
+		response().setContentType(contentProcessor.getContentType());
+		return ok(responseValue);
 	}
 
 	public static Result start() {
@@ -418,7 +422,8 @@ public class GitbTestbedController extends Controller {
 
 		System.out.println("responseValue:" + responseValue);
 
-		return ok("responseValue");
+		response().setContentType(contentProcessor.getContentType());
+		return ok(responseValue);
 	}
 
 	public static Result stop() {
@@ -454,7 +459,8 @@ public class GitbTestbedController extends Controller {
 		
 		System.out.println("responseValue:" + responseValue);
 
-		return ok("responseValue");
+		response().setContentType(contentProcessor.getContentType());
+		return ok(responseValue);
 	}
 
 }
