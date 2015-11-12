@@ -121,6 +121,7 @@ GET         /rest/login                                rest.controllers.LoginCon
 POST        /rest/login                                rest.controllers.LoginController.doLogin
 POST        /rest/validatecontent                      rest.controllers.XMLValidationController.validateContent
 POST        /rest/editdependency                       rest.controllers.TestGroupController.editDependency
+POST        /rest/getdependency                        rest.controllers.TestGroupController.getDependency
 
 #GITB Testbed Rest Services
 POST        /rest/testbed/getTestCaseDefinition        rest.controllers.GitbTestbedController.getTestCaseDefinition()

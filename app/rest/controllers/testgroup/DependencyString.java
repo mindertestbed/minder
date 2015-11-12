@@ -34,7 +34,7 @@ public class DependencyString {
     @XmlElement(required = true)
     protected String groupId;
 
-    @XmlElement(required = true)
+    @XmlElement(required = false)
     protected String value;
 
     public String getGroupId() {

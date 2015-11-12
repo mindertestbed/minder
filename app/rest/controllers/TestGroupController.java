@@ -30,7 +30,7 @@ import java.util.HashMap;
 public class TestGroupController extends Controller {
 
     /**
-     * This method receives JSON or XML request which includes groupId and dependecy string, and apply both add/edit
+     * This method receives JSON or XML request which includes groupId and dependecy string, and apply both add/edit/delete
      * operations.
      * The XSD for the client request is given in rest/testgroup/DependencyString.xsd
      *
@@ -106,6 +106,83 @@ public class TestGroupController extends Controller {
 
         minderResponse.setResult(Constants.SUCCESS);
         minderResponse.setDescription(Constants.RESULT_SUCCESS);
+
+        /*
+        * Preparing response
+        * */
+        String responseValue = null;
+        try {
+            responseValue = contentProcessor.prepareResponse(MinderResponse.class.getName(), minderResponse);
+        } catch (ParseException e) {
+            return internalServerError(e.getMessage());
+        }
+        System.out.println("responseValue:" + responseValue);
+
+        response().setContentType(contentProcessor.getContentType());
+        return ok(responseValue);
+    }
+
+    /**
+     * This method receives JSON or XML request which includes groupId and get dependencyString.
+     *
+     *
+     * The sample JSON request:
+     * {"groupId":1}
+     *
+     *
+     * The sample produced response by Minder (with the status code 200in the header):
+     * {"result":"SUCCESS","description":"org.beybunproject:xoola:1.0.1"}
+     *
+     * The format for the received maven dependecies:
+     * "groupId:artifactId[:extension[:classifier]]:version]]"
+     *
+     */
+    public static Result getDependency() {
+        MinderResponse minderResponse = new MinderResponse();
+
+        /*
+        * Parse client request and get user
+        */
+        String authorizationData = request().getHeader(AUTHORIZATION);
+        HashMap<String, String> clientRequest = RestUtils.createHashMapOfClientRequest(authorizationData);
+        User user = User.findByEmail(clientRequest.get("username"));
+        if (null == user) {
+            return unauthorized(Constants.RESULT_UNAUTHORIZED);
+        }
+
+        /*
+        * Handling the request message
+        * */
+        IRestContentProcessor contentProcessor = null;
+        try {
+            contentProcessor = RestUtils.createContentProcessor(request().getHeader(CONTENT_TYPE), request().body());
+        } catch (IllegalArgumentException e) {
+            return badRequest(e.getCause().toString());
+        }
+
+        DependencyString dependencyString = null;
+        try {
+            dependencyString = (DependencyString) contentProcessor.parseRequest(DependencyString.class.getName());
+        } catch (ParseException e) {
+            return internalServerError(e.getCause().toString());
+        }
+
+
+        Long grId=0L;
+        try {
+            grId = Long.parseLong(dependencyString.getGroupId());
+        }catch (RuntimeException e){
+            internalServerError(e.getCause().toString());
+        }
+
+        TestGroup tg = TestGroup.findById(grId);
+
+        if (tg == null) {
+            return badRequest("No group with id " + grId + ".");
+        }
+
+        minderResponse.setResult(Constants.SUCCESS);
+        minderResponse.setDescription(tg.dependencyString);
 
         /*
         * Preparing response
