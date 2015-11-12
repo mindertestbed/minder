@@ -46,6 +46,9 @@ public class TestGroupController extends Controller {
      *
      * You may give more than one dependency in the "value" section by seperatin them with "\n".
      * Eg. {"groupId":1,"value":"junit:junit:4.12\ncom.typesafe.play:play-java-ws_2.11:2.4.2"}
+     *
+     * To delete a dependency string, simple assign the value as "".
+     * Eg. {"groupId":1,"value":""}
      */
     public static Result editDependency() {
         MinderResponse minderResponse = new MinderResponse();
