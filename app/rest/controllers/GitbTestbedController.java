@@ -398,6 +398,12 @@ public class GitbTestbedController extends Controller {
 		GitbJob gitbJob = GitbJob.findById(Long.valueOf(basicCommand.getTcInstanceId()));
 		
 		String responseValue = null;
+		
+		try {
+            responseValue = contentProcessor.prepareResponse(com.gitb.tbs.v1.Void.class.getName(), new com.gitb.tbs.v1.Void());
+        } catch (ParseException e) {
+            return internalServerError(e.getMessage());
+        }
 
 		System.out.println("responseValue:" + responseValue);
 
@@ -429,6 +435,12 @@ public class GitbTestbedController extends Controller {
 		
 		String responseValue = null;
 
+		try {
+            responseValue = contentProcessor.prepareResponse(com.gitb.tbs.v1.Void.class.getName(), new com.gitb.tbs.v1.Void());
+        } catch (ParseException e) {
+            return internalServerError(e.getMessage());
+        }
+		
 		System.out.println("responseValue:" + responseValue);
 
 		return ok("responseValue");
