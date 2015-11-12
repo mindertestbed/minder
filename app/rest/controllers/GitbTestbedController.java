@@ -5,6 +5,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
 
@@ -16,6 +17,7 @@ import models.Tdl;
 import models.TestAssertion;
 import models.TestCase;
 import models.TestGroup;
+import models.User;
 import models.Wrapper;
 import models.WrapperParam;
 import models.WrapperVersion;
@@ -211,6 +213,7 @@ public class GitbTestbedController extends Controller {
         }
 		System.out.println("responseValue:" + responseValue);
 
+		response().setContentType(contentProcessor.getContentType());
 		return ok(responseValue);
 	}
 
@@ -276,7 +279,8 @@ public class GitbTestbedController extends Controller {
         }
 		System.out.println("responseValue:" + responseValue);
 
-		return ok("responseValue");
+		response().setContentType(contentProcessor.getContentType());
+		return ok(responseValue);
 	}
 	
 
@@ -314,7 +318,16 @@ public class GitbTestbedController extends Controller {
 		{
 			gitbJob.name = minderTestCase.name + "_" + tdl.version + "_job";
 			gitbJob.tdl = tdl;
-			gitbJob.owner = Authentication.getLocalUser();
+						 
+			String authorizationData = request().getHeader(AUTHORIZATION);
+
+	        /*
+	        * Parse client request
+	        */   
+			 HashMap<String,String> clientRequest = RestUtils.createHashMapOfClientRequest(authorizationData);
+		        
+			User user = User.findByEmail(clientRequest.get("username"));
+			gitbJob.owner = user;
 		
 		 try {
 		      Ebean.beginTransaction();
@@ -344,7 +357,8 @@ public class GitbTestbedController extends Controller {
 		
 		System.out.println("responseValue:" + responseValue);
 
-		return ok("responseValue");
+		response().setContentType(contentProcessor.getContentType());
+		return ok(responseValue);
 	}
 
 	public static Result configure() {
@@ -371,7 +385,8 @@ public class GitbTestbedController extends Controller {
 
 		System.out.println("responseValue:" + responseValue);
 
-		return ok("responseValue");
+		response().setContentType(contentProcessor.getContentType());
+		return ok(responseValue);
 	}
 
 	public static Result start() {
@@ -398,10 +413,17 @@ public class GitbTestbedController extends Controller {
 		GitbJob gitbJob = GitbJob.findById(Long.valueOf(basicCommand.getTcInstanceId()));
 		
 		String responseValue = null;
+		
+		try {
+            responseValue = contentProcessor.prepareResponse(com.gitb.tbs.v1.Void.class.getName(), new com.gitb.tbs.v1.Void());
+        } catch (ParseException e) {
+            return internalServerError(e.getMessage());
+        }
 
 		System.out.println("responseValue:" + responseValue);
 
-		return ok("responseValue");
+		response().setContentType(contentProcessor.getContentType());
+		return ok(responseValue);
 	}
 
 	public static Result stop() {
@@ -429,9 +451,16 @@ public class GitbTestbedController extends Controller {
 		
 		String responseValue = null;
 
+		try {
+            responseValue = contentProcessor.prepareResponse(com.gitb.tbs.v1.Void.class.getName(), new com.gitb.tbs.v1.Void());
+        } catch (ParseException e) {
+            return internalServerError(e.getMessage());
+        }
+		
 		System.out.println("responseValue:" + responseValue);
 
-		return ok("responseValue");
+		response().setContentType(contentProcessor.getContentType());
+		return ok(responseValue);
 	}
 
 }
