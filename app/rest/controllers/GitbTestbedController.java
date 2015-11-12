@@ -5,6 +5,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
 
@@ -16,6 +17,7 @@ import models.Tdl;
 import models.TestAssertion;
 import models.TestCase;
 import models.TestGroup;
+import models.User;
 import models.Wrapper;
 import models.WrapperParam;
 import models.WrapperVersion;
@@ -314,7 +316,16 @@ public class GitbTestbedController extends Controller {
 		{
 			gitbJob.name = minderTestCase.name + "_" + tdl.version + "_job";
 			gitbJob.tdl = tdl;
-			gitbJob.owner = Authentication.getLocalUser();
+						 
+			String authorizationData = request().getHeader(AUTHORIZATION);
+
+	        /*
+	        * Parse client request
+	        */   
+			 HashMap<String,String> clientRequest = RestUtils.createHashMapOfClientRequest(authorizationData);
+		        
+			User user = User.findByEmail(clientRequest.get("username"));
+			gitbJob.owner = user;
 		
 		 try {
 		      Ebean.beginTransaction();
