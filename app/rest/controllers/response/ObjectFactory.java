@@ -1,5 +1,5 @@
 
-package rest.controllers.xmlmodel.response;
+package rest.controllers.response;
 
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.annotation.XmlElementDecl;

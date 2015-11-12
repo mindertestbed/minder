@@ -11,7 +11,7 @@ import rest.controllers.contentvalidation.verifier.SchematronVerifier;
 import rest.controllers.contentvalidation.verifier.XSDVerifier;
 import rest.controllers.contentvalidation.request.ValidationRequest;
 import rest.controllers.restbodyprocessor.IRestContentProcessor;
-import rest.controllers.xmlmodel.response.MinderResponse;
+import rest.controllers.response.MinderResponse;
 
 import java.net.MalformedURLException;
 import java.text.ParseException;

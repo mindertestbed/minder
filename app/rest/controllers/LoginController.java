@@ -10,7 +10,7 @@ import rest.controllers.common.RestUtils;
 import rest.controllers.common.enumeration.MethodType;
 import rest.controllers.login.LoginToken;
 import rest.controllers.restbodyprocessor.IRestContentProcessor;
-import rest.controllers.xmlmodel.response.MinderResponse;
+import rest.controllers.response.MinderResponse;
 
 import java.text.ParseException;
 import java.util.HashMap;

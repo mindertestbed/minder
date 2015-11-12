@@ -2,6 +2,7 @@ package controllers;
 
 
 import com.fasterxml.jackson.databind.JsonNode;
+import controllers.common.enumeration.Utils;
 import editormodels.UtilClassEditorModel;
 import global.Util;
 import models.TestGroup;
@@ -187,7 +188,7 @@ public class UtilClassController extends Controller {
   public static Result doEditUtilClassField() {
     JsonNode jsonNode = request().body().asJson();
 
-    Result res = GroupController.doEditField(UtilClassEditorModel.class, UtilClass.class, jsonNode);
+    Result res = Utils.doEditField(UtilClassEditorModel.class, UtilClass.class, jsonNode,Authentication.getLocalUser());
 
     if (res.toScala().header().status() == BAD_REQUEST) {
       return res;

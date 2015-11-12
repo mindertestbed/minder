@@ -1,6 +1,7 @@
 package controllers;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import controllers.common.enumeration.Utils;
 import editormodels.TestSuiteEditorModel;
 import global.Util;
 import models.TestGroup;
@@ -157,7 +158,7 @@ public class TestSuiteController extends Controller {
   public static Result doEditTestSuiteField() {
     JsonNode jsonNode = request().body().asJson();
 
-    return GroupController.doEditField(TestSuiteEditorModel.class, TestSuite.class, jsonNode);
+    return Utils.doEditField(TestSuiteEditorModel.class, TestSuite.class, jsonNode,Authentication.getLocalUser());
   }
 
 
