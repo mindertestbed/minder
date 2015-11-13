@@ -47,11 +47,11 @@ import com.gitb.tpl.v1.Preliminary;
 import com.gitb.tpl.v1.Sequence;
 import com.gitb.tpl.v1.TestStep;
 
+import controllers.Authentication;
 import play.mvc.Controller;
 import play.mvc.Result;
 import rest.controllers.common.RestUtils;
 import rest.controllers.restbodyprocessor.IRestContentProcessor;
-import rest.controllers.xmlmodel.response.GetTestCaseDefinitions;
 import scala.collection.JavaConversions;
 
 public class GitbTestbedController extends Controller {
@@ -79,15 +79,126 @@ public class GitbTestbedController extends Controller {
 		
 		//tcId parameter matches tdl id.
 		Tdl tdl = Tdl.findById(Long.parseLong(basicRequest.getTcId()));
+		TestCase minderTestCase = TestCase.findById(tdl.testCase.id);
 		
-		com.gitb.tpl.v1.TestCase gitbTestCase;
+		//checks $wrapper existence. these wappers are not applicable with gitb
+		List<WrapperParam> wrapperParams = WrapperParam.findByTestCase(tdl);
+		if(wrapperParams != null && !wrapperParams.isEmpty())
+			return internalServerError("This testcase is not compatible with GITB");
+		
+	    GetTestCaseDefinitionResponse serviceResponse = new GetTestCaseDefinitionResponse();
+		
+	    com.gitb.tpl.v1.TestCase gitbTestCase = new com.gitb.tpl.v1.TestCase(); 
+	    
+	    //sets metadata
+	    Metadata metadata = new Metadata();
+		metadata.setName(minderTestCase.name + "_" + tdl.version);
+		metadata.setVersion(tdl.version);
+		metadata.setAuthors(minderTestCase.owner.name);
+		metadata.setDescription(minderTestCase.shortDescription);
+		metadata.setPublished(dateFormat.format(tdl.creationDate));
+		metadata.setLastModified(dateFormat.format(tdl.creationDate));
+		
+		gitbTestCase.setMetadata(metadata);
+		
+		//preliminary is not supported so that set null
+		gitbTestCase.setPreliminary(new Preliminary());
+		
+		//compiles tdl script and interprets it
+		TestAssertion testAssertion = TestAssertion.findById(minderTestCase.testAssertion.id);		
+		TestGroup testGroup = TestGroup.findById(testAssertion.testGroup.id);  
+		String packageRoot = "_" + testGroup.id;  
+		String packagePath = packageRoot + "/_" + minderTestCase.id;  
+		Class<MinderTdl> cls = TdlCompiler.compileTdl(packageRoot, packagePath, testGroup.dependencyString, minderTestCase.name, tdl.tdl, tdl.version);
+		
+		//initializes MinderTdl class
+		MinderTdl minderTdl = null;
 		try {
-			gitbTestCase = getGitbTestCase(tdl);
-		} catch (Exception e) {
-			return internalServerError(e.getMessage());
+			Constructor<MinderTdl> minderConstructor = (Constructor<MinderTdl>) cls.getConstructors()[0];
+			minderTdl = minderConstructor.newInstance(null, java.lang.Boolean.FALSE);
+			if(minderTdl == null)
+				return internalServerError("Cannot get wrapperdefs.");
+		} catch (InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException e1) {
+			return internalServerError(e1.toString());
+		}
+			
+		//get wrappers from tdl. minder wrapper is equal to gitb actor 
+		Set<String> wrapperDefs = JavaConversions.setAsJavaSet(minderTdl.wrapperDefs());
+		Roles actors = new Roles();
+		
+		//get wrappers
+		for (String wrapperDef : wrapperDefs) {
+			if(!wrapperDef.contains("$") && !wrapperDef.equals("NULLWRAPPER"))
+			{
+				Wrapper wrapper = Wrapper.findByName(wrapperDef);
+				List<WrapperVersion> wrapperVersions = WrapperVersion.getAllByWrapper(wrapper);
+				//set all wrapper versions as actor
+				for (WrapperVersion wrapperVersion : wrapperVersions) {
+					TestRole testRole = new TestRole();
+					testRole.setId(wrapperVersion.id.toString());
+					testRole.setName(wrapper.name + "_" + wrapperVersion.version);
+					testRole.setRole(TestRoleEnumeration.SUT);
+					
+					List<GitbEndpoint> gitbEndpoints = wrapperVersion.gitbEndpoints;
+					//set all endpoints
+					for (GitbEndpoint gitbEndpoint : gitbEndpoints) {
+						Endpoint endpoint = new Endpoint();
+						endpoint.setName(gitbEndpoint.name);
+						endpoint.setDesc(gitbEndpoint.description);
+						
+						List<GitbParameter> gitbParameters = gitbEndpoint.params;
+						
+						for (GitbParameter gitbParameter : gitbParameters) {
+							Parameter parameter = new Parameter();
+							parameter.setName(gitbParameter.name);
+							parameter.setDesc(gitbParameter.description);
+							parameter.setValue(gitbParameter.value);
+							parameter.setKind(ConfigurationType.valueOf(gitbParameter.kind.toString()));
+							parameter.setUse(UsageEnumeration.valueOf(gitbParameter.use.toString()));
+							endpoint.getConfig().add(parameter);
+						}
+						testRole.getEndpoint().add(endpoint);
+					}
+					
+					actors.getActor().add(testRole);
+				}
+			}
 		}
 		
-		GetTestCaseDefinitionResponse serviceResponse = new GetTestCaseDefinitionResponse();
+		gitbTestCase.setActors(actors);
+		
+		//get rivets
+		Sequence sequence = new Sequence();
+		List<Rivet> rivets = minderTdl.RivetDefs();
+		
+		//get sequences from rivets and set
+		for (Rivet rivet : rivets) {
+			TestStep testStep = null;
+			switch (rivet.tplStepType()) {
+			case SEQUENCE://TODO:can be removed
+				testStep = new Sequence();
+				break;
+			case MESSAGING_STEP:
+				testStep = new MessagingStep();
+				break;
+			case DECISION_STEP:
+				testStep = new DecisionStep();
+				break;
+			default:
+				testStep = new TestStep();
+				break;
+			}
+			
+			testStep.setId(String.valueOf(rivet.tplStepId()));
+			testStep.setDesc(rivet.tplStepDescription());
+			sequence.getMsgOrDecisionOrLoop().add(testStep);
+		}
+		
+		
+		gitbTestCase.setSteps(sequence);
+		
+		//set test case id
+		gitbTestCase.setId(basicRequest.getTcId());
 		
 		serviceResponse.setTestcase(gitbTestCase);
 				
@@ -350,174 +461,6 @@ public class GitbTestbedController extends Controller {
 
 		response().setContentType(contentProcessor.getContentType());
 		return ok(responseValue);
-	}
-	
-	public static Result getGetTestCaseDefinitions() {
-
-		/*
-		 * Handling the request message
-		 */
-		IRestContentProcessor contentProcessor = null;
-		try {
-			contentProcessor = RestUtils.createContentProcessor(request().getHeader(CONTENT_TYPE), request().body());
-		} catch (IllegalArgumentException e) {
-			return badRequest(e.getMessage());
-		}
-	
-		//tcId parameter matches tdl id.
-		List<Tdl> tdls = Tdl.getAllUnparametricTdls();
-		List<com.gitb.tpl.v1.TestCase> testCases = new ArrayList<com.gitb.tpl.v1.TestCase>();
-		
-		if(tdls.size() == 0)
-			return internalServerError("There is not any gitb test cases.");
-		
-		try {
-			for (Tdl tdl : tdls) {
-				testCases.add(getGitbTestCase(tdl));
-			}
-		} catch (Exception e) {
-			return internalServerError(e.getMessage());
-		}
-		
-		GetTestCaseDefinitions serviceResponse = new GetTestCaseDefinitions();
-		serviceResponse.setTestcases(testCases);
-		
-		String responseValue = null;
-
-		try {
-            responseValue = contentProcessor.prepareResponse(GetTestCaseDefinitions.class.getName(), serviceResponse);
-        } catch (ParseException e) {
-            return internalServerError(e.getMessage());
-        }
-		
-		System.out.println("responseValue:" + responseValue);
-
-		response().setContentType(contentProcessor.getContentType());
-		return ok(responseValue);
-	}
-	
-	private static com.gitb.tpl.v1.TestCase getGitbTestCase(Tdl tdl) throws Exception
-	{
-		TestCase minderTestCase = TestCase.findById(tdl.testCase.id);
-		
-		//checks $wrapper existence. these wappers are not applicable with gitb
-		List<WrapperParam> wrapperParams = WrapperParam.findByTestCase(tdl);
-		if(wrapperParams != null && !wrapperParams.isEmpty())
-			throw new Exception("This testcase is not compatible with GITB");
-		
-	    com.gitb.tpl.v1.TestCase gitbTestCase = new com.gitb.tpl.v1.TestCase(); 
-	    
-	    //sets metadata
-	    Metadata metadata = new Metadata();
-		metadata.setName(minderTestCase.name + "_" + tdl.version);
-		metadata.setVersion(tdl.version);
-		metadata.setAuthors(minderTestCase.owner.name);
-		metadata.setDescription(minderTestCase.shortDescription);
-		metadata.setPublished(dateFormat.format(tdl.creationDate));
-		metadata.setLastModified(dateFormat.format(tdl.creationDate));
-		
-		gitbTestCase.setMetadata(metadata);
-		
-		//preliminary is not supported so that set null
-		gitbTestCase.setPreliminary(new Preliminary());
-		
-		//compiles tdl script and interprets it
-		TestAssertion testAssertion = TestAssertion.findById(minderTestCase.testAssertion.id);		
-		TestGroup testGroup = TestGroup.findById(testAssertion.testGroup.id);  
-		String packageRoot = "_" + testGroup.id;  
-		String packagePath = packageRoot + "/_" + minderTestCase.id;  
-		Class<MinderTdl> cls = TdlCompiler.compileTdl(packageRoot, packagePath, testGroup.dependencyString, minderTestCase.name, tdl.tdl, tdl.version);
-		
-		//initializes MinderTdl class
-		MinderTdl minderTdl = null;
-		try {
-			Constructor<MinderTdl> minderConstructor = (Constructor<MinderTdl>) cls.getConstructors()[0];
-			minderTdl = minderConstructor.newInstance(null, java.lang.Boolean.FALSE);
-			if(minderTdl == null)
-				throw new Exception("Cannot get wrapperdefs.");
-		} catch (InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException e1) {
-			throw new Exception(e1.toString());
-		}
-			
-		//get wrappers from tdl. minder wrapper is equal to gitb actor 
-		Set<String> wrapperDefs = JavaConversions.setAsJavaSet(minderTdl.wrapperDefs());
-		Roles actors = new Roles();
-		
-		//get wrappers
-		for (String wrapperDef : wrapperDefs) {
-			if(!wrapperDef.contains("$") && !wrapperDef.equals("NULLWRAPPER"))
-			{
-				Wrapper wrapper = Wrapper.findByName(wrapperDef);
-				List<WrapperVersion> wrapperVersions = WrapperVersion.getAllByWrapper(wrapper);
-				//set all wrapper versions as actor
-				for (WrapperVersion wrapperVersion : wrapperVersions) {
-					TestRole testRole = new TestRole();
-					testRole.setId(wrapperVersion.id.toString());
-					testRole.setName(wrapper.name + "_" + wrapperVersion.version);
-					testRole.setRole(TestRoleEnumeration.SUT);
-					
-					List<GitbEndpoint> gitbEndpoints = wrapperVersion.gitbEndpoints;
-					//set all endpoints
-					for (GitbEndpoint gitbEndpoint : gitbEndpoints) {
-						Endpoint endpoint = new Endpoint();
-						endpoint.setName(gitbEndpoint.name);
-						endpoint.setDesc(gitbEndpoint.description);
-						
-						List<GitbParameter> gitbParameters = gitbEndpoint.params;
-						
-						for (GitbParameter gitbParameter : gitbParameters) {
-							Parameter parameter = new Parameter();
-							parameter.setName(gitbParameter.name);
-							parameter.setDesc(gitbParameter.description);
-							parameter.setValue(gitbParameter.value);
-							parameter.setKind(ConfigurationType.valueOf(gitbParameter.kind.toString()));
-							parameter.setUse(UsageEnumeration.valueOf(gitbParameter.use.toString()));
-							endpoint.getConfig().add(parameter);
-						}
-						testRole.getEndpoint().add(endpoint);
-					}
-					
-					actors.getActor().add(testRole);
-				}
-			}
-		}
-		
-		gitbTestCase.setActors(actors);
-		
-		//get rivets
-		Sequence sequence = new Sequence();
-		List<Rivet> rivets = minderTdl.RivetDefs();
-		
-		//get sequences from rivets and set
-		for (Rivet rivet : rivets) {
-			TestStep testStep = null;
-			switch (rivet.tplStepType()) {
-			case SEQUENCE://TODO:can be removed
-				testStep = new Sequence();
-				break;
-			case MESSAGING_STEP:
-				testStep = new MessagingStep();
-				break;
-			case DECISION_STEP:
-				testStep = new DecisionStep();
-				break;
-			default:
-				testStep = new TestStep();
-				break;
-			}
-			
-			testStep.setId(String.valueOf(rivet.tplStepId()));
-			testStep.setDesc(rivet.tplStepDescription());
-			sequence.getMsgOrDecisionOrLoop().add(testStep);
-		}
-		
-		
-		gitbTestCase.setSteps(sequence);
-		
-		//set test case id
-		gitbTestCase.setId(String.valueOf(tdl.id));
-		
-		return gitbTestCase;
 	}
 
 }
