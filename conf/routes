@@ -128,6 +128,7 @@ POST        /rest/testbed/initiate               rest.controllers.GitbTestbedCon
 POST        /rest/testbed/configure              rest.controllers.GitbTestbedController.configure()
 POST        /rest/testbed/start                  rest.controllers.GitbTestbedController.start()
 POST        /rest/testbed/stop                   rest.controllers.GitbTestbedController.stop()
+POST        /rest/testbed/getTestCaseDefinitions rest.controllers.GitbTestbedController.getGetTestCaseDefinitions()
 
 
 ##-------------

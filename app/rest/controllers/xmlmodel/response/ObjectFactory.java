@@ -25,6 +25,7 @@ import javax.xml.namespace.QName;
 public class ObjectFactory {
 
     private final static QName _MinderResponse_QNAME = new QName("", "minderResponse");
+    private final static QName _GetTestCaseDefinitions_QNAME = new QName("", "getTestCaseDefinitions");
 
     /**
      * Create a new ObjectFactory that can be used to create new instances of schema derived classes for package: rest.controllers.xmlmodel.response
@@ -48,6 +49,19 @@ public class ObjectFactory {
     @XmlElementDecl(namespace = "", name = "minderResponse")
     public JAXBElement<MinderResponse> createMinderResponse(MinderResponse value) {
         return new JAXBElement<MinderResponse>(_MinderResponse_QNAME, MinderResponse.class, null, value);
+    }
+    
+    public GetTestCaseDefinitions createGetTestCaseDefinitions() {
+        return new GetTestCaseDefinitions();
+    }
+
+    /**
+     * Create an instance of {@link JAXBElement }{@code <}{@link MinderResponse }{@code >}}
+     * 
+     */
+    @XmlElementDecl(namespace = "", name = "getTestCaseDefinitions")
+    public JAXBElement<GetTestCaseDefinitions> createGetTestCaseDefinitions(GetTestCaseDefinitions value) {
+        return new JAXBElement<GetTestCaseDefinitions>(_GetTestCaseDefinitions_QNAME, GetTestCaseDefinitions.class, null, value);
     }
 
 }
