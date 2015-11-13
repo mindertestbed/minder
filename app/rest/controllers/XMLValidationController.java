@@ -6,16 +6,15 @@ import org.beybunproject.xmlContentVerifier.Schema;
 import play.mvc.Controller;
 import play.mvc.Result;
 import rest.controllers.common.RestUtils;
-import rest.controllers.contentvalidation.verifier.ISchemaVerifier;
-import rest.controllers.contentvalidation.verifier.SchematronVerifier;
-import rest.controllers.contentvalidation.verifier.XSDVerifier;
-import rest.controllers.contentvalidation.request.ValidationRequest;
+import rest.controllers.contentvalidationverifier.ISchemaVerifier;
+import rest.controllers.contentvalidationverifier.SchematronVerifier;
+import rest.controllers.contentvalidationverifier.XSDVerifier;
+import rest.models.RestValidationRequest;
 import rest.controllers.restbodyprocessor.IRestContentProcessor;
-import rest.controllers.xmlmodel.response.MinderResponse;
+import rest.models.RestMinderResponse;
 
 import java.net.MalformedURLException;
 import java.text.ParseException;
-import java.util.Arrays;
 
 import static rest.controllers.common.Constants.*;
 
@@ -47,7 +46,7 @@ public class XMLValidationController extends Controller {
      * At last, method returns REST response to the client.
      */
     public static Result validateContent() {
-        MinderResponse minderResponse = new MinderResponse();
+        RestMinderResponse minderResponse = new RestMinderResponse();
         
         String[] parts = request().body().toString().split("Some\\(");
         if(parts.length >0){
@@ -67,9 +66,9 @@ public class XMLValidationController extends Controller {
             return badRequest(e.getMessage());
         }
 
-        ValidationRequest validationRequest = null;
+        RestValidationRequest validationRequest = null;
         try {
-            validationRequest = (ValidationRequest) contentProcessor.parseRequest(ValidationRequest.class.getName());
+            validationRequest = (RestValidationRequest) contentProcessor.parseRequest(RestValidationRequest.class.getName());
         } catch (ParseException e) {
             return internalServerError(e.getMessage());
 
@@ -86,7 +85,7 @@ public class XMLValidationController extends Controller {
         * */
         String responseValue = null;
         try {
-            responseValue = contentProcessor.prepareResponse(MinderResponse.class.getName(), minderResponse);
+            responseValue = contentProcessor.prepareResponse(RestMinderResponse.class.getName(), minderResponse);
         } catch (ParseException e) {
             return internalServerError(e.getMessage());
         }
@@ -103,7 +102,7 @@ public class XMLValidationController extends Controller {
      * It creates the ISchemaVerifier object according to the schema type: XSD or schematron. A Schema verifier hides the
      * details of schema and schematron validations and prevents many "if-then-else"s by using polymorphism and interface.
      */
-    private static MinderResponse checkValidation(MinderResponse minderResponse, ValidationRequest validationRequest) {
+    private static RestMinderResponse checkValidation(RestMinderResponse minderResponse, RestValidationRequest validationRequest) {
         ISchemaVerifier schemaVerifier = null;
         switch (validationRequest.getSchemaType()) {
             case TYPE_XSD:

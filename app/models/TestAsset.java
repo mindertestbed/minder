@@ -17,8 +17,8 @@ public class TestAsset extends Model{
   public Long id;
 
   @ManyToOne
-  @Column(name = "group", nullable = false)
-  public TestGroup group;
+  @Column(nullable = false)
+  public TestGroup testGroup;
 
   /**
    * The name of the asset,
@@ -26,8 +26,7 @@ public class TestAsset extends Model{
   @Column(nullable = false)
   public String name;
 
-  private static final Finder<Long, TestAsset> find = new Finder<>(Long.class,
-      TestAsset.class);
+  private static final Finder<Long, TestAsset> find = new Finder<>(TestAsset.class);
 
   @Column(length = ModelConstants.SHORT_DESC_LENGTH, columnDefinition = "TEXT")
   public String shortDescription;

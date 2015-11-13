@@ -1,6 +1,5 @@
 package controllers;
 
-import global.Global;
 import global.Util;
 import models.ModelConstants;
 import models.TestAsset;
@@ -13,7 +12,7 @@ import play.mvc.Controller;
 import play.mvc.Http;
 import play.mvc.Result;
 import play.mvc.Security;
-import views.html.testDesigner.group.*;
+import views.html.testDesigner.group.testAssetEditor;
 
 import java.io.*;
 
@@ -75,7 +74,7 @@ public class TestAssetController extends Controller {
         }
 
         asset = new TestAsset();
-        asset.group = group;
+        asset.testGroup = group;
         asset.shortDescription = model.shortDescription;
         asset.description = model.description;
         asset.name = model.name;
@@ -130,7 +129,7 @@ public class TestAssetController extends Controller {
       TestAssetModel model = filledForm.get();
       TestAsset ta = TestAsset.findById(model.id);
       User localuser = Authentication.getLocalUser();
-      if (!localuser.email.equals("root@minder") && !ta.group.owner.email.equals(localuser.email)) {
+      if (!localuser.email.equals("root@minder") && !ta.testGroup.owner.email.equals(localuser.email)) {
         return badRequest("You cant use this resource");
       }
 
@@ -138,7 +137,7 @@ public class TestAssetController extends Controller {
       //file upload part
       User localUser = Authentication.getLocalUser();
       try {
-        handleFileUpload(ta.group.id, model.name);
+        handleFileUpload(ta.testGroup.id, model.name);
       } catch (Exception ex) {
         filledForm.reject(ex.getMessage());
         return badRequest(testAssetEditor.render(filledForm, null));
@@ -151,7 +150,7 @@ public class TestAssetController extends Controller {
 
       Logger.info("Done updating test asset " + ta.name + ":" + ta.id);
 
-      return redirect(controllers.routes.GroupController.getGroupDetailView(ta.group.id, "assets"));
+      return redirect(controllers.routes.GroupController.getGroupDetailView(ta.testGroup.id, "assets"));
     }
   }
 
@@ -169,9 +168,9 @@ public class TestAssetController extends Controller {
       }
       User user = Authentication.getLocalUser();
 
-      new File("assets/_" + ta.group.id + "/" + ta.name).delete();
+      new File("assets/_" + ta.testGroup.id + "/" + ta.name).delete();
 
-      return redirect(controllers.routes.GroupController.getGroupDetailView(ta.group.id, "assets"));
+      return redirect(controllers.routes.GroupController.getGroupDetailView(ta.testGroup.id, "assets"));
     }
   }
 
@@ -184,7 +183,7 @@ public class TestAssetController extends Controller {
       User user = Authentication.getLocalUser();
       response().setContentType("application/x-download");
       response().setHeader("Content-disposition", "attachment; filename=" + ta.name);
-      return ok(new File("assets/_" + ta.group.id + "/" + ta.name));
+      return ok(new File("assets/_" + ta.testGroup.id + "/" + ta.name));
     }
   }
 
