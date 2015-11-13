@@ -51,7 +51,7 @@ import play.mvc.Controller;
 import play.mvc.Result;
 import rest.controllers.common.RestUtils;
 import rest.controllers.restbodyprocessor.IRestContentProcessor;
-import rest.controllers.testbed.GetTestCaseDefinitions;
+import rest.models.GetTestCaseDefinitions;
 import scala.collection.JavaConversions;
 
 public class GitbTestbedController extends Controller {

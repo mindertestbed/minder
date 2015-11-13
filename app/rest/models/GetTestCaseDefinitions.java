@@ -1,4 +1,4 @@
-package rest.controllers.testbed;
+package rest.models;
 
 import java.util.ArrayList;
 import java.util.List;
