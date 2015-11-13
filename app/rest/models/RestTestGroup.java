@@ -33,14 +33,24 @@ import javax.xml.bind.annotation.*;
 @XmlRootElement(name = "testGroup")
 public class RestTestGroup {
 
-    @XmlElement(required = true)
+    @XmlElement(required = false)
+    protected String id;
+
+    @XmlElement(required = false)
     protected String groupName;
 
-    @XmlElement(required = true)
+    @XmlElement(required = false)
     protected String shortDescription;
 
     @XmlElement(required = false)
     protected String description;
+
+    @XmlElement(required = false)
+    protected String owner;
+
+    @XmlElement(required = false)
+    protected String dependencyString;
+
 
     public String getGroupName() {
         return groupName;
@@ -65,4 +75,20 @@ public class RestTestGroup {
     public void setDescription(String description) {
         this.description = description;
     }
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
+    }
+
+    public String getOwner() { return owner;}
+
+    public void setOwner(String owner) {this.owner = owner;}
+
+    public String getDependencyString() {return dependencyString;}
+
+    public void setDependencyString(String dependencyString) {this.dependencyString = dependencyString;}
 }

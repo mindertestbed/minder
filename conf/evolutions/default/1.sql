@@ -110,7 +110,7 @@ create table TestAssertion (
 
 create table TestAsset (
   id                        bigserial not null,
-  group_id                  bigint,
+  test_group_id             bigint,
   name                      varchar(255) not null,
   short_description         TEXT,
   description               TEXT,
@@ -261,8 +261,8 @@ alter table TestAssertion add constraint fk_TestAssertion_testGroup_14 foreign k
 create index ix_TestAssertion_testGroup_14 on TestAssertion (test_group_id);
 alter table TestAssertion add constraint fk_TestAssertion_owner_15 foreign key (owner_id) references Users (id);
 create index ix_TestAssertion_owner_15 on TestAssertion (owner_id);
-alter table TestAsset add constraint fk_TestAsset_group_16 foreign key (group_id) references TestGroup (id);
-create index ix_TestAsset_group_16 on TestAsset (group_id);
+alter table TestAsset add constraint fk_TestAsset_testGroup_16 foreign key (test_group_id) references TestGroup (id);
+create index ix_TestAsset_testGroup_16 on TestAsset (test_group_id);
 alter table TestCase add constraint fk_TestCase_testAssertion_17 foreign key (test_assertion_id) references TestAssertion (id);
 create index ix_TestCase_testAssertion_17 on TestCase (test_assertion_id);
 alter table TestCase add constraint fk_TestCase_owner_18 foreign key (owner_id) references Users (id);

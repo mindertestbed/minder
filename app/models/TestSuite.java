@@ -35,7 +35,7 @@ public class TestSuite extends Model {
   public User owner;
 
   @ManyToOne
-  @Column(name = "group", nullable = false)
+  @Column(nullable = false)
   public TestGroup testGroup;
 
 

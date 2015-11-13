@@ -1,17 +1,9 @@
 package models;
 
-import java.util.List;
-
-import javax.persistence.CascadeType;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.FetchType;
-import javax.persistence.Id;
-import javax.persistence.ManyToOne;
-import javax.persistence.OneToMany;
-import javax.persistence.Table;
-
 import com.avaje.ebean.Model;
+
+import javax.persistence.*;
+import java.util.List;
 
 /**
  * Created by yerlibilgin on 22/12/14.
@@ -23,7 +15,7 @@ public class TestAssertion extends Model {
   public Long id;
 
   @ManyToOne
-  @Column(name = "group", nullable = false)
+  @Column(nullable = false)
   public TestGroup testGroup;
 
   @Column(nullable = false, unique = true)

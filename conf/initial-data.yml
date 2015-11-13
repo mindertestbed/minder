@@ -85,49 +85,49 @@ groups:
     testAssets:
     - !!models.TestAsset
         name: books.xsd
-        group: *sampleGroup
+        testGroup: *sampleGroup
     - !!models.TestAsset
         name: keys.sch
-        group: *sampleGroup
+        testGroup: *sampleGroup
     - !!models.TestAsset
         name: phases.sch
-        group: *sampleGroup
+        testGroup: *sampleGroup
     - !!models.TestAsset
         name: simple-namespaces.sch
-        group: *sampleGroup
+        testGroup: *sampleGroup
     - !!models.TestAsset
         name: simple.sch
-        group: *sampleGroup
+        testGroup: *sampleGroup
     - !!models.TestAsset
         name: library.jar
-        group: *sampleGroup
+        testGroup: *sampleGroup
     - !!models.TestAsset
         name: schematron.jar
-        group: *sampleGroup
+        testGroup: *sampleGroup
     - !!models.TestAsset
         name: library.zip
-        group: *sampleGroup
+        testGroup: *sampleGroup
     - !!models.TestAsset
         name: schematron.zip
-        group: *sampleGroup
+        testGroup: *sampleGroup
     - !!models.TestAsset
         name: sample-book.xml
-        group: *sampleGroup
+        testGroup: *sampleGroup
     - !!models.TestAsset
         name: sample-library-invalid.xml
-        group: *sampleGroup
+        testGroup: *sampleGroup
     - !!models.TestAsset
         name: sample-library.xml
-        group: *sampleGroup
+        testGroup: *sampleGroup
     - !!models.TestAsset
         name: simple-input-invalid.xml
-        group: *sampleGroup
+        testGroup: *sampleGroup
     - !!models.TestAsset
         name: simple-input-namespaces-invalid.xml
-        group: *sampleGroup
+        testGroup: *sampleGroup
     - !!models.TestAsset
         name: simple-input.xml
-        group: *sampleGroup
+        testGroup: *sampleGroup
 
 #wrappers
 wrappers:

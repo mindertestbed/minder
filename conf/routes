@@ -120,9 +120,14 @@ POST        /updateSettings                            controllers.SettingsContr
 GET         /rest/login                                rest.controllers.LoginController.login
 POST        /rest/login                                rest.controllers.LoginController.doLogin
 POST        /rest/validatecontent                      rest.controllers.XMLValidationController.validateContent
+#Rest test group management
 POST        /rest/editdependency                       rest.controllers.TestGroupController.editDependency
 POST        /rest/getdependency                        rest.controllers.TestGroupController.getDependency
 POST        /rest/addTestGroup                         rest.controllers.TestGroupController.addTestGroup
+POST        /rest/editTestGroup                        rest.controllers.TestGroupController.editTestGroup
+POST        /rest/deleteTestGroup                      rest.controllers.TestGroupController.deleteTestGroup
+POST        /rest/getTestGroup                         rest.controllers.TestGroupController.getTestGroup
+
 
 #GITB Testbed Rest Services
 POST        /rest/testbed/getTestCaseDefinition        rest.controllers.GitbTestbedController.getTestCaseDefinition()
