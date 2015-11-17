@@ -2,8 +2,10 @@ package models;
 
 import com.avaje.ebean.ExpressionList;
 import com.avaje.ebean.Model;
+import com.itextpdf.text.pdf.PdfStructTreeController.returnType;
 
 import javax.persistence.*;
+
 import java.util.List;
 
 /**
@@ -24,6 +26,8 @@ public class Job extends AbstractJob {
 
   public static Job findById(Long id) {
     Job byId = find.byId(id);
+    if(byId == null)
+    	return null;
     byId.owner = User.findById(byId.owner.id);
     return byId;
   }

@@ -5,28 +5,37 @@ import java.lang.reflect.InvocationTargetException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
 
+import minderengine.MinderSignalRegistry;
+import minderengine.MinderWrapperRegistry;
+import minderengine.SessionMap;
 import models.GitbEndpoint;
 import models.GitbJob;
 import models.GitbParameter;
 import models.MappedWrapper;
+import models.TOperationType;
 import models.Tdl;
 import models.TestAssertion;
 import models.TestCase;
 import models.TestGroup;
+import models.TestRun;
 import models.User;
+import models.UserHistory;
 import models.Wrapper;
 import models.WrapperParam;
 import models.WrapperVersion;
 import mtdl.MinderTdl;
+import mtdl.SignalSlotInfoProvider;
 import mtdl.TdlCompiler;
 import mtdl.Rivet;
 
 import com.avaje.ebean.Ebean;
 import com.gitb.core.v1.Actor;
+import com.gitb.core.v1.ActorConfiguration;
 import com.gitb.core.v1.ConfigurationType;
 import com.gitb.core.v1.Endpoint;
 import com.gitb.core.v1.Metadata;
@@ -37,6 +46,8 @@ import com.gitb.core.v1.TestRoleEnumeration;
 import com.gitb.core.v1.UsageEnumeration;
 import com.gitb.tbs.v1.BasicCommand;
 import com.gitb.tbs.v1.BasicRequest;
+import com.gitb.tbs.v1.ConfigureRequest;
+import com.gitb.tbs.v1.ConfigureResponse;
 import com.gitb.tbs.v1.GetActorDefinitionRequest;
 import com.gitb.tbs.v1.GetActorDefinitionResponse;
 import com.gitb.tbs.v1.GetTestCaseDefinitionResponse;
@@ -47,7 +58,10 @@ import com.gitb.tpl.v1.Preliminary;
 import com.gitb.tpl.v1.Sequence;
 import com.gitb.tpl.v1.TestStep;
 
+import controllers.TestRunContext;
+import controllers.common.enumeration.OperationType;
 import play.mvc.Controller;
+import play.mvc.Http;
 import play.mvc.Result;
 import rest.controllers.common.RestUtils;
 import rest.controllers.restbodyprocessor.IRestContentProcessor;
@@ -195,28 +209,21 @@ public class GitbTestbedController extends Controller {
 		
 		//tcId parameter matches tdl id.
 		Tdl tdl = Tdl.findById(Long.parseLong(basicRequest.getTcId()));
-		TestCase minderTestCase = TestCase.findById(tdl.testCase.id);
 		
-		if(tdl != null)
+		if(tdl == null)
 			return internalServerError("Gitb test case not existed.");
+		
+		TestCase minderTestCase = TestCase.findById(tdl.testCase.id);
 		
 		GitbJob gitbJob = GitbJob.findByTdl(tdl);
 		
 		//if job is not existed, create one
 		if(gitbJob == null)
 		{
+			gitbJob = new GitbJob();
 			gitbJob.name = minderTestCase.name + "_" + tdl.version + "_job";
 			gitbJob.tdl = tdl;
-						 
-			String authorizationData = request().getHeader(AUTHORIZATION);
-
-	        /*
-	        * Parse client request
-	        */   
-			 HashMap<String,String> clientRequest = RestUtils.createHashMapOfClientRequest(authorizationData);
-		        
-			User user = User.findByEmail(clientRequest.get("username"));
-			gitbJob.owner = user;
+			gitbJob.owner = getCurrentUser(request());
 		
 		 try {
 		      Ebean.beginTransaction();
@@ -262,15 +269,28 @@ public class GitbTestbedController extends Controller {
 			return badRequest(e.getMessage());
 		}
 
-//		ValidationRequest validationRequest = null;
-//		try {
-//			validationRequest = (ValidationRequest) contentProcessor
-//					.parseRequest(ValidationRequest.class.getName());
-//		} catch (ParseException e) {
-//			return internalServerError(e.getMessage());
-//
-//		}
+		ConfigureRequest configureRequest = null;
+		try {
+			configureRequest = (ConfigureRequest) contentProcessor
+					.parseRequest(ConfigureRequest.class.getName());
+		} catch (ParseException e) {
+			return internalServerError(e.getMessage());
+
+		}
+		
+		String tcInstanceId = configureRequest.getTcInstanceId();
+		List<ActorConfiguration> configurations = configureRequest.getConfigs();
+		
+		
+		ConfigureResponse serviceResponse = new ConfigureResponse();		
+		
 		String responseValue = null;
+		
+		try {
+            responseValue = contentProcessor.prepareResponse(ConfigureResponse.class.getName(), serviceResponse);
+        } catch (ParseException e) {
+            return internalServerError(e.getMessage());
+        }
 
 		System.out.println("responseValue:" + responseValue);
 
@@ -296,15 +316,27 @@ public class GitbTestbedController extends Controller {
 					.parseRequest(BasicCommand.class.getName());
 		} catch (ParseException e) {
 			return internalServerError(e.getMessage());
-
 		}
 		
 		GitbJob gitbJob = GitbJob.findById(Long.valueOf(basicCommand.getTcInstanceId()));
 		
+		if (gitbJob == null)
+			return internalServerError("A job with id [" + basicCommand.getTcInstanceId() + "] was not found!");
+		
+		User currentUser = getCurrentUser(request());
+		SessionMap.registerObject(currentUser.email, "signalRegistry", new MinderSignalRegistry());
+        SignalSlotInfoProvider.setSignalSlotInfoProvider(MinderWrapperRegistry.get());
+
+		TestRunContext testRunContext = createTestRun(gitbJob, currentUser);
+		
+		testRunContext.run();
+		
+		ConfigureResponse serviceResponse = new ConfigureResponse();		
+		
 		String responseValue = null;
 		
 		try {
-            responseValue = contentProcessor.prepareResponse(com.gitb.tbs.v1.Void.class.getName(), new com.gitb.tbs.v1.Void());
+            responseValue = contentProcessor.prepareResponse(ConfigureResponse.class.getName(), serviceResponse);
         } catch (ParseException e) {
             return internalServerError(e.getMessage());
         }
@@ -312,7 +344,8 @@ public class GitbTestbedController extends Controller {
 		System.out.println("responseValue:" + responseValue);
 
 		response().setContentType(contentProcessor.getContentType());
-		return ok(responseValue);
+		
+		return ok(responseValue);	
 	}
 
 	public static Result stop() {
@@ -338,17 +371,20 @@ public class GitbTestbedController extends Controller {
 		
 		GitbJob gitbJob = GitbJob.findById(Long.valueOf(basicCommand.getTcInstanceId()));
 		
+		ConfigureResponse serviceResponse = new ConfigureResponse();		
+		
 		String responseValue = null;
-
+		
 		try {
-            responseValue = contentProcessor.prepareResponse(com.gitb.tbs.v1.Void.class.getName(), new com.gitb.tbs.v1.Void());
+            responseValue = contentProcessor.prepareResponse(ConfigureResponse.class.getName(), serviceResponse);
         } catch (ParseException e) {
             return internalServerError(e.getMessage());
         }
-		
+
 		System.out.println("responseValue:" + responseValue);
 
 		response().setContentType(contentProcessor.getContentType());
+		
 		return ok(responseValue);
 	}
 	
@@ -518,6 +554,38 @@ public class GitbTestbedController extends Controller {
 		gitbTestCase.setId(String.valueOf(tdl.id));
 		
 		return gitbTestCase;
+	}
+	
+	private static User getCurrentUser(Http.Request request)
+	{
+		String authorizationData = request.getHeader(AUTHORIZATION);
+
+        /*
+        * Parse client request
+        */   
+		 HashMap<String,String> clientRequest = RestUtils.createHashMapOfClientRequest(authorizationData);
+	        
+		return User.findByEmail(clientRequest.get("username"));
+	}
+	
+	
+	private static TestRunContext createTestRun(GitbJob job, User user)
+	{
+		TestRun testRun = new TestRun();		
+		testRun.date = new Date();				    
+		testRun.job = job;
+		
+		UserHistory userHistory = new UserHistory();				    
+		userHistory.email = user.email;				    
+		userHistory.operationType = new TOperationType();
+		userHistory.operationType.name = OperationType.RUN_TEST_CASE;
+				    
+		userHistory.operationType.save();
+
+		testRun.history = userHistory;				    
+		testRun.runner = user;
+				    
+		return new TestRunContext(testRun);
 	}
 
 }
