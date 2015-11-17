@@ -28,6 +28,8 @@ public class ObjectFactory {
     private final static QName _RestValidationRequest_QNAME = new QName("", "restValidationRequest");
     private final static QName _RestTestGroup_QNAME = new QName("", "restTestGroup");
     private final static QName _RestDependencyString_QNAME = new QName("", "restDependencyString");
+    private final static QName _RestWrapper_QNAME = new QName("", "restWrapper");
+    private final static QName _RestWrapperVersion_QNAME = new QName("", "restWrapperVersion");
 
     /**
      * Create a new ObjectFactory that can be used to create new instances of schema derived classes for package: rest.controllers.xmlmodel.response
@@ -119,5 +121,39 @@ public class ObjectFactory {
     @XmlElementDecl(namespace = "", name = "restTestGroup")
     public JAXBElement<RestTestGroup> createRestTestGroup(RestTestGroup value) {
         return new JAXBElement<RestTestGroup>(_RestTestGroup_QNAME, RestTestGroup.class, null, value);
+    }
+
+    /**
+     * Create an instance of {@link rest.models.RestWrapper }
+     *
+     */
+    public RestWrapper createRestWrapper() {
+        return new RestWrapper();
+    }
+
+    /**
+     * Create an instance of {@link JAXBElement }{@code <}{@link RestWrapper }{@code >}}
+     *
+     */
+    @XmlElementDecl(namespace = "", name = "restWrapper")
+    public JAXBElement<RestWrapper> createRestWrapper(RestWrapper value) {
+        return new JAXBElement<RestWrapper>(_RestWrapper_QNAME, RestWrapper.class, null, value);
+    }
+
+    /**
+     * Create an instance of {@link rest.models.RestWrapperVersion }
+     *
+     */
+    public RestWrapperVersion createRestWrapperVersion() {
+        return new RestWrapperVersion();
+    }
+
+    /**
+     * Create an instance of {@link JAXBElement }{@code <}{@link RestWrapperVersion }{@code >}}
+     *
+     */
+    @XmlElementDecl(namespace = "", name = "restWrapperVersion")
+    public JAXBElement<RestWrapperVersion> createRestWrapperVersion(RestWrapperVersion value) {
+        return new JAXBElement<RestWrapperVersion>(_RestWrapperVersion_QNAME, RestWrapperVersion.class, null, value);
     }
 }

@@ -71,7 +71,7 @@ public class TestGroupController extends Controller {
             return internalServerError(e.getCause().toString());
         }
 
-        if (restTestGroup.getId().equals(""))
+        if (null==restTestGroup.getId())
             return badRequest("Please provide Test Group ID");
 
 
@@ -147,7 +147,7 @@ public class TestGroupController extends Controller {
             return internalServerError(e.getCause().toString());
         }
 
-        if (restTestGroup.getId().equals(""))
+        if (null==restTestGroup.getId())
             return badRequest("Please provide Test Group ID");
 
 
@@ -229,11 +229,11 @@ public class TestGroupController extends Controller {
             return internalServerError(e.getCause().toString());
         }
 
-        if (restTestGroup.getId().equals(""))
+        if (null==restTestGroup.getId())
             return badRequest("Please provide Test Group ID");
-        if (restTestGroup.getGroupName().equals(""))
+        if (null==restTestGroup.getGroupName())
             return badRequest("Please provide Test Group Name");
-        if (restTestGroup.getShortDescription().equals(""))
+        if (null==restTestGroup.getShortDescription())
             return badRequest("Please provide short description");
 
 
@@ -315,9 +315,9 @@ public class TestGroupController extends Controller {
             return internalServerError(e.getCause().toString());
         }
 
-        if (restTestGroup.getGroupName().equals(""))
+        if (null==restTestGroup.getGroupName())
             return badRequest("Please provide Test Group Name");
-        if (restTestGroup.getShortDescription().equals(""))
+        if (null==restTestGroup.getShortDescription())
             return badRequest("Please provide short description");
 
 
@@ -406,6 +406,11 @@ public class TestGroupController extends Controller {
         } catch (ParseException e) {
             return internalServerError(e.getCause().toString());
         }
+
+        if (null==dependencyString.getGroupId())
+            return badRequest("Please provide Test Group id");
+        if (null==dependencyString.getValue())
+            return badRequest("Please provide dependencyString value, even it is null String");
 
         String fieldName = null;
         try {
