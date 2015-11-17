@@ -13,7 +13,12 @@ import play.Application;
 import play.GlobalSettings;
 import play.Logger;
 import play.api.Play;
+import play.mvc.Result;
+import play.libs.F;
+import play.mvc.Action;
 import play.mvc.Http;
+import rest.controllers.common.RestUtils;
+import rest.controllers.routes;
 import scala.io.BufferedSource;
 import scala.io.Source;
 
@@ -43,17 +48,17 @@ public class Global extends GlobalSettings {
         }
 
 
-        //if(RestUtils.verifyAuthentication(request)) {
+        if (RestUtils.verifyAuthentication(request)) {
             return super.onRequest(request, method);
-        //}
+        }
 
 
-        /*return new Action.Simple() {
+        return new Action.Simple() {
             public F.Promise<Result> call(Http.Context ctx) throws Throwable {
                 System.out.println("Calling action for " + ctx);
                 return F.Promise.pure(redirect(routes.LoginController.login()));
             }
-        };*/
+        };
 
 
     }
