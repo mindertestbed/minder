@@ -26,9 +26,12 @@ import javax.xml.bind.annotation.*;
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "testGroup", propOrder = {
+        "id",
         "groupName",
         "shortDescription",
-        "description"
+        "description",
+        "owner",
+        "dependencyString"
 })
 @XmlRootElement(name = "testGroup")
 public class RestTestGroup {

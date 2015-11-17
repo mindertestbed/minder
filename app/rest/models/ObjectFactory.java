@@ -79,7 +79,7 @@ public class ObjectFactory {
     }
 
     /**
-     * Create an instance of {@link JAXBElement }{@code <}{@link ValidationRequest }{@code >}}
+     * Create an instance of {@link JAXBElement }{@code <}{@link rest.models.RestValidationRequest }{@code >}}
      * 
      */
     @XmlElementDecl(namespace = "", name = "validationRequest")
@@ -87,4 +87,37 @@ public class ObjectFactory {
         return new JAXBElement<RestValidationRequest>(_RestValidationRequest_QNAME, RestValidationRequest.class, null, value);
     }
 
+    /**
+     * Create an instance of {@link rest.models.RestDependencyString }
+     *
+     */
+    public RestDependencyString createRestDependencyString() {
+        return new RestDependencyString();
+    }
+
+    /**
+     * Create an instance of {@link JAXBElement }{@code <}{@link RestDependencyString }{@code >}}
+     *
+     */
+    @XmlElementDecl(namespace = "", name = "restDependencyString")
+    public JAXBElement<RestDependencyString> createRestDependencyString(RestDependencyString value) {
+        return new JAXBElement<RestDependencyString>(_RestDependencyString_QNAME, RestDependencyString.class, null, value);
+    }
+
+    /**
+     * Create an instance of {@link rest.models.RestTestGroup }
+     *
+     */
+    public RestTestGroup createRestTestGroup() {
+        return new RestTestGroup();
+    }
+
+    /**
+     * Create an instance of {@link JAXBElement }{@code <}{@link RestTestGroup }{@code >}}
+     *
+     */
+    @XmlElementDecl(namespace = "", name = "restTestGroup")
+    public JAXBElement<RestTestGroup> createRestTestGroup(RestTestGroup value) {
+        return new JAXBElement<RestTestGroup>(_RestTestGroup_QNAME, RestTestGroup.class, null, value);
+    }
 }
