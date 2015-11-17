@@ -13,10 +13,10 @@ import play.Application;
 import play.GlobalSettings;
 import play.Logger;
 import play.api.Play;
-import play.mvc.Result;
 import play.libs.F;
 import play.mvc.Action;
 import play.mvc.Http;
+import play.mvc.Result;
 import rest.controllers.common.RestUtils;
 import rest.controllers.routes;
 import scala.io.BufferedSource;
@@ -43,7 +43,7 @@ public class Global extends GlobalSettings {
      */
     @SuppressWarnings("rawtypes")
     public play.mvc.Action onRequest(final Http.Request request, Method method) {
-        if ((!request.path().contains("/rest/")) || (request.path().equals("/rest/login"))) {
+        if ((!request.path().contains("/rest/")) || (request.path().equals("/rest/login"))|| (request.path().equals("/rest/doLogin"))) {
             return super.onRequest(request, method);
         }
 
