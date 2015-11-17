@@ -184,6 +184,7 @@ create table UserAuthentication (
   issue_time                timestamp,
   expiry_time               timestamp,
   request_counter           integer,
+  constraint uq_UserAuthentication_user_id unique (user_id),
   constraint pk_UserAuthentication primary key (id))
 ;
 

@@ -8,10 +8,7 @@ import play.data.format.Formats;
 import rest.controllers.common.Constants;
 import rest.controllers.common.RestUtils;
 
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.ManyToOne;
-import javax.persistence.Table;
+import javax.persistence.*;
 import java.util.Date;
 
 /**
@@ -29,7 +26,8 @@ public class UserAuthentication extends Model {
     @Id
     public Long id;
 
-    @ManyToOne
+    @OneToOne
+    @Column(unique = true)
     public User user;
 
     public String realm;
@@ -103,27 +101,15 @@ public class UserAuthentication extends Model {
         userAuthentication.save();
     }
 
-    public static int deleteAllByUserEmail(String userEmail) {
+    public static int deleteByUserEmail(String userEmail) {
         User user = User.findByEmail(userEmail);
 
         Logger.debug("Delete all user authentication records" + userEmail);
 
-        SqlUpdate tangoDown = Ebean.createSqlUpdate("DELETE FROM UserAuthentication WHERE user=:user");
+        SqlUpdate tangoDown = Ebean.createSqlUpdate("DELETE FROM UserAuthentication WHERE user_id="+user.id);
         final int i = tangoDown.execute();
 
         Logger.debug(i + " user authentication records deleted");
-        return i;
-    }
-
-    public static int deleteByUserEmailAndNonce(String userEmail, String serverNonce) {
-        User user = User.findByEmail(userEmail);
-
-        Logger.debug("Delete user authentication record " + userEmail +" "+serverNonce);
-
-        SqlUpdate tangoDown = Ebean.createSqlUpdate("DELETE FROM UserAuthentication WHERE user=:+"+user+" AND serverNonce ="+ serverNonce);
-        final int i = tangoDown.execute();
-
-        Logger.debug(i + " user authentication record deleted");
         return i;
     }
 

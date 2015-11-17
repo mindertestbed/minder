@@ -118,7 +118,7 @@ POST        /updateSettings                            controllers.SettingsContr
 
 ######### REEEEEESSSTTT
 GET         /rest/login                                rest.controllers.LoginController.login
-POST        /rest/login                                rest.controllers.LoginController.doLogin
+GET         /rest/doLogin                              rest.controllers.LoginController.doLogin
 POST        /rest/validatecontent                      rest.controllers.XMLValidationController.validateContent
 #Rest test group management
 POST        /rest/editdependency                       rest.controllers.TestGroupController.editDependency

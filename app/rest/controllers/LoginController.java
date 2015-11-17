@@ -92,6 +92,11 @@ public class LoginController extends Controller {
         */
         HashMap<String,String> clientRequest = RestUtils.createHashMapOfClientRequest(authorizationData);
 
+        UserAuthentication userAuthentication = UserAuthentication.findByUserEmail(clientRequest.get("username"));
+        if (null != userAuthentication) {
+            UserAuthentication.deleteByUserEmail(userAuthentication.user.email);
+        }
+
         System.out.println("Validation Processes Started:");
         /*
         * Check user mail to validate a registered user
