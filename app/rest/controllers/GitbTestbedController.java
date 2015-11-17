@@ -58,6 +58,7 @@ import com.gitb.tpl.v1.Preliminary;
 import com.gitb.tpl.v1.Sequence;
 import com.gitb.tpl.v1.TestStep;
 
+import controllers.TestEngineController;
 import controllers.TestRunContext;
 import controllers.common.enumeration.OperationType;
 import play.mvc.Controller;
@@ -317,19 +318,9 @@ public class GitbTestbedController extends Controller {
 		} catch (ParseException e) {
 			return internalServerError(e.getMessage());
 		}
-		
-		GitbJob gitbJob = GitbJob.findById(Long.valueOf(basicCommand.getTcInstanceId()));
-		
-		if (gitbJob == null)
-			return internalServerError("A job with id [" + basicCommand.getTcInstanceId() + "] was not found!");
-		
-		User currentUser = getCurrentUser(request());
-		SessionMap.registerObject(currentUser.email, "signalRegistry", new MinderSignalRegistry());
-        SignalSlotInfoProvider.setSignalSlotInfoProvider(MinderWrapperRegistry.get());
 
-		TestRunContext testRunContext = createTestRun(gitbJob, currentUser);
-		
-		testRunContext.run();
+		User currentUser = getCurrentUser(request());
+		TestEngineController.enqueueGitbJobWithUser(Long.valueOf(basicCommand.getTcInstanceId()), currentUser);
 		
 		ConfigureResponse serviceResponse = new ConfigureResponse();		
 		
