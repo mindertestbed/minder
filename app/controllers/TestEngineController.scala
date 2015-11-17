@@ -183,6 +183,28 @@ object TestEngineController extends Controller {
         }
       }
   }
+  
+  /**
+   * an action for enqueuing a new job for test engine running
+   * @return
+   */
+  def enqueueGitbJobWithUser(id: Long, user: User) = Action {
+    implicit request =>
+      if (jobQueue.size >= 30) {
+        BadRequest("The job queue is full.")
+      } else {
+        val job = GitbJob.findById(id)
+        if (job == null) {
+          BadRequest("A job with id [" + id + "] was not found!")
+        } else {
+          val java_ctx = play.core.j.JavaHelpers.createJavaContext(request)
+          val java_session = java_ctx.session()
+          jobQueue.offer(createTestRunContext(job, user))
+          queueFeedUpdate();
+          Ok;
+        }
+      }
+  }
 
 
   /**
@@ -209,7 +231,7 @@ object TestEngineController extends Controller {
    * @return
    */
 
-  def createTestRunContext(job: Job, user: User): TestRunContext = {
+  def createTestRunContext(job: AbstractJob, user: User): TestRunContext = {
     Logger.debug("Create Run")
     val testRun = new TestRun()
     testRun.date = new Date()
