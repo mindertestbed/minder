@@ -25,6 +25,7 @@ class TestRunContext(val testRun: TestRun) extends Runnable with TestProcessWatc
   var error = ""
   var job: AbstractJob = Job.findById(testRun.job.id)
   if (job == null) job = SuiteJob.findById(testRun.job.id)
+  if (job == null) job = GitbJob.findById(testRun.job.id)
   val user = testRun.runner;
   val tdl = Tdl.findById(job.tdl.id);
   val testCase = TestCase.findById(tdl.testCase.id)
@@ -71,8 +72,6 @@ class TestRunContext(val testRun: TestRun) extends Runnable with TestProcessWatc
     override def getCurrentTestUserInfo: UserDTO = {
       null
     }
-
-    override def getSUTName(): String = ""
   }
   rg.startTest()
   rg.setReportTemplate(Source.fromInputStream(this.getClass.getResourceAsStream("/taReport.xml")).mkString.getBytes())

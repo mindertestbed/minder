@@ -1,26 +1,26 @@
 package rest.controllers.restbodyprocessor;
 
-import org.w3c.dom.Document;
 import play.mvc.Http;
 
 import javax.xml.bind.*;
 import javax.xml.transform.Source;
 import javax.xml.transform.stream.StreamSource;
+
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.text.ParseException;
 
 /**
  * The xml content processor parse a request body or prepare a response body according using the JAXB XML
- * marshaller/unmarshaller. It has a generic structure which is unaware of the marshalling/unmarshalling class.
- *
+ * marshaller/unmarshaller.
+ * JAXB is a 3rd party library which is embedded playframework.
+ * The class has generic structure which is unaware of the marshalling/unmarshalling object.
  *
  * @author: Melis Ozgur Cetinkaya Demir
  * @date: 16/10/15.
  */
 public class XMLContentProcessor implements IRestContentProcessor {
-    private Document dom;
-    String body;
+    private String body;
 
     public XMLContentProcessor() {}
 
@@ -75,6 +75,11 @@ public class XMLContentProcessor implements IRestContentProcessor {
             throw new ParseException("Error occured during the parsing of request's XML body. The details of the exception "+e.toString(),0);
         }
     }
+
+	@Override
+	public String getContentType() {
+		return "application/xml";
+	}
 
 
 }

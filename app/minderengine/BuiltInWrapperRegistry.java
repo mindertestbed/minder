@@ -15,7 +15,7 @@ import java.util.Properties;
  * A special map that holds the built-in wrappers as local IMinderClient Objects
  * Created by yerlibilgin on 11/12/14.
  */
-public class BuiltInWrapperRegistry extends HashMap<String, BuiltInWrapper> {
+public class BuiltInWrapperRegistry extends HashMap<AdapterIdentifier, BuiltInWrapper> {
   /**
    * A singleton instance that holds the currently registered built-in wrappers
    */
@@ -30,21 +30,40 @@ public class BuiltInWrapperRegistry extends HashMap<String, BuiltInWrapper> {
     return builtInWrapperRegistry;
   }
 
-  public boolean containsWrapper(String label) {
-    return containsKey(label);
+  public boolean containsWrapper(AdapterIdentifier identifier) {
+    return containsKey(identifier);
   }
 
-  public BuiltInWrapper getWrapper(String label) {
-    return get(label);
+  public BuiltInWrapper getWrapper(AdapterIdentifier identifier) {
+    return get(identifier);
+  }
+
+  public boolean containsWrapperByName(String label) {
+    //ignoring versions, find the adapter that matches the name
+    for (AdapterIdentifier key : keySet()) {
+      if (key.getName().equals(label))
+        return true;
+    }
+    return false;
+  }
+
+  public BuiltInWrapper getWrapperByName(String label) {
+    //ignoring versions, find the adapter that matches the name
+    for (AdapterIdentifier key : keySet()) {
+      if (key.getName().equals(label))
+        return get(key);
+    }
+    return null;
+
   }
 
   /**
    * Registers a new built-in wrapper into the system.
    *
-   * @param identifier label|version
+   * @param property       label|version
    * @param builtInWrapper
    */
-  public void registerWrapper(String identifier, BuiltInWrapper builtInWrapper) {
+  public void registerWrapper(String property, BuiltInWrapper builtInWrapper) {
 
     //register the signals-slots to the MinderWrapperRegistry
     //send the information to the server
@@ -59,23 +78,19 @@ public class BuiltInWrapperRegistry extends HashMap<String, BuiltInWrapper> {
     //check the database and create the wrapper if it does not exist.
     //MinderWrapperRegistry does the job of writing signal-slots
 
-    int indexOfBar = identifier.indexOf('|');
-    if (indexOfBar == -1){
-      throw new RuntimeException("A built-in wrapper has to have a version [" + identifier + "] is invalid");
-    }
+    AdapterIdentifier identifier = AdapterIdentifier.parse(property);
+    if (identifier.getVersion() == null)
+      throw new RuntimeException("A built-in wrapper has to have a version [" + property + "] is invalid");
 
-    String label = identifier.substring(0, indexOfBar);
     this.put(identifier, builtInWrapper);
-    this.put(label, builtInWrapper);
-    models.Wrapper wr = Wrapper.findByName(label);
+    models.Wrapper wr = Wrapper.findByName(identifier.getName());
     if (wr == null) {
       wr = new Wrapper();
       wr.shortDescription = builtInWrapper.getShortDescription();
-      wr.name = label;
+      wr.name = identifier.getName();
       //the user is system
       wr.user = User.findByEmail("root@minder");
       wr.save();
-
       //we don't register version, as the actual Minder Wrapper Registry will do
     }
 

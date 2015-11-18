@@ -43,12 +43,12 @@ public class Global extends GlobalSettings {
      */
     @SuppressWarnings("rawtypes")
     public play.mvc.Action onRequest(final Http.Request request, Method method) {
-        if ((!request.path().contains("/rest/")) || (request.path().equals("/rest/login"))) {
+        if ((!request.path().contains("/rest/")) || (request.path().equals("/rest/login"))|| (request.path().equals("/rest/doLogin"))) {
             return super.onRequest(request, method);
         }
 
 
-        if(RestUtils.verifyAuthentication(request)) {
+        if (RestUtils.verifyAuthentication(request)) {
             return super.onRequest(request, method);
         }
 

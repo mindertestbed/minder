@@ -14,8 +14,6 @@ import java.text.ParseException;
  *
  */
 public interface IRestContentProcessor {
-    public String body = null;
-
     /**
     * Prepare the response that can be in format XML or JSON.
     * */
@@ -26,6 +24,12 @@ public interface IRestContentProcessor {
     * Fills the String body.
     * */
     public Object parseRequest(String className) throws ParseException;
+    
+    /**
+     * 
+     * @return the content type that will be set to response
+     */
+    public String getContentType();
 
 
 }

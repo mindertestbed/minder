@@ -12,9 +12,11 @@ import java.util.HashMap;
 public abstract class BuiltInWrapper extends Wrapper implements IMinderClient, ISignalHandler {
 
   private final HashMap<String, MethodContainer> slots = new HashMap<>();
-  private String sessionId;
+  private TestSession session;
+  private SUTIdentifier identifier = new SUTIdentifier();
 
   public BuiltInWrapper() {
+    identifier.setSutName("");
     //lets resolve methods first
     for (Method method : this.getClass().getMethods()) {
       if (method.isAnnotationPresent(Slot.class)) {
@@ -25,7 +27,7 @@ public abstract class BuiltInWrapper extends Wrapper implements IMinderClient, I
   }
 
   @Override
-  public Object callSlot(String sessionId, String slotName, Object[] args) {
+  public Object callSlot(TestSession session, String slotName, Object[] args) {
     if (slots.containsKey(slotName)) {
       try {
         return slots.get(slotName).method.invoke(this, args);
@@ -33,23 +35,22 @@ public abstract class BuiltInWrapper extends Wrapper implements IMinderClient, I
         throw new IllegalStateException(e.getMessage(), e);
       }
     }
-
-    throw new IllegalArgumentException("Slot named [" + slotName + "] not found on [" + this.getSUTName() + "]");
+    throw new IllegalArgumentException("Slot named [" + slotName + "] not found on [" + this.getShortDescription() + "]");
   }
 
   @Override
-  public void startTest(String sessionId) {
-    this.sessionId = sessionId;
+  public void startTest(StartTestObject startTestObject) {
+    this.session = startTestObject.getSession();
   }
 
   @Override
   public UserDTO getCurrentTestUserInfo() {
-    if (sessionId == null)
+    if (session == null)
       throw new IllegalArgumentException("No active owner session found");
 
-    User user = SessionMap.getObject(sessionId, "owner");
+    User user = SessionMap.getObject(session.getSession(), "owner");
     if (user == null) {
-      throw new IllegalArgumentException("No owner defined for session " + sessionId);
+      throw new IllegalArgumentException("No owner defined for session " + session);
     }
 
     return new UserDTO(user.name, user.name, null, user.email);
@@ -57,7 +58,7 @@ public abstract class BuiltInWrapper extends Wrapper implements IMinderClient, I
 
   @Override
   public void finishTest() {
-    sessionId = null;
+    session = null;
   }
 
   /**
@@ -94,7 +95,7 @@ public abstract class BuiltInWrapper extends Wrapper implements IMinderClient, I
   public abstract String getShortDescription();
 
   @Override
-  public String getSUTName(){
-    return "";
+  public SUTIdentifier getSUTIdentifier() {
+    return identifier;
   }
 }

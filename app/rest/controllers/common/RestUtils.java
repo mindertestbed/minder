@@ -4,8 +4,8 @@ import global.Util;
 import models.User;
 import models.UserAuthentication;
 import play.mvc.Http;
-import rest.controllers.login.LoginToken;
 import rest.controllers.common.enumeration.MethodType;
+import rest.controllers.login.LoginToken;
 import rest.controllers.restbodyprocessor.IRestContentProcessor;
 import rest.controllers.restbodyprocessor.JSONContentProcessor;
 import rest.controllers.restbodyprocessor.XMLContentProcessor;
@@ -280,9 +280,9 @@ public class RestUtils {
 
     public static IRestContentProcessor createContentProcessor(String contentType, play.mvc.Http.RequestBody body) throws IllegalArgumentException{
         if(contentType.contains("text/xml") || contentType.contains("application/xml"))
-            return new XMLContentProcessor();
+            return new XMLContentProcessor(body);
         else if(contentType.contains("text/json") || contentType.contains("application/json"))
-            return new JSONContentProcessor();
+            return new JSONContentProcessor(body);
 
         throw new IllegalArgumentException("Content type is not defined. The defined types are text/xml and text/json. The received type is "+contentType);
     }
@@ -296,4 +296,6 @@ public class RestUtils {
         throw new IllegalArgumentException("Content type is not defined. The defined types are text/xml and text/json. The received type is "+contentType);
 
     }
+
+
 }

@@ -1,13 +1,9 @@
 package models;
 
-import com.avaje.ebean.Ebean;
-import minderengine.TestEngine;
-import mtdl.SignalSlot;
-import play.Logger;
 import com.avaje.ebean.Model;
 
 import javax.persistence.*;
-import java.util.*;
+import java.util.List;
 
 /**
  * Created by yerlibilgin on 22/12/14.

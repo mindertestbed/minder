@@ -1,5 +1,5 @@
 
-package rest.controllers.contentvalidation.xml.request;
+package rest.models;
 
 import javax.xml.bind.annotation.*;
 
@@ -37,7 +37,7 @@ import javax.xml.bind.annotation.*;
     "pathToSchema",
     "document"
 })
-public class ValidationRequest {
+public class RestValidationRequest {
 
     @XmlElement(required = true)
     protected byte[] schema;

@@ -1,5 +1,5 @@
 
-package rest.controllers.xmlmodel.response;
+package rest.models;
 
 import javax.xml.bind.annotation.*;
 
@@ -31,7 +31,7 @@ import javax.xml.bind.annotation.*;
     "description"
 })
 @XmlRootElement(name = "minderResponse")
-public class MinderResponse {
+public class RestMinderResponse {
 
     @XmlElement(required = true)
     protected String result;

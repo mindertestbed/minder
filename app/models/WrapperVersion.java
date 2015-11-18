@@ -32,9 +32,11 @@ public class WrapperVersion extends Model {
   @OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
   public List<TSlot> slots;
 
+  @OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+  public List<GitbEndpoint> gitbEndpoints;
 
-  public static final Finder<Long, WrapperVersion> find = new Finder<>(Long.class,
-      WrapperVersion.class);
+
+  public static final Finder<Long, WrapperVersion> find = new Finder<>(WrapperVersion.class);
 
   public static WrapperVersion findById(Long id) {
     return find.byId(id);
@@ -49,11 +51,23 @@ public class WrapperVersion extends Model {
     return list.get(0);
   }
 
+  public static WrapperVersion latestByWrapperName(String wrapperName) {
+    final List<WrapperVersion> list = find.where().eq("wrapper.name", wrapperName).orderBy().desc("creationDate").findList();
+
+    if (list.size() == 0)
+      return null;
+
+    return list.get(0);
+  }
+
   public static List<WrapperVersion> getAllByWrapper(Wrapper wrapper) {
     return find.where().eq("wrapper", wrapper).orderBy().desc("version").findList();
   }
 
   public static WrapperVersion findWrapperAndVersion(Wrapper wrapper, String version) {
     return find.where().eq("wrapper", wrapper).eq("version", version).findUnique();
+  }
+  public static WrapperVersion findWrapperNameAndVersion(String wrapperName, String version) {
+    return find.where().eq("wrapper.name", wrapperName).eq("version", version).findUnique();
   }
 }

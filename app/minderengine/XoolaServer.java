@@ -67,7 +67,7 @@ public class XoolaServer{
 
           @Override
           public void disconnected(XoolaInvocationHandler xoolaInvocationHandler, XoolaChannelState xoolaChannelState) {
-            System.out.println("CLIENT: " + xoolaChannelState.remoteId + " connected");
+            System.out.println("CLIENT: " + xoolaChannelState.remoteId + " disconnected");
             MinderWrapperRegistry.get().setWrapperAvailable(xoolaChannelState.remoteId, false);
           }
         });
@@ -82,7 +82,7 @@ public class XoolaServer{
     }
   }
 
-  public IMinderClient getClient(String wrapperId){
-    return server.get(IMinderClient.class, wrapperId, "minderClient");
+  public IMinderClient getClient(AdapterIdentifier adapterIdentifier){
+    return server.get(IMinderClient.class, adapterIdentifier.toString(), "minderClient");
   }
 }

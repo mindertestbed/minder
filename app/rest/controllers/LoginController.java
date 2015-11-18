@@ -10,7 +10,7 @@ import rest.controllers.common.RestUtils;
 import rest.controllers.common.enumeration.MethodType;
 import rest.controllers.login.LoginToken;
 import rest.controllers.restbodyprocessor.IRestContentProcessor;
-import rest.controllers.xmlmodel.response.MinderResponse;
+import rest.models.RestMinderResponse;
 
 import java.text.ParseException;
 import java.util.HashMap;
@@ -46,11 +46,11 @@ public class LoginController extends Controller {
             return badRequest(e.getMessage());
         }
 
-        MinderResponse minderResponse = new MinderResponse();
+        RestMinderResponse minderResponse = new RestMinderResponse();
         minderResponse.setResult(Constants.AUTHENTICATION);
 
 
-        String generatedNonce = "488E54E5CBA86B7E094B1C8DD6D53602";//RestUtils.generateNonce();
+        String generatedNonce = RestUtils.generateNonce();
         LoginToken loginToken = new LoginToken(generatedNonce,Constants.MINDER_REALM);
         RestUtils.addToCurrentNonces(generatedNonce, loginToken);
 
@@ -61,7 +61,7 @@ public class LoginController extends Controller {
         minderResponse.setDescription(Constants.RESULT_FIRST_UNAUTHORIZED);
         String responseValue = null;
         try {
-            responseValue = contentProcessor.prepareResponse(MinderResponse.class.getName(), minderResponse);
+            responseValue = contentProcessor.prepareResponse(RestMinderResponse.class.getName(), minderResponse);
         } catch (ParseException e) {
             return internalServerError(e.getMessage());
         }
@@ -82,7 +82,7 @@ public class LoginController extends Controller {
             return badRequest(e.getMessage());
         }
 
-        MinderResponse minderResponse = new MinderResponse();
+        RestMinderResponse minderResponse = new RestMinderResponse();
         minderResponse.setResult(Constants.AUTHENTICATION);
 
         String authorizationData = request().getHeader(AUTHORIZATION);
@@ -91,6 +91,11 @@ public class LoginController extends Controller {
         * Parse client request
         */
         HashMap<String,String> clientRequest = RestUtils.createHashMapOfClientRequest(authorizationData);
+
+        UserAuthentication userAuthentication = UserAuthentication.findByUserEmail(clientRequest.get("username"));
+        if (null != userAuthentication) {
+            UserAuthentication.deleteByUserEmail(userAuthentication.user.email);
+        }
 
         System.out.println("Validation Processes Started:");
         /*
@@ -162,7 +167,7 @@ public class LoginController extends Controller {
         minderResponse.setDescription(Constants.RESULT_SUCCESS);
         String responseValue = null;
         try {
-            responseValue = contentProcessor.prepareResponse(MinderResponse.class.getName(), minderResponse);
+            responseValue = contentProcessor.prepareResponse(RestMinderResponse.class.getName(), minderResponse);
         } catch (ParseException e) {
             return internalServerError(e.getMessage());
         }
