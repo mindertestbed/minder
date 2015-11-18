@@ -30,6 +30,7 @@ public class ObjectFactory {
     private final static QName _RestDependencyString_QNAME = new QName("", "restDependencyString");
     private final static QName _RestWrapper_QNAME = new QName("", "restWrapper");
     private final static QName _RestWrapperVersion_QNAME = new QName("", "restWrapperVersion");
+    private final static QName _RestWrapperList_QNAME = new QName("", "restWrapperList");
 
     /**
      * Create a new ObjectFactory that can be used to create new instances of schema derived classes for package: rest.controllers.xmlmodel.response
@@ -155,5 +156,22 @@ public class ObjectFactory {
     @XmlElementDecl(namespace = "", name = "restWrapperVersion")
     public JAXBElement<RestWrapperVersion> createRestWrapperVersion(RestWrapperVersion value) {
         return new JAXBElement<RestWrapperVersion>(_RestWrapperVersion_QNAME, RestWrapperVersion.class, null, value);
+    }
+
+    /**
+     * Create an instance of {@link rest.models.RestWrapperList }
+     *
+     */
+    public RestWrapperList createRestWrapperList() {
+        return new RestWrapperList();
+    }
+
+    /**
+     * Create an instance of {@link JAXBElement }{@code <}{@link RestWrapperList }{@code >}}
+     *
+     */
+    @XmlElementDecl(namespace = "", name = "restWrapperList")
+    public JAXBElement<RestWrapperList> createRestWrapperList(RestWrapperList value) {
+        return new JAXBElement<RestWrapperList>(_RestWrapperList_QNAME, RestWrapperList.class, null, value);
     }
 }
