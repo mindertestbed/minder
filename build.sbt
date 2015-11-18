@@ -2,7 +2,7 @@ organization := "gov.tubitak.minder"
 
 name := """minder"""
 
-version := "1.3.0-beta2"
+version := "1.4.0"
 
 lazy val minder = (project in file(".")).enablePlugins(PlayJava, PlayEbean)
 
@@ -18,6 +18,7 @@ libraryDependencies ++= Seq(
   javaJdbc,
   specs2 % Test,
   evolutions,
+  "xalan" % "serializer" % "2.7.2",
   "com.typesafe.play" % "play-java-ws_2.11" % "2.4.2",
   "com.typesafe.play" % "play-cache_2.11" % "2.4.2",
   "com.typesafe.play" % "play-java_2.11" % "2.4.2",
@@ -28,15 +29,16 @@ libraryDependencies ++= Seq(
   "org.scala-lang.modules" % "scala-xml_2.11" % "1.0.5",
   "postgresql" % "postgresql" % "9.1-901-1.jdbc4",
   "mysql" % "mysql-connector-java" % "5.1.18",
-  "org.beybunproject" % "xoola" % "1.0.1",
-  "gov.tubitak.minder" % "minder-common" % "0.3.1",
-  "gov.tubitak.minder" %% "minder-tdl" % "0.3.7-pre1",
+  "org.beybunproject" % "xoola" % "1.2.0",
+  "gov.tubitak.minder" % "minder-common" % "0.4.0",
+  "gov.tubitak.minder" %% "minder-tdl" % "0.4.0",
   "org.webjars" % "webjars-play_2.11" % "2.4.0-1",
   "org.webjars" % "bootstrap" % "3.3.5",
   "net.sf.jasperreports" % "jasperreports" % "6.0.0",
   "net.sourceforge.barbecue" % "barbecue" % "1.5-beta1",
   "org.codehaus.groovy" % "groovy" % "2.3.9",
-  "gov.tubitak.minder" % "minder-gitb-bridge-common" % "0.0.1"
+  "gov.tubitak.minder" % "minder-gitb-bridge-common" % "0.0.1",
+  "junit" % "junit" % "4.12" % Test
 )
 
 resolvers ++= Seq(

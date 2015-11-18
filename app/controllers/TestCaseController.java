@@ -6,15 +6,19 @@ import com.fasterxml.jackson.databind.JsonNode;
 import controllers.common.enumeration.Utils;
 import editormodels.TestCaseEditorModel;
 import global.Util;
+import minderengine.AdapterIdentifier;
 import minderengine.TestEngine;
 import models.*;
-import mtdl.SignalSlot;
+import mtdl.MinderTdl;
+import mtdl.NullSlot;
+import mtdl.WrapperFunction;
 import play.Logger;
 import play.data.Form;
 import play.mvc.Controller;
 import play.mvc.Result;
 import play.mvc.Security;
-import views.html.testDesigner.testCase.*;
+import views.html.testDesigner.testCase.testCaseEditor;
+import views.html.testDesigner.testCase.testCaseView;
 
 import java.util.*;
 
@@ -195,25 +199,48 @@ public class TestCaseController extends Controller {
 
   @Security.Authenticated(Secured.class)
   public static void detectAndSaveParameters(Tdl newTdl) {
-    Logger.debug("Detect parameters for newTdl");
-    LinkedHashMap<String, Set<SignalSlot>> descriptionMap = TestEngine.describeTdl(newTdl);
+    Logger.debug("Detect parameters for the newTdl");
+    LinkedHashMap<String, Set<WrapperFunction>> descriptionMap = TestEngine.describeTdl(newTdl);
 
     List<WrapperParam> wrapperParamList = new ArrayList<>();
-    for (Map.Entry<String, Set<SignalSlot>> entry : descriptionMap.entrySet()) {
+    for (Map.Entry<String, Set<WrapperFunction>> entry : descriptionMap.entrySet()) {
       //make sure that we are looping on variables.
-      if (!entry.getKey().startsWith("$"))
+      final String key = entry.getKey();
+      if (!key.startsWith("$")) {
+        //make sure that the entry really exists.
+
+        AdapterIdentifier adapterIdentifier = AdapterIdentifier.parse(key);
+
+        if (adapterIdentifier.getName().equals(MinderTdl.NULL_WRAPPER_NAME())){
+          //skip null wrapper
+          continue;
+        }
+        Wrapper wrapper = Wrapper.findByName(adapterIdentifier.getName());
+        if (wrapper == null){
+          //oops
+          throw new IllegalArgumentException("No adapter with name " + adapterIdentifier.getName());
+        }
+        //check if a version is used in the name
+        if (adapterIdentifier.getVersion() != null){
+          //we have a version, check if the version exists
+          WrapperVersion wrapperVersion = WrapperVersion.findWrapperAndVersion(wrapper, adapterIdentifier.getVersion());
+          if (wrapperVersion == null){
+            throw new IllegalArgumentException("No adapter version " + adapterIdentifier.getVersion() + " for " + adapterIdentifier.getName());
+          }
+        }
         continue;
+      }
 
       WrapperParam wrapperParam;
       wrapperParam = new WrapperParam();
-      wrapperParam.name = entry.getKey();
+      wrapperParam.name = key;
       wrapperParam.signatures = new ArrayList<>();
       wrapperParam.tdl = newTdl;
       wrapperParamList.add(wrapperParam);
 
-      Logger.debug("\t" + entry.getKey() + " detected");
+      Logger.debug("\t" + key + " detected");
 
-      for (SignalSlot signalSlot : entry.getValue()) {
+      for (WrapperFunction signalSlot : entry.getValue()) {
         ParamSignature ps = new ParamSignature();
         ps.signature = signalSlot.signature().replaceAll("\\s", "");
         ps.wrapperParam = wrapperParam;

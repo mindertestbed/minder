@@ -72,8 +72,6 @@ class TestRunContext(val testRun: TestRun) extends Runnable with TestProcessWatc
     override def getCurrentTestUserInfo: UserDTO = {
       null
     }
-
-    override def getSUTName(): String = ""
   }
   rg.startTest()
   rg.setReportTemplate(Source.fromInputStream(this.getClass.getResourceAsStream("/taReport.xml")).mkString.getBytes())

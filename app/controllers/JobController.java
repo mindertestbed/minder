@@ -337,6 +337,7 @@ public class JobController extends Controller {
 
 
 
+  @SuppressWarnings({"DEPRECATION"})
   @Security.Authenticated(Secured.class)
   private static byte[] toPdf(byte[] data, TestRun tr) {
     try {

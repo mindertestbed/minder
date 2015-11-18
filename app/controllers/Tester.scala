@@ -1,8 +1,7 @@
 package controllers
 
-import minderengine.{MinderSignalRegistry, MinderWrapperRegistry, SessionMap}
-import models.{Tdl, Job, TestCase, User}
-import mtdl.SignalSlotInfoProvider
+import minderengine.{MinderSignalRegistry, SessionMap}
+import models.{Job, Tdl, TestCase, User}
 import play.Logger
 import play.api.libs.iteratee.Concurrent
 import play.api.libs.json.JsValue
@@ -20,9 +19,6 @@ object Tester extends Controller {
 
     SessionMap.registerObject(mail, "signalRegistry", new MinderSignalRegistry());
     try {
-      SignalSlotInfoProvider.setSignalSlotInfoProvider(MinderWrapperRegistry.get())
-
-      //TestEngine.runTest(mail, "XMLTEST", tdl, "$xmlValueInitiator" -> "xmlValueInitiator", "$xmlGenerator" -> "xmlGenerator");
       Ok
     } catch {
       case t: Throwable => {
@@ -72,7 +68,6 @@ object Tester extends Controller {
         //a}
       } else {
         SessionMap.registerObject(mail, "signalRegistry", new MinderSignalRegistry());
-        SignalSlotInfoProvider.setSignalSlotInfoProvider(MinderWrapperRegistry.get())
         //val testRunner = new TestRunner(rc, user);
         // testMap(mail) = testRunner
       }

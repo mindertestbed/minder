@@ -5,26 +5,23 @@ import java.util.Date
 import java.util.concurrent.LinkedBlockingQueue
 
 import controllers.common.enumeration.OperationType
-import minderengine.{MinderSignalRegistry, MinderWrapperRegistry, SessionMap}
+import minderengine.{MinderSignalRegistry, SessionMap}
 import models._
-import mtdl.SignalSlotInfoProvider
 import play.Logger
 import play.api.libs.EventSource
 import play.api.libs.iteratee.Concurrent
 import play.api.mvc._
-import views.html.testDesigner.job._;
-
-import scala.collection.JavaConversions._
+import views.html.testDesigner.job._
 
 /**
- * Manages the job lifecycle.
- * Holds a job queue.
- */
+  * Manages the job lifecycle.
+  * Holds a job queue.
+  */
 object TestEngineController extends Controller {
 
   /**
-   * SSE tunnel for listing the active jobs running now.
-   */
+    * SSE tunnel for listing the active jobs running now.
+    */
   //val (jobListOut, jobListChannel) = Concurrent.broadcast[JsValue];
   val (jobQueueOut, jobQueueChannel) = Concurrent.broadcast[String];
   val (jobStatusOut, jobStatusChannel) = Concurrent.broadcast[String];
@@ -32,9 +29,9 @@ object TestEngineController extends Controller {
   val (logOut, logChannel) = Concurrent.broadcast[String];
 
   /**
-   * The queue that holds test runs. When a job is started, a test run is created for it.
-   * One can access all the information about a test run and a job here.
-   */
+    * The queue that holds test runs. When a job is started, a test run is created for it.
+    * One can access all the information about a test run and a job here.
+    */
   val jobQueue = new LinkedBlockingQueue[TestRunContext]();
   var activeRunContext: TestRunContext = null;
 
@@ -46,8 +43,8 @@ object TestEngineController extends Controller {
   //}
 
   /**
-   * A reusable thread pool for server side events
-   */
+    * A reusable thread pool for server side events
+    */
   val threadPool = java.util.concurrent.Executors.newFixedThreadPool(20);
 
   //a flag indicating the life of the thread.
@@ -55,8 +52,8 @@ object TestEngineController extends Controller {
 
   val currentLog = new StringBuilder
   /**
-   * The main test thread
-   */
+    * The main test thread
+    */
   val testThread = new Thread() {
     override def run(): Unit = {
       while (goon) {
@@ -65,7 +62,6 @@ object TestEngineController extends Controller {
           logFeedUpdate("--> Test Thread waiting on job queue");
           activeRunContext = TestEngineController.jobQueue.take();
           SessionMap.registerObject(activeRunContext.testRun.runner.email, "signalRegistry", new MinderSignalRegistry());
-          SignalSlotInfoProvider.setSignalSlotInfoProvider(MinderWrapperRegistry.get())
 
           jobFeedUpdate()
           queueFeedUpdate()
@@ -97,10 +93,10 @@ object TestEngineController extends Controller {
 
 
   /**
-   * An action that provides information about the current
-   * jobs in the queue.
-   * @return
-   */
+    * An action that provides information about the current
+    * jobs in the queue.
+    * @return
+    */
   def jobQueueFeed() = Action {
     println("Incoming request")
     threadPool.submit(new Runnable {
@@ -120,10 +116,10 @@ object TestEngineController extends Controller {
   }
 
   /**
-   * An action that provides information about the current
-   * running job.
-   * @return
-   */
+    * An action that provides information about the current
+    * running job.
+    * @return
+    */
   def jobStatusFeed() = Action {
     println("Job Status Feed")
     threadPool.submit(new Runnable {
@@ -142,9 +138,9 @@ object TestEngineController extends Controller {
   }
 
   /**
-   * An online feed for listing jobs runned
-   * @return
-   */
+    * An online feed for listing jobs runned
+    * @return
+    */
   def historyFeed() = Action {
     println("Job History Feed")
     Ok.chunked(jobHistoryOut &> EventSource()).as("text/event-stream")
@@ -152,19 +148,19 @@ object TestEngineController extends Controller {
 
 
   /**
-   * An action that provides information about the current
-   * running job.
-   * @return
-   */
+    * An action that provides information about the current
+    * running job.
+    * @return
+    */
   def logFeed() = Action {
     println("Log feed")
     Ok.chunked(logOut &> EventSource()).as("text/event-stream")
   }
 
   /**
-   * an action for enqueuing a new job for test engine running
-   * @return
-   */
+    * an action for enqueuing a new job for test engine running
+    * @return
+    */
   def enqueueJob(id: Long) = Action {
     implicit request =>
       if (jobQueue.size >= 30) {
@@ -183,11 +179,11 @@ object TestEngineController extends Controller {
         }
       }
   }
-  
+
   /**
-   * an action for enqueuing a new job for test engine running
-   * @return
-   */
+    * an action for enqueuing a new job for test engine running
+    * @return
+    */
   def enqueueGitbJobWithUser(id: Long, user: User) = Action {
     implicit request =>
       if (jobQueue.size >= 30) {
@@ -208,8 +204,8 @@ object TestEngineController extends Controller {
 
 
   /**
-   * Update the queue feed with the current active job and queue status
-   */
+    * Update the queue feed with the current active job and queue status
+    */
   def queueFeedUpdate(): Unit = {
     jobQueueChannel.push(jobQueueList.render().toString())
     jobHistoryChannel.push(jobHistoryList.render().toString())
@@ -227,9 +223,9 @@ object TestEngineController extends Controller {
   }
 
   /**
-   * Utility method to create a test run
-   * @return
-   */
+    * Utility method to create a test run
+    * @return
+    */
 
   def createTestRunContext(job: AbstractJob, user: User): TestRunContext = {
     Logger.debug("Create Run")
@@ -297,5 +293,42 @@ object TestEngineController extends Controller {
       } else {
         Ok
       }
+  }
+
+
+  def cancelOnRequest(request: Request[AnyContent], id: Long, user: User): Result = {
+    val job = GitbJob.findById(id)
+    if (job == null) {
+      return BadRequest("A job with id [" + id + "] was not found!")
+    }
+
+    var index = 0;
+    val arr = jobQueue.toArray
+    for (index <- 0 to arr.size) {
+      val tr = arr(index).asInstanceOf[TestRunContext]
+      if (user.email == "root@minder" || user.email == tr.testRun.runner.email) {
+        if (activeRunContext != null && activeRunContext.job.id == id) {
+          //now interrupt the thread.
+          testThread.interrupt();
+          return Ok;
+        }
+
+        if (tr.job.isInstanceOf[GitbJob] && tr.job.id == id) {
+          jobQueue.remove(tr)
+          queueFeedUpdate();
+          return Ok;
+        }
+      }
+    }
+    return BadRequest("A running job with id [" + id + "] was not found!")
+  }
+
+  /**
+    * an action for cancelling a given gitb job for test engine running
+    * @return
+    */
+  def cancelActiveGitbJob(id: Long, user: User) = Action {
+    implicit request =>
+      cancelOnRequest(request, id, user)
   }
 }

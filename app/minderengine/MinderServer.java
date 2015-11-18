@@ -15,38 +15,38 @@ public class MinderServer implements IMinderServer {
   /**
    * The client calls this method after a sucessfull handshake.
    *
-   * @param identifier
-   * Wrapper|Version
+   * @param adapterIdentifier
    * @param methodSet
    */
   @Override
-  public void hello(String identifier, Set<MethodContainer> methodSet) {
-    MinderWrapperRegistry.get().updateWrapper(identifier, methodSet);
+  public void hello(AdapterIdentifier adapterIdentifier, Set<MethodContainer> methodSet) {
+    MinderWrapperRegistry.get().updateWrapper(adapterIdentifier, methodSet);
   }
+
 
   /**
    * Provide information on the Test Designer who has a sessionId
    *
-   * @param sessionId the http session id of the web owner.
+   * @param testSession the session id of the web owner.
    * @return
    */
   @Override
-  public UserDTO getUserInfo(String sessionId) {
-    User user = SessionMap.getObject(sessionId, "owner");
+  public UserDTO getUserInfo(TestSession testSession) {
+    User user = SessionMap.getObject(testSession.getSession(), "owner");
     if (user == null)
-      throw new IllegalArgumentException("No owner defined for session " + sessionId);
+      throw new IllegalArgumentException("No owner defined for session " + testSession);
 
     return new UserDTO(user.name, user.name, null, user.email);
   }
 
   @Override
-  public Object signalEmitted(String sessionId, String label, String signature, SignalData signalData) {
-    Logger.debug("Signal emitted [" + sessionId + "." + label + "." + signature + "]");
-    MinderSignalRegistry me = SessionMap.getObject(sessionId, "signalRegistry");
+  public Object signalEmitted(TestSession testSession, AdapterIdentifier adapterIdentifier, String signature, SignalData signalData) {
+    Logger.debug("Signal emitted [" + testSession + "." + adapterIdentifier.getName() + "." + signature + "]");
+    MinderSignalRegistry me = SessionMap.getObject(testSession.getSession(), "signalRegistry");
     if (me == null)
-      throw new IllegalArgumentException("No MinderSignalRegistry object defined for session " + sessionId);
+      throw new IllegalArgumentException("No MinderSignalRegistry object defined for session " + testSession);
 
-    me.enqueueSignal(label, signature, signalData);
+    me.enqueueSignal(adapterIdentifier, signature, signalData);
     return null;
   }
 }

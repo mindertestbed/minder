@@ -19,9 +19,9 @@ import java.util.*;
  * </ol>
  * Created by yerlibilgin on 13/12/14.
  */
-public class MinderWrapperRegistry extends Observable implements ISignalSlotInfoProvider {
+public class MinderWrapperRegistry extends Observable {
   private static MinderWrapperRegistry instance;
-  private HashMap<String, HashMap<String, SignalSlot>> wrapperMap;
+  private HashMap<AdapterIdentifier, HashMap<String, WrapperFunction>> wrapperMap;
   private HashSet<Long> onlineWrappers;
 
   public static MinderWrapperRegistry get() {
@@ -43,36 +43,24 @@ public class MinderWrapperRegistry extends Observable implements ISignalSlotInfo
    * @param identifier
    * @param methodSet
    */
-  public void updateWrapper(String identifier, Set<MethodContainer> methodSet) {
-    Logger.info("Wrapper " + identifier + " connected. Updating signatures");
-
-    String versionString = "NA";
-    String label = identifier;
-    if (identifier.contains("|")) {
-      String[] tmp = identifier.split("\\|");
-      label = tmp[0];
-      versionString = tmp[1];
-    }
+  public void updateWrapper(AdapterIdentifier identifier, Set<MethodContainer> methodSet) {
+    final String name = identifier.getName();
+    Logger.info("Wrapper " + name + " connected. Updating signatures");
     //update the database for possible changes in the signatures
-    Wrapper wrapper = Wrapper.findByName(label);
+    Wrapper wrapper = Wrapper.findByName(name);
     Logger.info(wrapper.name);
-    WrapperVersion version = WrapperVersion.findWrapperAndVersion(wrapper, versionString);
+    WrapperVersion version = WrapperVersion.findWrapperAndVersion(wrapper, identifier.getVersion());
     if (version == null) {
       version = new WrapperVersion();
-      version.version = versionString;
+      version.version = identifier.getVersion();
       version.creationDate = new Date();
       version.wrapper = wrapper;
       version.save();
     }
     //MAPPING_METHODS:
-    HashMap<String, SignalSlot> methodMap = new HashMap<>();
+    HashMap<String, WrapperFunction> methodMap = new HashMap<>();
     for (MethodContainer mc : methodSet) {
-      SignalSlot ss;
-      if (mc.isSignal) {
-        ss = new SignalImpl(label, mc.methodKey);
-      } else {
-        ss = new SlotImpl(label, mc.methodKey);
-      }
+      WrapperFunction ss = new WrapperFunction(name, mc.methodKey);
       methodMap.put(mc.methodKey, ss);
     }
 
@@ -100,43 +88,18 @@ public class MinderWrapperRegistry extends Observable implements ISignalSlotInfo
       Ebean.endTransaction();
     }
 
-    if (versionString.equals("NA")) {
-      wrapperMap.put(label, methodMap);
-    } else {
-      wrapperMap.put(label + "|" + versionString, methodMap);
-    }
     onlineWrappers.add(version.id);
-    wrapperMap.put(label, methodMap);
+    wrapperMap.put(identifier, methodMap);
   }
 
   public List<String> getAllLabels() {
     return Arrays.asList(wrapperMap.keySet().toArray());
   }
 
-  public Collection<SignalSlot> getAllMethods(String label) {
+  public Collection<WrapperFunction> getAllMethods(String label) {
     if (!wrapperMap.containsKey(label))
       throw new IllegalArgumentException("A wrapper with label " + label + " is not available.");
     return wrapperMap.get(label).values();
-  }
-
-  /**
-   * @param searchKey either the wrapperName or wrapperName|version
-   * @param signature
-   * @return
-   */
-  @Override
-  public SignalSlot getSignalSlot(String searchKey, String signature) {
-    signature = signature.replaceAll("\\s", "");
-    if (!wrapperMap.containsKey(searchKey))
-      throw new IllegalArgumentException("No wrapper with name [" + searchKey + "]");
-
-    SignalSlot ss = wrapperMap.get(searchKey).get(signature);
-
-    if (ss == null) {
-      throw new IllegalArgumentException("No such signal or slot: [" + searchKey + "." + signature + "]");
-    }
-
-    return ss;
   }
 
   public boolean isWrapperAvailable(WrapperVersion wrapperVersion) {

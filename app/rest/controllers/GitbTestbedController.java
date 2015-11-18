@@ -1,66 +1,17 @@
 package rest.controllers;
 
-import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Set;
-
-import minderengine.MinderSignalRegistry;
-import minderengine.MinderWrapperRegistry;
-import minderengine.SessionMap;
-import models.GitbEndpoint;
-import models.GitbJob;
-import models.GitbParameter;
-import models.MappedWrapper;
-import models.TOperationType;
-import models.Tdl;
-import models.TestAssertion;
-import models.TestCase;
-import models.TestGroup;
-import models.TestRun;
-import models.User;
-import models.UserHistory;
-import models.Wrapper;
-import models.WrapperParam;
-import models.WrapperVersion;
-import mtdl.MinderTdl;
-import mtdl.SignalSlotInfoProvider;
-import mtdl.TdlCompiler;
-import mtdl.Rivet;
-
 import com.avaje.ebean.Ebean;
-import com.gitb.core.v1.Actor;
-import com.gitb.core.v1.ActorConfiguration;
-import com.gitb.core.v1.ConfigurationType;
-import com.gitb.core.v1.Endpoint;
-import com.gitb.core.v1.Metadata;
-import com.gitb.core.v1.Parameter;
-import com.gitb.core.v1.Roles;
-import com.gitb.core.v1.TestRole;
-import com.gitb.core.v1.TestRoleEnumeration;
-import com.gitb.core.v1.UsageEnumeration;
-import com.gitb.tbs.v1.BasicCommand;
-import com.gitb.tbs.v1.BasicRequest;
-import com.gitb.tbs.v1.ConfigureRequest;
-import com.gitb.tbs.v1.ConfigureResponse;
-import com.gitb.tbs.v1.GetActorDefinitionRequest;
-import com.gitb.tbs.v1.GetActorDefinitionResponse;
-import com.gitb.tbs.v1.GetTestCaseDefinitionResponse;
-import com.gitb.tbs.v1.InitiateResponse;
-import com.gitb.tpl.v1.DecisionStep;
-import com.gitb.tpl.v1.MessagingStep;
-import com.gitb.tpl.v1.Preliminary;
-import com.gitb.tpl.v1.Sequence;
-import com.gitb.tpl.v1.TestStep;
-
+import com.gitb.core.v1.*;
+import com.gitb.tbs.v1.*;
+import com.gitb.tpl.v1.*;
 import controllers.TestEngineController;
 import controllers.TestRunContext;
 import controllers.common.enumeration.OperationType;
+import models.*;
+import models.TestCase;
+import mtdl.MinderTdl;
+import mtdl.Rivet;
+import mtdl.TdlCompiler;
 import play.mvc.Controller;
 import play.mvc.Http;
 import play.mvc.Result;
@@ -68,6 +19,12 @@ import rest.controllers.common.RestUtils;
 import rest.controllers.restbodyprocessor.IRestContentProcessor;
 import rest.models.GetTestCaseDefinitions;
 import scala.collection.JavaConversions;
+
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.*;
 
 public class GitbTestbedController extends Controller {
 
