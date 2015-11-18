@@ -27,7 +27,8 @@ import java.util.List;
         "description",
         "shortDescription",
         "prescriptionLevel",
-        "owner"
+        "owner",
+        "testcases"
 })
 @XmlRootElement(name = "testAssertion")
 public class RestTestAssertion {

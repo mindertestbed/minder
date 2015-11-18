@@ -31,6 +31,8 @@ public class ObjectFactory {
     private final static QName _RestWrapper_QNAME = new QName("", "restWrapper");
     private final static QName _RestWrapperVersion_QNAME = new QName("", "restWrapperVersion");
     private final static QName _RestWrapperList_QNAME = new QName("", "restWrapperList");
+    private final static QName _RestTestAssertion_QNAME = new QName("", "restWrapperList");
+    private final static QName _RestTestCase_QNAME = new QName("", "restWrapperList");
 
     /**
      * Create a new ObjectFactory that can be used to create new instances of schema derived classes for package: rest.controllers.xmlmodel.response
@@ -173,5 +175,39 @@ public class ObjectFactory {
     @XmlElementDecl(namespace = "", name = "restWrapperList")
     public JAXBElement<RestWrapperList> createRestWrapperList(RestWrapperList value) {
         return new JAXBElement<RestWrapperList>(_RestWrapperList_QNAME, RestWrapperList.class, null, value);
+    }
+
+    /**
+     * Create an instance of {@link rest.models.RestTestAssertion }
+     *
+     */
+    public RestTestAssertion createRestTestAssertion() {
+        return new RestTestAssertion();
+    }
+
+    /**
+     * Create an instance of {@link JAXBElement }{@code <}{@link RestTestAssertion }{@code >}}
+     *
+     */
+    @XmlElementDecl(namespace = "", name = "restTestAssertion")
+    public JAXBElement<RestTestAssertion> createRestTestAssetion(RestTestAssertion value) {
+        return new JAXBElement<RestTestAssertion>(_RestTestAssertion_QNAME, RestTestAssertion.class, null, value);
+    }
+
+    /**
+     * Create an instance of {@link rest.models.RestTestCase }
+     *
+     */
+    public RestTestCase createRestTestCase() {
+        return new RestTestCase();
+    }
+
+    /**
+     * Create an instance of {@link JAXBElement }{@code <}{@link RestTestCase }{@code >}}
+     *
+     */
+    @XmlElementDecl(namespace = "", name = "restTestCase")
+    public JAXBElement<RestTestCase> createRestTestCase(RestTestCase value) {
+        return new JAXBElement<RestTestCase>(_RestTestCase_QNAME, RestTestCase.class, null, value);
     }
 }
