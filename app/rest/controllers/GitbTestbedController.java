@@ -317,7 +317,8 @@ public class GitbTestbedController extends Controller {
 
 		}
 		
-		GitbJob gitbJob = GitbJob.findById(Long.valueOf(basicCommand.getTcInstanceId()));
+		User currentUser = getCurrentUser(request());
+		TestEngineController.cancelGitbJob(Long.valueOf(basicCommand.getTcInstanceId()), currentUser);
 		
 		ConfigureResponse serviceResponse = new ConfigureResponse();		
 		
@@ -514,26 +515,6 @@ public class GitbTestbedController extends Controller {
 		 HashMap<String,String> clientRequest = RestUtils.createHashMapOfClientRequest(authorizationData);
 	        
 		return User.findByEmail(clientRequest.get("username"));
-	}
-	
-	
-	private static TestRunContext createTestRun(GitbJob job, User user)
-	{
-		TestRun testRun = new TestRun();		
-		testRun.date = new Date();				    
-		testRun.job = job;
-		
-		UserHistory userHistory = new UserHistory();				    
-		userHistory.email = user.email;				    
-		userHistory.operationType = new TOperationType();
-		userHistory.operationType.name = OperationType.RUN_TEST_CASE;
-				    
-		userHistory.operationType.save();
-
-		testRun.history = userHistory;				    
-		testRun.runner = user;
-				    
-		return new TestRunContext(testRun);
 	}
 
 }

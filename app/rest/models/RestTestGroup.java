@@ -1,6 +1,7 @@
 package rest.models;
 
 import javax.xml.bind.annotation.*;
+import java.util.List;
 
 /**
  * <p>Java class for minderResponse complex type.
@@ -54,6 +55,10 @@ public class RestTestGroup {
     @XmlElement(required = false)
     protected String dependencyString;
 
+    @XmlElementWrapper(name="testassertions")
+    @XmlElement(required = false)
+    public List<RestTestAssertion> testassertions;
+
 
     public String getGroupName() {
         return groupName;
@@ -94,4 +99,12 @@ public class RestTestGroup {
     public String getDependencyString() {return dependencyString;}
 
     public void setDependencyString(String dependencyString) {this.dependencyString = dependencyString;}
+
+    public List<RestTestAssertion> getTestassertions() {
+        return testassertions;
+    }
+
+    public void setTestassertions(List<RestTestAssertion> testassertions) {
+        this.testassertions = testassertions;
+    }
 }

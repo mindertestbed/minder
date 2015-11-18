@@ -6,6 +6,7 @@ import controllers.common.enumeration.Utils;
 import dependencyutils.DependencyClassLoaderCache;
 import editormodels.GroupEditorModel;
 import global.Util;
+import models.TestAssertion;
 import models.TestGroup;
 import models.User;
 import play.Logger;
@@ -18,10 +19,13 @@ import rest.controllers.common.RestUtils;
 import rest.controllers.restbodyprocessor.IRestContentProcessor;
 import rest.models.RestDependencyString;
 import rest.models.RestMinderResponse;
+import rest.models.RestTestAssertion;
 import rest.models.RestTestGroup;
 
 import java.text.ParseException;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 /**
  * This class provides Minder server side REST service for test group related operations.
@@ -33,7 +37,7 @@ import java.util.HashMap;
  * @author: Melis Ozgur Cetinkaya Demir
  * @date: 10/11/15.
  */
-public class TestGroupController extends Controller {
+public class RestTestGroupController extends Controller {
     /**
      * This method receives JSON or XML request which includes test group id and returns detailed testgroup info.
      * The XSD for the client request is given in rest/models/xsd/resttestgroup.xsd
@@ -71,7 +75,7 @@ public class TestGroupController extends Controller {
             return internalServerError(e.getCause().toString());
         }
 
-        if (restTestGroup.getId().equals(""))
+        if (null==restTestGroup.getId())
             return badRequest("Please provide Test Group ID");
 
 
@@ -87,6 +91,14 @@ public class TestGroupController extends Controller {
         responseRestTestGroup.setDescription(tg.description);
         responseRestTestGroup.setOwner(tg.owner.email);
         responseRestTestGroup.setDependencyString(tg.dependencyString);
+
+        responseRestTestGroup.setTestassertions(new ArrayList<RestTestAssertion>());
+
+        List<TestAssertion> taList = tg.testAssertions;
+        for(TestAssertion ta : taList){
+            RestTestAssertion rta = new RestTestAssertion();
+            rta.setTestAssertionId(ta.taId);
+        }
 
         /*
         * Preparing response
@@ -147,7 +159,7 @@ public class TestGroupController extends Controller {
             return internalServerError(e.getCause().toString());
         }
 
-        if (restTestGroup.getId().equals(""))
+        if (null==restTestGroup.getId())
             return badRequest("Please provide Test Group ID");
 
 
@@ -229,11 +241,11 @@ public class TestGroupController extends Controller {
             return internalServerError(e.getCause().toString());
         }
 
-        if (restTestGroup.getId().equals(""))
+        if (null==restTestGroup.getId())
             return badRequest("Please provide Test Group ID");
-        if (restTestGroup.getGroupName().equals(""))
+        if (null==restTestGroup.getGroupName())
             return badRequest("Please provide Test Group Name");
-        if (restTestGroup.getShortDescription().equals(""))
+        if (null==restTestGroup.getShortDescription())
             return badRequest("Please provide short description");
 
 
@@ -315,9 +327,9 @@ public class TestGroupController extends Controller {
             return internalServerError(e.getCause().toString());
         }
 
-        if (restTestGroup.getGroupName().equals(""))
+        if (null==restTestGroup.getGroupName())
             return badRequest("Please provide Test Group Name");
-        if (restTestGroup.getShortDescription().equals(""))
+        if (null==restTestGroup.getShortDescription())
             return badRequest("Please provide short description");
 
 
@@ -406,6 +418,11 @@ public class TestGroupController extends Controller {
         } catch (ParseException e) {
             return internalServerError(e.getCause().toString());
         }
+
+        if (null==dependencyString.getGroupId())
+            return badRequest("Please provide Test Group id");
+        if (null==dependencyString.getValue())
+            return badRequest("Please provide dependencyString value, even it is null String");
 
         String fieldName = null;
         try {
