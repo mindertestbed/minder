@@ -59,7 +59,7 @@
 </style>
 
 <script>
-
+@authentication.subjectHasRole(security.Role.TEST_DESIGNER){
 $(function() {
   minderAccordion("#accordion1");
 	var textArea = document.getElementById("tdl");
@@ -320,4 +320,5 @@ $(function() {
 
   } <!-- helper.form -->
   } <!-- defininf -->
+}
 } <!-- main -->

@@ -1,34 +1,38 @@
 @(localUser: models.User = null)
-@import java.util.concurrent.atomic.AtomicInteger
+  @import java.util.concurrent.atomic.AtomicInteger
 
-<script>
+  <script>
   $(function() {
     $( document ).tooltip();
   });
   </script>
 
-  @defining(new AtomicInteger(1)) {index =>
-  <table class="shaded">
-    @createFirstRow {
-      <th>Test Group Name</th>
-      <th>Short Description</th>
-      <th>Author</th>
-    }
-    @for(tg <- TestGroup.findAll()) {
-      <tr>
-        <td>@index.getAndIncrement()</td><td><a href="/getGroupDetailView?id=@tg.id&display=assertions">@tg.name</a></td> <td>@tg.shortDescription</td>
-        <td>@tg.owner.name @tg.owner.email</td>
-        <td>
-        <div title="Delete" class="bevel2 celldiv" style="height:30px;width:30px;cursor:hand;"
-        onclick='deleteWithDialog2("/doDeleteGroup?id=@tg.id", $("#dialog-confirm"), "Delete Group", "group", "@tg.name")'>
-        <img src="@routes.Assets.at("/images/trash2-64.png")" height="16px" alt='@tg.id'/>
-      </div>
-        </td>
-      </tr>
-    }
+  @defining(new AtomicInteger(1)) { index =>
+    <table class="shaded">
+      @createFirstRow {
+        <th>Test Group Name</th>
+        <th>Short Description</th>
+        <th>Author</th>
+      }
+      @for( tg <- TestGroup.findAll()) {
+        <tr>
+          <td>@index.getAndIncrement()</td> <td><a href="/getGroupDetailView?id=@tg.id&display=assertions">@tg.name</a></td> <td>@tg.shortDescription</td>
+          <td>@tg.owner.name @tg.owner.email</td>
+          @authentication.subjectHasRole(security.Role.TEST_DESIGNER) {
+            <td>
+              <div title="Delete" class="bevel2 celldiv" style="height:30px ; width:30px ; cursor:hand ;"
+              onclick='deleteWithDialog2("/doDeleteGroup?id=@tg.id", $("#dialog-confirm"), "Delete Group", "group", "@tg.name")'>
+                <img src="@routes.Assets.at("/images/trash2-64.png")" height="16px" alt='@tg.id'/>
+              </div>
+            </td>
+          }
+        </tr>
+      }
 
-    @createLastRow(3){
-      @createButton("/getCreateGroupEditorView", Messages("restrictedTestPage.createTestGroup"))
-    }
-  </table>
+      @authentication.subjectHasRole(security.Role.TEST_DESIGNER) {
+        @createLastRow(3) {
+          @createButton("/getCreateGroupEditorView", Messages("restrictedTestPage.createTestGroup"))
+        }
+      }
+    </table>
   }

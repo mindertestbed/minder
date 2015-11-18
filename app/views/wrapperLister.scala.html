@@ -1,85 +1,87 @@
 @(localUser: models.User = null)
 
- <script>
+<script>
   $(function() {
     $( document ).tooltip();
   });
   </script>
-  
- 
 
-<div id="WrapperListDiv@localUser.id" class="fullw bevel" style="height:100%;padding:0px;">
-	<table style="width: 100%;">
-	    <tr>
-	        <td>
-	         @defining(Wrapper.getAll()){ allWrappers =>
-                  @for(currentWrapper <- allWrappers){
-	              <div class="title hand differ" style="width:100%; border-bottom: 1px solid black; height: 30px;">
-	                <table class="fullw">
-	                  <tr>
-	                    <td class="trigger" style="width:30%;">@currentWrapper.name</td>
-	                    <td class="trigger" style="width:30%;">@currentWrapper.user.email</td>
-	                    <td class="trigger" style="width:30%;">@currentWrapper.shortDescription</td>
-	                    <td style="width:3%;" align="center" valign="middle" >
-	                     @if(currentWrapper.user.email == localUser.email) {
-				          <div id="editWrapper@currentWrapper.id" title="Edit" class="celldiv bevel2" style="height:26px;width:26px;">
-				              <img src="@routes.Assets.at("/images/edit_property-64.png")" height="16px" alt='@localUser.id'/>
-				          </div>
-				          <script>
-				              createFormDialog($("#editWrapper@currentWrapper.id"),
-				              "/editWrapperForm?id=@currentWrapper.id",
-				              "/doEditWrapper", "mainDialog", "Edit Wrapper", $("#WrapperListDiv@localUser.id").parent())
-				          </script> 
-				          }
-	                    </td>
-	                    <td style="width:3%;" align="center" valign="middle">
-	   			          @if(currentWrapper.user.email == localUser.email) {
-		   			          <div id="deleteWrapper@currentWrapper.id" title="Delete" class="celldiv bevel2" style="height:26px;width:26px;">
-					              <img src="@routes.Assets.at("/images/trash2-64.png")" height="16px" alt='@localUser.id'/>
-					          </div>
-					          <script>
-					            var elm = $("#deleteWrapper@currentWrapper.id");
-					            deleteWithDialog(elm, "/doDeleteWrapper?id=@currentWrapper.id", $("#dialog-confirm"),
-					            "Delete Wrapper", "wrapper", "@currentWrapper.name", $("#WrapperListDiv@localUser.id").parent())
-					          </script>
-				          }
-	                    </td>
-	                    
-	                    <td class="trigger">&nbsp;</td>
-	                    <td style="width:25px;" class="trigger">&nbsp;</td>
-	                  </tr>
-	                </table>
-	              </div>
-	             }
-	          }
-	        </td>
-	    </tr>
-    </table>
-    
-    <div class="title styledtitleinverse fullw hand create bevel2" style="margin:0;" align="center">
-	    <table><tr><td>
-	    <table width="100%">
-	      <tr>
-	        <td id="createWr1"
-	            style="height:23px;vertical-align:top; text-align:right;">
-	          <img src="@routes.Assets.at("/images/plus-64.png")" height="16px" />
-	        </td>
-	        <td id="createWr2" style="height:23px;">
-	          @Messages("restrictedTestPage.createWrapper")
-	        </td>
-	      </tr>
-	    </table></td></tr></table>
-   </div>
+
+
+<div id="WrapperListDiv@localUser.id" class="fullw bevel" style="height:100% ; padding:0px ;">
+  <table style="width: 100% ;">
+    <tr>
+      <td>
+      @defining(Wrapper.getAll()) { allWrappers =>
+        @for( currentWrapper <- allWrappers) {
+          <div class="title hand differ" style="width:100% ; border-bottom: 1px solid black ; height: 30px ;">
+            <table class="fullw">
+              <tr>
+                <td class="trigger" style="width:30% ;">@currentWrapper.name</td>
+                <td class="trigger" style="width:30% ;">@currentWrapper.user.email</td>
+                <td class="trigger" style="width:30% ;">@currentWrapper.shortDescription</td>
+                <td style="width:3% ;" align="center" valign="middle" >
+                @if(currentWrapper.user.email == localUser.email) {
+                  <div id="editWrapper@currentWrapper.id" title="Edit" class="celldiv bevel2" style="height:26px ; width:26px ;">
+                    <img src="@routes.Assets.at("/images/edit_property-64.png")" height="16px" alt='@localUser.id'/>
+                  </div>
+                  <script>
+                      createFormDialog($("#editWrapper@currentWrapper.id"),
+                          "/editWrapperForm?id=@currentWrapper.id",
+                          "/doEditWrapper", "mainDialog", "Edit Wrapper", $("#WrapperListDiv@localUser.id").parent())
+                  </script>
+                }
+                </td>
+                <td style="width:3% ;" align="center" valign="middle">
+                @if(currentWrapper.user.email == localUser.email) {
+                  <div id="deleteWrapper@currentWrapper.id" title="Delete" class="celldiv bevel2" style="height:26px ; width:26px ;">
+                    <img src="@routes.Assets.at("/images/trash2-64.png")" height="16px" alt='@localUser.id'/>
+                  </div>
+                  <script>
+                      var elm = $("#deleteWrapper@currentWrapper.id");
+                      deleteWithDialog(elm, "/doDeleteWrapper?id=@currentWrapper.id", $("#dialog-confirm"),
+                          "Delete Wrapper", "wrapper", "@currentWrapper.name", $("#WrapperListDiv@localUser.id").parent())
+                  </script>
+                }
+                </td>
+
+                <td class="trigger">&nbsp;</td>
+                <td style="width:25px ;" class="trigger">&nbsp;</td>
+              </tr>
+            </table>
+          </div>
+        }
+      }
+      </td>
+    </tr>
+  </table>
+
+  @authentication.subjectHasRole(security.Role.TEST_DEVELOPER) {
+    <div class="title styledtitleinverse fullw hand create bevel2" style="margin:0 ;" align="center">
+      <table><tr><td>
+        <table width="100%">
+          <tr>
+            <td id="createWr1"
+            style="height:23px ; vertical-align:top ; text-align:right ;">
+              <img src="@routes.Assets.at("/images/plus-64.png")" height="16px" />
+            </td>
+            <td id="createWr2" style="height:23px ;">
+            @Messages("restrictedTestPage.createWrapper")
+            </td>
+          </tr>
+        </table></td></tr></table>
+    </div>
+  }
 
   <script>
       createFormDialog($("#createWr1, #createWr2"),
-        "/createNewWrapperForm" ,
-        "/doCreateWrapper", "mainDialog", "Create Wrapper", $("#WrapperListDiv@localUser.id").parent())
+          "/createNewWrapperForm" ,
+          "/doCreateWrapper", "mainDialog", "Create Wrapper", $("#WrapperListDiv@localUser.id").parent())
 
 
   </script>
 </div>
-    
-    
+
+
 </div>
 

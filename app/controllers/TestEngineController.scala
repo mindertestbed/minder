@@ -17,14 +17,14 @@ import views.html._
 import scala.collection.JavaConversions._
 
 /**
- * Manages the job lifecycle.
- * Holds a job queue.
- */
+  * Manages the job lifecycle.
+  * Holds a job queue.
+  */
 object TestEngineController extends Controller {
 
   /**
-   * SSE tunnel for listing the active jobs running now.
-   */
+    * SSE tunnel for listing the active jobs running now.
+    */
   //val (jobListOut, jobListChannel) = Concurrent.broadcast[JsValue];
   val (jobQueueOut, jobQueueChannel) = Concurrent.broadcast[String];
   val (jobStatusOut, jobStatusChannel) = Concurrent.broadcast[String];
@@ -32,9 +32,9 @@ object TestEngineController extends Controller {
   val (logOut, logChannel) = Concurrent.broadcast[String];
 
   /**
-   * The queue that holds test runs. When a job is started, a test run is created for it.
-   * One can access all the information about a test run and a job here.
-   */
+    * The queue that holds test runs. When a job is started, a test run is created for it.
+    * One can access all the information about a test run and a job here.
+    */
   val jobQueue = new LinkedBlockingQueue[TestRunContext]();
   var activeRunContext: TestRunContext = null;
 
@@ -46,8 +46,8 @@ object TestEngineController extends Controller {
   //}
 
   /**
-   * A reusable thread pool for server side events
-   */
+    * A reusable thread pool for server side events
+    */
   val threadPool = java.util.concurrent.Executors.newFixedThreadPool(20);
 
   //a flag indicating the life of the thread.
@@ -55,8 +55,8 @@ object TestEngineController extends Controller {
 
   val currentLog = new StringBuilder
   /**
-   * The main test thread
-   */
+    * The main test thread
+    */
   val testThread = new Thread() {
     override def run(): Unit = {
       while (goon) {
@@ -97,10 +97,10 @@ object TestEngineController extends Controller {
 
 
   /**
-   * An action that provides information about the current
-   * jobs in the queue.
-   * @return
-   */
+    * An action that provides information about the current
+    * jobs in the queue.
+    * @return
+    */
   def jobQueueFeed() = Action {
     println("Incoming request")
     threadPool.submit(new Runnable {
@@ -120,10 +120,10 @@ object TestEngineController extends Controller {
   }
 
   /**
-   * An action that provides information about the current
-   * running job.
-   * @return
-   */
+    * An action that provides information about the current
+    * running job.
+    * @return
+    */
   def jobStatusFeed() = Action {
     println("Job Status Feed")
     threadPool.submit(new Runnable {
@@ -142,9 +142,9 @@ object TestEngineController extends Controller {
   }
 
   /**
-   * An online feed for listing jobs runned
-   * @return
-   */
+    * An online feed for listing jobs runned
+    * @return
+    */
   def historyFeed() = Action {
     println("Job History Feed")
     Ok.chunked(jobHistoryOut &> EventSource()).as("text/event-stream")
@@ -152,19 +152,19 @@ object TestEngineController extends Controller {
 
 
   /**
-   * An action that provides information about the current
-   * running job.
-   * @return
-   */
+    * An action that provides information about the current
+    * running job.
+    * @return
+    */
   def logFeed() = Action {
     println("Log feed")
     Ok.chunked(logOut &> EventSource()).as("text/event-stream")
   }
 
   /**
-   * an action for enqueuing a new job for test engine running
-   * @return
-   */
+    * an action for enqueuing a new job for test engine running
+    * @return
+    */
   def enqueueJob(id: Long) = Action {
     implicit request =>
       if (jobQueue.size >= 30) {
@@ -186,8 +186,8 @@ object TestEngineController extends Controller {
 
 
   /**
-   * Update the queue feed with the current active job and queue status
-   */
+    * Update the queue feed with the current active job and queue status
+    */
   def queueFeedUpdate(): Unit = {
     jobQueueChannel.push(jobQueueList.render().toString())
     jobHistoryChannel.push(jobHistoryList.render().toString())
@@ -205,9 +205,9 @@ object TestEngineController extends Controller {
   }
 
   /**
-   * Utility method to create a test run
-   * @return
-   */
+    * Utility method to create a test run
+    * @return
+    */
 
   def createTestRunContext(job: Job, user: User): TestRunContext = {
     Logger.debug("Create Run")
@@ -244,11 +244,22 @@ object TestEngineController extends Controller {
       if (index >= 0 && index < jobQueue.size()) {
         val arr = jobQueue.toArray
 
+        val java_ctx = play.core.j.JavaHelpers.createJavaContext(request)
+        val java_session = java_ctx.session()
+        val user = Authentication.getLocalUser(java_session);
+        //only allow root or the runner to do that
+
         val tr = arr(index).asInstanceOf[TestRunContext]
-        jobQueue.remove(tr)
-        queueFeedUpdate();
+        if (user.email == "root@minder" || user.email == tr.testRun.runner.email) {
+          jobQueue.remove(tr)
+          queueFeedUpdate();
+          Ok
+        } else {
+          BadRequest("Hey! <br/>Only root or the runner can cancel a job!!!")
+        }
+      } else {
+        Ok
       }
-      Ok
   }
 
   def cancelActiveJob() = Action {
