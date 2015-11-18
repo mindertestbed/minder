@@ -32,7 +32,8 @@ import java.util.List;
         "shortDescription",
         "description",
         "owner",
-        "dependencyString"
+        "dependencyString",
+        "testassertions"
 })
 @XmlRootElement(name = "testGroup")
 public class RestTestGroup {
