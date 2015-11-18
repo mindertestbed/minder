@@ -184,8 +184,7 @@ object TestEngineController extends Controller {
    * an action for enqueuing a new gitb job for test engine running
    * @return
    */
-  def enqueueGitbJobWithUser(id: Long, user: User) = Action {
-    implicit request =>
+  def enqueueGitbJobWithUser(id: Long, user: User){
       if (jobQueue.size >= 30) {
         BadRequest("The job queue is full.")
       } else {
@@ -193,15 +192,13 @@ object TestEngineController extends Controller {
         if (job == null) {
           BadRequest("A job with id [" + id + "] was not found!")
         } else {
-          val java_ctx = play.core.j.JavaHelpers.createJavaContext(request)
-          val java_session = java_ctx.session()
           jobQueue.offer(createTestRunContext(job, user))
           queueFeedUpdate();
           Ok;
         }
       }
   }
-
+      
   /**
    * Update the queue feed with the current active job and queue status
    */
@@ -293,39 +290,38 @@ object TestEngineController extends Controller {
       }
   }
 
-  def cancelOnRequest(request: Request[AnyContent], id: Long, user: User): Result = {
+    
+  /**
+   * an action for cancelling a given gitb job for test engine running
+   * @return
+   */
+  def cancelGitbJob(id: Long, user: User) {
     val job = GitbJob.findById(id)
     if (job == null) {
-      return BadRequest("A job with id [" + id + "] was not found!")
+      BadRequest("A job with id [" + id + "] was not found!")
     }
 
     var index = 0;
     val arr = jobQueue.toArray
-    for (index <- 0 to arr.size) {
+    if(arr == null || arr.size == 0)
+      BadRequest("No gitb job found in queue.")
+      
+    for (index <- 0 to (arr.size - 1)) {
       val tr = arr(index).asInstanceOf[TestRunContext]
       if (user.email == "root@minder" || user.email == tr.testRun.runner.email) {
         if (activeRunContext != null && activeRunContext.job.id == id) {
           //now interrupt the thread.
           testThread.interrupt();
-          return Ok;
+          Ok;
         }
 
         if (tr.job.isInstanceOf[GitbJob] && tr.job.id == id) {
           jobQueue.remove(tr)
           queueFeedUpdate();
-          return Ok;
+          Ok;
         }
       }
     }
-    return BadRequest("A running job with id [" + id + "] was not found!")
-  }
-
-  /**
-   * an action for cancelling a given gitb job for test engine running
-   * @return
-   */
-  def cancelGitbJob(id: Long, user: User) = Action {
-    implicit request =>
-      cancelOnRequest(request, id, user)
+    BadRequest("A running job with id [" + id + "] was not found!")
   }
 }
