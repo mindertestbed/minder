@@ -121,19 +121,22 @@ GET         /rest/login                                 rest.controllers.LoginCo
 GET         /rest/doLogin                               rest.controllers.LoginController.doLogin
 POST        /rest/validatecontent                       rest.controllers.XMLValidationController.validateContent
 #Rest test group management
-POST        /rest/editdependency                        rest.controllers.TestGroupController.editDependency
-POST        /rest/getdependency                         rest.controllers.TestGroupController.getDependency
-POST        /rest/addTestGroup                          rest.controllers.TestGroupController.addTestGroup
-POST        /rest/editTestGroup                         rest.controllers.TestGroupController.editTestGroup
-POST        /rest/deleteTestGroup                       rest.controllers.TestGroupController.deleteTestGroup
-POST        /rest/getTestGroup                          rest.controllers.TestGroupController.getTestGroup
+POST        /rest/editdependency                        rest.controllers.RestTestGroupController.editDependency
+POST        /rest/getdependency                         rest.controllers.RestTestGroupController.getDependency
+POST        /rest/addTestGroup                          rest.controllers.RestTestGroupController.addTestGroup
+POST        /rest/editTestGroup                         rest.controllers.RestTestGroupController.editTestGroup
+POST        /rest/deleteTestGroup                       rest.controllers.RestTestGroupController.deleteTestGroup
+POST        /rest/getTestGroup                          rest.controllers.RestTestGroupController.getTestGroup
+
+#Rest test assertion management
+POST        /rest/getTestAssertion                      rest.controllers.RestTestAssertionController.getTestAssertion
 
 #Rest wrapper management
-GET         /rest/listWrappers                          rest.controllers.WrapperController.listWrappers
-POST        /rest/getWrapperStatus                      rest.controllers.WrapperController.getWrapperStatus
-POST        /rest/getWrapper                            rest.controllers.WrapperController.getWrapper
-POST        /rest/addWrapper                            rest.controllers.WrapperController.addWrapper
-POST        /rest/editWrapper                           rest.controllers.WrapperController.editWrapper
+GET         /rest/listWrappers                          rest.controllers.RestWrapperController.listWrappers
+POST        /rest/getWrapperStatus                      rest.controllers.RestWrapperController.getWrapperStatus
+POST        /rest/getWrapper                            rest.controllers.RestWrapperController.getWrapper
+POST        /rest/addWrapper                            rest.controllers.RestWrapperController.addWrapper
+POST        /rest/editWrapper                           rest.controllers.RestWrapperController.editWrapper
 
 #GITB Testbed Rest Services
 POST        /rest/testbed/getTestCaseDefinition         rest.controllers.GitbTestbedController.getTestCaseDefinition()

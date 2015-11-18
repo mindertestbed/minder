@@ -29,7 +29,7 @@ import java.util.List;
  * @author: Melis Ozgur Cetinkaya Demir
  * @date: 17/11/15.
  */
-public class WrapperController extends Controller {
+public class RestWrapperController extends Controller {
     /**
      * This method receives JSON or XML request which includes wrapper version id information.
      * The XSD for the client request is given in rest/models/xsd/restwrapperversion.xsd

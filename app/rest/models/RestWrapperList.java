@@ -25,7 +25,7 @@ import java.util.List;
  * </pre>
  *
  * @author: Melis Ozgur Cetinkaya Demir
- * @date: 17/11/15.
+ * @date: 18/11/15.
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "wrapperList", propOrder = {
