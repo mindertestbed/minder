@@ -34,12 +34,12 @@ public class TestAsset extends Model{
   @Column(length = ModelConstants.DESCRIPTION_LENGTH, columnDefinition = "TEXT")
   public String description;
 
-  public static List<TestAsset> findByGroup(TestGroup group){
-    return find.where().eq("group", group).orderBy("id").findList();
+  public static List<TestAsset> findByGroup(TestGroup testGroup){
+    return find.where().eq("testGroup", testGroup).orderBy("id").findList();
   }
 
-  public static TestAsset findByGroup(TestGroup group, String name) {
-    return find.where().eq("group", group).eq("name", name).findUnique();
+  public static TestAsset findByGroup(TestGroup testGroup, String name) {
+    return find.where().eq("testGroup", testGroup).eq("name", name).findUnique();
   }
 
   public static TestAsset findById(Long id) {

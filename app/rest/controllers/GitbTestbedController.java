@@ -417,7 +417,7 @@ public class GitbTestbedController extends Controller {
 		MinderTdl minderTdl = null;
 		try {
 			Constructor<MinderTdl> minderConstructor = (Constructor<MinderTdl>) cls.getConstructors()[0];
-			minderTdl = minderConstructor.newInstance(null, java.lang.Boolean.FALSE);
+			minderTdl = minderConstructor.newInstance(java.lang.Boolean.FALSE);
 			if(minderTdl == null)
 				throw new Exception("Cannot get wrapperdefs.");
 		} catch (InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException e1) {
