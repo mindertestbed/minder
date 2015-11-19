@@ -365,6 +365,88 @@ public class RestTestAssertionController extends Controller {
         return ok(responseValue);
     }
 
+    /**
+     * This method receives JSON or XML request which includes test assertion id and deletes the test assertion.
+     * The XSD for the client request is given in rest/models/xsd/resttestgroup.xsd
+     * <p>
+     * The sample JSON request:
+     * {"testAssertionId":"SampleXmlValidation2"}
+     * <p>
+     * <p>
+     * The sample produced response by Minder (with the status code 200in the header):
+     * {"result":"SUCCESS","description":"Test assertion deleted!"}
+     * <p>
+     * Test assertion id is required.
+     */
+
+    public static Result deleteTestAssertion() {
+        RestMinderResponse minderResponse = new RestMinderResponse();
+
+        /*
+        * Parse client request and get user
+        */
+        String authorizationData = request().getHeader(AUTHORIZATION);
+        HashMap<String, String> clientRequest = RestUtils.createHashMapOfClientRequest(authorizationData);
+        User user = User.findByEmail(clientRequest.get("username"));
+        if (null == user) {
+            return unauthorized(Constants.RESULT_UNAUTHORIZED);
+        }
+
+        /*
+        * Handling the request message
+        * */
+        IRestContentProcessor contentProcessor = null;
+        try {
+            contentProcessor = RestUtils.createContentProcessor(request().getHeader(CONTENT_TYPE), request().body());
+        } catch (IllegalArgumentException e) {
+            return badRequest(e.getCause().toString());
+        }
+
+        RestTestAssertion restTestAssertion = null;
+        try {
+            restTestAssertion = (RestTestAssertion) contentProcessor.parseRequest(RestTestAssertion.class.getName());
+        } catch (ParseException e) {
+            return internalServerError(e.getCause().toString());
+        }
+
+        if (null == restTestAssertion.getTestAssertionId())
+            return badRequest("Please provide a unique test assertion id");
+
+        //Deleting the test assertion
+        TestAssertion ta = TestAssertion.findByTaId(restTestAssertion.getTestAssertionId());
+        if (ta == null) {
+            return badRequest("Test assertion with id " + restTestAssertion.getTestAssertionId() + " does not exist.");
+        }
+
+        if (!Util.canAccess(user, ta.owner))
+            return badRequest("You don't have permission to modify this resource");
+
+        try {
+            ta.delete();
+        } catch (Exception ex) {
+            return internalServerError("An error occurred during test assertion delete: " + ex.getMessage());
+        }
+
+        //
+        minderResponse.setResult(Constants.SUCCESS);
+        minderResponse.setDescription("Test assertion deleted!");
+
+        /*
+        * Preparing response
+        * */
+        String responseValue = null;
+        try {
+            responseValue = contentProcessor.prepareResponse(RestMinderResponse.class.getName(), minderResponse);
+        } catch (ParseException e) {
+            return internalServerError(e.getMessage());
+        }
+        System.out.println("responseValue:" + responseValue);
+
+        response().setContentType(contentProcessor.getContentType());
+        return ok(responseValue);
+    }
+
+
     private static void checkAndAssignRequiredFields(TestAssertion ta, RestTestAssertion restTestAssertion) throws IllegalArgumentException {
 
         //Checking the required fields
