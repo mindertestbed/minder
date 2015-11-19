@@ -130,6 +130,8 @@ POST        /rest/getTestGroup                          rest.controllers.RestTes
 
 #Rest test assertion management
 POST        /rest/getTestAssertion                      rest.controllers.RestTestAssertionController.getTestAssertion
+POST        /rest/addTestAssertion                      rest.controllers.RestTestAssertionController.addTestAssertion
+POST        /rest/editTestAssertion                     rest.controllers.RestTestAssertionController.editTestAssertion
 
 #Rest wrapper management
 GET         /rest/listWrappers                          rest.controllers.RestWrapperController.listWrappers
