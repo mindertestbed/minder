@@ -17,10 +17,7 @@ import rest.controllers.common.Constants;
 import rest.controllers.common.JsonNodeStructure;
 import rest.controllers.common.RestUtils;
 import rest.controllers.restbodyprocessor.IRestContentProcessor;
-import rest.models.RestDependencyString;
-import rest.models.RestMinderResponse;
-import rest.models.RestTestAssertion;
-import rest.models.RestTestGroup;
+import rest.models.*;
 
 import java.text.ParseException;
 import java.util.ArrayList;
@@ -38,6 +35,74 @@ import java.util.List;
  * @date: 10/11/15.
  */
 public class RestTestGroupController extends Controller {
+    /**
+     * This method receives JSON or XML request and returns all test groups defined in db.
+     *
+     * The sample produced response by Minder (with the status code 200in the header):
+     * <p>
+     * JSON
+     * =====
+     *{
+     *    "restTestGroups":[
+     *        {
+     *            "id":"1",
+     *            "groupName":"Showcase",
+     *            "shortDescription":"Showcase",
+     *            "description":"A sample test group that contains tests that *demonstate minder kapabilities",
+     *            "owner":"Tester",
+     *            "dependencyString":null,
+     *            "testassertions":null
+     *        }
+     *    ]
+     *}
+     *
+     * <p>
+     * No input is necessary.
+     */
+    public static Result listTestGroups() {
+        RestTestGroupList restTestGroupListResponse = new RestTestGroupList();
+
+        /*
+        * Handling the request message
+        * */
+        IRestContentProcessor contentProcessor = null;
+        try {
+            contentProcessor = RestUtils.createContentProcessor(request().getHeader(CONTENT_TYPE));
+        } catch (IllegalArgumentException e) {
+            return badRequest(e.getCause().toString());
+        }
+
+        //Getting all wrappers
+        List<TestGroup> testGroupList = TestGroup.findAll();
+        restTestGroupListResponse.setRestTestGroups(new ArrayList<RestTestGroup>());
+
+        for(TestGroup testGroup : testGroupList){
+            RestTestGroup rt = new RestTestGroup();
+            rt.setId(String.valueOf(testGroup.id));
+            rt.setGroupName(testGroup.name);
+            rt.setShortDescription(testGroup.shortDescription);
+            rt.setDependencyString(testGroup.dependencyString);
+            rt.setDescription(testGroup.description);
+            rt.setOwner(testGroup.owner.name);
+
+            restTestGroupListResponse.getRestTestGroups().add(rt);
+        }
+
+        /*
+        * Preparing response
+        * */
+        String responseValue = null;
+        try {
+            responseValue = contentProcessor.prepareResponse(RestTestGroupList.class.getName(), restTestGroupListResponse);
+        } catch (ParseException e) {
+            return internalServerError(e.getMessage());
+        }
+
+        response().setContentType(contentProcessor.getContentType());
+        return ok(responseValue);
+    }
+
+
     /**
      * This method receives JSON or XML request which includes test group id and returns detailed testgroup info.
      * The XSD for the client request is given in rest/models/xsd/resttestgroup.xsd
@@ -175,7 +240,7 @@ public class RestTestGroupController extends Controller {
         try {
             tg.delete();
         } catch (Exception ex) {
-            return internalServerError(ex.getCause().toString());
+            return internalServerError("An error occurred during test group delete: " + ex.getMessage());
         }
 
         //
@@ -209,7 +274,13 @@ public class RestTestGroupController extends Controller {
      * The sample produced response by Minder (with the status code 200in the header):
      * {"result":"SUCCESS","description":"Test group edited!"}
      * <p>
-     * Group id, Group name and short description is required, whereas, description is optional.
+     * groupId is required and cannot be null for the request.
+     * For a test group, group name and  short description are required. If you want to
+     * edit these fields, please send a not null value in the request. If you do not want to edit these fields, simply not to mention their tags
+     * in the request will make you keep their current values in DB.
+     * <p>
+     * The field description is optional. If you do not want to set any value to it, simply not mention
+     * its tag in the request.
      */
     public static Result editTestGroup() {
         RestMinderResponse minderResponse = new RestMinderResponse();
@@ -241,15 +312,11 @@ public class RestTestGroupController extends Controller {
             return internalServerError(e.getCause().toString());
         }
 
-        if (null==restTestGroup.getId())
-            return badRequest("Please provide Test Group ID");
         if (null==restTestGroup.getGroupName())
             return badRequest("Please provide Test Group Name");
-        if (null==restTestGroup.getShortDescription())
-            return badRequest("Please provide short description");
 
 
-        //Creating the new test group
+        //Editing the new test group
         TestGroup tg = TestGroup.findById(Long.parseLong(restTestGroup.getId()));
         if (tg == null)
             return badRequest("Test group with id [" + restTestGroup.getId() + "] not found!");
@@ -258,10 +325,13 @@ public class RestTestGroupController extends Controller {
         if (!Util.canAccess(user, tg.owner))
             return badRequest("You don't have permission to modify this resource");
 
-        tg.name = restTestGroup.getGroupName();
-        tg.shortDescription = restTestGroup.getShortDescription();
-        tg.description = restTestGroup.getDescription();
-        tg.update();
+
+        checkAndAssignRequiredFields(tg,restTestGroup);
+        try {
+            tg.update();
+        } catch (Exception e) {
+            return internalServerError("An error occurred during test group update: " + e.getMessage());
+        }
 
         //
         minderResponse.setResult(Constants.SUCCESS);
@@ -346,7 +416,11 @@ public class RestTestGroupController extends Controller {
         group.name = restTestGroup.getGroupName();
         group.dependencyString = "";
 
-        group.save();
+        try {
+            group.save();
+        } catch (Exception e) {
+            return internalServerError("An error occurred during test group add: " + e.getMessage());
+        }
 
         //
         minderResponse.setResult(Constants.SUCCESS);
@@ -568,6 +642,35 @@ public class RestTestGroupController extends Controller {
         } finally {
             Ebean.endTransaction();
         }
+
+    }
+
+    private static void checkAndAssignRequiredFields(TestGroup tg, RestTestGroup restTestGroup) throws IllegalArgumentException {
+
+        //Checking the required fields
+        if (null != restTestGroup.getGroupName()) {
+            if (restTestGroup.getGroupName().equals("")) {
+                throw new IllegalArgumentException("The required field groupName cannot be empty. If you do not want to change the current value, please" +
+                        " simply do not send this tag in the request.");
+
+            }
+            tg.name = restTestGroup.getGroupName();
+        }
+
+        if (null != restTestGroup.getShortDescription()) {
+            if (restTestGroup.getShortDescription().equals("")) {
+                throw new IllegalArgumentException("The required field shortDescription cannot be empty. If you do not want to change the current value, please" +
+                        " simply do not send this tag in the request.");
+
+            }
+            tg.shortDescription = restTestGroup.getShortDescription();
+        }
+
+        //Checking the other editable fields
+        if (null != restTestGroup.getDescription()) {
+            tg.description = restTestGroup.getDescription();
+        }
+
 
     }
 

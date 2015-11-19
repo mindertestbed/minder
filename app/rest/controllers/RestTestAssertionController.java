@@ -244,7 +244,6 @@ public class RestTestAssertionController extends Controller {
 
         try {
             ta.save();
-            ;
         } catch (Exception e) {
             return internalServerError("An error occurred during save of test assertion: " + e.getMessage());
         }
@@ -274,16 +273,16 @@ public class RestTestAssertionController extends Controller {
      * The XSD for the client request is given in rest/models/xsd/resttestgroup.xsd
      * <p>
      * The sample JSON request:
-     * {"testAssertionId":"SampleXmlValidation2",
-     * "shortDescription":"A sample sth",
+     * {"id":"1",
+     * "shortDescription":"A sample sth"
      * }
      * <p>
      * <p>
      * The sample produced response by Minder (with the status code 200in the header):
      * {"result":"SUCCESS","description":"Test assertion updated!"}
      * <p>
-     * testAssertionId is required and cannot be null for the request.
-     * For a test assertion short descripion, normative source, target,predicate and prescription levels are required. If you want to
+     * id is required and cannot be null for the request.
+     * For a test assertion testAssertionId,short description, normative source, target,predicate and prescription levels are required. If you want to
      * edit any of these fields, please send a not null value in the request. If you do not want to edit these fields, simply not to mention their tags
      * in the request will make you keep their current values in DB.
      * <p>
@@ -325,7 +324,7 @@ public class RestTestAssertionController extends Controller {
             return badRequest("Please provide a unique test assertion id");
 
         //Editing the new test assertion
-        TestAssertion ta = TestAssertion.findByTaId(restTestAssertion.getTestAssertionId());
+        TestAssertion ta = TestAssertion.findById(Long.parseLong(restTestAssertion.getId()));
         if (ta == null) {
             return badRequest("The test assertion with ID [" + restTestAssertion.getTestAssertionId() + "] not found");
         }
@@ -450,6 +449,15 @@ public class RestTestAssertionController extends Controller {
     private static void checkAndAssignRequiredFields(TestAssertion ta, RestTestAssertion restTestAssertion) throws IllegalArgumentException {
 
         //Checking the required fields
+        if (null != restTestAssertion.getTestAssertionId()) {
+            if (restTestAssertion.getTestAssertionId().equals("")) {
+                throw new IllegalArgumentException("The required field testAssertionId cannot be empty. If you do not want to change the current value, please" +
+                        " simply do not send this tag in the request.");
+
+            }
+            ta.taId = restTestAssertion.getTestAssertionId();
+        }
+
         if (null != restTestAssertion.getShortDescription()) {
             if (restTestAssertion.getShortDescription().equals("")) {
                 throw new IllegalArgumentException("The required field shortDescription cannot be empty. If you do not want to change the current value, please" +

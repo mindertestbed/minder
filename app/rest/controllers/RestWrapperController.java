@@ -413,26 +413,34 @@ public class RestWrapperController extends Controller {
      * <p>
      * JSON
      * =====
-     * {
-     *  "restWrappers":[
-     *      {
-     *          "id":"1",
-     *          "wrapperName":"xml-content-verifier",
-     *          "shortDescription":"XMl Content Verifier",
-     *          "description":null,
-     *          "userName":"ROOT",
-     *       "restWrapperVersion":null
-     *      },
-     *      {
-     *          "id":"2",
-     *          "wrapperName":"xml-generator",
-     *          "shortDescription":"XMl Generator Wrapper",
-     *          "description":null,
-     *          "userName":"ROOT",
-     *          "restWrapperVersion":null
-     *      }
-     *  ]
-     * }
+     *{
+     *    "restWrappers":[
+     *        {
+     *            "id":"1",
+     *            "wrapperName":"tamelizer",
+     *            "shortDescription":"The tamelizer wrapper for minder",
+     *            "description":null,
+     *            "userName":"ROOT",
+     *            "restWrapperVersion":null
+     *        },
+     *        {
+     *            "id":"2",
+     *            "wrapperName":"xml-content-verifier",
+     *            "shortDescription":"The default minder xml content verifier",
+     *            "description":null,
+     *            "userName":"ROOT",
+     *            "restWrapperVersion":null
+     *        },
+     *        {
+     *            "id":"3",
+     *            "wrapperName":"peppol-validator",
+     *            "shortDescription":"A minder adapted version of the Peppol *XML Content Validation Engine",
+     *            "description":null,
+     *            "userName":"ROOT",
+     *            "restWrapperVersion":null
+     *        }
+     *    ]
+     *}
      *
      * <p>
      * No input is necessary.
@@ -457,6 +465,7 @@ public class RestWrapperController extends Controller {
 
         for(Wrapper wrapper : wrapperList){
             RestWrapper rw = new RestWrapper();
+            rw.setId(String.valueOf(wrapper.id));
             rw.setWrapperName(wrapper.name);
             rw.setDescription(wrapper.description);
             rw.setId(String.valueOf(wrapper.id));

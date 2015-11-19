@@ -121,6 +121,7 @@ GET         /rest/login                                 rest.controllers.LoginCo
 GET         /rest/doLogin                               rest.controllers.LoginController.doLogin
 POST        /rest/validatecontent                       rest.controllers.XMLValidationController.validateContent
 #Rest test group management
+GET         /rest/listTestGroups                        rest.controllers.RestTestGroupController.listTestGroups
 POST        /rest/editdependency                        rest.controllers.RestTestGroupController.editDependency
 POST        /rest/getdependency                         rest.controllers.RestTestGroupController.getDependency
 POST        /rest/addTestGroup                          rest.controllers.RestTestGroupController.addTestGroup
