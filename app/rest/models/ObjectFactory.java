@@ -33,6 +33,7 @@ public class ObjectFactory {
     private final static QName _RestWrapperList_QNAME = new QName("", "restWrapperList");
     private final static QName _RestTestAssertion_QNAME = new QName("", "restWrapperList");
     private final static QName _RestTestCase_QNAME = new QName("", "restWrapperList");
+    private final static QName _RestTdl_QNAME = new QName("", "restTdl");
 
     /**
      * Create a new ObjectFactory that can be used to create new instances of schema derived classes for package: rest.controllers.xmlmodel.response
@@ -209,5 +210,22 @@ public class ObjectFactory {
     @XmlElementDecl(namespace = "", name = "restTestCase")
     public JAXBElement<RestTestCase> createRestTestCase(RestTestCase value) {
         return new JAXBElement<RestTestCase>(_RestTestCase_QNAME, RestTestCase.class, null, value);
+    }
+
+    /**
+     * Create an instance of {@link rest.models.RestTdl }
+     *
+     */
+    public RestTdl createRestTdl() {
+        return new RestTdl();
+    }
+
+    /**
+     * Create an instance of {@link JAXBElement }{@code <}{@link RestTdl }{@code >}}
+     *
+     */
+    @XmlElementDecl(namespace = "", name = "restTdl")
+    public JAXBElement<RestTdl> createRestTdl(RestTdl value) {
+        return new JAXBElement<RestTdl>(_RestTdl_QNAME, RestTdl.class, null, value);
     }
 }

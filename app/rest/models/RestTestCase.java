@@ -1,6 +1,7 @@
 package rest.models;
 
 import javax.xml.bind.annotation.*;
+import java.util.List;
 
 /**
  * <p>Java class for minderResponse complex type.
@@ -39,6 +40,10 @@ public class RestTestCase {
 
     @XmlElement(required = false)
     protected String owner;
+
+    @XmlElementWrapper(name="tdls")
+    @XmlElement(required = false)
+    public List<RestTdl> tdls;
 
     public String getId() {
         return id;
@@ -86,5 +91,13 @@ public class RestTestCase {
 
     public void setOwner(String owner) {
         this.owner = owner;
+    }
+
+    public void setTlds(List<RestTdl> tdls) {
+        this.tdls = tdls;
+    }
+
+    public List<RestTdl> getTlds() {
+        return tdls;
     }
 }
