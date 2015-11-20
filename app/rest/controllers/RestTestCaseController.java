@@ -1,18 +1,13 @@
 package rest.controllers;
 
 import global.Util;
-import models.Tdl;
-import models.TestAssertion;
-import models.TestCase;
-import models.User;
+import models.*;
 import play.mvc.Controller;
 import play.mvc.Result;
 import rest.controllers.common.Constants;
 import rest.controllers.common.RestUtils;
 import rest.controllers.restbodyprocessor.IRestContentProcessor;
-import rest.models.RestMinderResponse;
-import rest.models.RestTdl;
-import rest.models.RestTestCase;
+import rest.models.*;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -33,6 +28,89 @@ import java.util.List;
 public class RestTestCaseController extends Controller {
 
     public static SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSXXX");
+
+    /**
+     * This method receives JSON or XML request and returns all test cases for a given test assertion id
+     * To get the details of test cases please use getTestCase method.
+     *
+     * The sample JSON request:
+     * {"testAssertionId":"1"}
+     *
+     * The sample produced response by Minder (with the status code 200in the header):
+     * <p>
+     *{
+     *    "restTestCases":[
+     *        {
+     *            "id":"1",
+     *            "testAssertionId":null,
+     *            "name":"TestCaseSample1",
+     *            "shortDescription":"Books test",
+     *            "description":null,
+     *            "owner":null,
+     *            "tdls":null
+     *        }
+     *    ]
+     *}
+     *
+     * <p>
+     * testAssertionId is mandatory.
+     */
+    public static Result listTestCases() {
+        RestTestCaseList restTestCaseList = new RestTestCaseList();
+
+        /*
+        * Handling the request message
+        * */
+        IRestContentProcessor contentProcessor = null;
+        try {
+            contentProcessor = RestUtils.createContentProcessor(request().getHeader(CONTENT_TYPE),request().body());
+        } catch (IllegalArgumentException e) {
+            return badRequest(e.getCause().toString());
+        }
+
+        RestTestCase restTestCase = null;
+        try {
+            restTestCase = (RestTestCase) contentProcessor.parseRequest(RestTestCase.class.getName());
+        } catch (ParseException e) {
+            return internalServerError(e.getCause().toString());
+        }
+
+        if (null==restTestCase.getTestAssertionId())
+            return badRequest("Please provide Test Assertion Id");
+
+
+        //getting the  test group
+        TestAssertion ta = TestAssertion.findById(Long.parseLong(restTestCase.getTestAssertionId()));
+        if (ta == null)
+            return badRequest("Test assertion with id [" + restTestCase.getTestAssertionId() + "] not found!");
+
+
+        //Getting all test assertions
+        restTestCaseList.setRestTestCases(new ArrayList<RestTestCase>());
+
+        List<TestCase> testCaseList = ta.testCases;
+        for(TestCase tc : testCaseList){
+            RestTestCase rtc = new RestTestCase();
+            rtc.setId(String.valueOf(tc.id));
+            rtc.setName(tc.name);
+            rtc.setShortDescription(tc.shortDescription);
+
+            restTestCaseList.getRestTestCases().add(rtc);
+        }
+
+        /*
+        * Preparing response
+        * */
+        String responseValue = null;
+        try {
+            responseValue = contentProcessor.prepareResponse(RestTestCaseList.class.getName(), restTestCaseList);
+        } catch (ParseException e) {
+            return internalServerError(e.getMessage());
+        }
+
+        response().setContentType(contentProcessor.getContentType());
+        return ok(responseValue);
+    }
 
     /**
      * This method receives JSON or XML request which includes test case id and returns detailed testcase info.
@@ -99,7 +177,7 @@ public class RestTestCaseController extends Controller {
         responseRestTestCase.setTestAssertionId(tc.testAssertion.taId);
         responseRestTestCase.setDescription(tc.description);
         responseRestTestCase.setShortDescription(tc.shortDescription);
-        responseRestTestCase.setTlds(new ArrayList<RestTdl>());
+        responseRestTestCase.setTdls(new ArrayList<RestTdl>());
 
         List<Tdl> tdlList = tc.tdls;
         for(Tdl tdl : tdlList){
@@ -108,7 +186,7 @@ public class RestTestCaseController extends Controller {
             restTdl.setVersion(tdl.version);
             restTdl.setCreationDate(dateFormat.format(tdl.creationDate));
 
-            responseRestTestCase.getTlds().add(restTdl);
+            responseRestTestCase.getTdls().add(restTdl);
         }
 
         /*

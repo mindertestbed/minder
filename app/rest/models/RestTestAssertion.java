@@ -16,7 +16,7 @@ import java.util.List;
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "testAssertion", propOrder = {
         "id",
-        "groupName",
+        "groupId",
         "testAssertionId",
         "normativeSource",
         "target",
@@ -37,7 +37,7 @@ public class RestTestAssertion {
     protected String id;
 
     @XmlElement(required = false)
-    protected String groupName;
+    protected String groupId;
 
     @XmlElement(required = false)
     protected String testAssertionId;
@@ -84,12 +84,12 @@ public class RestTestAssertion {
         this.id = id;
     }
 
-    public String getGroupName() {
-        return groupName;
+    public String getGroupId() {
+        return groupId;
     }
 
-    public void setGroupName(String groupName) {
-        this.groupName = groupName;
+    public void setGroupId(String groupId) {
+        this.groupId = groupId;
     }
 
     public String getTestAssertionId() {

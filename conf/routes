@@ -130,12 +130,17 @@ POST        /rest/deleteTestGroup                       rest.controllers.RestTes
 POST        /rest/getTestGroup                          rest.controllers.RestTestGroupController.getTestGroup
 
 #Rest test assertion management
+POST        /rest/listTestAssertions                    rest.controllers.RestTestAssertionController.listTestAssertions
 POST        /rest/getTestAssertion                      rest.controllers.RestTestAssertionController.getTestAssertion
 POST        /rest/addTestAssertion                      rest.controllers.RestTestAssertionController.addTestAssertion
 POST        /rest/editTestAssertion                     rest.controllers.RestTestAssertionController.editTestAssertion
 POST        /rest/deleteTestAssertion                   rest.controllers.RestTestAssertionController.deleteTestAssertion
 
 #Rest test case management
+POST        /rest/listTestAssets                        rest.controllers.RestTestAssetController.listTestAssets
+
+#Rest test case management
+POST        /rest/listTestCases                         rest.controllers.RestTestCaseController.listTestCases
 POST        /rest/getTestCase                           rest.controllers.RestTestCaseController.getTestCase
 POST        /rest/addTestCase                           rest.controllers.RestTestCaseController.addTestCase
 POST        /rest/editTestCase                          rest.controllers.RestTestCaseController.editTestCase

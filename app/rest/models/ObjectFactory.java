@@ -31,9 +31,14 @@ public class ObjectFactory {
     private final static QName _RestWrapper_QNAME = new QName("", "restWrapper");
     private final static QName _RestWrapperVersion_QNAME = new QName("", "restWrapperVersion");
     private final static QName _RestWrapperList_QNAME = new QName("", "restWrapperList");
-    private final static QName _RestTestAssertion_QNAME = new QName("", "restWrapperList");
-    private final static QName _RestTestCase_QNAME = new QName("", "restWrapperList");
+    private final static QName _RestTestAssertion_QNAME = new QName("", "restTestAssertion");
+    private final static QName _RestTestCase_QNAME = new QName("", "restTestCase");
     private final static QName _RestTdl_QNAME = new QName("", "restTdl");
+    private final static QName _RestTestAsset_QNAME = new QName("", "restTestAsset");
+    private final static QName _RestTestAssetList_QNAME = new QName("", "restTestAssetList");
+    private final static QName _RestTestGroupList_QNAME = new QName("", "restTestGroupList");
+    private final static QName _RestTestAssertionList_QNAME = new QName("", "restTestAssertion");
+    private final static QName _RestTestCaseList_QNAME = new QName("", "restTestAssertion");
 
     /**
      * Create a new ObjectFactory that can be used to create new instances of schema derived classes for package: rest.controllers.xmlmodel.response
@@ -191,7 +196,7 @@ public class ObjectFactory {
      *
      */
     @XmlElementDecl(namespace = "", name = "restTestAssertion")
-    public JAXBElement<RestTestAssertion> createRestTestAssetion(RestTestAssertion value) {
+    public JAXBElement<RestTestAssertion> createRestTestAssertion(RestTestAssertion value) {
         return new JAXBElement<RestTestAssertion>(_RestTestAssertion_QNAME, RestTestAssertion.class, null, value);
     }
 
@@ -227,5 +232,76 @@ public class ObjectFactory {
     @XmlElementDecl(namespace = "", name = "restTdl")
     public JAXBElement<RestTdl> createRestTdl(RestTdl value) {
         return new JAXBElement<RestTdl>(_RestTdl_QNAME, RestTdl.class, null, value);
+    }
+
+
+    /**
+     * Create an instance of {@link rest.models.RestTestAsset }
+     *
+     */
+    public RestTestAsset createRestTestAsset() {
+        return new RestTestAsset();
+    }
+
+    /**
+     * Create an instance of {@link JAXBElement }{@code <}{@link RestTestAsset }{@code >}}
+     *
+     */
+    @XmlElementDecl(namespace = "", name = "restTestAsset")
+    public JAXBElement<RestTestAsset> createRestTestAsset(RestTestAsset value) {
+        return new JAXBElement<RestTestAsset>(_RestTestAsset_QNAME, RestTestAsset.class, null, value);
+    }
+
+
+    /**
+     * Create an instance of {@link rest.models.RestTestAssertionList }
+     *
+     */
+    public RestTestAssertionList createRestTestAssertionList() {
+        return new RestTestAssertionList();
+    }
+
+    /**
+     * Create an instance of {@link JAXBElement }{@code <}{@link RestTestAssertionList }{@code >}}
+     *
+     */
+    @XmlElementDecl(namespace = "", name = "restTestAssertionList")
+    public JAXBElement<RestTestAssertionList> createRestTestAssertionList(RestTestAssertionList value) {
+        return new JAXBElement<RestTestAssertionList>(_RestTestAssertionList_QNAME, RestTestAssertionList.class, null, value);
+    }
+
+
+    /**
+     * Create an instance of {@link rest.models.RestTestGroupList }
+     *
+     */
+    public RestTestGroupList createRestTestGroupList() {
+        return new RestTestGroupList();
+    }
+
+    /**
+     * Create an instance of {@link JAXBElement }{@code <}{@link RestTestGroupList }{@code >}}
+     *
+     */
+    @XmlElementDecl(namespace = "", name = "restTestGroup")
+    public JAXBElement<RestTestGroupList> createRestTestGroupList(RestTestGroupList value) {
+        return new JAXBElement<RestTestGroupList>(_RestTestGroupList_QNAME, RestTestGroupList.class, null, value);
+    }
+
+    /**
+     * Create an instance of {@link rest.models.RestTestCaseList }
+     *
+     */
+    public RestTestCaseList createRestTestCaseList() {
+        return new RestTestCaseList();
+    }
+
+    /**
+     * Create an instance of {@link JAXBElement }{@code <}{@link RestTestCaseList }{@code >}}
+     *
+     */
+    @XmlElementDecl(namespace = "", name = "restTestCaseList")
+    public JAXBElement<RestTestCaseList> createRestTestCaseList(RestTestCaseList value) {
+        return new JAXBElement<RestTestCaseList>(_RestTestCaseList_QNAME, RestTestCaseList.class, null, value);
     }
 }

@@ -10,6 +10,7 @@ import rest.controllers.common.RestUtils;
 import rest.controllers.restbodyprocessor.IRestContentProcessor;
 import rest.models.RestMinderResponse;
 import rest.models.RestTestAssertion;
+import rest.models.RestTestAssertionList;
 import rest.models.RestTestCase;
 
 import java.text.ParseException;
@@ -28,6 +29,113 @@ import java.util.List;
  * @date: 18/11/15.
  */
 public class RestTestAssertionController extends Controller {
+    /**
+     * This method receives JSON or XML request and returns all test assertions for a given group id
+     * To get the details of test assertions please use getTestAssertion method.
+     *
+     * The sample JSON request:
+     * {"groupId":"1"}
+     *
+     * The sample produced response by Minder (with the status code 200in the header):
+     * <p>
+     *{
+     *    "restTestAssertions":[
+     *        {
+     *            "id":"2",
+     *            "groupId":null,
+     *            "testAssertionId":"AllSchemaTests",
+     *            "normativeSource":null,
+     *            "target":null,
+     *            "prerequisites":null,
+     *            "predicate":null,
+     *            "variables":null,
+     *            "tag":null,
+     *            "description":null,
+     *            "shortDescription":"A sample xml-content-validation test",
+     *            "prescriptionLevel":null,
+     *            "owner":null,
+     *            "testcases":null
+     *        },
+     *        {
+     *            "id":"1",
+     *            "groupId":null,
+     *            "testAssertionId":"SampleXmlValidation",
+     *            "normativeSource":null,
+     *            "target":null,
+     *            "prerequisites":null,
+     *            "predicate":null,
+     *            "variables":null,
+     *            "tag":null,
+     *            "description":null,
+     *            "shortDescription":"A sample xml-content-validation test",
+     *            "prescriptionLevel":null,
+     *            "owner":null,
+     *            "testcases":null
+     *        }
+     *    ]
+     *}
+     *
+     * <p>
+     * groupId is mandatory.
+     */
+    public static Result listTestAssertions() {
+        RestTestAssertionList restTestAssertionListResponse = new RestTestAssertionList();
+
+        /*
+        * Handling the request message
+        * */
+        IRestContentProcessor contentProcessor = null;
+        try {
+            contentProcessor = RestUtils.createContentProcessor(request().getHeader(CONTENT_TYPE),request().body());
+        } catch (IllegalArgumentException e) {
+            return badRequest(e.getCause().toString());
+        }
+
+        RestTestAssertion restTestAssertion = null;
+        try {
+            restTestAssertion = (RestTestAssertion) contentProcessor.parseRequest(RestTestAssertion.class.getName());
+        } catch (ParseException e) {
+            return internalServerError(e.getCause().toString());
+        }
+
+        if (null==restTestAssertion.getGroupId())
+            return badRequest("Please provide Test Group ID");
+
+
+        //getting the  test group
+        TestGroup tg = TestGroup.findById(Long.parseLong(restTestAssertion.getGroupId()));
+        if (tg == null)
+            return badRequest("Test group with id [" + restTestAssertion.getId() + "] not found!");
+
+
+        //Getting all test assertions
+        restTestAssertionListResponse.setRestTestAssertions(new ArrayList<RestTestAssertion>());
+
+        List<TestAssertion> testAssertionList = TestAssertion.findByGroup(tg);
+        for(TestAssertion ta : testAssertionList){
+            RestTestAssertion rta = new RestTestAssertion();
+            rta.setTestAssertionId(ta.taId);
+            rta.setId(String.valueOf(ta.id));
+            rta.setShortDescription(ta.shortDescription);
+
+            restTestAssertionListResponse.getRestTestAssertions().add(rta);
+        }
+
+        /*
+        * Preparing response
+        * */
+        String responseValue = null;
+        try {
+            responseValue = contentProcessor.prepareResponse(RestTestAssertionList.class.getName(), restTestAssertionListResponse);
+        } catch (ParseException e) {
+            return internalServerError(e.getMessage());
+        }
+
+        response().setContentType(contentProcessor.getContentType());
+        return ok(responseValue);
+    }
+
+
     /**
      * This method receives JSON or XML request which includes test assertion id and returns detailed test assertion info
      * with its test cases. To get more detailed test case information please use Test Case services.
@@ -98,7 +206,7 @@ public class RestTestAssertionController extends Controller {
         }
 
         responseRestTestAssertion.setId(String.valueOf(ta.id));
-        responseRestTestAssertion.setGroupName(ta.testGroup.name);
+        responseRestTestAssertion.setGroupId(String.valueOf(ta.testGroup.id));
         responseRestTestAssertion.setTestAssertionId(ta.taId);
         responseRestTestAssertion.setNormativeSource(ta.normativeSource);
         responseRestTestAssertion.setTarget(ta.target);
@@ -189,8 +297,8 @@ public class RestTestAssertionController extends Controller {
             return internalServerError(e.getCause().toString());
         }
 
-        if (null == restTestAssertion.getGroupName())
-            return badRequest("Please provide Test Group Name");
+        if (null == restTestAssertion.getGroupId())
+            return badRequest("Please provide Test Group Id");
         if (null == restTestAssertion.getTestAssertionId())
             return badRequest("Please provide a unique test assertion id");
         if (null == restTestAssertion.getShortDescription())
@@ -211,7 +319,7 @@ public class RestTestAssertionController extends Controller {
             return badRequest("The test assertion with ID [" + ta.taId + "] already exists");
         }
 
-        TestGroup tg = TestGroup.findByName(restTestAssertion.getGroupName());
+        TestGroup tg = TestGroup.findById(Long.parseLong(restTestAssertion.getGroupId()));
 
         if (tg == null) {
             return badRequest("No group found with id [" + tg.id + "]");

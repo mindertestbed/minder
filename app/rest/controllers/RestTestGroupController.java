@@ -6,7 +6,6 @@ import controllers.common.enumeration.Utils;
 import dependencyutils.DependencyClassLoaderCache;
 import editormodels.GroupEditorModel;
 import global.Util;
-import models.TestAssertion;
 import models.TestGroup;
 import models.User;
 import play.Logger;
@@ -156,14 +155,6 @@ public class RestTestGroupController extends Controller {
         responseRestTestGroup.setDescription(tg.description);
         responseRestTestGroup.setOwner(tg.owner.email);
         responseRestTestGroup.setDependencyString(tg.dependencyString);
-
-        responseRestTestGroup.setTestassertions(new ArrayList<RestTestAssertion>());
-
-        List<TestAssertion> taList = tg.testAssertions;
-        for(TestAssertion ta : taList){
-            RestTestAssertion rta = new RestTestAssertion();
-            rta.setTestAssertionId(ta.taId);
-        }
 
         /*
         * Preparing response

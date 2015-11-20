@@ -60,6 +60,10 @@ public class RestTestGroup {
     @XmlElement(required = false)
     public List<RestTestAssertion> testassertions;
 
+    @XmlElementWrapper(name="testassets")
+    @XmlElement(required = false)
+    public List<RestTestAsset> testassets;
+
 
     public String getGroupName() {
         return groupName;
@@ -107,5 +111,13 @@ public class RestTestGroup {
 
     public void setTestassertions(List<RestTestAssertion> testassertions) {
         this.testassertions = testassertions;
+    }
+
+    public List<RestTestAsset> getTestassets() {
+        return testassets;
+    }
+
+    public void setTestassets(List<RestTestAsset> testassets) {
+        this.testassets = testassets;
     }
 }
