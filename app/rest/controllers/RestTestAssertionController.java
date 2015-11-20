@@ -86,14 +86,14 @@ public class RestTestAssertionController extends Controller {
             return internalServerError(e.getCause().toString());
         }
 
-        if (null == restTestAssertion.getTestAssertionId())
-            return badRequest("Please provide Test Assertion ID");
+        if (null == restTestAssertion.getId())
+            return badRequest("Please provide an ID");
 
 
         //Getting the test assertion
-        TestAssertion ta = TestAssertion.findByTaId(restTestAssertion.getTestAssertionId());
+        TestAssertion ta = TestAssertion.findById(Long.parseLong(restTestAssertion.getId()));
         if (ta == null) {
-            return badRequest("Test assertion with taId [" + restTestAssertion.getTestAssertionId() + "] not found!");
+            return badRequest("Test assertion with ID [" + restTestAssertion.getId() + "] not found!");
 
         }
 
@@ -141,7 +141,6 @@ public class RestTestAssertionController extends Controller {
 
     /**
      * This method receives JSON or XML request which includes test assertion information and creates a new test assertion.
-     * The XSD for the client request is given in rest/models/xsd/resttestgroup.xsd
      * <p>
      * The sample JSON request:
      * {"groupName":"Showcase",
@@ -219,16 +218,13 @@ public class RestTestAssertionController extends Controller {
         }
 
         ta = new TestAssertion();
-        ta.taId = restTestAssertion.getTestAssertionId();
-        ta.normativeSource = restTestAssertion.getNormativeSource();
-        ta.predicate = restTestAssertion.getPredicate();
-        ta.prerequisites = restTestAssertion.getPrerequisites();
-        ta.target = restTestAssertion.getTarget();
-        ta.variables = restTestAssertion.getVariables();
-        ta.tag = restTestAssertion.getTag();
-        ta.description = restTestAssertion.getDescription();
-        ta.shortDescription = restTestAssertion.getShortDescription();
         ta.testGroup = tg;
+        //Check the required fields' values.
+        try {
+            checkAndAssignRequiredFields(ta, restTestAssertion);
+        } catch (IllegalArgumentException e) {
+            return badRequest(e.getMessage());
+        }
 
         PrescriptionLevel prescriptionLevel = null;
         try {
@@ -320,8 +316,8 @@ public class RestTestAssertionController extends Controller {
             return internalServerError(e.getCause().toString());
         }
 
-        if (null == restTestAssertion.getTestAssertionId())
-            return badRequest("Please provide a unique test assertion id");
+        if (null == restTestAssertion.getId())
+            return badRequest("Please provide an id");
 
         //Editing the new test assertion
         TestAssertion ta = TestAssertion.findById(Long.parseLong(restTestAssertion.getId()));
@@ -369,13 +365,13 @@ public class RestTestAssertionController extends Controller {
      * The XSD for the client request is given in rest/models/xsd/resttestgroup.xsd
      * <p>
      * The sample JSON request:
-     * {"testAssertionId":"SampleXmlValidation2"}
+     * {"id":"1"}
      * <p>
      * <p>
      * The sample produced response by Minder (with the status code 200in the header):
      * {"result":"SUCCESS","description":"Test assertion deleted!"}
      * <p>
-     * Test assertion id is required.
+     * id is required.
      */
 
     public static Result deleteTestAssertion() {
@@ -408,13 +404,13 @@ public class RestTestAssertionController extends Controller {
             return internalServerError(e.getCause().toString());
         }
 
-        if (null == restTestAssertion.getTestAssertionId())
-            return badRequest("Please provide a unique test assertion id");
+        if (null == restTestAssertion.getId())
+            return badRequest("Please provide an ID");
 
         //Deleting the test assertion
-        TestAssertion ta = TestAssertion.findByTaId(restTestAssertion.getTestAssertionId());
+        TestAssertion ta = TestAssertion.findById(Long.parseLong(restTestAssertion.getId()));
         if (ta == null) {
-            return badRequest("Test assertion with id " + restTestAssertion.getTestAssertionId() + " does not exist.");
+            return badRequest("Test assertion with id " + restTestAssertion.getId() + " does not exist.");
         }
 
         if (!Util.canAccess(user, ta.owner))

@@ -135,12 +135,19 @@ POST        /rest/addTestAssertion                      rest.controllers.RestTes
 POST        /rest/editTestAssertion                     rest.controllers.RestTestAssertionController.editTestAssertion
 POST        /rest/deleteTestAssertion                   rest.controllers.RestTestAssertionController.deleteTestAssertion
 
+#Rest test case management
+POST        /rest/getTestCase                           rest.controllers.RestTestCaseController.getTestCase
+POST        /rest/addTestCase                           rest.controllers.RestTestCaseController.addTestCase
+POST        /rest/editTestCase                          rest.controllers.RestTestCaseController.editTestCase
+POST        /rest/deleteTestCase                        rest.controllers.RestTestCaseController.deleteTestCase
+
 #Rest wrapper management
 GET         /rest/listWrappers                          rest.controllers.RestWrapperController.listWrappers
 POST        /rest/getWrapperStatus                      rest.controllers.RestWrapperController.getWrapperStatus
 POST        /rest/getWrapper                            rest.controllers.RestWrapperController.getWrapper
 POST        /rest/addWrapper                            rest.controllers.RestWrapperController.addWrapper
 POST        /rest/editWrapper                           rest.controllers.RestWrapperController.editWrapper
+POST        /rest/deleteWrapper                         rest.controllers.RestWrapperController.deleteWrapper
 
 #GITB Testbed Rest Services
 POST        /rest/testbed/getTestCaseDefinition         rest.controllers.GitbTestbedController.getTestCaseDefinition()

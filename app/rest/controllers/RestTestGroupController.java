@@ -144,7 +144,7 @@ public class RestTestGroupController extends Controller {
             return badRequest("Please provide Test Group ID");
 
 
-        //Creating the new test group
+        //getting the  test group
         TestGroup tg = TestGroup.findById(Long.parseLong(restTestGroup.getId()));
         if (tg == null)
             return badRequest("Test group with id [" + restTestGroup.getId() + "] not found!");
@@ -274,7 +274,7 @@ public class RestTestGroupController extends Controller {
      * The sample produced response by Minder (with the status code 200in the header):
      * {"result":"SUCCESS","description":"Test group edited!"}
      * <p>
-     * groupId is required and cannot be null for the request.
+     * id is required and cannot be null for the request.
      * For a test group, group name and  short description are required. If you want to
      * edit these fields, please send a not null value in the request. If you do not want to edit these fields, simply not to mention their tags
      * in the request will make you keep their current values in DB.
@@ -312,8 +312,8 @@ public class RestTestGroupController extends Controller {
             return internalServerError(e.getCause().toString());
         }
 
-        if (null==restTestGroup.getGroupName())
-            return badRequest("Please provide Test Group Name");
+        if (null==restTestGroup.getId())
+            return badRequest("Please provide an Id");
 
 
         //Editing the new test group
@@ -325,8 +325,13 @@ public class RestTestGroupController extends Controller {
         if (!Util.canAccess(user, tg.owner))
             return badRequest("You don't have permission to modify this resource");
 
+        //Check the required fields' values.
+        try {
+            checkAndAssignRequiredFields(tg,restTestGroup);
+        } catch (IllegalArgumentException e) {
+            return badRequest(e.getMessage());
+        }
 
-        checkAndAssignRequiredFields(tg,restTestGroup);
         try {
             tg.update();
         } catch (Exception e) {
@@ -411,10 +416,13 @@ public class RestTestGroupController extends Controller {
 
         group = new TestGroup();
         group.owner = user;
-        group.shortDescription = restTestGroup.getShortDescription();
-        group.description = restTestGroup.getDescription();
-        group.name = restTestGroup.getGroupName();
-        group.dependencyString = "";
+
+        //Check the required fields' values.
+        try {
+            checkAndAssignRequiredFields(group,restTestGroup);
+        } catch (IllegalArgumentException e) {
+            return badRequest(e.getMessage());
+        }
 
         try {
             group.save();
@@ -462,6 +470,8 @@ public class RestTestGroupController extends Controller {
      * <p>
      * To delete a dependency string, simple assign the value as "".
      * Eg. {"groupId":1,"value":""}
+     *
+     * If you do not want to change the current value, please simply do not send this tag in the request.
      */
     public static Result editDependency() {
         RestMinderResponse minderResponse = new RestMinderResponse();
@@ -650,8 +660,7 @@ public class RestTestGroupController extends Controller {
         //Checking the required fields
         if (null != restTestGroup.getGroupName()) {
             if (restTestGroup.getGroupName().equals("")) {
-                throw new IllegalArgumentException("The required field groupName cannot be empty. If you do not want to change the current value, please" +
-                        " simply do not send this tag in the request.");
+                throw new IllegalArgumentException("The required field groupName cannot be empty");
 
             }
             tg.name = restTestGroup.getGroupName();
@@ -659,8 +668,7 @@ public class RestTestGroupController extends Controller {
 
         if (null != restTestGroup.getShortDescription()) {
             if (restTestGroup.getShortDescription().equals("")) {
-                throw new IllegalArgumentException("The required field shortDescription cannot be empty. If you do not want to change the current value, please" +
-                        " simply do not send this tag in the request.");
+                throw new IllegalArgumentException("The required field shortDescription cannot be empty.");
 
             }
             tg.shortDescription = restTestGroup.getShortDescription();
