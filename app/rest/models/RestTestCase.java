@@ -18,7 +18,8 @@ import java.util.List;
         "name",
         "shortDescription",
         "description",
-        "owner"
+        "owner",
+        "tdls"
 })
 @XmlRootElement(name = "testCase")
 public class RestTestCase {
