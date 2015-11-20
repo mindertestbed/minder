@@ -190,7 +190,6 @@ object TestEngineController extends Controller {
         } else {
           jobQueue.offer(createTestRunContext(job, user))
           queueFeedUpdate();
-          Ok;
         }
       }
   }
@@ -293,31 +292,43 @@ object TestEngineController extends Controller {
   def cancelGitbJob(id: Long, user: User) {
     val job = GitbJob.findById(id)
     if (job == null) {
-      BadRequest("A job with id [" + id + "] was not found!")
+      println("A job with id [" + id + "] was not found!")
+      return
     }
 
+    //now look at running gitb jobs
+    if (activeRunContext != null && activeRunContext.job.id == id) {
+      if (user.email == "root@minder" || user.email == activeRunContext.job.owner.email) {
+        //now interrupt the thread.
+        testThread.interrupt();  
+        return
+      }
+      else
+      {
+        println(user.email + " not permitted for" + " job with id [" + id + "]")
+        return
+      } 
+    }
+    
+    //now look at waiting gitb jobs
     var index = 0;
     val arr = jobQueue.toArray
     if(arr == null || arr.size == 0)
-      BadRequest("No gitb job found in queue.")
-      
+    {
+      println("A waiting job with id [" + id + "] was not found!")
+      return
+    }
+          
     for (index <- 0 to (arr.size - 1)) {
       val tr = arr(index).asInstanceOf[TestRunContext]
       if (user.email == "root@minder" || user.email == tr.testRun.runner.email) {
-        if (activeRunContext != null && activeRunContext.job.id == id) {
-          //now interrupt the thread.
-          testThread.interrupt();
-          Ok;
-        }
-
         if (tr.job.isInstanceOf[GitbJob] && tr.job.id == id) {
           jobQueue.remove(tr)
           queueFeedUpdate();
-          Ok;
+          return
         }
       }
     }
-    BadRequest("A running job with id [" + id + "] was not found!")
   }
 
 }
