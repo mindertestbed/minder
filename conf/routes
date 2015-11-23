@@ -167,6 +167,14 @@ POST        /rest/testbed/start                         rest.controllers.GitbTes
 POST        /rest/testbed/stop                          rest.controllers.GitbTestbedController.stop()
 POST        /rest/testbed/getTestCaseDefinitions        rest.controllers.GitbTestbedController.getGetTestCaseDefinitions()
 
+#GITB Messaging Rest Services
+POST        /rest/messaging/getModuleDefinition         rest.controllers.GitbMessagingController.getModuleDefinition()
+POST        /rest/messaging/initiate            		rest.controllers.GitbMessagingController.initiate()
+POST        /rest/messaging/beginTransaction            rest.controllers.GitbMessagingController.beginTransaction()
+POST        /rest/messaging/endTransaction              rest.controllers.GitbMessagingController.endTransaction()
+POST        /rest/messaging/send                        rest.controllers.GitbMessagingController.send()
+POST        /rest/messaging/finalize                    rest.controllers.GitbMessagingController.finalize()
+
 
 
 ##-------------
