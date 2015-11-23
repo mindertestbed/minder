@@ -136,8 +136,12 @@ POST        /rest/addTestAssertion                      rest.controllers.RestTes
 POST        /rest/editTestAssertion                     rest.controllers.RestTestAssertionController.editTestAssertion
 POST        /rest/deleteTestAssertion                   rest.controllers.RestTestAssertionController.deleteTestAssertion
 
-#Rest test case management
+#Rest test asset management
 POST        /rest/listTestAssets                        rest.controllers.RestTestAssetController.listTestAssets
+POST        /rest/getTestAsset                          rest.controllers.RestTestAssetController.getTestAsset
+POST        /rest/addTestAsset                          rest.controllers.RestTestAssetController.addTestAsset
+POST        /rest/editTestAsset                         rest.controllers.RestTestAssetController.editTestAsset
+POST        /rest/deleteTestAsset                       rest.controllers.RestTestAssetController.deleteTestAsset
 
 #Rest test case management
 POST        /rest/listTestCases                         rest.controllers.RestTestCaseController.listTestCases

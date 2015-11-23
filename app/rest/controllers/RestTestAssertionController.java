@@ -322,7 +322,7 @@ public class RestTestAssertionController extends Controller {
         TestGroup tg = TestGroup.findById(Long.parseLong(restTestAssertion.getGroupId()));
 
         if (tg == null) {
-            return badRequest("No group found with id [" + tg.id + "]");
+            return badRequest("No group found with id [" + restTestAssertion.getGroupId() + "]");
         }
 
         ta = new TestAssertion();
@@ -427,7 +427,7 @@ public class RestTestAssertionController extends Controller {
         if (null == restTestAssertion.getId())
             return badRequest("Please provide an id");
 
-        //Editing the new test assertion
+        //Editing the test assertion
         TestAssertion ta = TestAssertion.findById(Long.parseLong(restTestAssertion.getId()));
         if (ta == null) {
             return badRequest("The test assertion with ID [" + restTestAssertion.getTestAssertionId() + "] not found");
@@ -555,8 +555,7 @@ public class RestTestAssertionController extends Controller {
         //Checking the required fields
         if (null != restTestAssertion.getTestAssertionId()) {
             if (restTestAssertion.getTestAssertionId().equals("")) {
-                throw new IllegalArgumentException("The required field testAssertionId cannot be empty. If you do not want to change the current value, please" +
-                        " simply do not send this tag in the request.");
+                throw new IllegalArgumentException("The required field testAssertionId cannot be empty.");
 
             }
             ta.taId = restTestAssertion.getTestAssertionId();
@@ -564,8 +563,7 @@ public class RestTestAssertionController extends Controller {
 
         if (null != restTestAssertion.getShortDescription()) {
             if (restTestAssertion.getShortDescription().equals("")) {
-                throw new IllegalArgumentException("The required field shortDescription cannot be empty. If you do not want to change the current value, please" +
-                        "simply do not send this tag in the request.");
+                throw new IllegalArgumentException("The required field shortDescription cannot be empty");
 
             }
             ta.shortDescription = restTestAssertion.getShortDescription();
@@ -573,24 +571,21 @@ public class RestTestAssertionController extends Controller {
 
         if (null != restTestAssertion.getNormativeSource()) {
             if (restTestAssertion.getNormativeSource().equals("")) {
-                throw new IllegalArgumentException("The required field normativeSource cannot be empty. If you do not want to change the current value, please" +
-                        "simply do not send this tag in the request.");
+                throw new IllegalArgumentException("The required field normativeSource cannot be empty");
             }
             ta.normativeSource = restTestAssertion.getNormativeSource();
         }
 
         if (null != restTestAssertion.getTarget()) {
             if (restTestAssertion.getTarget().equals("")) {
-                throw new IllegalArgumentException("The required field target cannot be empty. If you do not want to change the current value, please" +
-                        "simply do not send this tag in the request.");
+                throw new IllegalArgumentException("The required field target cannot be empty");
             }
             ta.target = restTestAssertion.getTarget();
         }
 
         if (null != restTestAssertion.getPredicate()) {
             if (restTestAssertion.getPredicate().equals("")) {
-                throw new IllegalArgumentException("The required field predicate cannot be empty. If you do not want to change the current value, please" +
-                        "simply do not send this tag in the request.");
+                throw new IllegalArgumentException("The required field predicate cannot be empty.");
 
             }
             ta.predicate = restTestAssertion.getPredicate();
