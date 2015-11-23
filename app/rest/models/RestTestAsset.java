@@ -34,6 +34,9 @@ public class RestTestAsset {
     @XmlElement(required = false)
     protected String description;
 
+    @XmlElement(required = false)
+    protected byte[] asset;
+
     public String getId() {
         return id;
     }
@@ -72,5 +75,13 @@ public class RestTestAsset {
 
     public void setDescription(String description) {
         this.description = description;
+    }
+
+    public byte[] getAsset() {
+        return asset;
+    }
+
+    public void setAsset(byte[] asset) {
+        this.asset = asset;
     }
 }
