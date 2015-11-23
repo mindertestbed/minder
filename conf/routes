@@ -130,6 +130,10 @@ POST        /rest/deleteTestGroup                       rest.controllers.RestTes
 POST        /rest/getTestGroup                          rest.controllers.RestTestGroupController.getTestGroup
 
 #Rest test assertion management
+POST        /rest/listUtilClasses                       rest.controllers.RestUtilClassController.listUtilClasses
+
+
+#Rest test assertion management
 POST        /rest/listTestAssertions                    rest.controllers.RestTestAssertionController.listTestAssertions
 POST        /rest/getTestAssertion                      rest.controllers.RestTestAssertionController.getTestAssertion
 POST        /rest/addTestAssertion                      rest.controllers.RestTestAssertionController.addTestAssertion

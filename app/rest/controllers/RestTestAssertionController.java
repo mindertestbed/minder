@@ -99,10 +99,10 @@ public class RestTestAssertionController extends Controller {
         }
 
         if (null==restTestAssertion.getGroupId())
-            return badRequest("Please provide Test Group ID");
+            return badRequest("Please provide a Test Group ID");
 
 
-        //getting the  test group
+        //Getting the  test group
         TestGroup tg = TestGroup.findById(Long.parseLong(restTestAssertion.getGroupId()));
         if (tg == null)
             return badRequest("Test group with id [" + restTestAssertion.getId() + "] not found!");
