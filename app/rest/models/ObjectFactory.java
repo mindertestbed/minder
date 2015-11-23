@@ -283,7 +283,7 @@ public class ObjectFactory {
      * Create an instance of {@link JAXBElement }{@code <}{@link RestTestGroupList }{@code >}}
      *
      */
-    @XmlElementDecl(namespace = "", name = "restTestGroup")
+    @XmlElementDecl(namespace = "", name = "restTestGroupList")
     public JAXBElement<RestTestGroupList> createRestTestGroupList(RestTestGroupList value) {
         return new JAXBElement<RestTestGroupList>(_RestTestGroupList_QNAME, RestTestGroupList.class, null, value);
     }

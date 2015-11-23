@@ -17,7 +17,7 @@ import java.util.List;
 @XmlRootElement(name = "testGroupList")
 public class RestTestGroupList {
 
-    @XmlElementWrapper(name="testGroups")
+    @XmlElementWrapper(name="restTestGroups")
     @XmlElement(required = false)
     public List<RestTestGroup> restTestGroups;
 
