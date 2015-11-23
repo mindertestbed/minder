@@ -62,9 +62,12 @@ public class TestGroup extends Model {
   public static TestGroup findById(Long id){
 
     TestGroup byId = find.byId(id);
+    if (null == byId) return null;
+
     byId.owner = User.findById(byId.owner.id);
     return byId;
   }
+
 
   public static void updateUser(User user, User localUser) {
     //Ebean.createUpdate(TestGroup.class, )
