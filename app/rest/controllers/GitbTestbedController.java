@@ -5,8 +5,6 @@ import com.gitb.core.v1.*;
 import com.gitb.tbs.v1.*;
 import com.gitb.tpl.v1.*;
 import controllers.TestEngineController;
-import controllers.TestRunContext;
-import controllers.common.enumeration.OperationType;
 import models.*;
 import models.TestCase;
 import mtdl.MinderTdl;

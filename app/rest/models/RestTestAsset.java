@@ -15,6 +15,7 @@ import javax.xml.bind.annotation.*;
         "name",
         "shortDescription",
         "description",
+        "asset",
 })
 @XmlRootElement(name = "testAsset")
 public class RestTestAsset {
