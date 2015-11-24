@@ -131,6 +131,7 @@ POST        /rest/getTestGroup                          rest.controllers.RestTes
 
 #Rest test assertion management
 POST        /rest/listUtilClasses                       rest.controllers.RestUtilClassController.listUtilClasses
+POST        /rest/getUtilClass                        rest.controllers.RestUtilClassController.getUtilClass
 
 
 #Rest test assertion management

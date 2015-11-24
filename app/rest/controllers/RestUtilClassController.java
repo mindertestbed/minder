@@ -108,4 +108,75 @@ public class RestUtilClassController extends Controller {
         return ok(responseValue);
     }
 
+    /**
+     * This method receives JSON or XML request which includes util class id and returns detailed util class info
+     * <p>
+     * The sample JSON request:
+     * {"id":"3"}
+     * <p>
+     * <p>
+     * <p>
+     *{
+     *    "id":"3",
+     *    "groupId":"1",
+     *    "name":"SampleUtilClass",
+     *    "shortDescription":"SampleUtilClass",
+     *    "source":"def *prepareGETCommand(serverAddress:String,identifierScheme:String,id:String) : String = {\r\n   serverAddress + \"/\" + identifierScheme + \"::\"+id;\r\n}\r\n\r\n",
+     *    "ownerName":"tester@minder"
+     *}
+     * <p>
+     * Util class id is required.
+     */
+    public static Result getUtilClass() {
+        RestUtilClass restUtilClassResponse = new RestUtilClass();
+
+        /*
+        * Handling the request message
+        * */
+        IRestContentProcessor contentProcessor = null;
+        try {
+            contentProcessor = RestUtils.createContentProcessor(request().getHeader(CONTENT_TYPE), request().body());
+        } catch (IllegalArgumentException e) {
+            return badRequest(e.getCause().toString());
+        }
+
+        RestUtilClass restUtilClass = null;
+        try {
+            restUtilClass = (RestUtilClass) contentProcessor.parseRequest(RestUtilClass.class.getName());
+        } catch (ParseException e) {
+            return internalServerError(e.getCause().toString());
+        }
+
+        if (null == restUtilClass.getId())
+            return badRequest("Please provide an ID");
+
+
+        //Getting the util class
+        UtilClass uc = UtilClass.findById(Long.parseLong(restUtilClass.getId()));
+        if (uc == null) {
+            return badRequest("Util class with ID [" + restUtilClass.getId() + "] not found!");
+
+        }
+
+        restUtilClassResponse.setId(String.valueOf(uc.id));
+        restUtilClassResponse.setGroupId(String.valueOf(uc.testGroup.id));
+        restUtilClassResponse.setOwnerName(uc.owner.email);
+        restUtilClassResponse.setName(uc.name);
+        restUtilClassResponse.setShortDescription(uc.name);
+        restUtilClassResponse.setSource(uc.source);
+
+        /*
+        * Preparing response
+        * */
+        String responseValue = null;
+        try {
+            responseValue = contentProcessor.prepareResponse(RestUtilClass.class.getName(), restUtilClassResponse);
+        } catch (ParseException e) {
+            return internalServerError(e.getMessage());
+        }
+
+        response().setContentType(contentProcessor.getContentType());
+        return ok(responseValue);
+    }
+
 }
