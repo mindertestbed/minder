@@ -49,7 +49,7 @@ public class GitbMessagingController extends Controller {
 		return ok(responseValue);
 	}
 
-	public static Result initiate(InitiateRequest parameters){
+	public static Result initiate(){
 		/*
 		 * Handling the request message
 		 */
@@ -87,7 +87,7 @@ public class GitbMessagingController extends Controller {
 		return ok(responseValue);
 	}
 
-	public static Result beginTransaction(BeginTransactionRequest parameters){
+	public static Result beginTransaction(){
 		/*
 		 * Handling the request message
 		 */
@@ -125,7 +125,7 @@ public class GitbMessagingController extends Controller {
 		return ok(responseValue);
 	}
 
-	public static Result endTransaction(BasicRequest parameters){
+	public static Result endTransaction(){
 		/*
 		 * Handling the request message
 		 */
@@ -163,7 +163,7 @@ public class GitbMessagingController extends Controller {
 		return ok(responseValue);
 	}
 
-	public static Result send(SendRequest parameters){
+	public static Result send(){
 		/*
 		 * Handling the request message
 		 */
@@ -201,7 +201,7 @@ public class GitbMessagingController extends Controller {
 		return ok(responseValue);
 	}
 
-	public static Result finalize(FinalizeRequest parameters){
+	public static Result finalizeMessaging(){
 		/*
 		 * Handling the request message
 		 */

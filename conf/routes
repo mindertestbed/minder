@@ -177,7 +177,7 @@ POST        /rest/messaging/initiate            		rest.controllers.GitbMessaging
 POST        /rest/messaging/beginTransaction            rest.controllers.GitbMessagingController.beginTransaction()
 POST        /rest/messaging/endTransaction              rest.controllers.GitbMessagingController.endTransaction()
 POST        /rest/messaging/send                        rest.controllers.GitbMessagingController.send()
-POST        /rest/messaging/finalize                    rest.controllers.GitbMessagingController.finalize()
+POST        /rest/messaging/finalize                    rest.controllers.GitbMessagingController.finalizeMessaging()
 
 
 
