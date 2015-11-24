@@ -32,7 +32,7 @@ public class RestUtilClass {
     protected String shortDescription;
 
     @XmlElement(required = false)
-    protected String source;
+    protected byte[] source;
 
     @XmlElement(required = false)
     protected String ownerName;
@@ -69,11 +69,11 @@ public class RestUtilClass {
         this.shortDescription = shortDescription;
     }
 
-    public String getSource() {
+    public byte[] getSource() {
         return source;
     }
 
-    public void setSource(String source) {
+    public void setSource(byte[] source) {
         this.source = source;
     }
 
