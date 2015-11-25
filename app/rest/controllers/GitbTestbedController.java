@@ -1,32 +1,90 @@
 package rest.controllers;
 
-import com.avaje.ebean.Ebean;
-import com.gitb.core.v1.*;
-import com.gitb.tbs.v1.*;
-import com.gitb.tpl.v1.*;
-import controllers.TestEngineController;
-import models.*;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
+import java.math.BigInteger;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.GregorianCalendar;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Set;
+
+import javax.xml.datatype.DatatypeConfigurationException;
+import javax.xml.datatype.DatatypeFactory;
+import javax.xml.datatype.XMLGregorianCalendar;
+
+import models.AbstractJob;
+import models.GitbEndpoint;
+import models.GitbJob;
+import models.GitbParameter;
+import models.MappedWrapper;
+import models.Tdl;
+import models.TestAssertion;
 import models.TestCase;
+import models.TestGroup;
+import models.User;
+import models.Wrapper;
+import models.WrapperParam;
+import models.WrapperVersion;
 import mtdl.MinderTdl;
 import mtdl.Rivet;
 import mtdl.TdlCompiler;
+
+import org.apache.http.HttpEntity;
+import org.apache.http.HttpResponse;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.entity.StringEntity;
+import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.util.EntityUtils;
+
 import play.mvc.Controller;
 import play.mvc.Http;
 import play.mvc.Result;
 import rest.controllers.common.RestUtils;
 import rest.controllers.restbodyprocessor.IRestContentProcessor;
+import rest.controllers.restbodyprocessor.XMLContentProcessor;
 import rest.models.GetTestCaseDefinitions;
 import scala.collection.JavaConversions;
 
-import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.*;
+import com.avaje.ebean.Ebean;
+import com.gitb.core.v1.Actor;
+import com.gitb.core.v1.ActorConfiguration;
+import com.gitb.core.v1.ConfigurationType;
+import com.gitb.core.v1.Endpoint;
+import com.gitb.core.v1.Metadata;
+import com.gitb.core.v1.Parameter;
+import com.gitb.core.v1.Roles;
+import com.gitb.core.v1.StepStatus;
+import com.gitb.core.v1.TestRole;
+import com.gitb.core.v1.TestRoleEnumeration;
+import com.gitb.core.v1.UsageEnumeration;
+import com.gitb.core.v1.ValueEmbeddingEnumeration;
+import com.gitb.tbs.v1.BasicCommand;
+import com.gitb.tbs.v1.BasicRequest;
+import com.gitb.tbs.v1.ConfigureRequest;
+import com.gitb.tbs.v1.ConfigureResponse;
+import com.gitb.tbs.v1.GetActorDefinitionRequest;
+import com.gitb.tbs.v1.GetActorDefinitionResponse;
+import com.gitb.tbs.v1.GetTestCaseDefinitionResponse;
+import com.gitb.tbs.v1.InitiateResponse;
+import com.gitb.tbs.v1.TestStepStatus;
+import com.gitb.tpl.v1.DecisionStep;
+import com.gitb.tpl.v1.MessagingStep;
+import com.gitb.tpl.v1.Preliminary;
+import com.gitb.tpl.v1.Sequence;
+import com.gitb.tpl.v1.TestStep;
+import com.gitb.tr.v1.TestResultType;
+
+import controllers.TestEngineController;
 
 public class GitbTestbedController extends Controller {
 
 	public static SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSXXX");
+	private static final String REPLY_TO_URL_ADDRESS =  "Gitb-ReplyToUrlAddress";
 	
 	public static Result getTestCaseDefinition() {
 		/*
@@ -275,7 +333,12 @@ public class GitbTestbedController extends Controller {
 		}
 
 		User currentUser = getCurrentUser(request());
-		TestEngineController.enqueueGitbJobWithUser(Long.valueOf(basicCommand.getTcInstanceId()), currentUser);
+		String replyToUrlAddress = request().getHeader(REPLY_TO_URL_ADDRESS);
+		
+		if(replyToUrlAddress == null || replyToUrlAddress.isEmpty())
+			return internalServerError(REPLY_TO_URL_ADDRESS + " header tag and value should be set.");
+		
+		TestEngineController.enqueueGitbJobWithUser(Long.valueOf(basicCommand.getTcInstanceId()), currentUser, replyToUrlAddress);
 		
 		ConfigureResponse serviceResponse = new ConfigureResponse();		
 		
@@ -514,5 +577,75 @@ public class GitbTestbedController extends Controller {
 	        
 		return User.findByEmail(clientRequest.get("username"));
 	}
+	
+	public static void performUpdateStatusOperation(String replyToUrlAddress, Long jobId, StepStatus stepStatus, Long stepId, String log)
+    {
+		try{
+			
+		TestStepStatus status = new TestStepStatus();
+		status.setTcInstanceId(jobId.toString());
+		status.setStepId(stepId.toString());
+		status.setStatus(stepStatus);
 
+		com.gitb.tr.v1.TAR report = new com.gitb.tr.v1.TAR();
+
+		com.gitb.core.v1.AnyContent context = new com.gitb.core.v1.AnyContent();
+
+		// set context
+		context.setEmbeddingMethod(ValueEmbeddingEnumeration.STRING);
+		context.setName("Rivet_Log");
+		context.setValue(log);
+		report.setContext(context);
+
+		report.setDate(getNowAsXmlGregorianCalendar());
+		if(stepStatus == StepStatus.ERROR)
+			report.setResult(TestResultType.FAILURE);
+		else
+			report.setResult(TestResultType.SUCCESS);
+
+		status.setReport(report);
+
+		XMLContentProcessor contentProcessor = new XMLContentProcessor();
+		String innerBody = contentProcessor.prepareResponse(
+				TestStepStatus.class.getName(), status);
+		
+		innerBody = innerBody.substring(innerBody.indexOf('\n')+1);
+		
+		String body = "";
+		body += "<soap:Envelope xmlns:soap=\"http://schemas.xmlsoap.org/soap/envelope/\"><soap:Body>";
+		body += innerBody;
+		body += "</soap:Body>";
+		body += "</soap:Envelope>";
+
+		HttpPost httppost = new HttpPost(replyToUrlAddress);
+
+		// Request parameters and other properties.
+		StringEntity stringentity = new StringEntity(body, "UTF-8");
+		stringentity.setChunked(true);
+		httppost.setEntity(stringentity);
+		httppost.addHeader("Content-Type", "text/xml");
+		httppost.addHeader("Accept", "*/*");
+		httppost.addHeader("SOAPAction",
+				"http://www.gitb.com/tbs/v1/TestbedClient/updateStatusRequest");
+		// Execute and get the response.
+		HttpClient httpclient = new DefaultHttpClient();
+		HttpResponse response = httpclient.execute(httppost);
+		HttpEntity entity = response.getEntity();
+
+		String strresponse = null;
+		if (entity != null) {
+			strresponse = EntityUtils.toString(entity);
+		}
+		System.out.println(strresponse);
+
+	} catch (Exception e) {
+		System.out.println(e.toString());
+	}
+    }
+	
+	private static XMLGregorianCalendar getNowAsXmlGregorianCalendar() throws DatatypeConfigurationException{
+    	GregorianCalendar c = new GregorianCalendar();
+    	c.setTime(new Date());
+    	return DatatypeFactory.newInstance().newXMLGregorianCalendar(c);
+    }
 }

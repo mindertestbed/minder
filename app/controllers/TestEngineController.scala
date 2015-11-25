@@ -2,7 +2,6 @@ package controllers
 
 import java.util.Date
 import java.util.concurrent.LinkedBlockingQueue
-
 import controllers.common.enumeration.OperationType
 import minderengine.{MinderSignalRegistry, SessionMap}
 import models._
@@ -11,6 +10,8 @@ import play.api.libs.EventSource
 import play.api.libs.iteratee.Concurrent
 import play.api.mvc._
 import views.html.testDesigner.job._
+import rest.controllers.GitbTestbedController
+import com.gitb.core.v1.StepStatus
 
 /**
   * Manages the job lifecycle.
@@ -180,7 +181,7 @@ object TestEngineController extends Controller {
    * an action for enqueuing a new gitb job for test engine running
     * @return
     */
-  def enqueueGitbJobWithUser(id: Long, user: User){
+  def enqueueGitbJobWithUser(id: Long, user: User, replyToUrlAddress: String){
       if (jobQueue.size >= 30) {
         BadRequest("The job queue is full.")
       } else {
@@ -188,7 +189,9 @@ object TestEngineController extends Controller {
         if (job == null) {
           BadRequest("A job with id [" + id + "] was not found!")
         } else {
-          jobQueue.offer(createTestRunContext(job, user))
+          var testRunContext = createTestRunContext(job, user);
+          testRunContext.gitbReplyToUrlAddress = replyToUrlAddress
+          jobQueue.offer(testRunContext)
           queueFeedUpdate();
         }
       }
@@ -210,6 +213,13 @@ object TestEngineController extends Controller {
     Logger.debug(log)
     currentLog.append(log)
     logChannel.push(log)
+  }
+  
+  def gitbLogFeedUpdate(log: String, step: StepStatus, stepId: Long): Unit = {
+    if (activeRunContext != null && activeRunContext.job != null && activeRunContext.job.isInstanceOf[GitbJob])
+    {
+      GitbTestbedController.performUpdateStatusOperation(activeRunContext.gitbReplyToUrlAddress, activeRunContext.job.id, step, stepId, log);
+    }
   }
 
   /**

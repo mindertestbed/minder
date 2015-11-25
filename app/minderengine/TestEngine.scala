@@ -2,16 +2,16 @@ package minderengine
 
 import java.lang.reflect.InvocationTargetException
 import java.util
-
 import models._
 import mtdl._
 import org.apache.log4j.spi.LoggingEvent
 import org.apache.log4j.{AppenderSkeleton, EnhancedPatternLayout, Level}
 import play.Logger
-
 import scala.InterruptedException
 import scala.collection.JavaConversions._
 import scala.collection.mutable
+import controllers.TestEngineController
+import com.gitb.core.v1.StepStatus
 
 /**
   * Created by yerlibilgin on 07/12/14.
@@ -109,6 +109,7 @@ object TestEngine {
         var rivetIndex = 0;
         for (rivet <- minderTDL.RivetDefs) {
           lgr.info("> " + "RUN RIVET " + rivetIndex)
+          TestEngineController.gitbLogFeedUpdate("> " + "RUN RIVET " + rivetIndex, StepStatus.PROCESSING, rivet.tplStepId)
           val rivetWrapperId: String = rivet.wrapperFunction.wrapperId
           //resolve the minder client id. This might as well be resolved to a local built-in wrapper or the null slot.
           val slotPair = findPairOrError(identifierMinderClientMap, AdapterIdentifier.parse(rivetWrapperId))
@@ -122,12 +123,19 @@ object TestEngine {
           try {
             for (tuple@(label, signature) <- rivet.signalPipeMap.keySet) {
               val me: MinderSignalRegistry = SessionMap.getObject(userEmail, "signalRegistry")
-              if (me == null) throw new scala.IllegalArgumentException("No MinderSignalRegistry object defined for session " + userEmail)
+              if (me == null)
+              {
+                TestEngineController.gitbLogFeedUpdate("No MinderSignalRegistry object defined for session " + userEmail, StepStatus.ERROR, rivet.tplStepId)
+                throw new scala.IllegalArgumentException("No MinderSignalRegistry object defined for session " + userEmail)
+              }
 
               //obtain the source signal object
               val signalList = rivet.signalPipeMap(tuple);
               if (signalList == null || signalList.isEmpty)
+              {
+                TestEngineController.gitbLogFeedUpdate("singal list is empty for " + label + "." + signature, StepStatus.ERROR, rivet.tplStepId)
                 throw new scala.IllegalArgumentException("singal list is empty for " + label + "." + signature);
+              }
 
               val signal = signalList(0).inRef.source;
 
@@ -135,6 +143,8 @@ object TestEngine {
 
               val signalAdapterIdentifier = signalPair.adapterIdentifier
               lgr.debug("> Wait For Signal:" + signalAdapterIdentifier + "." + signature)
+              TestEngineController.gitbLogFeedUpdate("> Wait For Signal:" + signalAdapterIdentifier + "." + signature, StepStatus.WAITING, rivet.tplStepId)
+              
 
               val signalData: SignalData = try {
                 me.dequeueSignal(signalAdapterIdentifier, signature, signal.timeout)
@@ -142,15 +152,18 @@ object TestEngine {
                 case rte: RuntimeException => {
                   signal.handleTimeout(rte)
                   thereIsTimoeut = true
+                  TestEngineController.gitbLogFeedUpdate("Break rivet", StepStatus.ERROR, rivet.tplStepId)
                   throw new BreakException
                 }
               }
 
               lgr.debug("< Signal Arrived: " + signalAdapterIdentifier + "." + signature)
+              TestEngineController.gitbLogFeedUpdate("< Signal Arrived: " + signalAdapterIdentifier + "." + signature, StepStatus.PROCESSING, rivet.tplStepId)
 
               if (signalData.isInstanceOf[SignalErrorData]) {
                 lgr.debug("This is an error signal");
                 val signalErrorData = signalData.asInstanceOf[SignalErrorData]
+                TestEngineController.gitbLogFeedUpdate("Signal [" + signalAdapterIdentifier + "." + signature + "] failed [" + signalErrorData.signalFailedException.getMessage, StepStatus.ERROR, rivet.tplStepId)
                 throw new scala.RuntimeException("Signal [" + signalAdapterIdentifier + "." + signature + "] failed [" + signalErrorData.signalFailedException.getMessage,
                   signalErrorData.signalFailedException)
               }
@@ -173,6 +186,7 @@ object TestEngine {
 
           if (thereIsTimoeut) {
             //we hit a timeout, skip to the next rivet
+            TestEngineController.gitbLogFeedUpdate("< Rivet skipped", StepStatus.SKIPPED, rivet.tplStepId)
           } else {
             lgr.debug("Assign free vars")
 
@@ -193,12 +207,15 @@ object TestEngine {
             }
 
             lgr.info("> CALL SLOT " + slotPair.adapterIdentifier + "." + rivet.wrapperFunction.signature)
+            TestEngineController.gitbLogFeedUpdate("> CALL SLOT " + slotPair.adapterIdentifier + "." + rivet.wrapperFunction.signature, StepStatus.PROCESSING, rivet.tplStepId)
             testProcessWatcher.rivetInvoked(rivetIndex);
             rivet.result = slotPair.minderClient.callSlot(session, rivet.wrapperFunction.signature, args)
             lgr.info("< SLOT CALLED " + slotPair.adapterIdentifier + "." + rivet.wrapperFunction.signature)
+            TestEngineController.gitbLogFeedUpdate("< SLOT CALLED " + slotPair.adapterIdentifier + "." + rivet.wrapperFunction.signature, StepStatus.PROCESSING, rivet.tplStepId)
 
 
             testProcessWatcher.rivetFinished(rivetIndex)
+            TestEngineController.gitbLogFeedUpdate("< Rivet finished sucessfully", StepStatus.COMPLETED, rivet.tplStepId)
             lgr.info("< Rivet finished sucessfully")
             lgr.info("----------\n")
 

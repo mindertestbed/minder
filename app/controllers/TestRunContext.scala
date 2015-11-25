@@ -59,6 +59,7 @@ class TestRunContext(val testRun: TestRun) extends Runnable with TestProcessWatc
    */
   var progressPercent = 0;
 
+  var gitbReplyToUrlAddress = "";
 
   for (mappedWrapper: MappedWrapper <- mappedWrappers) {
     mappedWrapper.parameter = WrapperParam.findById(mappedWrapper.parameter.id);
