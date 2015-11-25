@@ -26,7 +26,7 @@ import java.util.List;
  * If you send an XML request, you will gather an XML response.
  * If you send an JSON request, you will gather an JSON response.
  *
- * The field "asset" indicates the actual data of the asset as bytearray. Therefore, one need to provide asset in hexadecimal notion.
+ * The field "asset" indicates the actual data of the asset as bytearray. Therefore, one need to provide asset in Base64 notation.
  *
  * @author: Melis Ozgur Cetinkaya Demir
  * @date: 20/11/15.
@@ -222,6 +222,7 @@ public class RestTestAssetController extends Controller {
      * {"result":"SUCCESS","description":"Test asset created!"}
      * <p>
      * Group id, name and short description are required, whereas, description is optional.
+     *
      */
 
     public static Result addTestAsset() {

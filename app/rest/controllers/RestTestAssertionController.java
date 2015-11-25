@@ -251,7 +251,7 @@ public class RestTestAssertionController extends Controller {
      * This method receives JSON or XML request which includes test assertion information and creates a new test assertion.
      * <p>
      * The sample JSON request:
-     * {"groupName":"Showcase",
+     * {"groupId":"1",
      * "testAssertionId":"SampleXmlValidation2",
      * "shortDescription":"A sample xml-content-validation test",
      * "normativeSource":"The system must generate valid book entries",
