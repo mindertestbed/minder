@@ -2,7 +2,6 @@ package rest.controllers;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
-import java.math.BigInteger;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -16,7 +15,6 @@ import javax.xml.datatype.DatatypeConfigurationException;
 import javax.xml.datatype.DatatypeFactory;
 import javax.xml.datatype.XMLGregorianCalendar;
 
-import models.AbstractJob;
 import models.GitbEndpoint;
 import models.GitbJob;
 import models.GitbParameter;
@@ -44,6 +42,7 @@ import org.apache.http.util.EntityUtils;
 import play.mvc.Controller;
 import play.mvc.Http;
 import play.mvc.Result;
+import rest.controllers.common.Constants;
 import rest.controllers.common.RestUtils;
 import rest.controllers.restbodyprocessor.IRestContentProcessor;
 import rest.controllers.restbodyprocessor.XMLContentProcessor;
@@ -84,7 +83,6 @@ import controllers.TestEngineController;
 public class GitbTestbedController extends Controller {
 
 	public static SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSXXX");
-	private static final String REPLY_TO_URL_ADDRESS =  "Gitb-ReplyToUrlAddress";
 	
 	public static Result getTestCaseDefinition() {
 		/*
@@ -333,10 +331,10 @@ public class GitbTestbedController extends Controller {
 		}
 
 		User currentUser = getCurrentUser(request());
-		String replyToUrlAddress = request().getHeader(REPLY_TO_URL_ADDRESS);
+		String replyToUrlAddress = request().getHeader (Constants.REPLY_TO_URL_ADDRESS);
 		
 		if(replyToUrlAddress == null || replyToUrlAddress.isEmpty())
-			return internalServerError(REPLY_TO_URL_ADDRESS + " header tag and value should be set.");
+			return internalServerError(Constants.REPLY_TO_URL_ADDRESS + " header tag and value should be set.");
 		
 		TestEngineController.enqueueGitbJobWithUser(Long.valueOf(basicCommand.getTcInstanceId()), currentUser, replyToUrlAddress);
 		

@@ -4,6 +4,7 @@ import java.text.ParseException;
 
 import play.mvc.Controller;
 import play.mvc.Result;
+import rest.controllers.common.Constants;
 import rest.controllers.common.RestUtils;
 import rest.controllers.restbodyprocessor.IRestContentProcessor;
 
@@ -67,6 +68,11 @@ public class GitbMessagingController extends Controller {
 		} catch (ParseException e) {
 			return internalServerError(e.getMessage());
 		}
+		
+		String replyToUrlAddress = request().getHeader(Constants.REPLY_TO_URL_ADDRESS);
+		
+		if(replyToUrlAddress == null || replyToUrlAddress.isEmpty())
+			return internalServerError(Constants.REPLY_TO_URL_ADDRESS + " header tag and value should be set.");
 		
 		//TODO: method operations
 		
