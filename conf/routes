@@ -165,6 +165,10 @@ POST        /rest/addWrapper                            rest.controllers.RestWra
 POST        /rest/editWrapper                           rest.controllers.RestWrapperController.editWrapper
 POST        /rest/deleteWrapper                         rest.controllers.RestWrapperController.deleteWrapper
 
+#Rest Job management
+POST        /rest/createJob                             rest.controllers.RestJobController.createJob
+POST        /rest/deleteJob                             rest.controllers.RestJobController.deleteJob
+
 #GITB Testbed Rest Services
 POST        /rest/testbed/getTestCaseDefinition         rest.controllers.GitbTestbedController.getTestCaseDefinition()
 POST        /rest/testbed/getActorDefinition            rest.controllers.GitbTestbedController.getActorDefinition()

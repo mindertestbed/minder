@@ -37,10 +37,12 @@ public class ObjectFactory {
     private final static QName _RestTestAsset_QNAME = new QName("", "restTestAsset");
     private final static QName _RestTestAssetList_QNAME = new QName("", "restTestAssetList");
     private final static QName _RestTestGroupList_QNAME = new QName("", "restTestGroupList");
-    private final static QName _RestTestAssertionList_QNAME = new QName("", "restTestAssertion");
-    private final static QName _RestTestCaseList_QNAME = new QName("", "restTestAssertion");
+    private final static QName _RestTestAssertionList_QNAME = new QName("", "restTestAssertionList");
+    private final static QName _RestTestCaseList_QNAME = new QName("", "restTestCaseList");
     private final static QName _RestUtilClass_QNAME = new QName("", "restUtilClass_QNAME");
     private final static QName _RestUtilClassList_QNAME = new QName("", "restUtilClassList_QNAME");
+    private final static QName _RestJob_QNAME = new QName("", "restJob_QNAME");
+    private final static QName _RestParametersForWrappers_QNAME = new QName("", "restParametersForWrappers_QNAME");
 
     /**
      * Create a new ObjectFactory that can be used to create new instances of schema derived classes for package: rest.controllers.xmlmodel.response
@@ -356,5 +358,40 @@ public class ObjectFactory {
     @XmlElementDecl(namespace = "", name = "restTestAssetList")
     public JAXBElement<RestTestAssetList> createRestTestAssetList(RestTestAssetList value) {
         return new JAXBElement<RestTestAssetList>(_RestTestAssetList_QNAME, RestTestAssetList.class, null, value);
+    }
+
+    /**
+     * Create an instance of {@link rest.models.RestJob }
+     *
+     */
+    public RestJob createRestJob() {
+        return new RestJob();
+    }
+
+    /**
+     * Create an instance of {@link JAXBElement }{@code <}{@link RestJob }{@code >}}
+     *
+     */
+    @XmlElementDecl(namespace = "", name = "restJob")
+    public JAXBElement<RestJob> createRestJob(RestJob value) {
+        return new JAXBElement<RestJob>(_RestJob_QNAME, RestJob.class, null, value);
+    }
+
+
+    /**
+     * Create an instance of {@link rest.models.RestParametersForWrappers }
+     *
+     */
+    public RestParametersForWrappers createRestParametersForWrappers() {
+        return new RestParametersForWrappers();
+    }
+
+    /**
+     * Create an instance of {@link JAXBElement }{@code <}{@link RestParametersForWrappers }{@code >}}
+     *
+     */
+    @XmlElementDecl(namespace = "", name = "restParametersForWrappers")
+    public JAXBElement<RestParametersForWrappers> createRestParametersForWrappers(RestParametersForWrappers value) {
+        return new JAXBElement<RestParametersForWrappers>(_RestParametersForWrappers_QNAME, RestParametersForWrappers.class, null, value);
     }
 }

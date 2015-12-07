@@ -134,7 +134,6 @@ public class JobController extends Controller {
 
     try {
       Ebean.beginTransaction();
-      List<MappedWrapper> mappedWrappers = new ArrayList<>();
       if (model.wrapperMappingList != null) {
         for (MappedWrapperModel mappedWrapperModel : model.wrapperMappingList) {
           MappedWrapper mw = new MappedWrapper();
@@ -144,7 +143,6 @@ public class JobController extends Controller {
           mw.save();
         }
       }
-      job.mappedWrappers = mappedWrappers;
       job.mtdlParameters = model.mtdlParameters;
       job.save();
       /*SuiteJob sj = new SuiteJob();
