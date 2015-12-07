@@ -43,6 +43,8 @@ public class ObjectFactory {
     private final static QName _RestUtilClassList_QNAME = new QName("", "restUtilClassList_QNAME");
     private final static QName _RestJob_QNAME = new QName("", "restJob_QNAME");
     private final static QName _RestParametersForWrappers_QNAME = new QName("", "restParametersForWrappers_QNAME");
+    private final static QName _RestTdlWrapperParam_QNAME = new QName("", "restTdlWrapperParam_QNAME");
+
 
     /**
      * Create a new ObjectFactory that can be used to create new instances of schema derived classes for package: rest.controllers.xmlmodel.response
@@ -393,5 +395,23 @@ public class ObjectFactory {
     @XmlElementDecl(namespace = "", name = "restParametersForWrappers")
     public JAXBElement<RestParametersForWrappers> createRestParametersForWrappers(RestParametersForWrappers value) {
         return new JAXBElement<RestParametersForWrappers>(_RestParametersForWrappers_QNAME, RestParametersForWrappers.class, null, value);
+    }
+
+
+    /**
+     * Create an instance of {@link rest.models.RestTdlWrapperParam }
+     *
+     */
+    public RestTdlWrapperParam createRestTdlWrapperParam() {
+        return new RestTdlWrapperParam();
+    }
+
+    /**
+     * Create an instance of {@link JAXBElement }{@code <}{@link RestTdlWrapperParam }{@code >}}
+     *
+     */
+    @XmlElementDecl(namespace = "", name = "restTdlWrapperParam")
+    public JAXBElement<RestTdlWrapperParam> createRestTdlWrapperParam(RestTdlWrapperParam value) {
+        return new JAXBElement<RestTdlWrapperParam>(_RestTdlWrapperParam_QNAME, RestTdlWrapperParam.class, null, value);
     }
 }

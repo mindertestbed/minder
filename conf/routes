@@ -169,6 +169,11 @@ POST        /rest/deleteWrapper                         rest.controllers.RestWra
 POST        /rest/createJob                             rest.controllers.RestJobController.createJob
 POST        /rest/deleteJob                             rest.controllers.RestJobController.deleteJob
 
+#Rest TDL management
+POST        /rest/getTdl                                rest.controllers.RestTdlController.getTdl
+POST        /rest/addTdl                                rest.controllers.RestTdlController.addTdl
+POST        /rest/editTdl                               rest.controllers.RestTdlController.editTdl
+
 #GITB Testbed Rest Services
 POST        /rest/testbed/getTestCaseDefinition         rest.controllers.GitbTestbedController.getTestCaseDefinition()
 POST        /rest/testbed/getActorDefinition            rest.controllers.GitbTestbedController.getActorDefinition()
@@ -180,7 +185,7 @@ POST        /rest/testbed/getTestCaseDefinitions        rest.controllers.GitbTes
 
 #GITB Messaging Rest Services
 POST        /rest/messaging/getModuleDefinition         rest.controllers.GitbMessagingController.getModuleDefinition()
-POST        /rest/messaging/initiate            		rest.controllers.GitbMessagingController.initiate()
+POST        /rest/messaging/initiate                    rest.controllers.GitbMessagingController.initiate()
 POST        /rest/messaging/beginTransaction            rest.controllers.GitbMessagingController.beginTransaction()
 POST        /rest/messaging/endTransaction              rest.controllers.GitbMessagingController.endTransaction()
 POST        /rest/messaging/send                        rest.controllers.GitbMessagingController.send()

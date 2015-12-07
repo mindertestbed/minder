@@ -1,6 +1,7 @@
 package rest.models;
 
 import javax.xml.bind.annotation.*;
+import java.util.List;
 
 /**
  * <p>Java class for RestTdl complex type.
@@ -11,7 +12,7 @@ import javax.xml.bind.annotation.*;
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "tdl", propOrder = {
         "id",
-        "testCaseName",
+        "testCaseId",
         "tdl",
         "version",
         "creationDate"
@@ -23,16 +24,20 @@ public class RestTdl {
     protected String id;
 
     @XmlElement(required = false)
-    protected String testCaseName;
+    protected String testCaseId;
 
     @XmlElement(required = false)
-    protected String tdl;
+    protected byte[] tdl;
 
     @XmlElement(required = false)
     protected String version;
 
     @XmlElement(required = false)
     protected String creationDate;
+
+    @XmlElementWrapper(name="wrapperParameters")
+    @XmlElement(required = false)
+    public List<RestTdlWrapperParam> parameters;
 
     public String getId() {
         return id;
@@ -42,19 +47,19 @@ public class RestTdl {
         this.id = id;
     }
 
-    public String getTestCaseName() {
-        return testCaseName;
+    public String getTestCaseId() {
+        return testCaseId;
     }
 
-    public void setTestCaseName(String testCaseName) {
-        this.testCaseName = testCaseName;
+    public void setTestCaseId(String testCaseId) {
+        this.testCaseId = testCaseId;
     }
 
-    public String getTdl() {
+    public byte[] getTdl() {
         return tdl;
     }
 
-    public void setTdl(String tdl) {
+    public void setTdl(byte[] tdl) {
         this.tdl = tdl;
     }
 
@@ -72,5 +77,13 @@ public class RestTdl {
 
     public void setCreationDate(String creationDate) {
         this.creationDate = creationDate;
+    }
+
+    public List<RestTdlWrapperParam> getParameters() {
+        return parameters;
+    }
+
+    public void setParameters(List<RestTdlWrapperParam> parameters) {
+        this.parameters = parameters;
     }
 }
