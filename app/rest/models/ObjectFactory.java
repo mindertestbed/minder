@@ -42,6 +42,7 @@ public class ObjectFactory {
     private final static QName _RestUtilClass_QNAME = new QName("", "restUtilClass_QNAME");
     private final static QName _RestUtilClassList_QNAME = new QName("", "restUtilClassList_QNAME");
     private final static QName _RestJob_QNAME = new QName("", "restJob_QNAME");
+    private final static QName _RestJobList_QNAME = new QName("", "restJobList_QNAME");
     private final static QName _RestParametersForWrappers_QNAME = new QName("", "restParametersForWrappers_QNAME");
     private final static QName _RestTdlWrapperParam_QNAME = new QName("", "restTdlWrapperParam_QNAME");
 
@@ -379,6 +380,23 @@ public class ObjectFactory {
         return new JAXBElement<RestJob>(_RestJob_QNAME, RestJob.class, null, value);
     }
 
+
+    /**
+     * Create an instance of {@link rest.models.RestJobList }
+     *
+     */
+    public RestJobList createRestJobList() {
+        return new RestJobList();
+    }
+
+    /**
+     * Create an instance of {@link JAXBElement }{@code <}{@link RestJobList }{@code >}}
+     *
+     */
+    @XmlElementDecl(namespace = "", name = "restJobList")
+    public JAXBElement<RestJobList> createRestJobList(RestJobList value) {
+        return new JAXBElement<RestJobList>(_RestJobList_QNAME, RestJobList.class, null, value);
+    }
 
     /**
      * Create an instance of {@link rest.models.RestParametersForWrappers }

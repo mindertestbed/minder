@@ -8,9 +8,7 @@ import play.mvc.Result;
 import rest.controllers.common.Constants;
 import rest.controllers.common.RestUtils;
 import rest.controllers.restbodyprocessor.IRestContentProcessor;
-import rest.models.RestJob;
-import rest.models.RestMinderResponse;
-import rest.models.RestParametersForWrappers;
+import rest.models.*;
 
 import java.text.ParseException;
 import java.util.ArrayList;
@@ -28,6 +26,165 @@ import java.util.List;
  * @date: 03/12/15.
  */
 public class RestJobController extends Controller {
+    /**
+     * This method receives JSON or XML request and returns all jobs defined in db.
+     *
+     * The sample produced response by Minder (with the status code 200in the header):
+     * <p>
+     * JSON
+     * =====
+     *{
+     *    "restJobs":[
+     *        {
+     *            "id":"1",
+     *            "name":"TestCaseSample1(1)",
+     *            "tdlId":"1",
+     *            "owner":"tester@minder",
+     *            "mtdlParameters":null,
+     *            "parametersForWrappers":null
+     *        },
+     *        {
+     *            "id":"3",
+     *            "name":"SampleJob_1",
+     *            "tdlId":"3",
+     *            "owner":"tester@minder",
+     *            "mtdlParameters":null,
+     *            "parametersForWrappers":null
+     *        }
+     *    ]
+     *}
+     *
+     * <p>
+     * No input is necessary.
+     */
+    public static Result listJobs() {
+        RestJobList restJobListResponse = new RestJobList();
+
+        /*
+        * Handling the request message
+        * */
+        IRestContentProcessor contentProcessor = null;
+        try {
+            contentProcessor = RestUtils.createContentProcessor(request().getHeader(CONTENT_TYPE));
+        } catch (IllegalArgumentException e) {
+            return badRequest(e.getCause().toString());
+        }
+
+        //Getting all wrappers
+        List<Job> jobList = Job.findAll();
+        restJobListResponse.setRestJobs(new ArrayList<RestJob>());
+
+        for(Job job : jobList){
+            RestJob restJob  = new RestJob();
+            restJob.setId(String.valueOf(job.id));
+            restJob.setName(job.name);
+            restJob.setOwner(job.owner.email);
+            restJob.setTdlId(String.valueOf(job.tdl.id));
+
+            restJobListResponse.getRestJobs().add(restJob);
+        }
+
+        /*
+        * Preparing response
+        * */
+        String responseValue = null;
+        try {
+            responseValue = contentProcessor.prepareResponse(RestJobList.class.getName(), restJobListResponse);
+        } catch (ParseException e) {
+            return internalServerError(e.getMessage());
+        }
+
+        response().setContentType(contentProcessor.getContentType());
+        return ok(responseValue);
+    }
+
+
+    /**
+     * This method receives JSON or XML request which includes job id and returns detailed job info.
+     * <p>
+     * The sample JSON request:
+     * {"id":"1"}
+     *
+     * <p>
+     * <p>
+     * The sample produced response by Minder (with the status code 200in the header):
+     *{
+     *    "id":"6",
+     *    "name":"TestCaseSample2",
+     *    "tdlId":"4",
+     *    "owner":"tester@minder",
+     *    "mtdlParameters":"",
+     *    "parametersForWrappers":[
+     *        {
+     *            "id":"4",
+     *            "wrapperParamId":"4",
+     *            "wrapperVersionId":"2"
+     *        }
+     *    ]
+     *}
+     * Job id is required.
+     *
+     */
+    public static Result getJob() {
+        RestJob restJobResponse = new RestJob();
+
+        /*
+        * Handling the request message
+        * */
+        IRestContentProcessor contentProcessor = null;
+        try {
+            contentProcessor = RestUtils.createContentProcessor(request().getHeader(CONTENT_TYPE), request().body());
+        } catch (IllegalArgumentException e) {
+            return badRequest(e.getCause().toString());
+        }
+
+        RestJob restJob = null;
+        try {
+            restJob = (RestJob) contentProcessor.parseRequest(RestJob.class.getName());
+        } catch (ParseException e) {
+            return internalServerError(e.getCause().toString());
+        }
+
+        if (null==restJob.getId())
+            return badRequest("Please provide a Job ID");
+
+
+        //Getting the job
+        Job job = Job.findById(Long.parseLong(restJob.getId()));
+        if (job == null)
+            return badRequest("Job with id [" + restJob.getId() + "] not found!");
+
+        restJobResponse.setId(String.valueOf(job.id));
+        restJobResponse.setName(job.name);
+        restJobResponse.setOwner(job.owner.email);
+        restJobResponse.setTdlId(String.valueOf(job.tdl.id));
+        restJobResponse.setMtdlParameters(job.mtdlParameters);
+        restJobResponse.setParametersForWrappers(new ArrayList<>());
+
+        for (MappedWrapper mappedWrapper : job.mappedWrappers) {
+            RestParametersForWrappers restParametersForWrappers = new RestParametersForWrappers();
+            restParametersForWrappers.setId(String.valueOf(mappedWrapper.id));
+            restParametersForWrappers.setWrapperParamId(String.valueOf(mappedWrapper.parameter.id));
+            restParametersForWrappers.setWrapperVersionId(String.valueOf(mappedWrapper.wrapperVersion.id));
+
+            restJobResponse.getParametersForWrappers().add(restParametersForWrappers);
+        }
+
+        /*
+        * Preparing response
+        * */
+        String responseValue = null;
+        try {
+            responseValue = contentProcessor.prepareResponse(RestJob.class.getName(), restJobResponse);
+        } catch (ParseException e) {
+            return internalServerError(e.getMessage());
+        }
+
+        response().setContentType(contentProcessor.getContentType());
+        return ok(responseValue);
+    }
+
+
     /**
      * This method receives JSON or XML request which includes job information and creates a new job.
      * <p>

@@ -166,6 +166,8 @@ POST        /rest/editWrapper                           rest.controllers.RestWra
 POST        /rest/deleteWrapper                         rest.controllers.RestWrapperController.deleteWrapper
 
 #Rest Job management
+GET         /rest/listJobs                              rest.controllers.RestJobController.listJobs
+POST        /rest/getJob                                rest.controllers.RestJobController.getJob
 POST        /rest/createJob                             rest.controllers.RestJobController.createJob
 POST        /rest/deleteJob                             rest.controllers.RestJobController.deleteJob
 

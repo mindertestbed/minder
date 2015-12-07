@@ -15,11 +15,22 @@ import javax.xml.bind.annotation.*;
 })
 @XmlRootElement(name = "ParametersForWrappers")
 public class RestParametersForWrappers {
+    @XmlElement(required = false)
+    protected String id;
+
     @XmlElement(required = true)
     protected String wrapperParamId;
 
     @XmlElement(required = true)
     protected String wrapperVersionId;
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
+    }
 
     public String getWrapperParamId() {
         return wrapperParamId;

@@ -37,5 +37,9 @@ public class Job extends AbstractJob {
     public static Job findByName(String name) {
         return find.where().eq("name", name).findUnique();
     }
+
+    public static List<Job> findAll(){
+        return find.where().setOrderBy("id").findList();
+    }
 }
 
