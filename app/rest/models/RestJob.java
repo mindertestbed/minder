@@ -15,7 +15,8 @@ import java.util.List;
         "name",
         "tdlId",
         "owner",
-        "mtdlParameters"
+        "mtdlParameters",
+        "parametersForWrappers"
 })
 @XmlRootElement(name = "job")
 public class RestJob {
