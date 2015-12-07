@@ -17,27 +17,24 @@ public class ParamSignature extends Model {
 	@ManyToOne
 	public WrapperParam wrapperParam;
 
-	@Override
-	public boolean equals(Object o) {
-		if (this == o) return true;
-		if (o == null || getClass() != o.getClass()) return false;
-		if (!super.equals(o)) return false;
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
 
-		ParamSignature that = (ParamSignature) o;
+        ParamSignature that = (ParamSignature) o;
 
-		if (!signature.equals(that.signature)) return false;
+        if (signature != null ? !signature.equals(that.signature) : that.signature != null) return false;
 
-		return true;
-	}
+        return true;
+    }
 
-	@Override
-	public int hashCode() {
-		int result = super.hashCode();
-		result = 31 * result + signature.hashCode();
-		return result;
-	}
+    @Override
+    public int hashCode() {
+        return signature != null ? signature.hashCode() : 0;
+    }
 
-	public static final Finder<Long, ParamSignature> find = new Finder<>(Long.class,
+    public static final Finder<Long, ParamSignature> find = new Finder<>(Long.class,
 			ParamSignature.class);
 	
 	public static List<ParamSignature> getAll() {

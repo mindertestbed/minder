@@ -32,7 +32,9 @@ import java.util.List;
         "shortDescription",
         "description",
         "owner",
-        "dependencyString"
+        "dependencyString",
+        "testassertions",
+        "testassets"
 })
 @XmlRootElement(name = "testGroup")
 public class RestTestGroup {
@@ -58,6 +60,10 @@ public class RestTestGroup {
     @XmlElementWrapper(name="testassertions")
     @XmlElement(required = false)
     public List<RestTestAssertion> testassertions;
+
+    @XmlElementWrapper(name="testassets")
+    @XmlElement(required = false)
+    public List<RestTestAsset> testassets;
 
 
     public String getGroupName() {
@@ -106,5 +112,13 @@ public class RestTestGroup {
 
     public void setTestassertions(List<RestTestAssertion> testassertions) {
         this.testassertions = testassertions;
+    }
+
+    public List<RestTestAsset> getTestassets() {
+        return testassets;
+    }
+
+    public void setTestassets(List<RestTestAsset> testassets) {
+        this.testassets = testassets;
     }
 }

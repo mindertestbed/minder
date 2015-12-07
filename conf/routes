@@ -121,6 +121,7 @@ GET         /rest/login                                 rest.controllers.LoginCo
 GET         /rest/doLogin                               rest.controllers.LoginController.doLogin
 POST        /rest/validatecontent                       rest.controllers.XMLValidationController.validateContent
 #Rest test group management
+GET         /rest/listTestGroups                        rest.controllers.RestTestGroupController.listTestGroups
 POST        /rest/editdependency                        rest.controllers.RestTestGroupController.editDependency
 POST        /rest/getdependency                         rest.controllers.RestTestGroupController.getDependency
 POST        /rest/addTestGroup                          rest.controllers.RestTestGroupController.addTestGroup
@@ -129,7 +130,32 @@ POST        /rest/deleteTestGroup                       rest.controllers.RestTes
 POST        /rest/getTestGroup                          rest.controllers.RestTestGroupController.getTestGroup
 
 #Rest test assertion management
+POST        /rest/listUtilClasses                       rest.controllers.RestUtilClassController.listUtilClasses
+POST        /rest/getUtilClass                          rest.controllers.RestUtilClassController.getUtilClass
+POST        /rest/addUtilClass                          rest.controllers.RestUtilClassController.addUtilClass
+POST        /rest/editUtilClass                         rest.controllers.RestUtilClassController.editUtilClass
+POST        /rest/deleteUtilClass                       rest.controllers.RestUtilClassController.deleteUtilClass
+
+#Rest test assertion management
+POST        /rest/listTestAssertions                    rest.controllers.RestTestAssertionController.listTestAssertions
 POST        /rest/getTestAssertion                      rest.controllers.RestTestAssertionController.getTestAssertion
+POST        /rest/addTestAssertion                      rest.controllers.RestTestAssertionController.addTestAssertion
+POST        /rest/editTestAssertion                     rest.controllers.RestTestAssertionController.editTestAssertion
+POST        /rest/deleteTestAssertion                   rest.controllers.RestTestAssertionController.deleteTestAssertion
+
+#Rest test asset management
+POST        /rest/listTestAssets                        rest.controllers.RestTestAssetController.listTestAssets
+POST        /rest/getTestAsset                          rest.controllers.RestTestAssetController.getTestAsset
+POST        /rest/addTestAsset                          rest.controllers.RestTestAssetController.addTestAsset
+POST        /rest/editTestAsset                         rest.controllers.RestTestAssetController.editTestAsset
+POST        /rest/deleteTestAsset                       rest.controllers.RestTestAssetController.deleteTestAsset
+
+#Rest test case management
+POST        /rest/listTestCases                         rest.controllers.RestTestCaseController.listTestCases
+POST        /rest/getTestCase                           rest.controllers.RestTestCaseController.getTestCase
+POST        /rest/addTestCase                           rest.controllers.RestTestCaseController.addTestCase
+POST        /rest/editTestCase                          rest.controllers.RestTestCaseController.editTestCase
+POST        /rest/deleteTestCase                        rest.controllers.RestTestCaseController.deleteTestCase
 
 #Rest wrapper management
 GET         /rest/listWrappers                          rest.controllers.RestWrapperController.listWrappers
@@ -137,6 +163,18 @@ POST        /rest/getWrapperStatus                      rest.controllers.RestWra
 POST        /rest/getWrapper                            rest.controllers.RestWrapperController.getWrapper
 POST        /rest/addWrapper                            rest.controllers.RestWrapperController.addWrapper
 POST        /rest/editWrapper                           rest.controllers.RestWrapperController.editWrapper
+POST        /rest/deleteWrapper                         rest.controllers.RestWrapperController.deleteWrapper
+
+#Rest Job management
+GET         /rest/listJobs                              rest.controllers.RestJobController.listJobs
+POST        /rest/getJob                                rest.controllers.RestJobController.getJob
+POST        /rest/createJob                             rest.controllers.RestJobController.createJob
+POST        /rest/deleteJob                             rest.controllers.RestJobController.deleteJob
+
+#Rest TDL management
+POST        /rest/getTdl                                rest.controllers.RestTdlController.getTdl
+POST        /rest/addTdl                                rest.controllers.RestTdlController.addTdl
+POST        /rest/editTdl                               rest.controllers.RestTdlController.editTdl
 
 #GITB Testbed Rest Services
 POST        /rest/testbed/getTestCaseDefinition         rest.controllers.GitbTestbedController.getTestCaseDefinition()
@@ -146,7 +184,6 @@ POST        /rest/testbed/configure                     rest.controllers.GitbTes
 POST        /rest/testbed/start                         rest.controllers.GitbTestbedController.start()
 POST        /rest/testbed/stop                          rest.controllers.GitbTestbedController.stop()
 POST        /rest/testbed/getTestCaseDefinitions        rest.controllers.GitbTestbedController.getGetTestCaseDefinitions()
-
 
 
 ##-------------

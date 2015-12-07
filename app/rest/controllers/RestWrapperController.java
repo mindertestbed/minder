@@ -284,12 +284,15 @@ public class RestWrapperController extends Controller {
         }
 
         wrapper = new Wrapper();
-
         wrapper.user = user;
         wrapper.name = restWrapper.getWrapperName();
         wrapper.shortDescription = restWrapper.getShortDescription();
 
-        wrapper.save();
+        try {
+            wrapper.save();
+        } catch (Exception e) {
+            return internalServerError("An error occurred during wrapper save: " + e.getMessage());
+        }
 
 
         minderResponse.setResult(Constants.SUCCESS);
@@ -386,10 +389,88 @@ public class RestWrapperController extends Controller {
         }
 
         wrapper.shortDescription = restWrapper.getShortDescription();
-        wrapper.update();
+        try {
+            wrapper.update();
+        } catch (Exception e) {
+            return internalServerError("An error occurred during wrapper update: " + e.getMessage());
+        }
 
         minderResponse.setResult(Constants.SUCCESS);
         minderResponse.setDescription("Wrapper editted!");
+
+        /*
+        * Preparing response
+        * */
+        String responseValue = null;
+        try {
+            responseValue = contentProcessor.prepareResponse(RestMinderResponse.class.getName(), minderResponse);
+        } catch (ParseException e) {
+            return internalServerError(e.getMessage());
+        }
+
+        response().setContentType(contentProcessor.getContentType());
+        return ok(responseValue);
+    }
+
+
+    /**
+     * This method receives JSON or XML request which includes wrapper name and delete wrapper.
+     * <p>
+     * The sample JSON request:
+     * {"wrapperName":"newWrapperName"}
+     *
+     * The sample produced response by Minder (with the status code 200in the header):
+     * {"result":"SUCCESS","description":"Wrapper deleted!"}
+     *
+     * wrapper name is required.
+     */
+    public static Result deleteWrapper() {
+        RestMinderResponse minderResponse = new RestMinderResponse();
+
+        /*
+        * Parse client request and get user
+        */
+        String authorizationData = request().getHeader(AUTHORIZATION);
+        HashMap<String, String> clientRequest = RestUtils.createHashMapOfClientRequest(authorizationData);
+        User user = User.findByEmail(clientRequest.get("username"));
+        if (null == user) {
+            return unauthorized(Constants.RESULT_UNAUTHORIZED);
+        }
+
+        /*
+        * Handling the request message
+        * */
+        IRestContentProcessor contentProcessor = null;
+        try {
+            contentProcessor = RestUtils.createContentProcessor(request().getHeader(CONTENT_TYPE), request().body());
+        } catch (IllegalArgumentException e) {
+            return badRequest(e.getCause().toString());
+        }
+
+        RestWrapper restWrapper = null;
+        try {
+            restWrapper = (RestWrapper) contentProcessor.parseRequest(RestWrapper.class.getName());
+        } catch (ParseException e) {
+            return internalServerError(e.getCause().toString());
+        }
+
+        if (null == restWrapper.getWrapperName())
+            return badRequest("Please provide a Wrapper name!");
+
+        //Editing the new wrapper
+        Wrapper wrapper = Wrapper.findByName(restWrapper.getWrapperName());
+        if (wrapper == null) {
+            return badRequest("Wrapper with name [" + restWrapper.getWrapperName() + "] not found!");
+        }
+
+        try {
+            wrapper.delete();
+        } catch (Exception e) {
+            return internalServerError("An error occurred during wrapper delete: " + e.getMessage());
+        }
+
+        minderResponse.setResult(Constants.SUCCESS);
+        minderResponse.setDescription("Wrapper deleted!");
 
         /*
         * Preparing response
@@ -413,26 +494,34 @@ public class RestWrapperController extends Controller {
      * <p>
      * JSON
      * =====
-     * {
-     *  "restWrappers":[
-     *      {
-     *          "id":"1",
-     *          "wrapperName":"xml-content-verifier",
-     *          "shortDescription":"XMl Content Verifier",
-     *          "description":null,
-     *          "userName":"ROOT",
-     *       "restWrapperVersion":null
-     *      },
-     *      {
-     *          "id":"2",
-     *          "wrapperName":"xml-generator",
-     *          "shortDescription":"XMl Generator Wrapper",
-     *          "description":null,
-     *          "userName":"ROOT",
-     *          "restWrapperVersion":null
-     *      }
-     *  ]
-     * }
+     *{
+     *    "restWrappers":[
+     *        {
+     *            "id":"1",
+     *            "wrapperName":"tamelizer",
+     *            "shortDescription":"The tamelizer wrapper for minder",
+     *            "description":null,
+     *            "userName":"ROOT",
+     *            "restWrapperVersion":null
+     *        },
+     *        {
+     *            "id":"2",
+     *            "wrapperName":"xml-content-verifier",
+     *            "shortDescription":"The default minder xml content verifier",
+     *            "description":null,
+     *            "userName":"ROOT",
+     *            "restWrapperVersion":null
+     *        },
+     *        {
+     *            "id":"3",
+     *            "wrapperName":"peppol-validator",
+     *            "shortDescription":"A minder adapted version of the Peppol *XML Content Validation Engine",
+     *            "description":null,
+     *            "userName":"ROOT",
+     *            "restWrapperVersion":null
+     *        }
+     *    ]
+     *}
      *
      * <p>
      * No input is necessary.
@@ -457,6 +546,7 @@ public class RestWrapperController extends Controller {
 
         for(Wrapper wrapper : wrapperList){
             RestWrapper rw = new RestWrapper();
+            rw.setId(String.valueOf(wrapper.id));
             rw.setWrapperName(wrapper.name);
             rw.setDescription(wrapper.description);
             rw.setId(String.valueOf(wrapper.id));

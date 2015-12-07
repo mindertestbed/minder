@@ -117,19 +117,26 @@ public class User extends Model {
 
     public void updatePassword(String email, String password) {
         User user = findByEmail(email);
-        user.password = Util.sha256(password.getBytes());
-        user.save();
+        if (null != user) {
+            user.password = Util.sha256(password.getBytes());
+            user.save();
+        }
     }
 
     public static byte[] getHashedPassword(String email) {
         User user = findByEmail(email);
+        if (null == user) {
+            return null;
+        }
         return user.password;
     }
 
     public void resetPassword(String email) {
         User user = findByEmail(email);
-        user.password = Util.sha256("12345".getBytes());
-        user.save();
+        if (null != user) {
+            user.password = Util.sha256("12345".getBytes());
+            user.save();
+        }
     }
 
     public static User findById(Long id) {

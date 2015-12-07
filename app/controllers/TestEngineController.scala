@@ -2,7 +2,6 @@ package controllers
 
 import java.util.Date
 import java.util.concurrent.LinkedBlockingQueue
-
 import controllers.common.enumeration.OperationType
 import minderengine.{MinderSignalRegistry, SessionMap}
 import models._
@@ -11,6 +10,8 @@ import play.api.libs.EventSource
 import play.api.libs.iteratee.Concurrent
 import play.api.mvc._
 import views.html.testDesigner.job._
+import rest.controllers.GitbTestbedController
+import com.gitb.core.v1.StepStatus
 
 /**
   * Manages the job lifecycle.
@@ -180,7 +181,7 @@ object TestEngineController extends Controller {
    * an action for enqueuing a new gitb job for test engine running
     * @return
     */
-  def enqueueGitbJobWithUser(id: Long, user: User){
+  def enqueueGitbJobWithUser(id: Long, user: User, replyToUrlAddress: String){
       if (jobQueue.size >= 30) {
         BadRequest("The job queue is full.")
       } else {
@@ -188,9 +189,10 @@ object TestEngineController extends Controller {
         if (job == null) {
           BadRequest("A job with id [" + id + "] was not found!")
         } else {
-          jobQueue.offer(createTestRunContext(job, user))
+          var testRunContext = createTestRunContext(job, user);
+          testRunContext.gitbReplyToUrlAddress = replyToUrlAddress
+          jobQueue.offer(testRunContext)
           queueFeedUpdate();
-          Ok;
         }
       }
   }
@@ -211,6 +213,13 @@ object TestEngineController extends Controller {
     Logger.debug(log)
     currentLog.append(log)
     logChannel.push(log)
+  }
+  
+  def gitbLogFeedUpdate(log: String, step: StepStatus, stepId: Long): Unit = {
+    if (activeRunContext != null && activeRunContext.job != null && activeRunContext.job.isInstanceOf[GitbJob])
+    {
+      GitbTestbedController.performUpdateStatusOperation(activeRunContext.gitbReplyToUrlAddress, activeRunContext.job.id, step, stepId, log);
+    }
   }
 
   /**
@@ -293,31 +302,43 @@ object TestEngineController extends Controller {
   def cancelGitbJob(id: Long, user: User) {
     val job = GitbJob.findById(id)
     if (job == null) {
-      BadRequest("A job with id [" + id + "] was not found!")
+      println("A job with id [" + id + "] was not found!")
+      return
     }
 
+    //now look at running gitb jobs
+    if (activeRunContext != null && activeRunContext.job.id == id) {
+      if (user.email == "root@minder" || user.email == activeRunContext.job.owner.email) {
+        //now interrupt the thread.
+        testThread.interrupt();  
+        return
+      }
+      else
+      {
+        println(user.email + " not permitted for" + " job with id [" + id + "]")
+        return
+      } 
+    }
+    
+    //now look at waiting gitb jobs
     var index = 0;
     val arr = jobQueue.toArray
     if(arr == null || arr.size == 0)
-      BadRequest("No gitb job found in queue.")
-      
+    {
+      println("A waiting job with id [" + id + "] was not found!")
+      return
+    }
+          
     for (index <- 0 to (arr.size - 1)) {
       val tr = arr(index).asInstanceOf[TestRunContext]
       if (user.email == "root@minder" || user.email == tr.testRun.runner.email) {
-        if (activeRunContext != null && activeRunContext.job.id == id) {
-          //now interrupt the thread.
-          testThread.interrupt();
-          Ok;
-        }
-
         if (tr.job.isInstanceOf[GitbJob] && tr.job.id == id) {
           jobQueue.remove(tr)
           queueFeedUpdate();
-          Ok;
+          return
         }
       }
     }
-    BadRequest("A running job with id [" + id + "] was not found!")
   }
 
 }

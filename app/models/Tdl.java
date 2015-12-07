@@ -74,4 +74,8 @@ public class Tdl extends Model {
 
         return tdlList;
     }
+
+    public static Tdl findByTestCaseAndVersion(TestCase testCase, String version) {
+        return find.where().eq("testCase", testCase).eq("version",version).findUnique();
+    }
 }

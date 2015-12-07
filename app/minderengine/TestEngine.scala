@@ -2,16 +2,16 @@ package minderengine
 
 import java.lang.reflect.InvocationTargetException
 import java.util
-
 import models._
 import mtdl._
 import org.apache.log4j.spi.LoggingEvent
 import org.apache.log4j.{AppenderSkeleton, EnhancedPatternLayout, Level}
 import play.Logger
-
 import scala.InterruptedException
 import scala.collection.JavaConversions._
 import scala.collection.mutable
+import controllers.TestEngineController
+import com.gitb.core.v1.StepStatus
 
 /**
   * Created by yerlibilgin on 07/12/14.
@@ -56,6 +56,38 @@ object TestEngine {
       false;
     }
   }
+  
+  class GitbWatcher() extends GitbRivetWatcher {
+    override def notifyProcessingInfo(log: String, rivet: Rivet): Unit =
+    {
+      notify(log, StepStatus.PROCESSING, rivet)
+    }
+
+    override def notifySkippedInfo(log: String, rivet: Rivet): Unit =
+    {
+      notify(log, StepStatus.SKIPPED, rivet)
+    }
+
+    override def notifyWaitingInfo(log: String, rivet: Rivet): Unit =
+    {
+      notify(log, StepStatus.WAITING, rivet)
+    }
+
+    override def notifyErrorInfo(log: String, rivet: Rivet): Unit =
+    {
+      notify(log, StepStatus.ERROR, rivet)
+    }
+
+    override def notifyCompletedInfo(log: String, rivet: Rivet): Unit =
+    {
+      notify(log, StepStatus.COMPLETED, rivet)
+    }
+    
+    def notify(log: String, stepStatus: StepStatus, rivet: Rivet): Unit =
+    {
+      TestEngineController.gitbLogFeedUpdate(log, stepStatus, rivet.tplStepId)
+    }
+  }
 
   /**
     * Runs the provided already compiled tdl class with the given parameter mapping
@@ -69,6 +101,7 @@ object TestEngine {
               testProcessWatcher: TestProcessWatcher, params: String): Unit = {
     val lgr: org.apache.log4j.Logger = org.apache.log4j.Logger.getLogger("test");
     val app = new MyAppender(testProcessWatcher);
+    val gtb = new GitbWatcher();
     app.setLayout(new EnhancedPatternLayout("%d{ISO8601}: %-5p - %m%n%throwable"));
     lgr.addAppender(app);
 
@@ -108,7 +141,9 @@ object TestEngine {
       try {
         var rivetIndex = 0;
         for (rivet <- minderTDL.RivetDefs) {
-          lgr.info("> " + "RUN RIVET " + rivetIndex)
+          var msg:String = "> " + "RUN RIVET " + rivetIndex;
+          lgr.info(msg)
+          gtb.notifyProcessingInfo(msg, rivet)
           val rivetWrapperId: String = rivet.wrapperFunction.wrapperId
           //resolve the minder client id. This might as well be resolved to a local built-in wrapper or the null slot.
           val slotPair = findPairOrError(identifierMinderClientMap, AdapterIdentifier.parse(rivetWrapperId))
@@ -122,19 +157,31 @@ object TestEngine {
           try {
             for (tuple@(label, signature) <- rivet.signalPipeMap.keySet) {
               val me: MinderSignalRegistry = SessionMap.getObject(userEmail, "signalRegistry")
-              if (me == null) throw new scala.IllegalArgumentException("No MinderSignalRegistry object defined for session " + userEmail)
+              if (me == null)
+              {
+                msg = "No MinderSignalRegistry object defined for session " + userEmail;
+                gtb.notifyErrorInfo(msg, rivet)
+                throw new scala.IllegalArgumentException(msg)
+              }
 
               //obtain the source signal object
               val signalList = rivet.signalPipeMap(tuple);
               if (signalList == null || signalList.isEmpty)
-                throw new scala.IllegalArgumentException("singal list is empty for " + label + "." + signature);
+              {
+                msg = "singal list is empty for " + label + "." + signature;
+                gtb.notifyErrorInfo(msg, rivet);
+                throw new scala.IllegalArgumentException(msg);
+              }
 
               val signal = signalList(0).inRef.source;
 
               val signalPair = findPairOrError(identifierMinderClientMap, AdapterIdentifier.parse(label));
 
               val signalAdapterIdentifier = signalPair.adapterIdentifier
-              lgr.debug("> Wait For Signal:" + signalAdapterIdentifier + "." + signature)
+              msg = "> Wait For Signal:" + signalAdapterIdentifier + "." + signature;
+              lgr.debug(msg)
+              gtb.notifyWaitingInfo(msg, rivet)
+              
 
               val signalData: SignalData = try {
                 me.dequeueSignal(signalAdapterIdentifier, signature, signal.timeout)
@@ -142,17 +189,21 @@ object TestEngine {
                 case rte: RuntimeException => {
                   signal.handleTimeout(rte)
                   thereIsTimoeut = true
+                  gtb.notifyErrorInfo("Break rivet", rivet)
                   throw new BreakException
                 }
               }
 
-              lgr.debug("< Signal Arrived: " + signalAdapterIdentifier + "." + signature)
+              msg = "< Signal Arrived: " + signalAdapterIdentifier + "." + signature
+              lgr.debug(msg)
+              gtb.notifyProcessingInfo(msg, rivet)
 
               if (signalData.isInstanceOf[SignalErrorData]) {
                 lgr.debug("This is an error signal");
                 val signalErrorData = signalData.asInstanceOf[SignalErrorData]
-                throw new scala.RuntimeException("Signal [" + signalAdapterIdentifier + "." + signature + "] failed [" + signalErrorData.signalFailedException.getMessage,
-                  signalErrorData.signalFailedException)
+                msg = "Signal [" + signalAdapterIdentifier + "." + signature + "] failed [" + signalErrorData.signalFailedException.getMessage
+                gtb.notifyErrorInfo(msg, rivet)
+                throw new scala.RuntimeException(msg, signalErrorData.signalFailedException)
               }
               val signalCallData: SignalCallData = signalData.asInstanceOf[SignalCallData]
 
@@ -173,6 +224,7 @@ object TestEngine {
 
           if (thereIsTimoeut) {
             //we hit a timeout, skip to the next rivet
+            gtb.notifySkippedInfo("< Rivet skipped", rivet)
           } else {
             lgr.debug("Assign free vars")
 
@@ -192,14 +244,20 @@ object TestEngine {
               testProcessWatcher.signalEmitted(rivetIndex, signalIndex, signalData2)
             }
 
-            lgr.info("> CALL SLOT " + slotPair.adapterIdentifier + "." + rivet.wrapperFunction.signature)
+            msg = "> CALL SLOT " + slotPair.adapterIdentifier + "." + rivet.wrapperFunction.signature
+            lgr.info(msg)
+            gtb.notifyProcessingInfo(msg, rivet)
             testProcessWatcher.rivetInvoked(rivetIndex);
             rivet.result = slotPair.minderClient.callSlot(session, rivet.wrapperFunction.signature, args)
-            lgr.info("< SLOT CALLED " + slotPair.adapterIdentifier + "." + rivet.wrapperFunction.signature)
+            msg = "< SLOT CALLED " + slotPair.adapterIdentifier + "." + rivet.wrapperFunction.signature;
+            lgr.info(msg)
+            gtb.notifyProcessingInfo(msg, rivet)
 
 
+            msg = "< Rivet finished sucessfully";
             testProcessWatcher.rivetFinished(rivetIndex)
-            lgr.info("< Rivet finished sucessfully")
+            gtb.notifyCompletedInfo(msg, rivet)
+            lgr.info(msg)
             lgr.info("----------\n")
 
           }

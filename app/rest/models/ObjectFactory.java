@@ -31,6 +31,21 @@ public class ObjectFactory {
     private final static QName _RestWrapper_QNAME = new QName("", "restWrapper");
     private final static QName _RestWrapperVersion_QNAME = new QName("", "restWrapperVersion");
     private final static QName _RestWrapperList_QNAME = new QName("", "restWrapperList");
+    private final static QName _RestTestAssertion_QNAME = new QName("", "restTestAssertion");
+    private final static QName _RestTestCase_QNAME = new QName("", "restTestCase");
+    private final static QName _RestTdl_QNAME = new QName("", "restTdl");
+    private final static QName _RestTestAsset_QNAME = new QName("", "restTestAsset");
+    private final static QName _RestTestAssetList_QNAME = new QName("", "restTestAssetList");
+    private final static QName _RestTestGroupList_QNAME = new QName("", "restTestGroupList");
+    private final static QName _RestTestAssertionList_QNAME = new QName("", "restTestAssertionList");
+    private final static QName _RestTestCaseList_QNAME = new QName("", "restTestCaseList");
+    private final static QName _RestUtilClass_QNAME = new QName("", "restUtilClass_QNAME");
+    private final static QName _RestUtilClassList_QNAME = new QName("", "restUtilClassList_QNAME");
+    private final static QName _RestJob_QNAME = new QName("", "restJob_QNAME");
+    private final static QName _RestJobList_QNAME = new QName("", "restJobList_QNAME");
+    private final static QName _RestParametersForWrappers_QNAME = new QName("", "restParametersForWrappers_QNAME");
+    private final static QName _RestTdlWrapperParam_QNAME = new QName("", "restTdlWrapperParam_QNAME");
+
 
     /**
      * Create a new ObjectFactory that can be used to create new instances of schema derived classes for package: rest.controllers.xmlmodel.response
@@ -173,5 +188,248 @@ public class ObjectFactory {
     @XmlElementDecl(namespace = "", name = "restWrapperList")
     public JAXBElement<RestWrapperList> createRestWrapperList(RestWrapperList value) {
         return new JAXBElement<RestWrapperList>(_RestWrapperList_QNAME, RestWrapperList.class, null, value);
+    }
+
+    /**
+     * Create an instance of {@link rest.models.RestTestAssertion }
+     *
+     */
+    public RestTestAssertion createRestTestAssertion() {
+        return new RestTestAssertion();
+    }
+
+    /**
+     * Create an instance of {@link JAXBElement }{@code <}{@link RestTestAssertion }{@code >}}
+     *
+     */
+    @XmlElementDecl(namespace = "", name = "restTestAssertion")
+    public JAXBElement<RestTestAssertion> createRestTestAssertion(RestTestAssertion value) {
+        return new JAXBElement<RestTestAssertion>(_RestTestAssertion_QNAME, RestTestAssertion.class, null, value);
+    }
+
+    /**
+     * Create an instance of {@link rest.models.RestTestCase }
+     *
+     */
+    public RestTestCase createRestTestCase() {
+        return new RestTestCase();
+    }
+
+    /**
+     * Create an instance of {@link JAXBElement }{@code <}{@link RestTestCase }{@code >}}
+     *
+     */
+    @XmlElementDecl(namespace = "", name = "restTestCase")
+    public JAXBElement<RestTestCase> createRestTestCase(RestTestCase value) {
+        return new JAXBElement<RestTestCase>(_RestTestCase_QNAME, RestTestCase.class, null, value);
+    }
+
+    /**
+     * Create an instance of {@link rest.models.RestTdl }
+     *
+     */
+    public RestTdl createRestTdl() {
+        return new RestTdl();
+    }
+
+    /**
+     * Create an instance of {@link JAXBElement }{@code <}{@link RestTdl }{@code >}}
+     *
+     */
+    @XmlElementDecl(namespace = "", name = "restTdl")
+    public JAXBElement<RestTdl> createRestTdl(RestTdl value) {
+        return new JAXBElement<RestTdl>(_RestTdl_QNAME, RestTdl.class, null, value);
+    }
+
+
+    /**
+     * Create an instance of {@link rest.models.RestTestAsset }
+     *
+     */
+    public RestTestAsset createRestTestAsset() {
+        return new RestTestAsset();
+    }
+
+    /**
+     * Create an instance of {@link JAXBElement }{@code <}{@link RestTestAsset }{@code >}}
+     *
+     */
+    @XmlElementDecl(namespace = "", name = "restTestAsset")
+    public JAXBElement<RestTestAsset> createRestTestAsset(RestTestAsset value) {
+        return new JAXBElement<RestTestAsset>(_RestTestAsset_QNAME, RestTestAsset.class, null, value);
+    }
+
+
+    /**
+     * Create an instance of {@link rest.models.RestTestAssertionList }
+     *
+     */
+    public RestTestAssertionList createRestTestAssertionList() {
+        return new RestTestAssertionList();
+    }
+
+    /**
+     * Create an instance of {@link JAXBElement }{@code <}{@link RestTestAssertionList }{@code >}}
+     *
+     */
+    @XmlElementDecl(namespace = "", name = "restTestAssertionList")
+    public JAXBElement<RestTestAssertionList> createRestTestAssertionList(RestTestAssertionList value) {
+        return new JAXBElement<RestTestAssertionList>(_RestTestAssertionList_QNAME, RestTestAssertionList.class, null, value);
+    }
+
+
+    /**
+     * Create an instance of {@link rest.models.RestTestGroupList }
+     *
+     */
+    public RestTestGroupList createRestTestGroupList() {
+        return new RestTestGroupList();
+    }
+
+    /**
+     * Create an instance of {@link JAXBElement }{@code <}{@link RestTestGroupList }{@code >}}
+     *
+     */
+    @XmlElementDecl(namespace = "", name = "restTestGroupList")
+    public JAXBElement<RestTestGroupList> createRestTestGroupList(RestTestGroupList value) {
+        return new JAXBElement<RestTestGroupList>(_RestTestGroupList_QNAME, RestTestGroupList.class, null, value);
+    }
+
+    /**
+     * Create an instance of {@link rest.models.RestTestCaseList }
+     *
+     */
+    public RestTestCaseList createRestTestCaseList() {
+        return new RestTestCaseList();
+    }
+
+    /**
+     * Create an instance of {@link JAXBElement }{@code <}{@link RestTestCaseList }{@code >}}
+     *
+     */
+    @XmlElementDecl(namespace = "", name = "restTestCaseList")
+    public JAXBElement<RestTestCaseList> createRestTestCaseList(RestTestCaseList value) {
+        return new JAXBElement<RestTestCaseList>(_RestTestCaseList_QNAME, RestTestCaseList.class, null, value);
+    }
+
+    /**
+     * Create an instance of {@link rest.models.RestUtilClass }
+     *
+     */
+    public RestUtilClass createRestUtilClass() {
+        return new RestUtilClass();
+    }
+
+    /**
+     * Create an instance of {@link JAXBElement }{@code <}{@link RestUtilClass }{@code >}}
+     *
+     */
+    @XmlElementDecl(namespace = "", name = "restUtilClass")
+    public JAXBElement<RestUtilClass> createRestUtilClass(RestUtilClass value) {
+        return new JAXBElement<RestUtilClass>(_RestUtilClass_QNAME, RestUtilClass.class, null, value);
+    }
+
+    /**
+     * Create an instance of {@link rest.models.RestUtilClassList }
+     *
+     */
+    public RestUtilClassList createRestUtilClassList() {
+        return new RestUtilClassList();
+    }
+
+    /**
+     * Create an instance of {@link JAXBElement }{@code <}{@link RestUtilClassList }{@code >}}
+     *
+     */
+    @XmlElementDecl(namespace = "", name = "restUtilClassList")
+    public JAXBElement<RestUtilClassList> createRestUtilClassList(RestUtilClassList value) {
+        return new JAXBElement<RestUtilClassList>(_RestUtilClassList_QNAME, RestUtilClassList.class, null, value);
+    }
+
+    /**
+     * Create an instance of {@link rest.models.RestTestAssetList }
+     *
+     */
+    public RestTestAssetList createRestTestAssetList() {
+        return new RestTestAssetList();
+    }
+
+    /**
+     * Create an instance of {@link JAXBElement }{@code <}{@link RestTestAssetList }{@code >}}
+     *
+     */
+    @XmlElementDecl(namespace = "", name = "restTestAssetList")
+    public JAXBElement<RestTestAssetList> createRestTestAssetList(RestTestAssetList value) {
+        return new JAXBElement<RestTestAssetList>(_RestTestAssetList_QNAME, RestTestAssetList.class, null, value);
+    }
+
+    /**
+     * Create an instance of {@link rest.models.RestJob }
+     *
+     */
+    public RestJob createRestJob() {
+        return new RestJob();
+    }
+
+    /**
+     * Create an instance of {@link JAXBElement }{@code <}{@link RestJob }{@code >}}
+     *
+     */
+    @XmlElementDecl(namespace = "", name = "restJob")
+    public JAXBElement<RestJob> createRestJob(RestJob value) {
+        return new JAXBElement<RestJob>(_RestJob_QNAME, RestJob.class, null, value);
+    }
+
+
+    /**
+     * Create an instance of {@link rest.models.RestJobList }
+     *
+     */
+    public RestJobList createRestJobList() {
+        return new RestJobList();
+    }
+
+    /**
+     * Create an instance of {@link JAXBElement }{@code <}{@link RestJobList }{@code >}}
+     *
+     */
+    @XmlElementDecl(namespace = "", name = "restJobList")
+    public JAXBElement<RestJobList> createRestJobList(RestJobList value) {
+        return new JAXBElement<RestJobList>(_RestJobList_QNAME, RestJobList.class, null, value);
+    }
+
+    /**
+     * Create an instance of {@link rest.models.RestParametersForWrappers }
+     *
+     */
+    public RestParametersForWrappers createRestParametersForWrappers() {
+        return new RestParametersForWrappers();
+    }
+
+    /**
+     * Create an instance of {@link JAXBElement }{@code <}{@link RestParametersForWrappers }{@code >}}
+     *
+     */
+    @XmlElementDecl(namespace = "", name = "restParametersForWrappers")
+    public JAXBElement<RestParametersForWrappers> createRestParametersForWrappers(RestParametersForWrappers value) {
+        return new JAXBElement<RestParametersForWrappers>(_RestParametersForWrappers_QNAME, RestParametersForWrappers.class, null, value);
+    }
+
+
+    /**
+     * Create an instance of {@link rest.models.RestTdlWrapperParam }
+     *
+     */
+    public RestTdlWrapperParam createRestTdlWrapperParam() {
+        return new RestTdlWrapperParam();
+    }
+
+    /**
+     * Create an instance of {@link JAXBElement }{@code <}{@link RestTdlWrapperParam }{@code >}}
+     *
+     */
+    @XmlElementDecl(namespace = "", name = "restTdlWrapperParam")
+    public JAXBElement<RestTdlWrapperParam> createRestTdlWrapperParam(RestTdlWrapperParam value) {
+        return new JAXBElement<RestTdlWrapperParam>(_RestTdlWrapperParam_QNAME, RestTdlWrapperParam.class, null, value);
     }
 }

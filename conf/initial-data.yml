@@ -29,6 +29,47 @@ users:
             user: *tester
             role: TEST_DEVELOPER
         testGroups: []
+        
+#wrappers
+wrappers:
+- &xmlContentVerifier !!models.Wrapper
+  name: xml-content-verifier
+  user: *root
+  shortDescription: XMl Content Verifier
+  wrapperVersions:
+  - !!models.WrapperVersion
+    signals: []
+    slots: []
+    version: "1"
+    creationDate: "2015-08-08 00:00:00"
+    wrapper: *xmlContentVerifier
+- &xmlGenerator !!models.Wrapper
+  name: xml-generator
+  user: *root
+  shortDescription: XMl Generator Wrapper
+  wrapperVersions:
+  - !!models.WrapperVersion
+    signals: []
+    slots: []
+    version: "1"
+    creationDate: "2015-08-08 00:00:00"
+    wrapper: *xmlGenerator
+- &xmlValueInitiator  !!models.Wrapper
+  name: xml-value-initiator
+  shortDescription: XMl Value Initiator Wrapper
+  user: *root
+  wrapperVersions:
+  - !!models.WrapperVersion
+    signals: []
+    slots: []
+    version: "1"
+    creationDate: "2015-02-02 00:00:00"
+    wrapper: *xmlValueInitiator
+#Operation Types
+TOperationTypes:
+- &opType1 !!models.TOperationType
+  name: RUN_TEST_CASE
+
 #Groups
 groups:
 - &sampleGroup !!models.TestGroup
@@ -55,7 +96,7 @@ groups:
            tdls:
            - !!models.Tdl
              tdl: conf/initialdata/xmltest.tdl
-             version: 0.0.1
+             version: 1
              creationDate: "2015-02-02 00:00:00"
              testCase: *testCase1
            testAssertion: *taSample1
@@ -79,7 +120,7 @@ groups:
            tdls:
            - !!models.Tdl
              tdl: conf/initialdata/SchemaHell.tdl
-             version: 0.0.1
+             version: 1
              creationDate: "2015-02-02 00:00:00"
              testCase: *testCase2
     testAssets:
@@ -128,44 +169,4 @@ groups:
     - !!models.TestAsset
         name: simple-input.xml
         testGroup: *sampleGroup
-
-#wrappers
-wrappers:
-- &xmlContentVerifier !!models.Wrapper
-  name: xml-content-verifier
-  user: *root
-  shortDescription: XMl Content Verifier
-  wrapperVersions:
-  - !!models.WrapperVersion
-    signals: []
-    slots: []
-    version: "1"
-    creationDate: "2015-08-08 00:00:00"
-    wrapper: *xmlContentVerifier
-- &xmlGenerator !!models.Wrapper
-  name: xml-generator
-  user: *root
-  shortDescription: XMl Generator Wrapper
-  wrapperVersions:
-  - !!models.WrapperVersion
-    signals: []
-    slots: []
-    version: "1"
-    creationDate: "2015-08-08 00:00:00"
-    wrapper: *xmlGenerator
-- &xmlValueInitiator  !!models.Wrapper
-  name: xml-value-initiator
-  shortDescription: XMl Value Initiator Wrapper
-  user: *root
-  wrapperVersions:
-  - !!models.WrapperVersion
-    signals: []
-    slots: []
-    version: "1"
-    creationDate: "2015-02-02 00:00:00"
-    wrapper: *xmlValueInitiator
-#Operation Types
-TOperationTypes:
-- &opType1 !!models.TOperationType
-  name: RUN_TEST_CASE
-
+        

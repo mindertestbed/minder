@@ -37,7 +37,8 @@ public final class Constants {
     public static final String SUB_TYPE_PLAIN = "PLAIN";
     public static final String SUB_TYPE_ZIP = "ZIP";
     public static final String SUB_TYPE_JAR = "JAR";
-
+    
+    public static final String REPLY_TO_URL_ADDRESS =  "Gitb-ReplyToUrlAddress";
 
     private Constants(){
         //This prevents even the native class from calling this actor.
