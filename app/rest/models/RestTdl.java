@@ -15,7 +15,8 @@ import java.util.List;
         "testCaseId",
         "tdl",
         "version",
-        "creationDate"
+        "creationDate",
+        "parameters"
 })
 @XmlRootElement(name = "tdl")
 public class RestTdl {

@@ -12,7 +12,8 @@ import java.util.List;
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "tdlWrapperParam", propOrder = {
         "id",
-        "name"
+        "name",
+        "signatures"
 })
 @XmlRootElement(name = "tdlWrapperParam")
 public class RestTdlWrapperParam {
