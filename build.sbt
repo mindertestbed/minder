@@ -51,7 +51,7 @@ resolvers ++= Seq(
   "jasper" at "http://jaspersoft.artifactoryonline.com/jaspersoft/third-party-ce-artifacts/"
 )
 
-includeFilter in (Assets, LessKeys.less) := "main.less"
+includeFilter in (Assets, LessKeys.less) := "ui2.less"
 
 import com.typesafe.sbt.SbtAspectj.AspectjKeys.{binaries, inputs}
 import com.typesafe.sbt.SbtAspectj.{Aspectj, aspectjSettings, compiledClasses}
