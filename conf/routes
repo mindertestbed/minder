@@ -26,8 +26,9 @@ GET         /doDeleteUser                               controllers.UserControll
 POST        /doEditUser                                 controllers.UserController.doEditUser()
 
 # Map static resources from the /public folder to the /assets URL path
-GET         /assets/*file                               controllers.Assets.at(path="/public", file)
 GET         /webjars/*file                              controllers.WebJarAssets.at(file)
+GET         /assets/*file                               controllers.Assets.at(path="/public", file)
+GET         /assets/*file                               controllers.Assets.versioned(path="/public", file: Asset)
 
 #test group management
 GET         /getCreateGroupEditorView                   controllers.GroupController.getCreateGroupEditorView
@@ -120,8 +121,9 @@ POST        /updateSettings                             controllers.SettingsCont
 GET         /rest/login                                 rest.controllers.LoginController.login
 GET         /rest/doLogin                               rest.controllers.LoginController.doLogin
 POST        /rest/validatecontent                       rest.controllers.XMLValidationController.validateContent
+
 #Rest test group management
-GET         /rest/listTestGroups                        rest.controllers.RestTestGroupController.listTestGroups
+POST        /rest/listTestGroups                        rest.controllers.RestTestGroupController.listTestGroups
 POST        /rest/editdependency                        rest.controllers.RestTestGroupController.editDependency
 POST        /rest/getdependency                         rest.controllers.RestTestGroupController.getDependency
 POST        /rest/addTestGroup                          rest.controllers.RestTestGroupController.addTestGroup
@@ -187,3 +189,8 @@ POST        /rest/testbed/getTestCaseDefinitions        rest.controllers.GitbTes
 
 
 ##-------------
+
+
+GET         /ui2                                        controllers.secondGen.Application.main
+GET         /ui2/loginPage                              controllers.secondGen.Application.loginPage
+GET         /ui2/mainLayout                             controllers.secondGen.Application.mainLayout

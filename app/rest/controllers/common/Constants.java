@@ -17,7 +17,7 @@ public final class Constants {
     public static final String AUTHENTICATION = "AUTHENTICATION";
 
     public static final String MINDER_REALM = "rest@minder.gov.tr";
-    public static final String AUTHORIZATION_DIGEST = "Digest";
+    public static final String AUTHORIZATION_DIGEST = "xDigest";
     public static final String DATE_FORMAT = "yyyy-MM-dd HH:mm:ss";
     public static final int NONCE_VALIDITY_MILISECONDS = 300000; //300000miliseconds eq. to 300 seconds or 5 min.
     public static final String NONCE_VALIDITY_IN_DB = "1 HOUR"; //300000miliseconds eq. to 300 seconds or 5 min.

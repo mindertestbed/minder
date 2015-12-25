@@ -12,8 +12,6 @@ body {
     height: 100%;
 }
 
-form .error {
-
 input {
     background-color: #F2DEDE;
     border-color: #EED3D7;
@@ -22,8 +20,6 @@ input {
 
 .help-inline {
     color: #B94A48;
-}
-
 }
 
 .providers {
