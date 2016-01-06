@@ -57,13 +57,32 @@
           $('#minder-main-layout').w2layout(mainLayout);
           layoutUpdate(w2ui.mainLayout, 'top', $('#minder-top-panel'))
           layoutUpdate(w2ui.mainLayout, 'right', $('#minder-right-panel'))
-          layoutUpdate(w2ui.mainLayout, 'left', $('#minder-left-panel'), 'Test Groups')
+          layoutUpdate(w2ui.mainLayout, 'left', $('#minder-left-panel'))
           layoutUpdate(w2ui.mainLayout, 'main', $('#workspace'))
 
-          RestUtil.restCall(w2ui.smallGridTestGroupList.load('@rest.controllers.routes.RestTestGroupController.listTestGroups()'))
+          //load the test group list
 
-          var btn = w2ui.smallGridTestGroupList.buttons;
-          btn['search'].caption     = 'icon-repeat';
+          RestUtil.restCall({
+            async:false,
+            type: 'GET',
+            url: '@rest.controllers.routes.RestTestGroupController.listTestGroups()',
+            success: function(data){
+              smallGridTestGroupList.testGroupList = data.restTestGroups
+            },
+            error: function(data){
+              w2alert(data.responseText)
+              smallGridTestGroupList.testGroupList = null
+            }
+          })
+
+          //w2ui.smallGridTestGroupList.clear()
+          if (smallGridTestGroupList.testGroupList !== null){
+            for (idx in smallGridTestGroupList.testGroupList){
+              var group=smallGridTestGroupList.testGroupList[idx]
+              w2ui.smallGridTestGroupList.add({ recid: group.id, fname: group.groupName })
+            }
+          }
+
           w2ui.mainLayout.refresh();
         });
     </script>

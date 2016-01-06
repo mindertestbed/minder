@@ -4,7 +4,7 @@ mainLayout = {
   name: 'mainLayout',
   panels: [
     {type: 'top', size: 79, resizable: false, style: pstyle},
-    {type: 'left', size: 250, resizable: true, style: pstyle},
+    {type: 'left', size: 240, resizable: true, style: pstyle},
     {type: 'main', style: pstyle},
     {
       type: 'right',

@@ -123,7 +123,7 @@ GET         /rest/doLogin                               rest.controllers.LoginCo
 POST        /rest/validatecontent                       rest.controllers.XMLValidationController.validateContent
 
 #Rest test group management
-POST        /rest/listTestGroups                        rest.controllers.RestTestGroupController.listTestGroups
+GET         /rest/listTestGroups                        rest.controllers.RestTestGroupController.listTestGroups
 POST        /rest/editdependency                        rest.controllers.RestTestGroupController.editDependency
 POST        /rest/getdependency                         rest.controllers.RestTestGroupController.getDependency
 POST        /rest/addTestGroup                          rest.controllers.RestTestGroupController.addTestGroup

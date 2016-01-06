@@ -50,6 +50,7 @@ var RestUtil = {
     }
 
     Authentication.requestCounter++
+    Authentication.persist()
 
     var response = RestUtil.calculateResponseValue('POST');
     var authHeader = RestUtil.prepareAuthenticateHeader(response);
