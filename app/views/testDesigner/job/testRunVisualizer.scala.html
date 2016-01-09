@@ -33,7 +33,7 @@
       <td style="text-align:left;width:auto;">&nbsp;</td>
       <td style="width:3%;" align="center" title="View Log" valign="middle">
         <div id="viewUserHistory@testRun.id" class="celldiv bevel2" style="height:26px;width:26px;">
-          <img src="@routes.Assets.at("/images/console-64.png")" height="16px"/>
+          <img src="@routes.Assets.versioned("/images/console-64.png")" height="16px"/>
         </div>
         <script>
                             createFormDialog($("#viewUserHistory@{testRun.id}"),
@@ -46,7 +46,7 @@
       <td style="width:3%;" align="center" valign="middle">
         <div id="viewReport@testRun.id" title="View Report" class="celldiv bevel2" style="height:26px;width:26px;"
              onclick='showReportDialog("selectReportType", @testRun.id)'>
-          <img src="@routes.Assets.at("/images/print-64.png")" height="16px" alt='@testRun.id'/>
+          <img src="@routes.Assets.versioned("/images/print-64.png")" height="16px" alt='@testRun.id'/>
         </div>
       </td>
     </tr>

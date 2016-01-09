@@ -31,10 +31,10 @@
         <td class="tabshrink" align="center">
           <table><tr><td>
             <div id="downloadAsset@asset.id" title="Download" class="bevel2 celldiv" style="height:30px;width:30px;padding-left: 5px;padding-right: 5px;">
-                <a href="/downloadAsset?id=@asset.id"><img src="@routes.Assets.at("/images/download-64.png")" height="16px" alt="Download"/></a>
+                <a href="/downloadAsset?id=@asset.id"><img src="@routes.Assets.versioned("/images/download-64.png")" height="16px" alt="Download"/></a>
             </div></td><td>&nbsp;</td><td>
             <div id="editAsset@asset.id" class="bevel2 celldiv" style="height:30px;width:30px;padding-left: 5px;padding-right: 5px;">
-                <img src="@routes.Assets.at("/images/edit_property-64.png")" height="16px"/>
+                <img src="@routes.Assets.versioned("/images/edit_property-64.png")" height="16px"/>
               <script>
                 createMultipartFormDialog($("#editAsset@asset.id"), "/editAssetForm?id=@{asset.id}", "/doEditAsset", "mainDialog",
                                 "Edit Asset", $("#testGroupAsset@{testGroup.id}").parent());
@@ -43,7 +43,7 @@
           </td><td>&nbsp;</td>
         <td style="width:3%;" align="center">
           <div id="deleteAsset@asset.id" class="bevel2 celldiv" style="height:30px;width:30px;padding-left: 5px;padding-right: 5px;">
-              <img src="@routes.Assets.at("/images/trash2-64.png")" height="16px"/>
+              <img src="@routes.Assets.versioned("/images/trash2-64.png")" height="16px"/>
           </div>
           <script>
             var elm = $("#deleteAsset@asset.id");
@@ -66,7 +66,7 @@
     <table>
       <tr>
         <td style="height:23px;vertical-align:top; text-align:right;">
-          <img src="@routes.Assets.at("/images/plus-64.png")" height="16px" />
+          <img src="@routes.Assets.versioned("/images/plus-64.png")" height="16px" />
         </td>
         <td id="createAsset2" style="height:23px;">
         @Messages("restrictedTestPage.createAsset")

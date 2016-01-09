@@ -23,7 +23,7 @@
 	                    <td style="width:3%;" align="center" valign="middle" >
 	                     @if(currentWrapper.user.email == localUser.email) {
 				          <div id="editWrapper@currentWrapper.id" title="Edit" class="celldiv bevel2" style="height:26px;width:26px;">
-				              <img src="@routes.Assets.at("/images/edit_property-64.png")" height="16px" alt='@localUser.id'/>
+				              <img src="@routes.Assets.versioned("/images/edit_property-64.png")" height="16px" alt='@localUser.id'/>
 				          </div>
 				          <script>
 				              createFormDialog($("#editWrapper@currentWrapper.id"),
@@ -35,7 +35,7 @@
 	                    <td style="width:3%;" align="center" valign="middle">
 	   			          @if(currentWrapper.user.email == localUser.email) {
 		   			          <div id="deleteWrapper@currentWrapper.id" title="Delete" class="celldiv bevel2" style="height:26px;width:26px;">
-					              <img src="@routes.Assets.at("/images/trash2-64.png")" height="16px" alt='@localUser.id'/>
+					              <img src="@routes.Assets.versioned("/images/trash2-64.png")" height="16px" alt='@localUser.id'/>
 					          </div>
 					          <script>
 					            var elm = $("#deleteWrapper@currentWrapper.id");
@@ -62,7 +62,7 @@
 	      <tr>
 	        <td id="createWr1"
 	            style="height:23px;vertical-align:top; text-align:right;">
-	          <img src="@routes.Assets.at("/images/plus-64.png")" height="16px" />
+	          <img src="@routes.Assets.versioned("/images/plus-64.png")" height="16px" />
 	        </td>
 	        <td id="createWr2" style="height:23px;">
 	          @Messages("restrictedTestPage.createWrapper")

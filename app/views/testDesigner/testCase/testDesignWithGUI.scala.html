@@ -128,15 +128,15 @@ $(function() {
 	        </div>
 	        <div class="Cell maxw fullh scroll" style="width:70%;height:95%;">
 			   	<button type="submit" style="border: 0; background: transparent"  onclick=addNewConverter()>
-                     <img src="@routes.Assets.at("/images/plus-64.png")" alt="Add New Converter" height="20" width="20">
+                     <img src="@routes.Assets.versioned("/images/plus-64.png")" alt="Add New Converter" height="20" width="20">
                 </button>
                 <button type="submit" style="border: 0; background: transparent"  onclick=removeSelectedElement()>
-                     <img src="@routes.Assets.at("/images/trash2-64.png")" alt="Delete Element" height="20" width="20">
+                     <img src="@routes.Assets.versioned("/images/trash2-64.png")" alt="Delete Element" height="20" width="20">
                 </button>
                 <button type="submit" style="border: 0; background: transparent"  onclick=generateXMLofSVG()>
-                     <img src="@routes.Assets.at("/images/save_as-64.png")" alt="Save" height="20" width="20">
+                     <img src="@routes.Assets.versioned("/images/save_as-64.png")" alt="Save" height="20" width="20">
                 </button>
-			   <object style="border:1px solid red;" id="SVGCanvas" width="100%" height="100%" type="image/svg+xml" data="@routes.Assets.at("javascripts/fundamentals.svg")"></object>
+			   <object style="border:1px solid red;" id="SVGCanvas" width="100%" height="100%" type="image/svg+xml" data="@routes.Assets.versioned("javascripts/fundamentals.svg")"></object>
         	</div>
     	</div>
 	</div>

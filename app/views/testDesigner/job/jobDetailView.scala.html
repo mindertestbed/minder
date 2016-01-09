@@ -60,8 +60,8 @@
                                 <tr>
                                     <td>@mw.parameter.name</td><td>@mw.wrapperVersion.wrapper.name</td>
                                     <td align="center">
-                                    <span class="onStatus@{mw.wrapperVersion.id}" style="display:none" class="bignobold online"> <img src="@routes.Assets.at("/images/Pc_Online.png")"/></span>
-                                    <span class="offStatus@{mw.wrapperVersion.id}" style="display:none" class="bignobold offline"> <img src="@routes.Assets.at("/images/Pc_Offline.png")"/></span>
+                                    <span class="onStatus@{mw.wrapperVersion.id}" style="display:none" class="bignobold online"> <img src="@routes.Assets.versioned("/images/Pc_Online.png")"/></span>
+                                    <span class="offStatus@{mw.wrapperVersion.id}" style="display:none" class="bignobold offline"> <img src="@routes.Assets.versioned("/images/Pc_Offline.png")"/></span>
                                 </td></tr>
                             }
                         }
@@ -79,14 +79,14 @@
             <table  class="section"><tr><td>
                 @subjectHasRoleOr(Role.TEST_DESIGNER){
                 <button id="enqueue" type="button" onclick='simpleAjaxGet("mainDialog", "/enqueueJob?id=@{job.id}", "Enqueue Job", "Enqueue job [@{job.name}]?")'>
-                    Enqueue Job <img src="@routes.Assets.at("/images/running-64.png")" height="16px"/>
+                    Enqueue Job <img src="@routes.Assets.versioned("/images/running-64.png")" height="16px"/>
                 </button>
                 }{
 
                 }
 
                 <button type="button" onclick='window.location="/restrictedTestDesigner?display=jobQueue"'>
-                    Show Running Jobs <img src="@routes.Assets.at("/images/rules-64.png")" height="16px"/>
+                    Show Running Jobs <img src="@routes.Assets.versioned("/images/rules-64.png")" height="16px"/>
                 </button></td></tr>
             </table>
         </div>

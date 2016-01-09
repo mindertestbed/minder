@@ -19,12 +19,12 @@
                     <div style="border:1px solid gray;background-color:white;height:14px;width:100%;padding:0">
                         <div style="background-color:lightgreen;height:12px;width:@{activeRunContext.progressPercent}%;margin:0">&nbsp;</div>
                     </div></td><td style="width:20px;vertical-align:text-top;">
-                        &nbsp; <span title='Cancel "@activeRunContext.job.name"' style="cursor:hand" onclick='ajaxCancelActiveJob("@{activeRunContext.job.name}")'><img src="@routes.Assets.at("/images/Delete-icon.png")" height="12px"/></span>
+                        &nbsp; <span title='Cancel "@activeRunContext.job.name"' style="cursor:hand" onclick='ajaxCancelActiveJob("@{activeRunContext.job.name}")'><img src="@routes.Assets.versioned("/images/Delete-icon.png")" height="12px"/></span>
                 </td></tr></table>
             </div>
         </div>
     } else{
-        <div style="overflow: hidden; height:50px;"><img style="position: relative; top:0" src="@routes.Assets.at("/images/sleeping.png")"
+        <div style="overflow: hidden; height:50px;"><img style="position: relative; top:0" src="@routes.Assets.versioned("/images/sleeping.png")"
           alt="http://www.cliparthut.com/clip-arts/481/people-sleeping-clip-art-481711.jpeg" height="70" width="250"></div>
     }
 }
@@ -57,7 +57,7 @@
                                 <div style="border:1px solid #ccc;background-color:white;height:14px;width:100%; padding:0">
                                     <div style="background-color:lightgreen;height:12px;width:0%;margin:0">&nbsp;</div>
                                 </div></td><td style="width:20px;vertical-align:text-top;">
-                                    &nbsp; <span title='Cancel "@k.job.name"' style="cursor:hand" onclick='ajaxCancelJob(@{index.getAndIncrement}, "@{k.job.name}")'><img src="@routes.Assets.at("/images/Delete-icon.png")" height="12px"/></span>
+                                    &nbsp; <span title='Cancel "@k.job.name"' style="cursor:hand" onclick='ajaxCancelJob(@{index.getAndIncrement}, "@{k.job.name}")'><img src="@routes.Assets.versioned("/images/Delete-icon.png")" height="12px"/></span>
                             </td>
                             </tr>
                             </table>

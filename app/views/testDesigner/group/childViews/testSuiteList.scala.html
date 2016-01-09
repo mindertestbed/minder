@@ -20,7 +20,7 @@
           <td>
             <div title="Delete" class="bevel2 celldiv" style="height:30px;width:30px;cursor:hand;"
             onclick='deleteWithDialog2("@routes.TestSuiteController.doDeleteTestSuite(suite.id)", $("#dialog-confirm"), "@Messages("testSuite.Delete")", "@Messages("testSuite.testSuite")", "@suite.name")'>
-              <img src="@routes.Assets.at("/images/trash2-64.png")" height="16px" alt='@suite.id'/>
+              <img src="@routes.Assets.versioned("/images/trash2-64.png")" height="16px" alt='@suite.id'/>
             </div>
           </td>
         </tr>
