@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>MINDER Testbed</title>
+    <link rel="stylesheet" type="text/css" media="screen" href="@routes.Assets.versioned("stylesheets/font-awesome/font-awesome.min.css")">
+    <link rel="stylesheet" type="text/css" href="@routes.Assets.versioned("stylesheets/web2ui/w2ui-1.4.3.min.css")" />
+    <script type="text/javascript" src="@routes.Assets.versioned("javascripts/jquery.js")"></script>
+    <script type="text/javascript" src="@routes.Assets.versioned("javascripts/jquery.cookie.js")"></script>
+    <script type="text/javascript" src="@routes.Assets.versioned("javascripts/w2ui/w2ui-1.4.3.min.js")"></script>
+    <script type="text/javascript" src="@routes.Assets.versioned("javascripts/ui2/sha256.js")"></script>
+    <script type="text/javascript" src="@routes.Assets.versioned("javascripts/ui2/md5.js")"></script>
+    <script type="text/javascript" src="@routes.Assets.versioned("javascripts/ui2/CryptoFunctions.js")"></script>
+    <script type="text/javascript" src="@routes.Assets.versioned("javascripts/ui2/RestUtil.js")"></script>
+    <script type="text/javascript" src="@routes.Assets.versioned("javascripts/ui2/Authentication.js")"></script>
+    <link rel="stylesheet" type="text/css" media="screen" href="@routes.Assets.versioned("stylesheets/ui2.css")">
+    <link href='https://fonts.googleapis.com/css?family=Titillium+Web:400,200,200italic,300,300italic,400italic,900,700italic,600italic,600,700&subset=latin,latin-ext' rel='stylesheet' type='text/css' />
+    <link href='https://fonts.googleapis.com/css?family=Raleway:400,300,500,600' rel='stylesheet' type='text/css'>
+    <link href='https://fonts.googleapis.com/css?family=Open+Sans:400,300italic,400italic,600,700' rel='stylesheet' type='text/css'>
+
+  </head>
+  <body style="padding:0 ;">
+      <!-- Main layout -->
+    <div id="container" style="position:absolute ; top:0px ; left:0px ; width:100% ; height:100% ;"></div>
+
+    <script type="text/javascript">
+        var pstyle = 'border: 1px solid #dfdfdf; padding: 0px;'
+        $(function () {
+          //this is the main function
+
+          Authentication.successCallback = loadMainLayout
+          Authentication.logoutCallback = loadLoginPage
+
+          if (Authentication.isAuthenticated()){
+            //load main layout
+            loadMainLayout()
+          } else {
+            //load login page
+            loadLoginPage();
+          }
+        });
+
+        function loadMainLayout(){
+          $.ajax({
+            type: 'GET',
+            sync: true,
+            url: '@controllers.secondGen.routes.Application.mainLayout()',
+            success: function (data, textStatus, response) {
+              $("#container").html(data)
+            },
+            error: function (response, textStatus, errorThrown) {
+              w2alert("Couldn't load main layout")
+            }
+          })
+        }
+
+        function loadLoginPage(){
+          $.ajax({
+            type: 'GET',
+            async: false,
+            url: '@controllers.secondGen.routes.Application.loginPage()',
+            success: function (data, textStatus, response) {
+              $("#container").html(data)
+            },
+            error: function (response, textStatus, errorThrown) {
+              w2alert("Couldn't load main layout")
+            }
+          })
+        }
+    </script>
+  </body>
+</html>
