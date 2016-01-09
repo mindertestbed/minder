@@ -1,0 +1,17 @@
+@(ts: TestSuite)
+@import scala.collection.JavaConversions._
+
+@*
+This template is responsible of rendering the TDL's that have been
+submitted in the list parameters in a tabular, selectable way
+*@
+
+@defining(SuiteJob.getAllByTestSuite(ts)) { suiteJobList =>
+  @if(suiteJobList.size() == 0) {
+    <h4>No Suite Job yet. <a onclick="listAvailableTdlsForSuite(@ts.id)" href="#">Click</a> to add.</h4>
+  } else {
+    @for(suiteJob <- suiteJobList) {
+      @suiteJob.name <br />
+    }
+  }
+}

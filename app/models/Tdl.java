@@ -78,4 +78,8 @@ public class Tdl extends Model {
     public static Tdl findByTestCaseAndVersion(TestCase testCase, String version) {
         return find.where().eq("testCase", testCase).eq("version",version).findUnique();
     }
+	
+	public static List<Tdl>  listByTestCase(TestCase testCase) {
+    return find.where().eq("testCase", testCase).orderBy().desc("creationDate").findList();
+    }
 }

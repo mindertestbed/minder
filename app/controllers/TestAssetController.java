@@ -13,6 +13,7 @@ import play.mvc.Http;
 import play.mvc.Result;
 import play.mvc.Security;
 import views.html.testDesigner.group.testAssetEditor;
+import views.html.testDesigner.group.childViews.testAssetList;
 
 import java.io.*;
 
@@ -49,8 +50,8 @@ public class TestAssetController extends Controller {
       return badRequest("Test Group with [" + testGroupId + "] not found");
     }
 
-    User localuser = Authentication.getLocalUser();
-    if (localuser.email.equals("root@minder") || group.owner.email.equals(localuser.email)) {
+    User localUser = Authentication.getLocalUser();
+    if (localUser.email.equals("root@minder") || group.owner.email.equals(localUser.email)) {
 
       if (filledForm.hasErrors()) {
         Util.printFormErrors(filledForm);
@@ -81,10 +82,10 @@ public class TestAssetController extends Controller {
 
         asset.save();
 
-        return redirect(controllers.routes.GroupController.getGroupDetailView(group.id, "assets"));
+        return ok(testAssetList.render(group));
       }
     } else {
-      return badRequest("You cant use this resource");
+      return badRequest("You can't use this resource");
     }
   }
 
@@ -95,17 +96,19 @@ public class TestAssetController extends Controller {
 
   @Security.Authenticated(Secured.class)
   public static Result editAssetForm(Long id) {
-    User localuser = Authentication.getLocalUser();
+    User localUser = Authentication.getLocalUser();
 
     TestGroup group = TestGroup.findById(id);
-    if (!localuser.email.equals("root@minder") && !group.owner.email.equals(localuser.email)) {
-      return badRequest("You cant use this resource");
+    if (localUser == null || (!localUser.email.equals("root@minder") && !group.owner.email.equals(localUser.email))) {
+      return badRequest("You can't use this resource");
     }
-
     TestAsset ta = TestAsset.findById(id);
     if (ta == null) {
       return badRequest("Test asset with id [" + id + "] not found!");
     } else {
+
+
+
       TestAssetModel tgem = new TestAssetModel();
       tgem.id = ta.id;
       tgem.name = ta.name;
@@ -128,14 +131,10 @@ public class TestAssetController extends Controller {
     } else {
       TestAssetModel model = filledForm.get();
       TestAsset ta = TestAsset.findById(model.id);
-      User localuser = Authentication.getLocalUser();
-      if (!localuser.email.equals("root@minder") && !ta.testGroup.owner.email.equals(localuser.email)) {
+      User localUser = Authentication.getLocalUser();
+      if (localUser == null || (!localUser.email.equals("root@minder") && !ta.testGroup.owner.email.equals(localUser.email))) {
         return badRequest("You cant use this resource");
       }
-
-
-      //file upload part
-      User localUser = Authentication.getLocalUser();
       try {
         handleFileUpload(ta.testGroup.id, model.name);
       } catch (Exception ex) {
@@ -180,7 +179,6 @@ public class TestAssetController extends Controller {
     if (ta == null) {
       return badRequest("Test asset with id [" + id + "] not found!");
     } else {
-      User user = Authentication.getLocalUser();
       response().setContentType("application/x-download");
       response().setHeader("Content-disposition", "attachment; filename=" + ta.name);
       return ok(new File("assets/_" + ta.testGroup.id + "/" + ta.name));

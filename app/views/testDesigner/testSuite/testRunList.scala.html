@@ -1,0 +1,15 @@
+@(ts: TestSuite)
+@import java.util.concurrent.atomic.AtomicInteger
+@import global.Util._;
+@import views.html.util._
+
+  <br />
+@defining(SuiteJob.getAllByTestSuite(ts)) { suiteJobList =>
+  @if(suiteJobList.size() == 0) {
+    <h4>No Test Run yet. <a onclick="addTdl(@ts.id)" href="#">Click</a> to launch the test suite.</h4>
+  } else {
+    @for(suiteJob <- suiteJobList) {
+      @suiteJob.name <br />
+    }
+  }
+}

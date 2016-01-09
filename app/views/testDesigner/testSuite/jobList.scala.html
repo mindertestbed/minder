@@ -1,0 +1,46 @@
+@(ts: TestSuite)
+
+<br />
+<script>
+  var suiteJobAddDialog = null;
+
+  var availableTdlDiv = $("#availableList")
+
+  decorateAsClosable(availableTdlDiv, "Available Tdls", renderTdlList)
+
+
+  /**
+  * Make server side ajax call to render existingTdls.scala.html into #tdlList
+   */
+  function renderTdlList(){
+    var tdlListDiv = $("#tdlList")
+    tdlListDiv.empty();
+    tdlListDiv.slideDown();
+    var obj = jsRoutes.controllers.TestSuiteController.renderTdlList
+    ajaxRouteGet(obj, @ts.id, tdlListDiv);
+  }
+  /**
+   * Performs ajax query to list available TDLS that can be added to this test suite.
+   * The template is server side rendered and filled to the #availableList div via ajax.
+   *
+   * @@param id
+   *   The ID of the test suite
+   */
+  function listAvailableTdlsForSuite(id){
+
+     var tdlListDiv = $("#tdlList")
+     //ajax fill the content
+     var obj = jsRoutes.controllers.TestSuiteController.listAvailableTdlsForSuite
+     //display the dialog
+     tdlListDiv.hide();
+     availableTdlDiv.slideDown();
+     ajaxRouteGet(obj, id, availableTdlDiv);
+  }
+</script>
+
+<div id="tdlList">
+  @tdlList.existingTdls(ts)
+</div>
+
+<div id="availableList" style="display:none;border:2px solid #aaccff">
+</div>

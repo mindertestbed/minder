@@ -13,8 +13,7 @@ import play.data.Form;
 import play.mvc.Controller;
 import play.mvc.Result;
 import play.mvc.Security;
-import views.html.testDesigner.testCase.utilClassEditor;
-import views.html.testDesigner.testCase.utilClassView;
+import views.html.testDesigner.utilClass.*;
 
 import static play.data.Form.form;
 

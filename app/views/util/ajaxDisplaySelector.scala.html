@@ -1,0 +1,63 @@
+@(default: String, pairs: Tuple2[String, Tuple2[String, String]]*)
+
+@if(pairs != null && pairs.size > 0){
+  <table style="width:100%;">
+    <tr>
+      <td style="width:10px;border-bottom:1px solid gray;">&nbsp;</td>
+      @for((displayKey, (label, targetFunction)) <- pairs) {
+        @*
+        The @{displayKey}Td is a simple DOM id, like 1Td, 2Td ...
+        I use that kind of id mapping to ensure unique DOM ids
+        within the whole APP.
+        *@
+        <td id="@{displayKey}Td" class='tabshrink'>
+          <h4>
+            <a onclick='tabClickHandler(event, @{targetFunction}, $("#@{displayKey}Td"))' href="#">@label</a>
+          </h4>
+        </td>
+      }
+      <td class="tabexpand">&nbsp;</td>
+    </tr>
+  </table>
+
+  <script>
+    function tabClickHandler(event, targetFunction, target){
+      event.stopImmediatePropagation();
+      event.preventDefault();
+      deactivateAll()
+      target.removeClass("passivetab");
+      target.addClass("activetab");
+      targetFunction();
+    }
+
+    function deactivateAll(){
+      @for((displayKey, (label, jsFunctionName)) <- pairs){
+       $("#@{displayKey}Td").removeClass("activetab");
+       $("#@{displayKey}Td").addClass("passivetab");
+      }
+    }
+
+    //activate the first one
+    $(function(){
+      //activate the first one.
+      @if(default != null){ //take the default from the scala code.
+        //find the pair that has the key default
+        @for((displayKey, (label, jsFunctionName)) <- pairs){
+          //render the default display if hit
+          //we assuem that the key exists only once in the list
+          @if(displayKey == default){
+            var targetFunction = @{jsFunctionName}
+            var displayKeyName = "@{displayKey}"
+            var jsSelector = "#" + displayKeyName + "Td"
+            tabClickHandler(event, targetFunction, $(jsSelector));
+          }
+        }
+      } else {
+        var targetFunction = @{pairs.head._2}
+        var displayKeyName = "@{pairs.head._1}"
+        var jsSelector = "#" + displayKeyName + "Td"
+        tabClickHandler(event, targetFunction, $(jsSelector));
+      }
+    })
+  </script>
+}

@@ -4,15 +4,20 @@ import com.fasterxml.jackson.databind.JsonNode;
 import controllers.common.enumeration.Utils;
 import editormodels.TestSuiteEditorModel;
 import global.Util;
-import models.TestGroup;
-import models.TestSuite;
+import models.*;
 import play.Logger;
+import play.api.libs.json.Json;
 import play.data.Form;
 import play.mvc.Controller;
 import play.mvc.Result;
 import security.AllowedRoles;
 import security.Role;
 import views.html.testDesigner.testSuite.*;
+import views.html.testDesigner.testSuite.tdlList.existingTdls;
+import views.html.testDesigner.testSuite.tdlList.suitableTdls;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import static play.data.Form.form;
 
@@ -35,7 +40,7 @@ public class TestSuiteController extends Controller {
       testSuiteEditorModel.groupId = groupId;
       Form<TestSuiteEditorModel> bind = TEST_SUITE_FORM
           .fill(testSuiteEditorModel);
-      return ok(testSuiteEditor.render(bind));
+      return ok(editor.render(bind));
     }
   }
 
@@ -46,7 +51,7 @@ public class TestSuiteController extends Controller {
 
     if (filledForm.hasErrors()) {
       Util.printFormErrors(filledForm);
-      return badRequest(testSuiteEditor.render(filledForm));
+      return badRequest(editor.render(filledForm));
     } else {
       TestSuiteEditorModel model = filledForm.get();
 
@@ -54,7 +59,7 @@ public class TestSuiteController extends Controller {
 
       if (tg == null) {
         filledForm.reject("No group found with id [" + tg.id + "]");
-        return badRequest(testSuiteEditor.render(filledForm));
+        return badRequest(editor.render(filledForm));
       }
 
       TestSuite ts = new TestSuite();
@@ -91,7 +96,7 @@ public class TestSuiteController extends Controller {
 
     Form<TestSuiteEditorModel> bind = TEST_SUITE_FORM
         .fill(tsModel);
-    return ok(testSuiteEditor.render(bind));
+    return ok(editor.render(bind));
   }
 
   @AllowedRoles(Role.TEST_DESIGNER)
@@ -101,7 +106,7 @@ public class TestSuiteController extends Controller {
 
     if (filledForm.hasErrors()) {
       Util.printFormErrors(filledForm);
-      return badRequest(testSuiteEditor.render(filledForm));
+      return badRequest(editor.render(filledForm));
     } else {
       TestSuiteEditorModel model = filledForm.get();
 
@@ -109,7 +114,7 @@ public class TestSuiteController extends Controller {
       if (testSuite == null) {
         filledForm.reject("The test TestSuite with ID [" + model.id
             + "] does not exist");
-        return badRequest(testSuiteEditor.render(filledForm));
+        return badRequest(editor.render(filledForm));
       }
 
       if (!Util.canAccess(Authentication.getLocalUser(), testSuite.owner))
@@ -150,7 +155,7 @@ public class TestSuiteController extends Controller {
     if (testSuite == null) {
       return badRequest("No test TestSuite with id " + id + ".");
     }
-    return ok(testSuiteDetailView.render(testSuite, display));
+    return ok(mainView.render(testSuite, display));
   }
 
 
@@ -161,5 +166,52 @@ public class TestSuiteController extends Controller {
     return Utils.doEditField(TestSuiteEditorModel.class, TestSuite.class, jsonNode,Authentication.getLocalUser());
   }
 
+  @AllowedRoles(Role.TEST_DESIGNER)
+  public static Result listAvailableTdlsForSuite(long testSuiteId) {
 
+    TestSuite testSuite = TestSuite.findById(testSuiteId);
+
+    if (testSuite == null) {
+      return badRequest("Test Suite Not found");
+    }
+
+    TestGroup testGroup = TestGroup.findById(testSuite.testGroup.id);
+
+    List<Tdl> list = new ArrayList<>();
+    testGroup.testAssertions = TestAssertion.findByGroup(testGroup);
+    for (TestAssertion testAssertion : testGroup.testAssertions) {
+      testAssertion.testGroup = testGroup;
+      testAssertion.testCases = TestCase.listByTestAssertion(testAssertion);
+      for (TestCase testCase : testAssertion.testCases) {
+        testCase.testAssertion = testAssertion;
+        testCase.tdls = Tdl.listByTestCase(testCase);
+        for (Tdl tdl : testCase.tdls) {
+          tdl.testCase = testCase;
+          list.add(tdl);
+        }
+      }
+
+    }
+    return ok(suitableTdls.render(list));
+  }
+
+  @AllowedRoles(Role.TEST_DESIGNER)
+  public static Result renderJoblistView(long id) {
+    return ok(jobList.render(TestSuite.findById(id)));
+  }
+
+  @AllowedRoles(Role.TEST_DESIGNER)
+  public static Result renderTestRunListView(long id) {
+    return ok(testRunList.render(TestSuite.findById(id)));
+  }
+
+  @AllowedRoles(Role.TEST_DESIGNER)
+  public static Result renderDetailView(long id) {
+    return ok(details.render(TestSuite.findById(id)));
+  }
+
+  @AllowedRoles(Role.TEST_DESIGNER)
+  public static Result renderTdlList(long id) {
+    return ok(existingTdls.render(TestSuite.findById(id)));
+  }
 }

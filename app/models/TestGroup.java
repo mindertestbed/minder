@@ -60,7 +60,6 @@ public class TestGroup extends Model {
   }
 
   public static TestGroup findById(Long id){
-
     TestGroup byId = find.byId(id);
     if (null == byId) return null;
 

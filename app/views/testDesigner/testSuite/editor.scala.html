@@ -12,7 +12,6 @@
 
         <h2>Create New Test Suite</h2>
         @helper.form(action = routes.TestSuiteController.doCreateTestSuite()) {
-
             @if(frm.hasGlobalErrors) {
                 <p class="alert alert-danger">
                 @frm.globalError.message
