@@ -1,19 +1,4 @@
-# --- Created by Ebean DDL
-# To stop Ebean DDL generation, remove this comment and start using Evolutions
-
 # --- !Ups
-
-create table abstract_job (
-  _type                     integer not null,
-  id                        bigserial not null,
-  name                      varchar(255) not null,
-  tdl_id                    bigint,
-  owner_id                  bigint,
-  mtdl_parameters           varchar(255),
-  test_suite_id             bigint,
-  constraint uq_abstract_job_name unique (name),
-  constraint pk_abstract_job primary key (id))
-;
 
 create table dbrole (
   id                        bigserial not null,
@@ -23,25 +8,14 @@ create table dbrole (
   constraint pk_dbrole primary key (id))
 ;
 
-create table GitbEndpoint (
+create table Job (
   id                        bigserial not null,
-  wrapper_version_id        bigint not null,
   name                      varchar(255) not null,
-  description               TEXT,
-  constraint pk_GitbEndpoint primary key (id))
-;
-
-create table GitbParameter (
-  id                        bigserial not null,
-  gitb_endpoint_id          bigint not null,
-  name                      varchar(255) not null,
-  value                     varchar(255) not null,
-  use                       integer,
-  kind                      integer,
-  description               TEXT,
-  constraint ck_GitbParameter_use check (use in (0,1)),
-  constraint ck_GitbParameter_kind check (kind in (0,1)),
-  constraint pk_GitbParameter primary key (id))
+  tdl_id                    bigint,
+  owner_id                  bigint,
+  mtdl_parameters           varchar(255),
+  constraint uq_Job_name unique (name),
+  constraint pk_Job primary key (id))
 ;
 
 create table MappedWrapper (
@@ -110,7 +84,7 @@ create table TestAssertion (
 
 create table TestAsset (
   id                        bigserial not null,
-  test_group_id             bigint,
+  group_id                  bigint,
   name                      varchar(255) not null,
   short_description         TEXT,
   description               TEXT,
@@ -154,18 +128,6 @@ create table TestRun (
   constraint pk_TestRun primary key (id))
 ;
 
-create table TestSuite (
-  id                        bigserial not null,
-  name                      varchar(255) not null,
-  short_description         TEXT not null,
-  description               TEXT,
-  mtdl_parameters           varchar(255),
-  owner_id                  bigint,
-  test_group_id             bigint,
-  constraint uq_TestSuite_name unique (name),
-  constraint pk_TestSuite primary key (id))
-;
-
 create table Users (
   id                        bigserial not null,
   email                     varchar(255),
@@ -174,18 +136,6 @@ create table Users (
   last_login                timestamp,
   constraint uq_Users_email unique (email),
   constraint pk_Users primary key (id))
-;
-
-create table UserAuthentication (
-  id                        bigserial not null,
-  user_id                   bigint,
-  realm                     varchar(255),
-  server_nonce              varchar(255),
-  issue_time                timestamp,
-  expiry_time               timestamp,
-  request_counter           integer,
-  constraint uq_UserAuthentication_user_id unique (user_id),
-  constraint pk_UserAuthentication primary key (id))
 ;
 
 create table UserHistory (
@@ -232,80 +182,64 @@ create table WrapperVersion (
   constraint pk_WrapperVersion primary key (id))
 ;
 
-alter table abstract_job add constraint fk_abstract_job_tdl_1 foreign key (tdl_id) references Tdl (id);
-create index ix_abstract_job_tdl_1 on abstract_job (tdl_id);
-alter table abstract_job add constraint fk_abstract_job_owner_2 foreign key (owner_id) references Users (id);
-create index ix_abstract_job_owner_2 on abstract_job (owner_id);
-alter table abstract_job add constraint fk_abstract_job_testSuite_3 foreign key (test_suite_id) references TestSuite (id);
-create index ix_abstract_job_testSuite_3 on abstract_job (test_suite_id);
-alter table dbrole add constraint fk_dbrole_user_4 foreign key (user_id) references Users (id);
-create index ix_dbrole_user_4 on dbrole (user_id);
-alter table GitbEndpoint add constraint fk_GitbEndpoint_WrapperVersion_5 foreign key (wrapper_version_id) references WrapperVersion (id);
-create index ix_GitbEndpoint_WrapperVersion_5 on GitbEndpoint (wrapper_version_id);
-alter table GitbParameter add constraint fk_GitbParameter_GitbEndpoint_6 foreign key (gitb_endpoint_id) references GitbEndpoint (id);
-create index ix_GitbParameter_GitbEndpoint_6 on GitbParameter (gitb_endpoint_id);
-alter table MappedWrapper add constraint fk_MappedWrapper_parameter_7 foreign key (parameter_id) references WrapperParam (id);
-create index ix_MappedWrapper_parameter_7 on MappedWrapper (parameter_id);
-alter table MappedWrapper add constraint fk_MappedWrapper_wrapperVersio_8 foreign key (wrapper_version_id) references WrapperVersion (id);
-create index ix_MappedWrapper_wrapperVersio_8 on MappedWrapper (wrapper_version_id);
-alter table MappedWrapper add constraint fk_MappedWrapper_job_9 foreign key (job_id) references abstract_job (id);
-create index ix_MappedWrapper_job_9 on MappedWrapper (job_id);
-alter table ParamSignature add constraint fk_ParamSignature_wrapperPara_10 foreign key (wrapper_param_id) references WrapperParam (id);
-create index ix_ParamSignature_wrapperPara_10 on ParamSignature (wrapper_param_id);
-alter table TSignal add constraint fk_TSignal_wrapperVersion_11 foreign key (wrapper_version_id) references WrapperVersion (id);
-create index ix_TSignal_wrapperVersion_11 on TSignal (wrapper_version_id);
-alter table TSlot add constraint fk_TSlot_wrapperVersion_12 foreign key (wrapper_version_id) references WrapperVersion (id);
-create index ix_TSlot_wrapperVersion_12 on TSlot (wrapper_version_id);
-alter table Tdl add constraint fk_Tdl_testCase_13 foreign key (test_case_id) references TestCase (id);
-create index ix_Tdl_testCase_13 on Tdl (test_case_id);
-alter table TestAssertion add constraint fk_TestAssertion_testGroup_14 foreign key (test_group_id) references TestGroup (id);
-create index ix_TestAssertion_testGroup_14 on TestAssertion (test_group_id);
-alter table TestAssertion add constraint fk_TestAssertion_owner_15 foreign key (owner_id) references Users (id);
-create index ix_TestAssertion_owner_15 on TestAssertion (owner_id);
-alter table TestAsset add constraint fk_TestAsset_testGroup_16 foreign key (test_group_id) references TestGroup (id);
-create index ix_TestAsset_testGroup_16 on TestAsset (test_group_id);
-alter table TestCase add constraint fk_TestCase_testAssertion_17 foreign key (test_assertion_id) references TestAssertion (id);
-create index ix_TestCase_testAssertion_17 on TestCase (test_assertion_id);
-alter table TestCase add constraint fk_TestCase_owner_18 foreign key (owner_id) references Users (id);
-create index ix_TestCase_owner_18 on TestCase (owner_id);
-alter table TestGroup add constraint fk_TestGroup_owner_19 foreign key (owner_id) references Users (id);
-create index ix_TestGroup_owner_19 on TestGroup (owner_id);
-alter table TestRun add constraint fk_TestRun_job_20 foreign key (job_id) references abstract_job (id);
-create index ix_TestRun_job_20 on TestRun (job_id);
-alter table TestRun add constraint fk_TestRun_runner_21 foreign key (runner_id) references Users (id);
-create index ix_TestRun_runner_21 on TestRun (runner_id);
-alter table TestRun add constraint fk_TestRun_history_22 foreign key (history_id) references UserHistory (id);
-create index ix_TestRun_history_22 on TestRun (history_id);
-alter table TestSuite add constraint fk_TestSuite_owner_23 foreign key (owner_id) references Users (id);
-create index ix_TestSuite_owner_23 on TestSuite (owner_id);
-alter table TestSuite add constraint fk_TestSuite_testGroup_24 foreign key (test_group_id) references TestGroup (id);
-create index ix_TestSuite_testGroup_24 on TestSuite (test_group_id);
-alter table UserAuthentication add constraint fk_UserAuthentication_user_25 foreign key (user_id) references Users (id);
-create index ix_UserAuthentication_user_25 on UserAuthentication (user_id);
-alter table UserHistory add constraint fk_UserHistory_operationType_26 foreign key (operation_type_id) references OperationType (id);
-create index ix_UserHistory_operationType_26 on UserHistory (operation_type_id);
-alter table UtilClass add constraint fk_UtilClass_testGroup_27 foreign key (test_group_id) references TestGroup (id);
-create index ix_UtilClass_testGroup_27 on UtilClass (test_group_id);
-alter table UtilClass add constraint fk_UtilClass_owner_28 foreign key (owner_id) references Users (id);
-create index ix_UtilClass_owner_28 on UtilClass (owner_id);
-alter table Wrapper add constraint fk_Wrapper_user_29 foreign key (user_id) references Users (id);
-create index ix_Wrapper_user_29 on Wrapper (user_id);
-alter table WrapperParam add constraint fk_WrapperParam_tdl_30 foreign key (tdl_id) references Tdl (id);
-create index ix_WrapperParam_tdl_30 on WrapperParam (tdl_id);
-alter table WrapperVersion add constraint fk_WrapperVersion_wrapper_31 foreign key (wrapper_id) references Wrapper (id);
-create index ix_WrapperVersion_wrapper_31 on WrapperVersion (wrapper_id);
+alter table dbrole add constraint fk_dbrole_user_1 foreign key (user_id) references Users (id);
+create index ix_dbrole_user_1 on dbrole (user_id);
+alter table Job add constraint fk_Job_tdl_2 foreign key (tdl_id) references Tdl (id);
+create index ix_Job_tdl_2 on Job (tdl_id);
+alter table Job add constraint fk_Job_owner_3 foreign key (owner_id) references Users (id);
+create index ix_Job_owner_3 on Job (owner_id);
+alter table MappedWrapper add constraint fk_MappedWrapper_parameter_4 foreign key (parameter_id) references WrapperParam (id);
+create index ix_MappedWrapper_parameter_4 on MappedWrapper (parameter_id);
+alter table MappedWrapper add constraint fk_MappedWrapper_wrapperVersio_5 foreign key (wrapper_version_id) references WrapperVersion (id);
+create index ix_MappedWrapper_wrapperVersio_5 on MappedWrapper (wrapper_version_id);
+alter table MappedWrapper add constraint fk_MappedWrapper_job_6 foreign key (job_id) references Job (id);
+create index ix_MappedWrapper_job_6 on MappedWrapper (job_id);
+alter table ParamSignature add constraint fk_ParamSignature_wrapperParam_7 foreign key (wrapper_param_id) references WrapperParam (id);
+create index ix_ParamSignature_wrapperParam_7 on ParamSignature (wrapper_param_id);
+alter table TSignal add constraint fk_TSignal_wrapperVersion_8 foreign key (wrapper_version_id) references WrapperVersion (id);
+create index ix_TSignal_wrapperVersion_8 on TSignal (wrapper_version_id);
+alter table TSlot add constraint fk_TSlot_wrapperVersion_9 foreign key (wrapper_version_id) references WrapperVersion (id);
+create index ix_TSlot_wrapperVersion_9 on TSlot (wrapper_version_id);
+alter table Tdl add constraint fk_Tdl_testCase_10 foreign key (test_case_id) references TestCase (id);
+create index ix_Tdl_testCase_10 on Tdl (test_case_id);
+alter table TestAssertion add constraint fk_TestAssertion_testGroup_11 foreign key (test_group_id) references TestGroup (id);
+create index ix_TestAssertion_testGroup_11 on TestAssertion (test_group_id);
+alter table TestAssertion add constraint fk_TestAssertion_owner_12 foreign key (owner_id) references Users (id);
+create index ix_TestAssertion_owner_12 on TestAssertion (owner_id);
+alter table TestAsset add constraint fk_TestAsset_group_13 foreign key (group_id) references TestGroup (id);
+create index ix_TestAsset_group_13 on TestAsset (group_id);
+alter table TestCase add constraint fk_TestCase_testAssertion_14 foreign key (test_assertion_id) references TestAssertion (id);
+create index ix_TestCase_testAssertion_14 on TestCase (test_assertion_id);
+alter table TestCase add constraint fk_TestCase_owner_15 foreign key (owner_id) references Users (id);
+create index ix_TestCase_owner_15 on TestCase (owner_id);
+alter table TestGroup add constraint fk_TestGroup_owner_16 foreign key (owner_id) references Users (id);
+create index ix_TestGroup_owner_16 on TestGroup (owner_id);
+alter table TestRun add constraint fk_TestRun_job_17 foreign key (job_id) references Job (id);
+create index ix_TestRun_job_17 on TestRun (job_id);
+alter table TestRun add constraint fk_TestRun_runner_18 foreign key (runner_id) references Users (id);
+create index ix_TestRun_runner_18 on TestRun (runner_id);
+alter table TestRun add constraint fk_TestRun_history_19 foreign key (history_id) references UserHistory (id);
+create index ix_TestRun_history_19 on TestRun (history_id);
+alter table UserHistory add constraint fk_UserHistory_operationType_20 foreign key (operation_type_id) references OperationType (id);
+create index ix_UserHistory_operationType_20 on UserHistory (operation_type_id);
+alter table UtilClass add constraint fk_UtilClass_testGroup_21 foreign key (test_group_id) references TestGroup (id);
+create index ix_UtilClass_testGroup_21 on UtilClass (test_group_id);
+alter table UtilClass add constraint fk_UtilClass_owner_22 foreign key (owner_id) references Users (id);
+create index ix_UtilClass_owner_22 on UtilClass (owner_id);
+alter table Wrapper add constraint fk_Wrapper_user_23 foreign key (user_id) references Users (id);
+create index ix_Wrapper_user_23 on Wrapper (user_id);
+alter table WrapperParam add constraint fk_WrapperParam_tdl_24 foreign key (tdl_id) references Tdl (id);
+create index ix_WrapperParam_tdl_24 on WrapperParam (tdl_id);
+alter table WrapperVersion add constraint fk_WrapperVersion_wrapper_25 foreign key (wrapper_id) references Wrapper (id);
+create index ix_WrapperVersion_wrapper_25 on WrapperVersion (wrapper_id);
 
 
 
 # --- !Downs
 
-drop table if exists abstract_job cascade;
-
 drop table if exists dbrole cascade;
 
-drop table if exists GitbEndpoint cascade;
-
-drop table if exists GitbParameter cascade;
+drop table if exists Job cascade;
 
 drop table if exists MappedWrapper cascade;
 
@@ -329,11 +263,7 @@ drop table if exists TestGroup cascade;
 
 drop table if exists TestRun cascade;
 
-drop table if exists TestSuite cascade;
-
 drop table if exists Users cascade;
-
-drop table if exists UserAuthentication cascade;
 
 drop table if exists UserHistory cascade;
 
