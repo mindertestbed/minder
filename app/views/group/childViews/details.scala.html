@@ -1,0 +1,16 @@
+@(tg: TestGroup)
+@import authentication._
+@import views.html.util._
+
+<h4>Description</h4>
+<div id="description@{tg.id}"
+  @subjectIs(tg.owner) {
+    onclick='showUpdateTextAreaDialog(@tg.id, "description", $(this ).next(), "/doEditGroupField")'
+  } class="editable"></div>
+<input type="hidden" value="@tg.description"/>
+
+<script>
+$(function(){
+    bindValues($("#description@{tg.id}"))
+})
+</script>

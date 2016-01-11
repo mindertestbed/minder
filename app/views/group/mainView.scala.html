@@ -1,0 +1,81 @@
+@(tg: TestGroup, display: String)
+
+@import java.util.concurrent.atomic.AtomicInteger
+@import global.Util._
+@import authentication._
+@import views.html._
+@import views.html.group._
+@import views.html.util._
+
+@main(Messages("minder.navigation.restricted.testdesigner"), "mainNavigation",
+  Array(("Test Groups", controllers.routes.Application.testGroups().path()),
+    (tg.name, controllers.routes.GroupController.getGroupDetailView(tg.id, "details").path()))) {
+
+    @dialogs()
+
+    <h3 style="display:table-cell">Test Group
+        <div id="name@{tg.id}"
+        @subjectIs(tg.owner) {
+          onclick='showUpdateInputTextDialog(@tg.id, "name", $(this).next(), "/doEditGroupField")'
+        }
+          class="hl editable"></div>
+        <input type="hidden" value="@tg.name"/>
+        </h3>
+
+    <div class="indent">
+
+      <h4>Owner</h4>
+      <p>
+        @tg.owner.name @tg.owner.email
+      </p>
+
+      <h4>Short Description</h4>
+      <div id="shortDescription@{tg.id}"
+        @subjectIs(tg.owner) {
+          onclick='showUpdateInputTextDialog(@tg.id, "shortDescription", $(this).next(), "/doEditGroupField")'
+        } class="editable"></div>
+      <input type="hidden" value="@tg.shortDescription"/>
+
+      <script>
+        $(function(){
+            bindValues($("#name@{tg.id}"))
+            bindValues($("#shortDescription@{tg.id}"))
+        })
+        </script>
+
+      <script>
+        function showDetails(){
+          ajaxRouteGet(jsRoutes.controllers.GroupController.renderDetails, @tg.id, $("#groupSubItems"))
+        }
+        function showAssertions(){
+          ajaxRouteGet(jsRoutes.controllers.GroupController.renderTestAssertionList, @tg.id, $("#groupSubItems"))
+        }
+        function showSuites(){
+          ajaxRouteGet(jsRoutes.controllers.GroupController.renderTestSuites, @tg.id, $("#groupSubItems"))
+        }
+        function showAssets(){
+          ajaxRouteGet(jsRoutes.controllers.GroupController.renderTestAssets, @tg.id, $("#groupSubItems"))
+        }
+        function showUtils(){
+          ajaxRouteGet(jsRoutes.controllers.GroupController.renderUtilClasses, @tg.id, $("#groupSubItems"))
+        }
+        function showDependencies(){
+          ajaxRouteGet(jsRoutes.controllers.GroupController.renderDependencies, @tg.id, $("#groupSubItems"))
+        }
+      </script>
+
+      @ajaxDisplaySelector(display,
+        "details" -> ("Details", "showDetails"),
+        "assertions" -> ("Test Assertions", "showAssertions"),
+       // "suites" -> ("Test Suites", "showSuites"),
+        "assets" -> ( "Test Assets", "showAssets"),
+        "utils" -> ( "Utility Classes", "showUtils"),
+        "deps" -> ( "Dependencies", "showDependencies"))
+
+      <br />
+      <div id="groupSubItems">
+
+      </div>
+    </div>
+
+}

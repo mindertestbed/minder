@@ -11,8 +11,6 @@ import play.mvc.Result;
 import play.mvc.Results;
 import play.mvc.Security;
 import views.html.authentication.login;
-import views.html.index;
-import views.html.testDesigner.restrictedTestDesigner;
 import views.html.authentication.*;
 
 import static play.data.Form.form;
@@ -65,12 +63,12 @@ public class Authentication extends Controller {
 
     session().clear();
     session().put("email", lgn.email);
-    return ok(index.render());
+    return redirect(routes.Application.testGroups());
   }
 
   public static Result doLogout() {
     session().clear();
-    return ok(index.render());
+    return redirect(routes.Authentication.login());
   }
 
   @Security.Authenticated(Secured.class)

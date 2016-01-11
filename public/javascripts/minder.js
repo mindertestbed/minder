@@ -1,3 +1,35 @@
+function minderAccordion(selector) {
+  var ogl = selector + " > div";
+  //hide the contents
+  $(ogl + ".content").hide();
+
+  var titles = $(ogl + ".title");
+
+  var triggers = $(ogl + ".title .trigger");
+
+  triggers.each(function (index) {
+    $(this).addClass('hand');
+  });
+
+  triggers.click(function () {
+    //get the parent that has class title.
+    var parent = $(this).closest('.title');
+
+    var nxt = parent.next();
+    if (parent.hasClass("closed")) {
+      nxt.slideUp();
+      titles.slideDown();
+      parent.removeClass("closed");
+    } else {
+      parent.addClass("closed");
+      titles.slideUp();
+      parent.slideDown();
+      nxt.slideDown();
+    }
+  });
+}
+
+
 function executeScripts(target) {
   target.find("script").each(function (i) {
     eval($(this).text());

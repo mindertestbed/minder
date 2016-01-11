@@ -93,7 +93,6 @@ public class RestTestCaseController extends Controller {
             RestTestCase rtc = new RestTestCase();
             rtc.setId(String.valueOf(tc.id));
             rtc.setName(tc.name);
-            rtc.setShortDescription(tc.shortDescription);
 
             restTestCaseList.getRestTestCases().add(rtc);
         }
@@ -175,8 +174,6 @@ public class RestTestCaseController extends Controller {
         responseRestTestCase.setName(tc.name);
         responseRestTestCase.setOwner(tc.owner.email);
         responseRestTestCase.setTestAssertionId(tc.testAssertion.taId);
-        responseRestTestCase.setDescription(tc.description);
-        responseRestTestCase.setShortDescription(tc.shortDescription);
         responseRestTestCase.setTdls(new ArrayList<RestTdl>());
 
         List<Tdl> tdlList = tc.tdls;
@@ -254,8 +251,6 @@ public class RestTestCaseController extends Controller {
             return badRequest("Please provide Test Case Name");
         if (null == restTestCase.getTestAssertionId())
             return badRequest("Please provide related test assertion id");
-        if (null == restTestCase.getShortDescription())
-            return badRequest("Please provide a short description");
 
 
         //Creating the new test assertion
@@ -485,20 +480,6 @@ public class RestTestCaseController extends Controller {
             }
             tc.name = restTestCase.getName();
         }
-
-        if (null != restTestCase.getShortDescription()) {
-            if (restTestCase.getShortDescription().equals("")) {
-                throw new IllegalArgumentException("The required field shortDescription cannot be empty.");
-
-            }
-            tc.shortDescription = restTestCase.getShortDescription();
-        }
-
-        //Checking the other editable fields
-        if (null != restTestCase.getDescription()) {
-            tc.description = restTestCase.getDescription();
-        }
-
 
     }
 

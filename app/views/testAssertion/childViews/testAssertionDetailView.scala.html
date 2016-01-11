@@ -1,0 +1,104 @@
+@(ta: TestAssertion)
+
+@import authentication._
+
+<h4>Owner</h4>
+<p>
+  @ta.owner.name @ta.owner.email
+</p>
+
+<h4>Normative Source/Statement</h4>
+<div id="normativeSource@{
+  ta.id
+}"
+  @subjectIs(ta.owner) {
+    onclick='showUpdateTextAreaDialog(@ta.id, "normativeSource", $(this ).next(), "/doEditAssertionField")'
+  }
+class="editable"></div>
+<input type="hidden" value="@ta.normativeSource"/>
+
+<h4>Target</h4>
+<div id="target@ta.id" class="editable"
+  @subjectIs(ta.owner) {
+    onclick='showUpdateInputTextDialog(@ta.id, "target", $(this).next(), "/doEditAssertionField")'
+    }
+></div>
+<input type="hidden" value="@ta.target"/>
+
+<h4>Prerequisites</h4>
+<div id="prerequisites@{
+  ta.id
+}"
+  @subjectIs(ta.owner) {
+    onclick='showUpdateTextAreaDialog(@ta.id, "prerequisites", $(this ).next(), "/doEditAssertionField")'
+  }
+class="editable"></div>
+<input type="hidden" value="@ta.prerequisites"/>
+
+<h4>Predicate</h4>
+<div id="predicate@{
+  ta.id
+}"
+  @subjectIs(ta.owner) {
+    onclick='showUpdateTextAreaDialog(@ta.id, "predicate", $(this ).next(), "/doEditAssertionField")'
+  }
+class="editable"></div>
+<input type="hidden" value="@ta.predicate"/>
+
+<h4>Prescription Level</h4>
+<div id="prescriptionLevel@{
+  ta.id
+}"
+  @subjectIs(ta.owner) {
+    onclick='showUpdateOptionDialog(@ta.id, "prescriptionLevel", $(this ).next(), "/doEditAssertionField", "PrescriptionLevel", {Mandatory:"Mandatory",
+      Preferred:"Preferred",
+      Permitted:"Permitted"})'
+  }
+
+class="editable"></div>
+<input type="hidden" value="@ta.prescriptionLevel"/>
+
+<h4>Variables</h4>
+<div id="variables@{
+  ta.id
+}"
+  @subjectIs(ta.owner) {
+    onclick='showUpdateTextAreaDialog(@ta.id, "variables", $(this ).next(), "/doEditAssertionField")'
+  }
+class="editable"></div>
+<input type="hidden" value="@ta.variables"/>
+
+
+<h4>Tag</h4>
+<div id="tag@{
+  ta.id
+}"
+  @subjectIs(ta.owner) {
+    onclick='showUpdateTextAreaDialog(@ta.id, "tag", $(this ).next(), "/doEditAssertionField")'
+  }
+class="editable"></div>
+<input type="hidden" value="@ta.tag"/>
+
+<h4>Detailed Description</h4>
+<div id="description@{
+  ta.id
+}"
+  @subjectIs(ta.owner) {
+    onclick='showUpdateTextAreaDialog(@ta.id, "description", $(this ).next(), "/doEditAssertionField")' class="editable"
+    }
+></div>
+<input type="hidden" value="@ta.description"/>
+
+<script>
+    $(function(){
+      bindValues($("#normativeSource@{ta.id}"))
+      bindValues($("#target@{ta.id}"))
+      bindValues($("#prerequisites@{ta.id}"))
+      bindValues($("#predicate@{ta.id}"))
+      bindValues($("#variables@{ta.id}"))
+      bindValues($("#tag@{ta.id}"))
+      bindValues($("#description@{ta.id}"))
+      bindValues($("#prescriptionLevel@{ta.id}"))
+    });
+</script>
+<hr />

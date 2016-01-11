@@ -1,0 +1,90 @@
+@(utilClass: UtilClass)
+  @import views.html.util._
+  @import authentication._
+
+  @main(Messages("minder.navigation.restricted.testdesigner"), "mainNavigation",
+    Array(("Test Groups", controllers.routes.Application.testGroups().path()),
+      (utilClass.testGroup.name, controllers.routes.GroupController.getGroupDetailView(utilClass.testGroup.id, "utils").path()),
+      (utilClass.name, ""))) {
+    @dialogs()
+
+    <h3>Util Class
+      <div id="name@{
+        utilClass.id
+      }"
+
+        @subjectIs(utilClass.owner) {
+          onclick='showUpdateInputTextDialog(@utilClass.id, "name", $(this).next(), "/doEditUtilClassField")'
+        }
+      class="hl editable"></div>
+      <input type="hidden" value="@utilClass.name"/>
+    </h3>
+
+    <div class="indent">
+      <h4>Short Description</h4>
+      <div id="shortDescription@{
+        utilClass.id
+      }"
+
+        @subjectIs(utilClass.owner) {
+          onclick='showUpdateInputTextDialog(@utilClass.id, "shortDescription", $(this).next(), "/doEditUtilClassField")'
+        }
+      class="editable"></div>
+
+      <input type="hidden" value="@utilClass.shortDescription"/>
+
+      <table class="section fullw" style="border-top:1px solid gray ; margin-top:0 ;">
+        <tr>
+          <td>
+            <br />
+            <div>
+              @subjectIs(utilClass.owner) {
+                <input type="button" onclick='window.location="/getEditUtilClassEditorView?id=@{utilClass.id}"' value="         Edit         "/> &nbsp;&nbsp;&nbsp;&nbsp;
+                }
+            Theme: <select id="select">
+              <option>3024-day</option>
+              <option>ambiance</option>
+              <option>cobalt</option>
+              <option>eclipse</option>
+              <option selected>mdn-like</option>
+              <option>neat</option>
+              <option>neo</option>
+            </select>
+            </div>
+            <form>
+              <textarea id="code" name="code" class="CodeMirror fullw">@utilClass.source</textarea>
+            </form>
+            <script>
+                var editor = CodeMirror.fromTextArea(document.getElementById("code"), {
+                  lineWrapping: true,
+                  lineNumbers: true,
+                  styleActiveLine: true,
+                  readOnly: true,
+                  viewportMargin: Infinity,
+                  mode: {name: "text/x-scala", globalVars: true},
+                  theme: "mdn-like"
+                });
+
+                $( "#select" ).change(function() {
+                  $( "#select option:selected" ).each(function() {
+                    editor.setOption("theme", $( this ).text());
+                  });
+                });
+            </script>
+          </td>
+        </tr>
+      </table>
+    </div>
+    <br />
+
+    <script>
+        $(function(){
+          bindValues($("#name@{utilClass.id}"))
+          bindValues($("#shortDescription@{utilClass.id}"))
+        })
+    </script>
+  }
+
+
+
+

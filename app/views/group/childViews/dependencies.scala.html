@@ -1,0 +1,22 @@
+@(tg: TestGroup)
+
+  @import authentication._
+
+  <div class="indent">
+    <div id="dependencies@{
+      tg.id
+    }"
+
+      @subjectIs(tg.owner) {
+        onclick='showUpdateTextAreaDialog(@tg.id, "dependencyString", $(this ).next(), "/doEditGroupField")'
+      }
+    class="editable"></div>
+    <input type="hidden" value="@tg.dependencyString"/>
+  </div>
+
+
+  <script>
+      $(function(){
+        bindValues($("#dependencies@{tg.id}"))
+      });
+</script>

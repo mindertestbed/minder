@@ -97,7 +97,7 @@ function bindValues(elem) {
 
 function smartUpdate(selnext, elem) {
   var slnv = selnext.val()
-  if (slnv == null || slnv.length == 0) elem[0].innerHTML = '<b>No Content. Click To Add</b>'
+  if (slnv == null || slnv.length == 0) elem[0].innerHTML = '<i style="color:gray;">No Content. Click To Add</i>'
   else
     updateBr(slnv, elem)
 }

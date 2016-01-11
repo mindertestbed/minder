@@ -1,0 +1,44 @@
+@(ta: TestAssertion)
+  @import views.html.util._
+  @import java.util.concurrent.atomic.AtomicInteger
+  @import global.Util._;
+
+  @import authentication.subjectIs
+
+  @if(ta.testCases.size() == 0) {
+    <p>No Test cases yet</p>
+    @subjectIs(ta.owner) {
+      @createButton("/getCreateCaseEditorView?assertionId=" + ta.id, Messages("restrictedTestPage.createTestCase"))
+    }
+  } else {
+    <table class="datatable shaded">
+      @createFirstRow {
+        <th>Test Case Name</th>
+        <th>Author</th>
+      }
+      @defining(new AtomicInteger(1)) { index =>
+        @for( tc <- ta.testCases) {
+          <tr>
+            <td>@index.getAndIncrement()</td>
+            <td><a href="/viewTestCase?id=@tc.id&showJobs=true">@tc.name</a></td>
+            <td>@{
+              tc.owner.email
+            }</td>
+            @subjectIs(tc.owner) {
+            <td style="border:1px solid white;background-color:white;">
+              <div title="Delete" class="bevel2 celldiv" style="height:30px ; width:30px ; cursor:hand ;"
+              onclick='deleteWithDialog2("/doDeleteCase?id=@tc.id", $("#dialog-confirm"), "Delete Test Case", "test case", "@tc.name")'>
+                <img src="@routes.Assets.versioned("/images/trash2-64.png")" height="16px" alt='@ta.id'/>
+              </div>
+            }
+            </td>
+          </tr>
+        }
+      }
+      @subjectIs(ta.owner) {
+        @createLastRow(3) {
+          @createButton("/getCreateCaseEditorView?assertionId=" + ta.id, Messages("restrictedTestPage.createTestCase"))
+        }
+      }
+    </table>
+  }

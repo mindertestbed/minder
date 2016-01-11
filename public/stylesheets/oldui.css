@@ -12,10 +12,44 @@ body {
     height: 100%;
 }
 
-input {
-    background-color: #F2DEDE;
-    border-color: #EED3D7;
-    color: #B94A48;
+input[type="button"] {
+    border: none;
+    background: #1d8be2;
+    background-image: -webkit-linear-gradient(top, @minderfg, shade(@minderfg, 40%));
+    background-image: -moz-linear-gradient(top, @minderfg, shade(@minderfg, 40%));
+    background-image: -ms-linear-gradient(top, @minderfg, shade(@minderfg, 40%));
+    background-image: -o-linear-gradient(top, @minderfg, shade(@minderfg, 40%));
+    background-image: linear-gradient(to bottom, @minderfg, shade(@minderfg, 40%));
+    -webkit-border-radius: 4px;
+    -moz-border-radius: 4px;
+    border-radius: 4px;
+    -webkit-box-shadow: 0px 1px 3px #666666;
+    -moz-box-shadow: 0px 1px 3px #666666;
+    box-shadow: 0px 1px 3px #666666;
+    color: #ffffff;
+    font-size: 16px;
+    padding: 3px 15px 3px 15px;
+    text-decoration: none;
+}
+
+button {
+    border: none;
+    background: #1d8be2;
+    background-image: -webkit-linear-gradient(top, @minderfg, shade(@minderfg, 40%));
+    background-image: -moz-linear-gradient(top, @minderfg, shade(@minderfg, 40%));
+    background-image: -ms-linear-gradient(top, @minderfg, shade(@minderfg, 40%));
+    background-image: -o-linear-gradient(top, @minderfg, shade(@minderfg, 40%));
+    background-image: linear-gradient(to bottom, @minderfg, shade(@minderfg, 40%));
+    -webkit-border-radius: 4px;
+    -moz-border-radius: 4px;
+    border-radius: 4px;
+    -webkit-box-shadow: 0px 1px 3px #666666;
+    -moz-box-shadow: 0px 1px 3px #666666;
+    box-shadow: 0px 1px 3px #666666;
+    color: #ffffff;
+    font-size: 16px;
+    padding: 3px 15px 3px 15px;
+    text-decoration: none;
 }
 
 .help-inline {
@@ -30,7 +64,6 @@ input {
 li {
     display: inline;
 }
-
 
 .help-block {
     margin: -10px 0 10px 0;
@@ -76,13 +109,6 @@ code {
     padding: 0 2px;
 }
 
-.CodeMirror-scroll {
-    height: auto;
-    overflow-y: hidden;
-    overflow-x: auto;
-    width: 100%
-}
-
 .explanation {
     cursor: pointer;
 }
@@ -96,7 +122,7 @@ td {
     vertical-align: middle;
 }
 
-.padabit{
+.padabit {
     padding: 10px;
 }
 
@@ -355,6 +381,7 @@ td.activetab, td.passivetab {
     vertical-align: bottom;
     padding: 0px;
 }
+
 td.passivetab {
     border-bottom: 1px solid gray;
 }
@@ -449,12 +476,21 @@ table.padabit td {
     border-radius: 2px;
     padding: 3px;
     display: inline-block;
+    color: #222222
 }
 
 .editable:hover {
     border: 1px solid #ccc;
     border-radius: 2px;
 
+}
+
+h4 {
+    color: #a8564e;
+}
+
+h3 {
+    color: #4e6fce;
 }
 
 div.parent {
@@ -509,13 +545,13 @@ pre {
     font-family: Monaco, Consolas, "Courier New"
 }
 
-.paddedContentPane{
+.paddedContentPane {
     padding: 15px;
 }
 
-div.closable .header{
+div.closable .header {
     color: gray;
-    width:100%;
+    width: 100%;
     height: 30px;
     padding: 15px;
     border-top-left-radius: 4px;
@@ -534,28 +570,92 @@ div.closable .header{
     box-shadow: 0px 0px 5px rgba(0, 0, 0, 0.5), /*top external highlight*/ inset 0 -1px 1px rgba(0, 0, 0, 0.5), /*bottom internal shadow*/ inset 0 1px 1px rgba(255, 255, 255, 1); /*top internal highlight*/
 }
 
-.closableButton{
+.closableButton {
     vertical-align: middle;
     font-family: Arial;
     font-weight: bolder;
 }
 
-table.datatable{
-    border: 1px solid gray;
-}
-
-table.datatable tr td,th{
-    border: 1px solid lightgrey;
+table.datatable > tbody > tr > td, th {
     padding-top: 7px;
     padding-bottom: 7px;
     padding-left: 10px;
     padding-right: 10px;
 }
 
-table.datatable tr:nth-child(odd) td{
+table.datatable tr:nth-child(odd) td {
     background-color: #eff0ff;
 }
 
-table.datatable tr:nth-child(even) td{
-   background-color: #fff0ef;
+table.datatable tr:nth-child(even) td {
+    background-color: #fff0ef;
+}
+
+table.topcell tr > td, th {
+    vertical-align: top;
+}
+
+.breadcrumbParent {
+    font-family: Helvetica;
+    font-size: 14px;
+    position: fixed;
+    top: 50px;
+    left: 0px;
+    right: 0px;
+    height: 30px;
+    overflow: hidden;
+    background-color: #ffffc6;
+    padding: 5px;
+    box-shadow: 0 0 5px rgba(1, 1, 1, 0.7);
+    border-radius: 0px;
+}
+
+.breadcrumb {
+    background-color: transparent;
+    padding: 0px;
+    border-radius: 0px;
+}
+
+li.breadactive {
+    color: #ff721f;
+    font-weight: bold;
+}
+
+
+select {
+    /* styling */
+    background-color: white;
+    border-radius: 4px;
+    display: inline-block;
+    font: inherit;
+    line-height: 1.3em;
+    padding: 3px 10px 3px 5px;
+
+    /* reset */
+
+    margin: 0;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+
+    background-image: url("/assets/images/Expand Arrow-50.png");
+    background-position: calc(100% - 7px) 7px;
+    background-size: 10px 10px;
+    background-repeat: no-repeat;
+    outline: 0;
+}
+
+select:focus {
+    background-image: url("/assets/images/Collapse Arrow-50.png");
+    background-position: calc(100% - 7px) 7px;
+    background-size: 10px 10px;
+    background-repeat: no-repeat;
+    outline: 0;
+}
+
+select:-moz-focusring {
+    color: transparent;
+    text-shadow: 0 0 0 #000;
 }

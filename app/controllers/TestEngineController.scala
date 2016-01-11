@@ -9,7 +9,7 @@ import play.Logger
 import play.api.libs.EventSource
 import play.api.libs.iteratee.Concurrent
 import play.api.mvc._
-import views.html.testDesigner.job._
+import views.html.job._
 import rest.controllers.GitbTestbedController
 import com.gitb.core.v1.StepStatus
 

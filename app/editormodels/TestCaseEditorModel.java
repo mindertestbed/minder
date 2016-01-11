@@ -15,11 +15,6 @@ public class TestCaseEditorModel {
   public String name;
 
   @Constraints.Required
-  @Constraints.MinLength(ModelConstants.MIN_DESC_LENGTH)
-  @Constraints.MaxLength(ModelConstants.SHORT_DESC_LENGTH)
-  public String shortDescription;
-
-  @Constraints.Required
   public String tdl;
 
   @Constraints.Required

@@ -1,0 +1,93 @@
+@(tc: TestCase, selectedTdl: Tdl, localUser: models.User = null, display: String = "jobs")
+@import java.util.concurrent.atomic.AtomicInteger
+@import views.html.util._
+@import global.Util._
+@import authentication._
+
+
+@main(Messages("minder.navigation.restricted.testdesigner"), "mainNavigation",
+  Array(("Test Groups", controllers.routes.Application.testGroups().path()),
+    (tc.testAssertion.testGroup.name, controllers.routes.GroupController.getGroupDetailView(tc.testAssertion.testGroup.id, "assertions").path()),
+    (tc.testAssertion.taId, controllers.routes.TestAssertionController.getAssertionDetailView(tc.testAssertion.id, "cases").path()),
+    (tc.name, controllers.routes.TestCaseController.viewTestCase(tc.id, "jobs").path()))){
+  @dialogs()
+
+  <h3>Test Case
+    <div id="name@{
+      tc.id
+    }"
+      @subjectIs(tc.owner) {
+        onclick='showUpdateInputTextDialog(@tc.id, "name", $(this).next(), "/doEditCaseField")'
+      }
+
+    class="hl editable">
+    @tc.name
+
+    </div>
+    <input type="hidden" value="@tc.name"/>
+  </h3>
+
+
+
+
+  <h4>Owner</h4>
+  @{
+    tc.owner.email
+  }
+
+  <h4>Version</h4>
+  <select id="version" style="width:100px ;">
+  @for( tdl <- Tdl.findByTestCase(tc)) {
+    <option value="@tdl.id"
+      @if(tdl.id == selectedTdl.id) {
+        selected="selected" }>@{
+      tdl.version
+    }</option>
+  }
+  </select>
+
+  <script>
+      $( "#version" ).change(function(data) {
+        var vl=$("#version" ).val()
+        document.location="viewTestCase2?id=@{tc.id}&tdlId="+vl+"&display=@{display}"
+      });
+  </script>
+
+  @if(selectedTdl.parameters != null && selectedTdl.parameters.size() > 0) {
+    <h4>Parametric Wrapper Names</h4>
+    <ul>
+    @for( pm <- selectedTdl.parameters) {
+      <li>
+      @pm.name
+      </li>
+    }
+    </ul>
+  }
+
+  <hr />
+
+
+  <div class="indent">
+    <script>
+        function showJobs(){
+          ajaxRouteGet(jsRoutes.controllers.TestCaseController.renderJobs, [@tc.id, @selectedTdl.id], $("#caseSubItems"))
+        }
+        function showCode(){
+          ajaxRouteGet(jsRoutes.controllers.TestCaseController.renderCode, [@tc.id, @selectedTdl.id], $("#caseSubItems"))
+        }
+    </script>
+
+    @ajaxDisplaySelector(display,
+      "jobs" ->("Jobs", "showJobs"),
+      "code" ->("MTDL Code", "showCode"))
+
+    <div id="caseSubItems" style="padding: 5px ;">
+
+    </div>
+  </div>
+  <script>
+      $(function(){
+        bindValues($("#name@{tc.id}"))
+      })
+  </script>
+}

@@ -7,28 +7,13 @@ import play.mvc.Result;
 import play.mvc.Security;
 import security.AllowedRoles;
 import security.Role;
-import views.html.*;
 import views.html.authentication.profile;
 import views.html.rootViews.rootPage;
-import views.html.testDesigner.restrictedTestDesigner;
-import views.html.testDeveloper.restrictedTestDeveloper;
-import views.html.testObserver.restrictedObserver;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
 public class Application extends Controller {
-
-  public static Result index() {
-    return ok(index.render());
-  }
-
-  @Security.Authenticated(Secured.class)
-  public static Result restrictedObserver() {
-    final User localUser = Authentication.getLocalUser();
-    return ok(restrictedObserver.render(localUser));
-  }
-
   public static Result root(String display) {
     final User localUser = Authentication.getLocalUser();
     if (localUser == null)
@@ -42,28 +27,33 @@ public class Application extends Controller {
   }
 
   @AllowedRoles({Role.TEST_DESIGNER, Role.TEST_OBSERVER})
-  public static Result restrictedTestDesigner(String display) {
+  public static Result testGroups() {
     final User localUser = Authentication.getLocalUser();
 
     if (!session().containsKey("testPageMode")) {
       session().put("testPageMode", "none");
     }
-    return ok(restrictedTestDesigner.render(display));
+    return ok(views.html.group.testGroupListView.render());
   }
 
-
-  @AllowedRoles({Role.TEST_DESIGNER})
-  public static Result createNewTest() {
+  @AllowedRoles({Role.TEST_DESIGNER, Role.TEST_OBSERVER})
+  public static Result adapters() {
     final User localUser = Authentication.getLocalUser();
-    session().put("testPageMode", "new");
-    return ok(restrictedTestDesigner.render("designWithGui"));
+
+    if (!session().containsKey("testPageMode")) {
+      session().put("testPageMode", "none");
+    }
+    return ok(views.html.adapters.wrapperManager.render());
   }
 
-
-  @AllowedRoles({Role.TEST_DEVELOPER, Role.TEST_DESIGNER, Role.TEST_OBSERVER})
-  public static Result restrictedTestDeveloper() {
+  @AllowedRoles({Role.TEST_DESIGNER, Role.TEST_OBSERVER})
+  public static Result jobFeed() {
     final User localUser = Authentication.getLocalUser();
-    return ok(restrictedTestDeveloper.render(localUser));
+
+    if (!session().containsKey("testPageMode")) {
+      session().put("testPageMode", "none");
+    }
+    return ok(views.html.job.jobFeed.render());
   }
 
   @AllowedRoles({Role.TEST_DEVELOPER, Role.TEST_DESIGNER, Role.TEST_OBSERVER})
@@ -87,7 +77,11 @@ public class Application extends Controller {
             routes.javascript.GroupController.renderTestSuites(),
             routes.javascript.GroupController.renderTestAssets(),
             routes.javascript.GroupController.renderUtilClasses(),
-            routes.javascript.GroupController.renderDependencies()
+            routes.javascript.GroupController.renderDependencies(),
+            routes.javascript.TestAssertionController.renderDetails(),
+            routes.javascript.TestAssertionController.renderTestCases(),
+            routes.javascript.TestCaseController.renderJobs(),
+            routes.javascript.TestCaseController.renderCode()
         ))
         .as("text/javascript");
   }

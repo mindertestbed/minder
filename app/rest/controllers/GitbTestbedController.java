@@ -456,7 +456,7 @@ public class GitbTestbedController extends Controller {
 		metadata.setName(minderTestCase.name + "_" + tdl.version);
 		metadata.setVersion(tdl.version);
 		metadata.setAuthors(minderTestCase.owner.name);
-		metadata.setDescription(minderTestCase.shortDescription);
+		metadata.setDescription("");
 		metadata.setPublished(dateFormat.format(tdl.creationDate));
 		metadata.setLastModified(dateFormat.format(tdl.creationDate));
 		

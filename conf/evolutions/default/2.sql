@@ -1,89 +1,96 @@
 # --- !Ups
 
-alter table TestAsset rename group_id to test_group_id;
+ALTER TABLE TestAsset RENAME group_id TO test_group_id;
 
-alter table Job rename to abstract_job;
+ALTER TABLE Job RENAME TO abstract_job;
 
-ALTER TABLE abstract_job ADD COLUMN _type integer;
+ALTER TABLE abstract_job ADD COLUMN _type INTEGER;
 ALTER TABLE abstract_job ALTER COLUMN _type SET NOT NULL;
-ALTER TABLE abstract_job ADD COLUMN test_suite_id bigint;
+ALTER TABLE abstract_job ADD COLUMN test_suite_id BIGINT;
 
-create table GitbEndpoint (
-  id                        bigserial not null,
-  wrapper_version_id        bigint not null,
-  name                      varchar(255) not null,
-  description               TEXT,
-  constraint pk_GitbEndpoint primary key (id))
-;
+ALTER TABLE TestCase DROP COLUMN short_description;
+ALTER TABLE TestCase DROP COLUMN description;
 
-create table GitbParameter (
-  id                        bigserial not null,
-  gitb_endpoint_id          bigint not null,
-  name                      varchar(255) not null,
-  value                     varchar(255) not null,
-  use                       integer,
-  kind                      integer,
-  description               TEXT,
-  constraint ck_GitbParameter_use check (use in (0,1)),
-  constraint ck_GitbParameter_kind check (kind in (0,1)),
-  constraint pk_GitbParameter primary key (id))
-;
+CREATE TABLE GitbEndpoint (
+  id                 BIGSERIAL    NOT NULL,
+  wrapper_version_id BIGINT       NOT NULL,
+  name               VARCHAR(255) NOT NULL,
+  description        TEXT,
+  CONSTRAINT pk_GitbEndpoint PRIMARY KEY (id)
+);
 
-
-create table TestSuite (
-  id                        bigserial not null,
-  name                      varchar(255) not null,
-  short_description         TEXT not null,
-  description               TEXT,
-  mtdl_parameters           varchar(255),
-  owner_id                  bigint,
-  test_group_id             bigint,
-  constraint uq_TestSuite_name unique (name),
-  constraint pk_TestSuite primary key (id))
-;
+CREATE TABLE GitbParameter (
+  id               BIGSERIAL    NOT NULL,
+  gitb_endpoint_id BIGINT       NOT NULL,
+  name             VARCHAR(255) NOT NULL,
+  value            VARCHAR(255) NOT NULL,
+  use              INTEGER,
+  kind             INTEGER,
+  description      TEXT,
+  CONSTRAINT ck_GitbParameter_use CHECK (use IN (0, 1)),
+  CONSTRAINT ck_GitbParameter_kind CHECK (kind IN (0, 1)),
+  CONSTRAINT pk_GitbParameter PRIMARY KEY (id)
+);
 
 
-create table UserAuthentication (
-  id                        bigserial not null,
-  user_id                   bigint,
-  realm                     varchar(255),
-  server_nonce              varchar(255),
-  issue_time                timestamp,
-  expiry_time               timestamp,
-  request_counter           integer,
-  constraint uq_UserAuthentication_user_id unique (user_id),
-  constraint pk_UserAuthentication primary key (id))
-;
+CREATE TABLE TestSuite (
+  id                BIGSERIAL    NOT NULL,
+  name              VARCHAR(255) NOT NULL,
+  short_description TEXT         NOT NULL,
+  description       TEXT,
+  mtdl_parameters   VARCHAR(255),
+  owner_id          BIGINT,
+  test_group_id     BIGINT,
+  CONSTRAINT uq_TestSuite_name UNIQUE (name),
+  CONSTRAINT pk_TestSuite PRIMARY KEY (id)
+);
 
-alter table abstract_job add constraint fk_abstract_job_testSuite_3 foreign key (test_suite_id) references TestSuite (id);
-create index ix_abstract_job_testSuite_3 on abstract_job (test_suite_id);
 
-alter table GitbEndpoint add constraint fk_GitbEndpoint_WrapperVersion_5 foreign key (wrapper_version_id) references WrapperVersion (id);
-create index ix_GitbEndpoint_WrapperVersion_5 on GitbEndpoint (wrapper_version_id);
-alter table GitbParameter add constraint fk_GitbParameter_GitbEndpoint_6 foreign key (gitb_endpoint_id) references GitbEndpoint (id);
-create index ix_GitbParameter_GitbEndpoint_6 on GitbParameter (gitb_endpoint_id);
-alter table TestSuite add constraint fk_TestSuite_owner_23 foreign key (owner_id) references Users (id);
-create index ix_TestSuite_owner_23 on TestSuite (owner_id);
-alter table TestSuite add constraint fk_TestSuite_testGroup_24 foreign key (test_group_id) references TestGroup (id);
-create index ix_TestSuite_testGroup_24 on TestSuite (test_group_id);
-alter table UserAuthentication add constraint fk_UserAuthentication_user_25 foreign key (user_id) references Users (id);
-create index ix_UserAuthentication_user_25 on UserAuthentication (user_id);
+CREATE TABLE UserAuthentication (
+  id              BIGSERIAL NOT NULL,
+  user_id         BIGINT,
+  realm           VARCHAR(255),
+  server_nonce    VARCHAR(255),
+  issue_time      TIMESTAMP,
+  expiry_time     TIMESTAMP,
+  request_counter INTEGER,
+  CONSTRAINT uq_UserAuthentication_user_id UNIQUE (user_id),
+  CONSTRAINT pk_UserAuthentication PRIMARY KEY (id)
+);
+
+ALTER TABLE abstract_job ADD CONSTRAINT fk_abstract_job_testSuite_3 FOREIGN KEY (test_suite_id) REFERENCES TestSuite (id);
+CREATE INDEX ix_abstract_job_testSuite_3 ON abstract_job (test_suite_id);
+
+ALTER TABLE GitbEndpoint ADD CONSTRAINT fk_GitbEndpoint_WrapperVersion_5 FOREIGN KEY (wrapper_version_id) REFERENCES WrapperVersion (id);
+CREATE INDEX ix_GitbEndpoint_WrapperVersion_5 ON GitbEndpoint (wrapper_version_id);
+ALTER TABLE GitbParameter ADD CONSTRAINT fk_GitbParameter_GitbEndpoint_6 FOREIGN KEY (gitb_endpoint_id) REFERENCES GitbEndpoint (id);
+CREATE INDEX ix_GitbParameter_GitbEndpoint_6 ON GitbParameter (gitb_endpoint_id);
+ALTER TABLE TestSuite ADD CONSTRAINT fk_TestSuite_owner_23 FOREIGN KEY (owner_id) REFERENCES Users (id);
+CREATE INDEX ix_TestSuite_owner_23 ON TestSuite (owner_id);
+ALTER TABLE TestSuite ADD CONSTRAINT fk_TestSuite_testGroup_24 FOREIGN KEY (test_group_id) REFERENCES TestGroup (id);
+CREATE INDEX ix_TestSuite_testGroup_24 ON TestSuite (test_group_id);
+ALTER TABLE UserAuthentication ADD CONSTRAINT fk_UserAuthentication_user_25 FOREIGN KEY (user_id) REFERENCES Users (id);
+CREATE INDEX ix_UserAuthentication_user_25 ON UserAuthentication (user_id);
 
 # --- !Downs
 
 
-alter table TestAsset rename test_group_id to group_id;
+ALTER TABLE TestAsset RENAME test_group_id TO group_id;
 
 ALTER TABLE abstract_job DROP CONSTRAINT fk_abstract_job_testsuite_3;
 ALTER TABLE abstract_job DROP COLUMN test_suite_id;
 ALTER TABLE abstract_job DROP COLUMN _type;
-alter table abstract_job rename to Job;
+ALTER TABLE abstract_job RENAME TO Job;
 
-drop table if exists GitbEndpoint cascade;
+DROP TABLE IF EXISTS GitbEndpoint CASCADE;
 
-drop table if exists GitbParameter cascade;
+DROP TABLE IF EXISTS GitbParameter CASCADE;
 
-drop table if exists TestSuite cascade;
+DROP TABLE IF EXISTS TestSuite CASCADE;
 
-drop table if exists UserAuthentication cascade;
+DROP TABLE IF EXISTS UserAuthentication CASCADE;
 
+
+ALTER TABLE TestCase ADD COLUMN short_description TEXT NOT NULL DEFAULT " ";
+
+ALTER TABLE TestCase ADD COLUMN description TEXT;

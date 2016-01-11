@@ -15,8 +15,8 @@ import play.mvc.Result;
 import play.mvc.Security;
 import security.AllowedRoles;
 import security.Role;
-import views.html.testDesigner.group.childViews.*;
-import views.html.testDesigner.group.*;
+import views.html.group.childViews.*;
+import views.html.group.*;
 
 import static play.data.Form.form;
 
@@ -56,7 +56,7 @@ public class GroupController extends Controller {
       group.dependencyString = "";
 
       group.save();
-      return redirect(routes.Application.restrictedTestDesigner("testGroups"));
+      return redirect(routes.Application.testGroups());
     }
   }
 
@@ -164,22 +164,22 @@ public class GroupController extends Controller {
     return ok(testSuiteList.render(TestGroup.findById(id)));
   }
 
-  @AllowedRoles(Role.TEST_DESIGNER)
+  @AllowedRoles({Role.TEST_DESIGNER, Role.TEST_OBSERVER})
   public static Result renderTestAssets(long id) {
     return ok(testAssetList.render(TestGroup.findById(id)));
   }
 
-  @AllowedRoles(Role.TEST_DESIGNER)
+  @AllowedRoles({Role.TEST_DESIGNER, Role.TEST_OBSERVER})
   public static Result renderUtilClasses(long id) {
     return ok(utilClassList.render(TestGroup.findById(id)));
   }
 
-  @AllowedRoles(Role.TEST_DESIGNER)
+  @AllowedRoles({Role.TEST_DESIGNER, Role.TEST_OBSERVER})
   public static Result renderDependencies(long id) {
     return ok(dependencies.render(TestGroup.findById(id)));
   }
 
-  @AllowedRoles(Role.TEST_DESIGNER)
+  @AllowedRoles({Role.TEST_DESIGNER, Role.TEST_OBSERVER})
   public static Result renderDetails(long id) {
     return ok(details.render(TestGroup.findById(id)));
   }

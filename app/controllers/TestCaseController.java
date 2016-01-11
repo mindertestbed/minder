@@ -10,15 +10,14 @@ import minderengine.AdapterIdentifier;
 import minderengine.TestEngine;
 import models.*;
 import mtdl.MinderTdl;
-import mtdl.NullSlot;
 import mtdl.WrapperFunction;
 import play.Logger;
 import play.data.Form;
 import play.mvc.Controller;
 import play.mvc.Result;
 import play.mvc.Security;
-import views.html.testDesigner.testCase.testCaseEditor;
-import views.html.testDesigner.testCase.testCaseView;
+import views.html.testCase.mainView;
+import views.html.testCase.childViews.*;
 
 import java.util.*;
 
@@ -57,7 +56,6 @@ public class TestCaseController extends Controller {
       String maxx = max < 10 ? ("0" + max) : "" + max;
 
       testCaseEditorModel.name = ta.taId + "_TC" + maxx;
-      testCaseEditorModel.shortDescription = testCaseEditorModel.name;
       Form<TestCaseEditorModel> bind = TEST_CASE_FORM
           .fill(testCaseEditorModel);
       return ok(testCaseEditor.render(bind, false));
@@ -97,7 +95,6 @@ public class TestCaseController extends Controller {
       tdl.testCase = tc;
       tdl.tdl = model.tdl;
       tdl.creationDate = new Date();
-      tc.shortDescription = model.shortDescription;
       tc.testAssertion = ta;
       tc.owner = localUser;
       try {
@@ -118,7 +115,7 @@ public class TestCaseController extends Controller {
 
       Logger.info("Test Case with name " + tc.id + ":" + tc.name
           + " was created");
-      return redirect(routes.TestAssertionController.getAssertionDetailView(ta.id, "testCases"));
+      return redirect(routes.TestAssertionController.getAssertionDetailView(ta.id, "cases"));
     }
   }
 
@@ -135,7 +132,6 @@ public class TestCaseController extends Controller {
       TestCaseEditorModel tcModel = new TestCaseEditorModel();
       tcModel.id = tdlId;
       tcModel.name = tdl.testCase.name;
-      tcModel.shortDescription = tdl.testCase.name;
       tcModel.tdl = tdl.tdl;
       tcModel.version = tdl.version;
 
@@ -211,20 +207,20 @@ public class TestCaseController extends Controller {
 
         AdapterIdentifier adapterIdentifier = AdapterIdentifier.parse(key);
 
-        if (adapterIdentifier.getName().equals(MinderTdl.NULL_WRAPPER_NAME())){
+        if (adapterIdentifier.getName().equals(MinderTdl.NULL_WRAPPER_NAME())) {
           //skip null wrapper
           continue;
         }
         Wrapper wrapper = Wrapper.findByName(adapterIdentifier.getName());
-        if (wrapper == null){
+        if (wrapper == null) {
           //oops
           throw new IllegalArgumentException("No adapter with name " + adapterIdentifier.getName());
         }
         //check if a version is used in the name
-        if (adapterIdentifier.getVersion() != null){
+        if (adapterIdentifier.getVersion() != null) {
           //we have a version, check if the version exists
           WrapperVersion wrapperVersion = WrapperVersion.findWrapperAndVersion(wrapper, adapterIdentifier.getVersion());
-          if (wrapperVersion == null){
+          if (wrapperVersion == null) {
             throw new IllegalArgumentException("No adapter version " + adapterIdentifier.getVersion() + " for " + adapterIdentifier.getName());
           }
         }
@@ -288,7 +284,7 @@ public class TestCaseController extends Controller {
     if (tc == null) {
       return badRequest("No test case with id " + id + ".");
     }
-    return ok(testCaseView.render(tc, Tdl.getLatestTdl(tc), Authentication.getLocalUser(), display));
+    return ok(mainView.render(tc, Tdl.getLatestTdl(tc), Authentication.getLocalUser(), display));
   }
 
   @Security.Authenticated(Secured.class)
@@ -301,14 +297,14 @@ public class TestCaseController extends Controller {
     if (tdl == null) {
       return badRequest("No tdl with id " + id + ".");
     }
-    return ok(testCaseView.render(tc, tdl, Authentication.getLocalUser(), display));
+    return ok(mainView.render(tc, tdl, Authentication.getLocalUser(), display));
   }
 
   @Security.Authenticated(Secured.class)
   public static Result doEditCaseField() {
     JsonNode jsonNode = request().body().asJson();
 
-    Result res = Utils.doEditField(TestCaseEditorModel.class, TestCase.class, jsonNode,Authentication.getLocalUser());
+    Result res = Utils.doEditField(TestCaseEditorModel.class, TestCase.class, jsonNode, Authentication.getLocalUser());
 
     if (res.toScala().header().status() == BAD_REQUEST) {
       return res;
@@ -324,5 +320,30 @@ public class TestCaseController extends Controller {
         return badRequest("Failed to save the test case [" + ex.getMessage() + "]");
       }
     }
+  }
+
+  public static Result renderJobs(long id, long tdlId) {
+    TestCase tc = TestCase.findById(id);
+    Tdl tdl = Tdl.findById(tdlId);
+    if (tc == null) {
+      return badRequest("No test case with id " + id + ".");
+    }
+    if (tdl == null) {
+      return badRequest("No tdl with id " + id + ".");
+    }
+    return ok(testCaseJobList.render(tc, tdl));
+  }
+
+
+  public static Result renderCode(long id, long tdlId) {
+    TestCase tc = TestCase.findById(id);
+    Tdl tdl = Tdl.findById(tdlId);
+    if (tc == null) {
+      return badRequest("No test case with id " + id + ".");
+    }
+    if (tdl == null) {
+      return badRequest("No tdl with id " + id + ".");
+    }
+    return ok(testCaseCodeDisplay.render(tc, tdl));
   }
 }

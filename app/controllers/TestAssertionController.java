@@ -13,7 +13,8 @@ import play.mvc.Controller;
 import play.mvc.Result;
 import security.AllowedRoles;
 import security.Role;
-import views.html.testDesigner.testAssertion.*;
+import views.html.testAssertion.childViews.*;
+import views.html.testAssertion.mainView;
 
 import static play.data.Form.form;
 
@@ -198,7 +199,7 @@ public class TestAssertionController extends Controller {
     if (ta == null) {
       return badRequest("No test assertion with id " + id + ".");
     }
-    return ok(assertionDetailView.render(ta, display));
+    return ok(mainView.render(ta, display));
   }
 
 
@@ -206,8 +207,24 @@ public class TestAssertionController extends Controller {
   public static Result doEditAssertionField() {
     JsonNode jsonNode = request().body().asJson();
 
-    return Utils.doEditField(AssertionEditorModel.class, TestAssertion.class, jsonNode,Authentication.getLocalUser());
+    return Utils.doEditField(AssertionEditorModel.class, TestAssertion.class, jsonNode, Authentication.getLocalUser());
   }
 
 
+  @AllowedRoles({Role.TEST_DESIGNER, Role.TEST_OBSERVER})
+  public static Result renderDetails(Long id) {
+    TestAssertion ta = TestAssertion.findById(id);
+    if (ta == null) {
+      return badRequest("No test assertion with id " + id + ".");
+    }
+    return ok(testAssertionDetailView.render(ta));
+  }
+
+  public static Result renderTestCases(long id) {
+    TestAssertion ta = TestAssertion.findById(id);
+    if (ta == null) {
+      return badRequest("No test assertion with id " + id + ".");
+    }
+    return ok(testAssertionCaseLister.render(ta));
+  }
 }

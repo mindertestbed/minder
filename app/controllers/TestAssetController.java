@@ -12,8 +12,8 @@ import play.mvc.Controller;
 import play.mvc.Http;
 import play.mvc.Result;
 import play.mvc.Security;
-import views.html.testDesigner.group.testAssetEditor;
-import views.html.testDesigner.group.childViews.testAssetList;
+import views.html.group.testAssetEditor;
+import views.html.group.childViews.testAssetList;
 
 import java.io.*;
 

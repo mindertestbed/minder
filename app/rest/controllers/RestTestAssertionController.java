@@ -226,8 +226,6 @@ public class RestTestAssertionController extends Controller {
             restTestCase.setId(String.valueOf(tc.id));
             restTestCase.setTestAssertionId(tc.testAssertion.taId);
             restTestCase.setName(tc.name);
-            restTestCase.setShortDescription(tc.shortDescription);
-            restTestCase.setDescription(tc.description);
             restTestCase.setOwner(tc.owner.email);
 
             responseRestTestAssertion.getTestcases().add(restTestCase);

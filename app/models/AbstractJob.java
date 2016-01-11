@@ -28,6 +28,8 @@ public abstract class AbstractJob extends Model {
   @Column(nullable = false)
   public User owner;
 
+  public Visibility visibility;
+
   public String mtdlParameters;
 
 

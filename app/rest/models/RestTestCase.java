@@ -16,8 +16,6 @@ import java.util.List;
         "id",
         "testAssertionId",
         "name",
-        "shortDescription",
-        "description",
         "owner",
         "tdls"
 })
@@ -32,12 +30,6 @@ public class RestTestCase {
 
     @XmlElement(required = false)
     protected String name;
-
-    @XmlElement(required = false)
-    protected String shortDescription;
-
-    @XmlElement(required = false)
-    protected String description;
 
     @XmlElement(required = false)
     protected String owner;
@@ -68,22 +60,6 @@ public class RestTestCase {
 
     public void setName(String name) {
         this.name = name;
-    }
-
-    public String getShortDescription() {
-        return shortDescription;
-    }
-
-    public void setShortDescription(String shortDescription) {
-        this.shortDescription = shortDescription;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
     }
 
     public String getOwner() {

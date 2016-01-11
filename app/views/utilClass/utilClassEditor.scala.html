@@ -1,0 +1,198 @@
+@(frm: Form[_], editMode: Boolean = true)
+
+  @import helper._
+  @import views.html.util._
+
+
+  @implicitFieldConstructor = @{
+    FieldConstructor(myInput.f)
+  }
+
+
+
+  @getOrDummy() = @{
+    val id = frm("id").value
+    if(id == null || id.length == 0) {
+      val tg = TestGroup.findById(frm("groupId").value.toLong)
+      val tc = new UtilClass
+      tc.name = "New Util Class"
+      tc.testGroup = tg
+      tc
+    } else {
+      UtilClass.findById(id.toLong)
+    }
+  }
+
+  @defining(getOrDummy()) { utilClass =>
+    @main(Messages("minder.navigation.restricted.testdesigner"), "mainNavigation",
+      Array(("Test Groups", controllers.routes.Application.testGroups().path()),
+        (utilClass.testGroup.name, controllers.routes.GroupController.getGroupDetailView(utilClass.testGroup.id, "utils").path()),
+        (utilClass.name, ""))) {
+      @dialogs()
+
+      <link rel="stylesheet" href="@routes.Assets.versioned("stylesheets/theme/3024-day.css")" rel="stylesheet">
+      <link rel="stylesheet" href="@routes.Assets.versioned("stylesheets/theme/ambiance.css")" rel="stylesheet">
+      <link rel="stylesheet" href="@routes.Assets.versioned("stylesheets/theme/cobalt.css")" rel="stylesheet">
+      <link rel="stylesheet" href="@routes.Assets.versioned("stylesheets/theme/eclipse.css")" rel="stylesheet">
+      <link rel="stylesheet" href="@routes.Assets.versioned("stylesheets/theme/mdn-like.css")" rel="stylesheet">
+      <link rel="stylesheet" href="@routes.Assets.versioned("stylesheets/theme/neat.css")" rel="stylesheet">
+      <link rel="stylesheet" href="@routes.Assets.versioned("stylesheets/theme/neo.css")" rel="stylesheet">
+
+      <style>
+      #accordion1 {
+      height: 100% ;
+      overflow:scroll ;
+      }
+
+      .myscroll {
+      overflow:scroll ;
+      width:100% ;
+
+      background: rgb(200,230,255) ;
+      }
+
+
+      </style>
+
+      <script>
+
+          $(function() {
+            var textArea = document.getElementById("tdl");
+            var editor = CodeMirror.fromTextArea(textArea, {
+              lineNumbers: true,
+              lineWrapping: true,
+              styleActiveLine: true,
+              viewportMargin: Infinity,
+              extraKeys: {"Ctrl-Space": "autocomplete"},
+              mode: {name: "text/x-scala", globalVars: true},
+              theme: "mdn-like"
+            });
+
+            // store it
+            $("#tdl").data('CodeMirrorInstance', editor);
+
+            editor.on("change", function(cm, change) {
+              textArea.value = editor.getDoc().getValue();
+            });
+
+            $( "#select" ).change(function() {
+              $( "#select option:selected" ).each(function() {
+                editor.setOption("theme", $( this ).text());
+              });
+            });
+          });
+      </script>
+
+      @defining(if(editMode == false) {
+        routes.UtilClassController.doCreateUtilClass()
+      } else {
+        routes.UtilClassController.doEditUtilClass()
+      }) { act =>
+        @helper.form(action = act, 'class -> "fullh") {
+          <div id="contentPane" style="position:absolute ; top:0px ; left:3px ; bottom: 3px ; right: 3px ;">
+            <div class="bevel2" style="position:absolute ; width:100% ; height:50px ; margin:0 ; padding:10px ;">
+              <table style="width: 100% ;">
+                <tr>
+                  <td class="tabshrink">
+                    <b>Util Class: </b>
+                    @if(!editMode) {
+                      <input type="text" name="name" value='@frm("name").value' style="border: 1px solid lightgrey ; background: white ; width:150px ;"/>
+                    } else {
+                      @frm("name").value
+                      <input type="hidden" name="name" id="name" value='@frm("name").value'/>
+                    }</td>
+                  <td class="tabshrink">
+                      &nbsp;
+                    <b>Short Description:</b>
+                    <input type="text" name="shortDescription" value='@frm("shortDescription").value' style="border: 1px solid lightgrey ; background: white ; width:200px ;"/>
+                  </td>
+                  <td align="right">
+                    <table><tr><td>
+
+                      <b>Theme</b>: <select id="select">
+                      <option>3024-day</option>
+                      <option>ambiance</option>
+                      <option>cobalt</option>
+                      <option>eclipse</option>
+                      <option selected>mdn-like</option>
+                      <option>neat</option>
+                      <option>neo</option>
+                    </select>
+                        &nbsp;&nbsp;&nbsp;&nbsp;
+                    <td align="right">
+                      <button type="submit">Save</button>&nbsp;
+                      <button type="reset">Reset</button>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                      <button type="button" onclick="history.back ( )">Cancel</button>
+                    </td></tr></table>
+
+                  </td>
+                </tr>
+              </table>
+            </div>
+            <div style="position:absolute ; top:50px ; left:0 ; right:0 ; bottom: 0 ; margin:0 ; padding:5px ; overflow:auto ;">
+              @if(frm.hasErrors) {
+                <p id="error" class="alert alert-danger" style='font-family:"Monaco", "Courier New", "monospace"'></p>
+                <xmp id="source" style="display: none">
+                  @if(frm.hasGlobalErrors) {
+                    @frm.globalError
+                  }
+                  @if(frm.hasErrors) {
+                    @for( error <- frm.errors) {
+                      @for( err <- error._2) {
+                        @error._1: @Messages(err.message)
+                      }
+                    }
+                  }
+                </xmp>
+
+                <script>
+                    function trimAll(arr){
+                      var arr2 = new Array()
+                      for(a in arr){
+                        arr[a] =arr[a].trim()
+                        if (arr[a].length > 0) arr2.push(arr[a])
+                      }
+                      return arr2;
+                    }
+                    $(function(){
+                      var newd  = $("#source" ).text()
+                      newd = trimAll(newd.split(/\n/g)).join("<br/>");
+                      newd = newd.replace(/ /g, '&nbsp;')
+                      $("#error")[0 ].innerHTML = newd.trim();
+                    });
+                </script>
+              }
+
+              <textarea id="tdl" name="tdl" class = "CodeMirror">@frm("tdl").value </textarea>
+              @defining(if(frm("tdl").value == null) {
+                ""
+              } else {
+                frm("tdl").value
+              }) { str =>
+                @defining(str.toString.split("\\\n").length) { len =>
+                  <script>
+                      $(function(){
+                        var editor = $("#tdl").data('CodeMirrorInstance');
+
+                        var nls = "";
+                        for(i = @len; i < 20; i++){
+                          nls += "\n"
+                        }
+
+                        editor.replaceRange(nls, CodeMirror.Pos(editor.lastLine()))
+                      });
+                  </script>
+                }
+              }
+
+            </div>
+
+          </div>
+
+          <input type="hidden" name="id" id="id" value='@frm("id").value'/>
+          <input type="hidden" name="groupId" id="groupId" value='@frm("groupId").value'/>
+
+        } <!-- helper.form -->
+      } <!-- defininf -->
+    } <!-- main -->
+  } <!-- defining -->

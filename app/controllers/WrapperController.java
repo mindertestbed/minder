@@ -9,9 +9,8 @@ import play.data.Form;
 import play.mvc.Controller;
 import play.mvc.Result;
 import play.mvc.Security;
-import views.html.testDeveloper.wrapper.wrapperEditor;
-import views.html.testDeveloper.wrapper.wrapperEditor2;
-import views.html.testDeveloper.wrapper.wrapperLister;
+import views.html.adapters.wrapperEditor;
+import views.html.adapters.wrapperLister;
 
 import static play.data.Form.form;
 
@@ -27,7 +26,7 @@ public class WrapperController extends Controller {
     final User localUser = Authentication.getLocalUser();
     if (filledForm.hasErrors()) {
       Util.printFormErrors(filledForm);
-      return badRequest(wrapperEditor.render(filledForm));
+      return badRequest(wrapperEditor.render(filledForm, false));
     } else {
       WrapperEditorModel model = filledForm.get();
 
@@ -35,7 +34,7 @@ public class WrapperController extends Controller {
       if (wrapper != null) {
         filledForm.reject("The wrapper with name [" + wrapper.name
             + "] already exists");
-        return badRequest(wrapperEditor.render(filledForm));
+        return badRequest(wrapperEditor.render(filledForm, false));
       }
 
       wrapper = new Wrapper();
@@ -52,7 +51,7 @@ public class WrapperController extends Controller {
 
   @Security.Authenticated(Secured.class)
   public static Result createNewWrapperForm() {
-    return ok(wrapperEditor.render(WRAPPER_FORM));
+    return ok(wrapperEditor.render(WRAPPER_FORM, false));
   }
 
   @Security.Authenticated(Secured.class)
@@ -89,7 +88,7 @@ public class WrapperController extends Controller {
 
       Form<WrapperEditorModel> bind = WRAPPER_FORM
           .fill(wrModel);
-      return ok(wrapperEditor2.render(bind));
+      return ok(wrapperEditor.render(bind, false));
     }
   }
 

@@ -12,7 +12,7 @@ import play.data.Form;
 import play.mvc.Controller;
 import play.mvc.Result;
 import play.mvc.Security;
-import views.html.testDesigner.job.*;
+import views.html.job.*;
 
 import java.io.ByteArrayOutputStream;
 import java.util.*;
