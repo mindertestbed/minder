@@ -26,12 +26,12 @@ import static play.data.Form.form;
 public class GroupController extends Controller {
   public static final Form<GroupEditorModel> TEST_GROUP_FORM = form(GroupEditorModel.class);
 
-  @Security.Authenticated(Secured.class)
+  @AllowedRoles(Role.TEST_DESIGNER)
   public static Result getCreateGroupEditorView() {
     return ok(testGroupEditor.render(TEST_GROUP_FORM));
   }
 
-  @Security.Authenticated(Secured.class)
+  @AllowedRoles(Role.TEST_DESIGNER)
   public static Result doCreateTestGroup() {
     final Form<GroupEditorModel> filledForm = TEST_GROUP_FORM
         .bindFromRequest();
@@ -60,7 +60,7 @@ public class GroupController extends Controller {
     }
   }
 
-  @Security.Authenticated(Secured.class)
+  @AllowedRoles(Role.TEST_DESIGNER)
   public static Result editGroupForm(Long id) {
     final User localUser = Authentication.getLocalUser();
     TestGroup tg = TestGroup.findById(id);
@@ -82,7 +82,7 @@ public class GroupController extends Controller {
     }
   }
 
-  @Security.Authenticated(Secured.class)
+  @AllowedRoles(Role.TEST_DESIGNER)
   public static Result doEditGroupField() {
     JsonNode jsonNode = request().body().asJson();
 
@@ -124,7 +124,8 @@ public class GroupController extends Controller {
     return result;
   }
 
-  @Security.Authenticated(Secured.class)
+
+  @AllowedRoles(Role.TEST_DESIGNER)
   public static Result doDeleteGroup(Long id) {
     TestGroup tg = TestGroup.findById(id);
     if (tg == null) {

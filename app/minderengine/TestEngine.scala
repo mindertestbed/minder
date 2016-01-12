@@ -1,7 +1,9 @@
 package minderengine
 
+import java.io.ByteArrayInputStream
 import java.lang.reflect.InvocationTargetException
 import java.util
+import java.util.Properties
 import models._
 import mtdl._
 import org.apache.log4j.spi.LoggingEvent
@@ -56,35 +58,29 @@ object TestEngine {
       false;
     }
   }
-  
+
   class GitbWatcher() extends GitbRivetWatcher {
-    override def notifyProcessingInfo(log: String, rivet: Rivet): Unit =
-    {
+    override def notifyProcessingInfo(log: String, rivet: Rivet): Unit = {
       notify(log, StepStatus.PROCESSING, rivet)
     }
 
-    override def notifySkippedInfo(log: String, rivet: Rivet): Unit =
-    {
+    override def notifySkippedInfo(log: String, rivet: Rivet): Unit = {
       notify(log, StepStatus.SKIPPED, rivet)
     }
 
-    override def notifyWaitingInfo(log: String, rivet: Rivet): Unit =
-    {
+    override def notifyWaitingInfo(log: String, rivet: Rivet): Unit = {
       notify(log, StepStatus.WAITING, rivet)
     }
 
-    override def notifyErrorInfo(log: String, rivet: Rivet): Unit =
-    {
+    override def notifyErrorInfo(log: String, rivet: Rivet): Unit = {
       notify(log, StepStatus.ERROR, rivet)
     }
 
-    override def notifyCompletedInfo(log: String, rivet: Rivet): Unit =
-    {
+    override def notifyCompletedInfo(log: String, rivet: Rivet): Unit = {
       notify(log, StepStatus.COMPLETED, rivet)
     }
-    
-    def notify(log: String, stepStatus: StepStatus, rivet: Rivet): Unit =
-    {
+
+    def notify(log: String, stepStatus: StepStatus, rivet: Rivet): Unit = {
       TestEngineController.gitbLogFeedUpdate(log, stepStatus, rivet.tplStepId)
     }
   }
@@ -124,8 +120,12 @@ object TestEngine {
 
       val startTestObject = new StartTestObject
       val session = new TestSession
+      val properties = new Properties()
+      properties.load(new ByteArrayInputStream(params.getBytes()))
+
       session.setSession(userEmail)
       startTestObject.setSession(session)
+      startTestObject.setProperties(properties)
 
       val identifierMinderClientMap = mapAllTransitiveWrappers(wrapperMapping)
 
@@ -141,7 +141,7 @@ object TestEngine {
       try {
         var rivetIndex = 0;
         for (rivet <- minderTDL.RivetDefs) {
-          var msg:String = "> " + "RUN RIVET " + rivetIndex;
+          var msg: String = "> " + "RUN RIVET " + rivetIndex;
           lgr.info(msg)
           gtb.notifyProcessingInfo(msg, rivet)
           val rivetWrapperId: String = rivet.wrapperFunction.wrapperId
@@ -157,8 +157,7 @@ object TestEngine {
           try {
             for (tuple@(label, signature) <- rivet.signalPipeMap.keySet) {
               val me: MinderSignalRegistry = SessionMap.getObject(userEmail, "signalRegistry")
-              if (me == null)
-              {
+              if (me == null) {
                 msg = "No MinderSignalRegistry object defined for session " + userEmail;
                 gtb.notifyErrorInfo(msg, rivet)
                 throw new scala.IllegalArgumentException(msg)
@@ -166,8 +165,7 @@ object TestEngine {
 
               //obtain the source signal object
               val signalList = rivet.signalPipeMap(tuple);
-              if (signalList == null || signalList.isEmpty)
-              {
+              if (signalList == null || signalList.isEmpty) {
                 msg = "singal list is empty for " + label + "." + signature;
                 gtb.notifyErrorInfo(msg, rivet);
                 throw new scala.IllegalArgumentException(msg);
@@ -181,7 +179,7 @@ object TestEngine {
               msg = "> Wait For Signal:" + signalAdapterIdentifier + "." + signature;
               lgr.debug(msg)
               gtb.notifyWaitingInfo(msg, rivet)
-              
+
 
               val signalData: SignalData = try {
                 me.dequeueSignal(signalAdapterIdentifier, signature, signal.timeout)

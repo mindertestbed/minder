@@ -103,7 +103,7 @@ GET         /jobQueueFeed                               controllers.TestEngineCo
 GET         /jobStatusFeed                              controllers.TestEngineController.jobStatusFeed
 GET         /historyFeed                                controllers.TestEngineController.historyFeed
 GET         /logFeed                                    controllers.TestEngineController.logFeed
-GET         /enqueueJob                                 controllers.TestEngineController.enqueueJob(id: Long)
+GET         /enqueueJob                                 controllers.TestEngineController.enqueueJob(id: Long, visibility: String)
 GET         /cancelJob                                  controllers.TestEngineController.cancelJob(index: Int)
 GET         /cancelActiveJob                            controllers.TestEngineController.cancelActiveJob
 

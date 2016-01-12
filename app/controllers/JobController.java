@@ -67,6 +67,7 @@ public class JobController extends Controller {
     model.tdlID = tdlId;
     model.name = tdl.testCase.name + "(" + (max + 1) + ")";
     model.mtdlParameters = "";
+    model.visibility = Visibility.PROTECTED;
 
     //
     initWrapperListForModel(tdl, model);
@@ -130,6 +131,7 @@ public class JobController extends Controller {
     Job job = new Job();
     job.name = model.name;
     job.tdl = tdl;
+    job.visibility = model.visibility;
     job.owner = Authentication.getLocalUser();
 
     try {
@@ -206,6 +208,7 @@ public class JobController extends Controller {
     JobEditorModel jobEditorModel = new JobEditorModel();
     jobEditorModel.id = job.id;
     jobEditorModel.name = job.name;
+    jobEditorModel.visibility = job.visibility;
     jobEditorModel.wrapperMappingList = new ArrayList<>();
     jobEditorModel.mtdlParameters = job.mtdlParameters;
 
@@ -215,7 +218,7 @@ public class JobController extends Controller {
 
     Form<?> fill = JOB_FORM.fill(jobEditorModel);
 
-    return ok(jobEditor.render(fill));
+    return ok(views.html.job.jobEditor.render(fill));
   }
 
   @Security.Authenticated(Secured.class)
@@ -332,7 +335,6 @@ public class JobController extends Controller {
     response().setHeader("Content-disposition", "attachment; filename=" + fileName);
     return ok(data);
   }
-
 
 
   @SuppressWarnings({"DEPRECATION"})

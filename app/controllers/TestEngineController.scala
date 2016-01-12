@@ -158,7 +158,7 @@ object TestEngineController extends Controller {
     * an action for enqueuing a new job for test engine running
     * @return
     */
-  def enqueueJob(id: Long) = Action {
+  def enqueueJob(id: Long, visibility: String) = Action {
     implicit request =>
       if (jobQueue.size >= 30) {
         BadRequest("The job queue is full.")
@@ -170,7 +170,7 @@ object TestEngineController extends Controller {
           val java_ctx = play.core.j.JavaHelpers.createJavaContext(request)
           val java_session = java_ctx.session()
           val user = Authentication.getLocalUser(java_session);
-          jobQueue.offer(createTestRunContext(job, user))
+          jobQueue.offer(createTestRunContext(job, user, Visibility.valueOf(visibility)))
           queueFeedUpdate();
           Ok;
         }
@@ -178,25 +178,25 @@ object TestEngineController extends Controller {
   }
 
   /**
-   * an action for enqueuing a new gitb job for test engine running
+    * an action for enqueuing a new gitb job for test engine running
     * @return
     */
-  def enqueueGitbJobWithUser(id: Long, user: User, replyToUrlAddress: String){
-      if (jobQueue.size >= 30) {
-        BadRequest("The job queue is full.")
+  def enqueueGitbJobWithUser(id: Long, user: User, replyToUrlAddress: String) {
+    if (jobQueue.size >= 30) {
+      BadRequest("The job queue is full.")
+    } else {
+      val job = GitbJob.findById(id)
+      if (job == null) {
+        BadRequest("A job with id [" + id + "] was not found!")
       } else {
-        val job = GitbJob.findById(id)
-        if (job == null) {
-          BadRequest("A job with id [" + id + "] was not found!")
-        } else {
-          var testRunContext = createTestRunContext(job, user);
-          testRunContext.gitbReplyToUrlAddress = replyToUrlAddress
-          jobQueue.offer(testRunContext)
-          queueFeedUpdate();
-        }
+        var testRunContext = createTestRunContext(job, user, Visibility.PROTECTED);
+        testRunContext.gitbReplyToUrlAddress = replyToUrlAddress
+        jobQueue.offer(testRunContext)
+        queueFeedUpdate();
       }
+    }
   }
-      
+
   /**
     * Update the queue feed with the current active job and queue status
     */
@@ -214,10 +214,9 @@ object TestEngineController extends Controller {
     currentLog.append(log)
     logChannel.push(log)
   }
-  
+
   def gitbLogFeedUpdate(log: String, step: StepStatus, stepId: Long): Unit = {
-    if (activeRunContext != null && activeRunContext.job != null && activeRunContext.job.isInstanceOf[GitbJob])
-    {
+    if (activeRunContext != null && activeRunContext.job != null && activeRunContext.job.isInstanceOf[GitbJob]) {
       GitbTestbedController.performUpdateStatusOperation(activeRunContext.gitbReplyToUrlAddress, activeRunContext.job.id, step, stepId, log);
     }
   }
@@ -227,11 +226,12 @@ object TestEngineController extends Controller {
     * @return
     */
 
-  def createTestRunContext(job: AbstractJob, user: User): TestRunContext = {
+  def createTestRunContext(job: AbstractJob, user: User, visibility: Visibility): TestRunContext = {
     Logger.debug("Create Run")
     val testRun = new TestRun()
     testRun.date = new Date()
     testRun.job = job;
+    testRun.visibility = visibility;
     val userHistory = new UserHistory
     userHistory.email = user.email;
     userHistory.operationType = new TOperationType
@@ -296,9 +296,9 @@ object TestEngineController extends Controller {
   }
 
   /**
-   * an action for cancelling a given gitb job for test engine running
-   * @return
-   */
+    * an action for cancelling a given gitb job for test engine running
+    * @return
+    */
   def cancelGitbJob(id: Long, user: User) {
     val job = GitbJob.findById(id)
     if (job == null) {
@@ -310,25 +310,23 @@ object TestEngineController extends Controller {
     if (activeRunContext != null && activeRunContext.job.id == id) {
       if (user.email == "root@minder" || user.email == activeRunContext.job.owner.email) {
         //now interrupt the thread.
-        testThread.interrupt();  
+        testThread.interrupt();
         return
       }
-      else
-      {
+      else {
         println(user.email + " not permitted for" + " job with id [" + id + "]")
         return
-      } 
+      }
     }
-    
+
     //now look at waiting gitb jobs
     var index = 0;
     val arr = jobQueue.toArray
-    if(arr == null || arr.size == 0)
-    {
+    if (arr == null || arr.size == 0) {
       println("A waiting job with id [" + id + "] was not found!")
       return
     }
-          
+
     for (index <- 0 to (arr.size - 1)) {
       val tr = arr(index).asInstanceOf[TestRunContext]
       if (user.email == "root@minder" || user.email == tr.testRun.runner.email) {

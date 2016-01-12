@@ -16,7 +16,7 @@ public abstract class AbstractJob extends Model {
   @Id
   public Long id;
 
-  @Column(unique = true, nullable = false)
+  @Column(nullable = false)
   public String name;
 
   @ManyToOne

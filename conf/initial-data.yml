@@ -29,7 +29,17 @@ users:
             user: *tester
             role: TEST_DEVELOPER
         testGroups: []
-        
+  - !!models.UserInitiator
+      password: 12345
+      user: &guest !!models.User
+        email: guest@minder
+        name: Guest
+        roles:
+        - !!models.DBRole
+            user: *guest
+            role: TEST_OBSERVER
+        testGroups: []
+
 #wrappers
 wrappers:
 - &xmlContentVerifier !!models.Wrapper
@@ -91,7 +101,6 @@ groups:
         owner: *tester
         testCases:
         - &testCase1 !!models.TestCase
-           shortDescription: Books test
            owner: *tester
            tdls:
            - !!models.Tdl
@@ -113,7 +122,6 @@ groups:
         owner: *tester
         testCases:
         - &testCase2 !!models.TestCase
-           shortDescription: All xml verification tests
            owner: *tester
            testAssertion: *taSample2
            name: SchemaHell

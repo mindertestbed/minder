@@ -1,13 +1,14 @@
 package editormodels;
 
 import controllers.MappedWrapperModel;
+import models.Visibility;
 import play.data.validation.Constraints;
 
 import java.util.List;
 
 /**
-* Created by yerlibilgin on 03/05/15.
-*/
+ * Created by yerlibilgin on 03/05/15.
+ */
 public class JobEditorModel {
   public Long id;
 
@@ -19,4 +20,6 @@ public class JobEditorModel {
   public List<MappedWrapperModel> wrapperMappingList;
 
   public String mtdlParameters;
+
+  public Visibility visibility;
 }
