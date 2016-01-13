@@ -1,16 +1,104 @@
 <script>
-    $ ( function ( ) {
-        var historyfeed = $( "#historyfeed" )[0];
-        new EventSource ( '/historyFeed' ).onmessage = function ( event ) {
-            historyfeed.innerHTML = event.data
+  $ ( function ( ) {
+
+
+    var successImage = '<img src="@routes.Assets.versioned("/images/Check-icon.png")" height="12px" alt="G"/>'
+    var failImage = '<img src="@routes.Assets.versioned("/images/Delete-icon.png")" height="12px" alt="B"/>'
+
+    var rowTemplate = '<tr class="$trclass" style="border:1px solid #eee ; border-radius: 2px">'+
+        '<td style="text-align:left ;" class="tabshrink">'+
+        '$image' +
+        '</td><td style="text-align:center ;" class="tabshrink">#$testRunNumber</td>'+
+        '<td class="tabexpandNoBorder">'+
+        '<span class="$visibilityClass" title="$visibility" style="color:$visibilityColor;">&nbsp; </span> &nbsp;'+
+        '<a href="/viewJob?id=$jobId&showHistory=true">$jobName</a></td>'+
+        '<td align="center" valign="middle" class="tabshrink">'+
+        '<a href="/viewTestRunHistory?testRunId=$testRunId" title="View Log" class="celldiv" style="height:16px ; width:16px ;">'+
+        '<img src="@routes.Assets.versioned("/images/console-64.png")" height="12px"/>'+
+        '</a></td></tr>'
+
+    historyTableBody = $( "#updatableTbody" )
+    new EventSource ('@{controllers.routes.TestRunFeeder.jobHistoryFeed()}' ).onmessage =
+        function ( event ) {
+
+          console.log("History " + event.data)
+          var json = JSON.parse ( event.data )
+
+          var img = successImage
+          var cls = 'goodTestRun'
+          if (!json.success) {
+            img = failImage
+            cls = 'badTestRun'
+          }
+          var visibilityColor = 'red'
+          var visibilityClass = "fa-lock"
+          if (json.visibility == "PUBLIC"){
+            visibilityClass = 'fa-globe'
+            visibilityColor = '#1fc36d'
+          }
+          else if (json.visibility == "PROTECTED"){
+            visibilityClass = 'fa-group'
+            visibilityColor = '#7cd8ff'
+          }
+
+          var newRow  = rowTemplate.replace('$image', img).replace("$trclass", cls).
+          replace('$testRunNumber', json.no).
+          replace('$testRunId', json.id).
+          replace('$jobName', json.name).
+          replace('$jobName', json.name).
+          replace('$jobId', json.jobId).
+          replace('$visibilityColor', visibilityColor).
+          replace('$visibilityClass', visibilityClass).
+          replace('$visibility', json.visibility)
+
+
+          historyTableBody.prepend(newRow)
         }
-    });
+  });
 </script>
 
+
 <table class="fullw">
-    <tr>
-        <td id="historyfeed" style="vertical-align:text-top;">
-            @jobHistoryList()
-        </td>
-    </tr>
+  <tr>
+    <td id="historyfeed" style="vertical-align:text-top ;">
+      <label>Job History</label>
+      <br />
+      <div>
+        <table class="padabit">
+          <tbody id="updatableTbody">
+          @defining(TestRun.getRecentRuns(40)) { testRunList =>
+            @for( testRun <- testRunList) {
+              @authentication.decideOnVisibility(testRun.visibility, testRun.runner) {
+                <tr class="@if(testRun.success) {goodTestRun} else {badTestRun}" style="border:1px solid #eee ; border-radius: 2px">
+                  <td style="text-align:left ;" class="tabshrink">
+                  @if(testRun.success) {
+                    <img src="@routes.Assets.versioned("/images/Check-icon.png")" height="12px" alt='G'/>
+                  } else {
+                    <img src="@routes.Assets.versioned("/images/Delete-icon.png")" height="12px" alt='B'/>
+                  }
+                  </td>
+                  <td style="text-align:center ;" class="tabshrink">#@testRun.number</td>
+                  <td class="tabexpandNoBorder">@if(testRun.job != null) {
+                    @util.renderVisibilityTag(testRun.visibility)
+                    <a href="/viewJob?id=@{
+                      testRun.job.id
+                    }&showHistory=true">
+                    @testRun.job.name</a>
+
+                  }</td>
+                  <td align="center" valign="middle" class="tabshrink">
+                    <a href="/viewTestRunHistory?testRunId=@testRun.id" title="View Log" class="celldiv" style="height:16px ; width:16px ;">
+                      <img src="@routes.Assets.versioned("/images/console-64.png")" height="12px"/>
+                    </a>
+                  </td>
+                </tr>
+              }
+            }
+          }
+          </tbody>
+        </table>
+      </div>
+
+    </td>
+  </tr>
 </table>

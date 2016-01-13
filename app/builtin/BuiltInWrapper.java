@@ -95,7 +95,7 @@ public abstract class BuiltInWrapper extends Wrapper implements IMinderClient, I
   public abstract String getShortDescription();
 
   @Override
-  public SUTIdentifier getSUTIdentifier() {
-    return identifier;
+  public SUTIdentifiers getSUTIdentifiers() {
+    return null;
   }
 }

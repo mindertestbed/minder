@@ -12,7 +12,7 @@ import play.Logger
 import scala.InterruptedException
 import scala.collection.JavaConversions._
 import scala.collection.mutable
-import controllers.TestEngineController
+import controllers.TestQueueController
 import com.gitb.core.v1.StepStatus
 
 /**
@@ -81,7 +81,7 @@ object TestEngine {
     }
 
     def notify(log: String, stepStatus: StepStatus, rivet: Rivet): Unit = {
-      TestEngineController.gitbLogFeedUpdate(log, stepStatus, rivet.tplStepId)
+      TestQueueController.gitbLogFeedUpdate(log, stepStatus, rivet.tplStepId)
     }
   }
 
@@ -116,7 +116,7 @@ object TestEngine {
 
       //first, call the start methods for all registered wrappers of this test.
 
-      lgr.info("> CALL START TEST ON Wrappers");
+      lgr.info("> Initialize the Adapters");
 
       val startTestObject = new StartTestObject
       val session = new TestSession
@@ -131,8 +131,15 @@ object TestEngine {
 
       //call start test on all adapters and populate the SUT names
       identifierMinderClientMap.values().foreach(pair => {
-        sutNameSet.add(pair.minderClient.getSUTIdentifier.getSutName)
+        val sutIdentifiers = pair.minderClient.getSUTIdentifiers;
         pair.minderClient.startTest(startTestObject)
+
+        if (sutIdentifiers != null){
+          for (sutIdentifier <- sutIdentifiers.getIdentifiers) {
+            lgr.info("SUT: " + sutIdentifier.getSutName)
+            sutNameSet.add(sutIdentifier.getSutName)
+          }
+        }
       })
 
       //update the SUT names on the watcher
@@ -141,7 +148,7 @@ object TestEngine {
       try {
         var rivetIndex = 0;
         for (rivet <- minderTDL.RivetDefs) {
-          var msg: String = "> " + "RUN RIVET " + rivetIndex;
+          var msg: String = "> RUN RIVET " + rivetIndex;
           lgr.info(msg)
           gtb.notifyProcessingInfo(msg, rivet)
           val rivetWrapperId: String = rivet.wrapperFunction.wrapperId

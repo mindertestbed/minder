@@ -9,7 +9,6 @@ GET         /listTestGroups                             controllers.Application.
 GET         /jobFeed                                    controllers.Application.jobFeed()
 GET         /adapters                                   controllers.Application.adapters()
 GET         /assets/javascript/routes.js                controllers.Application.jsRoutes
-
 GET         /profile                                    controllers.Application.profile
 
 GET         /login                                      controllers.Authentication.login
@@ -24,9 +23,6 @@ POST        /doCreateUser                               controllers.UserControll
 GET         /doDeleteUser                               controllers.UserController.doDeleteUser(id: Long)
 POST        /doEditUser                                 controllers.UserController.doEditUser()
 
-# Map static resources from the /public folder to the /assets URL path
-GET         /assets/*file                               controllers.Assets.versioned(path="/public", file)
-GET         /webjars/*file                              controllers.WebJarAssets.at(file)
 
 #test group management
 GET         /getCreateGroupEditorView                   controllers.GroupController.getCreateGroupEditorView
@@ -98,14 +94,15 @@ GET         /editWrapperForm                            controllers.WrapperContr
 POST        /doEditWrapper                              controllers.WrapperController.doEditWrapper
 
 #SSE Test
-GET         /wrapperStatusFeed                          controllers.SSEHandler.wrapperStatusFeed(id: Long)
-GET         /jobQueueFeed                               controllers.TestEngineController.jobQueueFeed
-GET         /jobStatusFeed                              controllers.TestEngineController.jobStatusFeed
-GET         /historyFeed                                controllers.TestEngineController.historyFeed
-GET         /logFeed                                    controllers.TestEngineController.logFeed
-GET         /enqueueJob                                 controllers.TestEngineController.enqueueJob(id: Long, visibility: String)
-GET         /cancelJob                                  controllers.TestEngineController.cancelJob(index: Int)
-GET         /cancelActiveJob                            controllers.TestEngineController.cancelActiveJob
+GET         /wrapperStatusFeed                          controllers.AdapterStatusFeeder.wrapperStatusFeed(id: Long)
+GET         /jobQueueFeed                               controllers.TestRunFeeder.jobQueueFeed
+GET         /testStatusFeed                              controllers.TestRunFeeder.testStatusFeed
+GET         /historyFeed                                controllers.TestRunFeeder.jobHistoryFeed
+GET         /logFeed                                    controllers.LogFeeder.logFeed
+GET         /cancelJob                                  controllers.TestQueueController.cancelJob(index: Int)
+GET         /cancelActiveJob                            controllers.TestQueueController.cancelActiveJob
+GET         /enqueueJob                                 controllers.TestQueueController.enqueueJob(id: Long, visibility: String)
+
 
 POST        /doEditTestSuiteField                       controllers.TestSuiteController.doEditTestSuiteField
 GET         /getTestSuiteDetailView                     controllers.TestSuiteController.getTestSuiteDetailView(id: Long, display: String)
@@ -206,3 +203,8 @@ POST        /rest/testbed/getTestCaseDefinitions        rest.controllers.GitbTes
 GET         /ui2                                        controllers.secondGen.Application.main
 GET         /ui2/loginPage                              controllers.secondGen.Application.loginPage
 GET         /ui2/mainLayout                             controllers.secondGen.Application.mainLayout
+
+
+# Map static resources from the /public folder to the /assets URL path
+GET         /assets/*file                               controllers.Assets.versioned(path="/public", file)
+GET         /webjars/*file                              controllers.WebJarAssets.at(file)

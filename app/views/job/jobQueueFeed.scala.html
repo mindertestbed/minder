@@ -2,8 +2,9 @@
 <script>
     $ ( function ( ) {
         var queuefeed = $( "#queuefeed" )[0];
-        new EventSource ( '/jobQueueFeed' ).onmessage = function ( event ) {
+        new EventSource ( '@controllers.routes.TestRunFeeder.jobQueueFeed()' ).onmessage = function ( event ) {
             queuefeed.innerHTML = event.data
+            console.log("JOBQUEUUEFEED " + event.data)
         }
     });
 </script>

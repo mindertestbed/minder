@@ -8,35 +8,38 @@
 <div>
   <table class="shaded fullw">
     <tr>
-      <th>#</th><th>Status</th><th>Date</th><th>Run by</th><th>Log</th><th>Report</th>
+      <th>#</th><th>Status</th><th>Date</th><th>Visibility</th><th>Run by</th><th>Log</th><th>Report</th>
     </tr>
     @defining(TestRun.findByJob(configurationId)){ testRunList =>
       @for(testRun <- testRunList){
-        <tr class="@if(testRun.success){goodTestRun} else {badTestRun}">
-          <td style="text-align:center;" class="tabshrink">
-          @testRun.number
-          </td>
-          <td style="text-align:center;" class="tabshrink">
-          @if(testRun.success){
-            <img src="@routes.Assets.versioned("/images/Check-icon.png")" height="16px" alt='G'/>
-          } else {
-            <img src="@routes.Assets.versioned("/images/Delete-icon.png")" height="16px" alt='B'/>
-          }
-        </td>
-        <td style="text-align:left;" class="tabshrink">@testRun.date</td>
-        <td style="text-align:left;" class="tabexpand">@testRun.runner.email</td>
-        <td align="center" valign="middle" class="tabshrink">
-          <a href="/viewTestRunHistory?testRunId=@testRun.id" title="View Log" class="celldiv bevel2" style="height:26px;width:26px;">
-            <img src="@routes.Assets.versioned("/images/console-64.png")" height="16px"/>
-          </a>
-        </td>
-        <td align="center" class="tabshrink">
-            <div id="viewReport@testRun.id" title="View Report" class="celldiv bevel2" style="height:26px;width:26px;"
-                onclick='showReportDialog("selectReportType", @testRun.id)'>
-              <img src="@routes.Assets.versioned("/images/print-64.png")" height="16px" alt='@testRun.id'/>
-            </div>
-        </td>
-        </tr>
+        @authentication.decideOnVisibility(testRun.visibility, testRun.runner) {
+          <tr class="@if(testRun.success) {goodTestRun} else {badTestRun}">
+            <td style="text-align:center ;" class="tabshrink">
+            @testRun.number
+            </td>
+            <td style="text-align:center ;" class="tabshrink">
+            @if(testRun.success) {
+              <img src="@routes.Assets.versioned("/images/Check-icon.png")" height="16px" alt='G'/>
+            } else {
+              <img src="@routes.Assets.versioned("/images/Delete-icon.png")" height="16px" alt='B'/>
+            }
+            </td>
+            <td style="text-align:left ;" class="tabshrink">@testRun.date</td>
+            <td style="text-align:center ;font-size:20px;" class="tabshrink">@util.renderVisibilityTag(testRun.visibility)</td>
+            <td style="text-align:left ;" class="tabexpand">@testRun.runner.email</td>
+            <td align="center" valign="middle" class="tabshrink">
+              <a href="/viewTestRunHistory?testRunId=@testRun.id" title="View Log" class="celldiv bevel2" style="height:26px ; width:26px ;">
+                <img src="@routes.Assets.versioned("/images/console-64.png")" height="16px"/>
+              </a>
+            </td>
+            <td align="center" class="tabshrink">
+              <div id="viewReport@testRun.id" title="View Report" class="celldiv bevel2" style="height:26px ; width:26px ;"
+              onclick='showReportDialog("selectReportType", @testRun.id)'>
+                <img src="@routes.Assets.versioned("/images/print-64.png")" height="16px" alt='@testRun.id'/>
+              </div>
+            </td>
+          </tr>
+        }
       }
     }
   </table>

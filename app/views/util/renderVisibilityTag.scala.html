@@ -1,0 +1,27 @@
+@(visibility: Visibility)
+
+<span
+  @visibility match {
+    case Visibility.PUBLIC => {
+      class="fa-globe"
+    }
+    case Visibility.PRIVATE => {
+      class="fa-lock"
+    }
+    case Visibility.PROTECTED => {
+      class="fa-group"
+    }
+  }
+
+    title="@visibility" style="color: @visibility match {
+    case Visibility.PUBLIC => {
+      #1fc36d
+    }
+    case Visibility.PRIVATE => {
+      red
+    }
+    case Visibility.PROTECTED => {
+      #7cd8ff
+    }
+  }"
+>&nbsp; </span> &nbsp;

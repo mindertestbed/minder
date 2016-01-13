@@ -78,7 +78,7 @@ import com.gitb.tpl.v1.Sequence;
 import com.gitb.tpl.v1.TestStep;
 import com.gitb.tr.v1.TestResultType;
 
-import controllers.TestEngineController;
+import controllers.TestQueueController;
 
 public class GitbTestbedController extends Controller {
 
@@ -336,7 +336,7 @@ public class GitbTestbedController extends Controller {
 		if(replyToUrlAddress == null || replyToUrlAddress.isEmpty())
 			return internalServerError(Constants.REPLY_TO_URL_ADDRESS + " header tag and value should be set.");
 		
-		TestEngineController.enqueueGitbJobWithUser(Long.valueOf(basicCommand.getTcInstanceId()), currentUser, replyToUrlAddress);
+		TestQueueController.enqueueGitbJobWithUser(Long.valueOf(basicCommand.getTcInstanceId()), currentUser, replyToUrlAddress);
 		
 		ConfigureResponse serviceResponse = new ConfigureResponse();		
 		
@@ -377,7 +377,7 @@ public class GitbTestbedController extends Controller {
 		}
 		
 		User currentUser = getCurrentUser(request());
-		TestEngineController.cancelGitbJob(Long.valueOf(basicCommand.getTcInstanceId()), currentUser);
+		TestQueueController.cancelGitbJob(Long.valueOf(basicCommand.getTcInstanceId()), currentUser);
 		
 		ConfigureResponse serviceResponse = new ConfigureResponse();		
 		

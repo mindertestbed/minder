@@ -5,15 +5,16 @@ import java.lang.reflect.Field
 import java.util._
 import java.util.zip.{GZIPInputStream, GZIPOutputStream}
 
-import models.{PrescriptionLevel, User}
+import models.{PrescriptionLevel, User, Visibility}
 import play.Logger
 import play.data.Form
 import play.data.validation.{Constraints, ValidationError}
 import play.mvc.Http
 
+
 /**
- * Created by yerlibilgin on 02/05/15.
- */
+  * Created by yerlibilgin on 02/05/15.
+  */
 object Util {
   def choose(value: Any, expected: Any, matchValue: String = "activetab", nonMatchValue: String = "passivetab"): String = {
     if (value == expected)
@@ -39,9 +40,9 @@ object Util {
   }
 
 
-  def checkField(cls: Class[_], fieldName: String, newValue: String): Unit ={
-    System.out.println("Class Name"+cls);
-    System.out.println("Field Name"+fieldName);
+  def checkField(cls: Class[_], fieldName: String, newValue: String): Unit = {
+    System.out.println("Class Name" + cls);
+    System.out.println("Field Name" + fieldName);
     val fld: Field = cls.getDeclaredField(fieldName)
     val required: Boolean = fld.getAnnotation(classOf[Constraints.Required]) != null
 
@@ -78,39 +79,53 @@ object Util {
     }
   }
 
-  abstract class Converter{
-    def convert(any: Any) : Any;
+  abstract class Converter {
+    def convert(any: Any): Any;
   }
 
-  case class PrescriptionLevelConverter() extends Converter{
-    override def convert(any: Any) : Any ={
+  case class PrescriptionLevelConverter() extends Converter {
+    override def convert(any: Any): Any = {
       PrescriptionLevel.valueOf(any.toString);
     }
   }
 
   val converters = scala.collection.immutable.Map("PrescriptionLevel" -> PrescriptionLevelConverter());
 
-  def convertValue(converter: String, newValue: String) : Any = {
+  def convertValue(converter: String, newValue: String): Any = {
     converters(converter).convert(newValue)
   }
 
 
-  def getBooleanIcon(flag: Boolean) : String = {
-    if (flag) {"/images/Happy-32.png"} else {"/images/Sad-32.png"}
+  def getBooleanIcon(flag: Boolean): String = {
+    if (flag) {
+      "/images/Happy-32.png"
+    } else {
+      "/images/Sad-32.png"
+    }
   }
 
 
-  def canAccess(localUser: User, owner: User) : Boolean = {
+  def canAccess(localUser: User, owner: User): Boolean = {
     println(localUser.email + " vs. " + owner.email)
-    localUser.email=="root@minder" || localUser.email==owner.email
+    localUser.email == "root@minder" || localUser.email == owner.email
+  }
+
+  def canAccess(subject: User, owner: User, visibility: models.Visibility): Boolean = {
+    if (subject != null && owner != null) {
+      if ((subject.email == "root@minder") || (subject.email == owner.email) ||
+        (subject.hasRole(security.Role.TEST_DESIGNER) && visibility != Visibility.PRIVATE)
+        || (visibility == Visibility.PUBLIC))
+        return true
+    }
+    false
   }
 
   /**
-   * compress the given byte array
-   *
-   * @param plain
-   * @return
-   */
+    * compress the given byte array
+    *
+    * @param plain
+    * @return
+    */
   def gzip(plain: Array[Byte]): Array[Byte] = {
     val bais: ByteArrayInputStream = new ByteArrayInputStream(plain)
     val baos: ByteArrayOutputStream = new ByteArrayOutputStream
@@ -126,11 +141,11 @@ object Util {
   }
 
   /**
-   * Compress the given stream as GZIP
-   *
-   * @param inputStream
-   * @param outputStream
-   */
+    * Compress the given stream as GZIP
+    *
+    * @param inputStream
+    * @param outputStream
+    */
   def gzip(inputStream: InputStream, outputStream: OutputStream) {
     try {
       val gzipOutputStream: GZIPOutputStream = new GZIPOutputStream(outputStream, true)
@@ -145,11 +160,11 @@ object Util {
   }
 
   /**
-   * Decompress the given stream that contains gzip data
-   *
-   * @param inputStream
-   * @param outputStream
-   */
+    * Decompress the given stream that contains gzip data
+    *
+    * @param inputStream
+    * @param outputStream
+    */
   def gunzip(inputStream: InputStream, outputStream: OutputStream) {
     try {
       val gzipInputStream: GZIPInputStream = new GZIPInputStream(inputStream)
@@ -168,19 +183,22 @@ object Util {
     val chunk: Array[Byte] = new Array[Byte](1024)
     var read: Int = -1
     while ((({
-      read = gzipInputStream.read(chunk, 0, chunk.length); read
+      read = gzipInputStream.read(chunk, 0, chunk.length);
+      read
     })) > 0) {
       outputStream.write(chunk, 0, read)
     }
   }
 
   def sha256(array: Array[Byte]): Array[Byte] = {
+
     import java.security.MessageDigest;
     val md = MessageDigest.getInstance("SHA-256");
     md.digest(array)
   }
 
   def md5(array: Array[Byte]): Array[Byte] = {
+
     import java.security.MessageDigest;
     val md = MessageDigest.getInstance("MD5");
     md.digest(array)

@@ -5,20 +5,12 @@ package minderengine
   * Date:   17/11/15.
   */
 class NullClient extends IMinderClient {
-  override def callSlot(testSession: TestSession, s: String, objects: Array[AnyRef]): AnyRef = {
-    null
-  }
+  override def callSlot(testSession: TestSession, s: String, objects: Array[AnyRef]) = null;
 
-  override def finishTest(finishTestObject: FinishTestObject): Unit = {}
+  override def finishTest(finishTestObject: FinishTestObject) {}
 
-  override def getSUTIdentifier: SUTIdentifier = {
-    val identifier: SUTIdentifier = new SUTIdentifier()
-    identifier.setSutName("")
-    identifier
-  }
+  override def getSUTIdentifiers: SUTIdentifiers = null
 
-  override def startTest(startTestObject: StartTestObject): Unit = {
-
-  }
+  override def startTest(startTestObject: StartTestObject) {}
 }
 

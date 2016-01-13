@@ -12,11 +12,11 @@
 @if(testRun != null){
   <label>Status</label>
 
-    @if(TestEngineController.activeRunContext!=null&&TestEngineController.activeRunContext.testRun==testRun){
+    @if(TestQueueController.activeRunContext!=null&&TestQueueController.activeRunContext.testRun==testRun){
         <!-- this is an active test run -->
         <table class="fullw"><tr><td>
             <div style="border:1px solid gray;background-color:white;height:14px;width:100%;padding:0">
-                <div style="background-color:lightgreen;height:12px;width:@{TestEngineController.activeRunContext.progressPercent}%;margin:0">&nbsp;</div>
+                <div style="background-color:lightgreen;height:12px;width:@{TestQueueController.activeRunContext.progressPercent}%;margin:0">&nbsp;</div>
             </div></td></tr></table>
     } else {
         @if(testRun.success) {

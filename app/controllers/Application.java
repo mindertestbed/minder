@@ -81,7 +81,8 @@ public class Application extends Controller {
             routes.javascript.TestAssertionController.renderDetails(),
             routes.javascript.TestAssertionController.renderTestCases(),
             routes.javascript.TestCaseController.renderJobs(),
-            routes.javascript.TestCaseController.renderCode()
+            routes.javascript.TestCaseController.renderCode(),
+            routes.javascript.TestQueueController.enqueueJob()
         ))
         .as("text/javascript");
   }

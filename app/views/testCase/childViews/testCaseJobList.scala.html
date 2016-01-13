@@ -22,6 +22,7 @@
             <th>Author</th>
           }
           @for( job <- jobs) {
+            @decideOnVisibility(job.visibility, job.owner){
             <tr>
               <td>@index.getAndIncrement()</td> <td><a href="/viewJob?id=@job.id&showHistory=true">@job.name</a></td> <td>SHORT Description</td>
               <td>@job.owner.email</td>
@@ -35,6 +36,7 @@
                 </td>
               }
             </tr>
+            }
           }
           @subjectHasRole(security.Role.TEST_DESIGNER) {
             @createLastRow(3) {

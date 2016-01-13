@@ -4,7 +4,7 @@
 
 </div>
 
-@defining(TestEngineController.activeRunContext){ activeRunContext =>
+@defining(TestQueueController.activeRunContext){ activeRunContext =>
     @if(activeRunContext != null){
         <div class="fullw" style="padding:10px;">
             <div class="fullw bevel2" style="padding:10px;"
@@ -33,7 +33,7 @@
 
 <label>Job Queue</label>
 
-@defining(TestEngineController.jobQueue) { queue =>
+@defining(TestQueueController.jobQueue) { queue =>
 @if(queue.isEmpty){
     <br />
     <span class="title" style="color:#d3d3d3">EMPTY</span>

@@ -3,8 +3,11 @@ package controllers
 import java.util
 
 import builtin.ReportGenerator
+import controllers.LogFeeder
+import controllers.LogFeeder.LogRecord
 import controllers.common.enumeration.TestStatus
-import minderengine.{SignalData, TestEngine, TestProcessWatcher, UserDTO}
+import minderengine._
+import models.Wrapper
 import models._
 import mtdl.{Rivet, TdlCompiler}
 import play.Logger
@@ -13,10 +16,10 @@ import scala.collection.JavaConversions._
 import scala.io.Source
 
 /**
- * This class starts a test in a new actor and
- * provides information to the main actor (status)
- * Created by yerlibilgin on 13/01/15.
- */
+  * This class starts a test in a new actor and
+  * provides information to the main actor (status)
+  * Created by yerlibilgin on 13/01/15.
+  */
 class TestRunContext(val testRun: TestRun) extends Runnable with TestProcessWatcher {
   //prepare a mapping
   val variableWrapperMapping = collection.mutable.Map[String, MappedWrapper]();
@@ -42,21 +45,21 @@ class TestRunContext(val testRun: TestRun) extends Runnable with TestProcessWatc
   var status = TestStatus.PENDING
 
   /**
-   * Number of steps that will be calculated at the beginning for percentage
-   * calculation.
-   */
+    * Number of steps that will be calculated at the beginning for percentage
+    * calculation.
+    */
   var totalSteps = 1 //for divide by zero
 
   /**
-   * Where we are?
-   *
-   * The progress will be calculated as: progress = currentStep * 100 / totalSteps
-   */
+    * Where we are?
+    *
+    * The progress will be calculated as: progress = currentStep * 100 / totalSteps
+    */
   var currentStep = 0;
 
   /**
-   * progress = currentStep * 100 / totalSteps
-   */
+    * progress = currentStep * 100 / totalSteps
+    */
   var progressPercent = 0;
 
   var gitbReplyToUrlAddress = "";
@@ -70,10 +73,11 @@ class TestRunContext(val testRun: TestRun) extends Runnable with TestProcessWatc
 
 
   val rg = new ReportGenerator {
-    override def getCurrentTestUserInfo: UserDTO = {
-      null
-    }
+    override def getCurrentTestUserInfo: UserDTO = null
+
+    override def getSUTIdentifiers: SUTIdentifiers = null
   }
+
   rg.startTest()
   rg.setReportTemplate(Source.fromInputStream(this.getClass.getResourceAsStream("/taReport.xml")).mkString.getBytes())
   rg.setReportAuthor(user.name, user.email);
@@ -86,9 +90,9 @@ class TestRunContext(val testRun: TestRun) extends Runnable with TestProcessWatc
   }
 
   /**
-   * This callback comes from the engine so that we can create our status data structure and later update it.
-   * @param slotDefs
-   */
+    * This callback comes from the engine so that we can create our status data structure and later update it.
+    * @param slotDefs
+    */
   def describe(slotDefs: util.List[Rivet]): Unit = {
     totalSteps = slotDefs.size() * 2; //one rivet call, one rivet finished
   }
@@ -99,8 +103,7 @@ class TestRunContext(val testRun: TestRun) extends Runnable with TestProcessWatc
     if (progressPercent > 100)
       progressPercent = 100
 
-    TestEngineController.queueFeedUpdate()
-    TestEngineController.jobFeedUpdate()
+    TestRunFeeder.testStatusUpdate(progressPercent)
   }
 
   override def rivetFinished(rivetIndex: Int): Unit = {
@@ -130,14 +133,14 @@ class TestRunContext(val testRun: TestRun) extends Runnable with TestProcessWatc
 
   override def addLog(log: String): Unit = {
     logStringBuilder.append(log)
-    TestEngineController.logFeedUpdate(log)
+    LogFeeder.log(LogRecord(testRun, log))
   }
 
 
   override def addReportLog(log: String): Unit = {
     reportLogBuilder.append(log)
     logStringBuilder.append(log)
-    TestEngineController.logFeedUpdate(log)
+    LogFeeder.log(LogRecord(testRun, log))
   }
 
   def updateRun(): Unit = {

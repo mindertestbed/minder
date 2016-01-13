@@ -12,6 +12,8 @@ import play.data.Form;
 import play.mvc.Controller;
 import play.mvc.Result;
 import play.mvc.Security;
+import security.AllowedRoles;
+import security.Role;
 import views.html.job.*;
 
 import java.io.ByteArrayOutputStream;
@@ -26,7 +28,7 @@ public class JobController extends Controller {
   public static final Form<JobEditorModel> JOB_FORM = form(JobEditorModel.class);
 
 
-  @Security.Authenticated(Secured.class)
+  @AllowedRoles({Role.TEST_DESIGNER, Role.TEST_DEVELOPER, Role.TEST_OBSERVER})
   public static Result listTestRuns(Long configurationId) {
     Job rc = Job.findById(configurationId);
     if (rc == null) {
@@ -39,7 +41,7 @@ public class JobController extends Controller {
 
   }
 
-  @Security.Authenticated(Secured.class)
+  @AllowedRoles(Role.TEST_DESIGNER)
   public static Result getCreateJobEditorView(Long tdlId) {
     Tdl tdl = Tdl.findById(tdlId);
     tdl.testCase = TestCase.findById(tdl.testCase.id);
@@ -75,7 +77,7 @@ public class JobController extends Controller {
     return ok(jobEditor.render(JOB_FORM.fill(model)));
   }
 
-  @Security.Authenticated(Secured.class)
+  @AllowedRoles(Role.TEST_DESIGNER)
   private static void initWrapperListForModel(Tdl tdl, JobEditorModel model) {
     model.wrapperMappingList = new ArrayList<>();
 
@@ -91,7 +93,7 @@ public class JobController extends Controller {
     });
   }
 
-  @Security.Authenticated(Secured.class)
+  @AllowedRoles(Role.TEST_DESIGNER)
   public static Result doCreateJob() {
     Form<JobEditorModel> form = JOB_FORM.bindFromRequest();
 
@@ -168,7 +170,7 @@ public class JobController extends Controller {
   }
 
 
-  @Security.Authenticated(Secured.class)
+  @AllowedRoles(Role.TEST_DESIGNER)
   public static Result doDeleteJob(Long id) {
     Job rc = Job.findById(id);
     if (rc == null) {
@@ -193,7 +195,7 @@ public class JobController extends Controller {
     return redirect(routes.TestCaseController.viewTestCase(rc.tdl.testCase.id, "jobs"));
   }
 
-  @Security.Authenticated(Secured.class)
+  @AllowedRoles(Role.TEST_DESIGNER)
   public static Result getEditJobEditorView(Long id) {
     Job job = Job.findById(id);
     if (job == null) {
@@ -221,18 +223,20 @@ public class JobController extends Controller {
     return ok(views.html.job.jobEditor.render(fill));
   }
 
-  @Security.Authenticated(Secured.class)
+  @AllowedRoles({Role.TEST_DESIGNER, Role.TEST_DEVELOPER, Role.TEST_OBSERVER})
   public static Result displayJob(Long id, boolean showHistory) {
     Job rc = Job.findById(id);
 
     final User localUser = Authentication.getLocalUser();
 
     if (rc == null) {
-      return badRequest("A Job with id [" + id
-          + "] was not found");
+      return badRequest("A Job with id [" + id + "] was not found");
     }
 
-    return ok(jobDetailView.render(rc, showHistory, localUser));
+    if (Util.canAccess(localUser, rc.owner, rc.visibility))
+      return ok(views.html.job.jobDetailView.render(rc, showHistory, localUser));
+    else
+      return unauthorized("You can't see this resource");
   }
 
   /**
@@ -242,7 +246,7 @@ public class JobController extends Controller {
    * @param mappedWrapperModel
    * @return
    */
-  @Security.Authenticated(Secured.class)
+  @AllowedRoles(Role.TEST_DESIGNER)
   public static List<WrapperVersion> listFittingWrappers(MappedWrapperModel mappedWrapperModel) {
     // get signatures supported by this wp.
     List<ParamSignature> psList = ParamSignature.getByWrapperParam(mappedWrapperModel.wrapperParam);
@@ -307,7 +311,7 @@ public class JobController extends Controller {
     return listOptions;
   }
 
-  @Security.Authenticated(Secured.class)
+  @AllowedRoles(Role.TEST_DESIGNER)
   public static Result viewTestRunHistory(Long testRunId) {
     TestRun tr = TestRun.findById(testRunId);
     if (tr == null) {
@@ -317,7 +321,7 @@ public class JobController extends Controller {
     }
   }
 
-  @Security.Authenticated(Secured.class)
+  @AllowedRoles(Role.TEST_DESIGNER)
   public static Result viewReport(Long testRunId, String type) {
     TestRun tr = TestRun.findById(testRunId);
     if (tr == null)
@@ -338,7 +342,7 @@ public class JobController extends Controller {
 
 
   @SuppressWarnings({"DEPRECATION"})
-  @Security.Authenticated(Secured.class)
+  @AllowedRoles(Role.TEST_DESIGNER)
   private static byte[] toPdf(byte[] data, TestRun tr) {
     try {
       JasperReport report = JasperCompileManager.compileReport(WrapperController.class.getResourceAsStream("/taReport.jrxml"));

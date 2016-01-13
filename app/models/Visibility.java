@@ -6,11 +6,11 @@ package models;
  */
 public enum Visibility {
   /**
-   * Everyone can see
+   * Everyone registered user can see
    */
   PUBLIC,
   /**
-   * Only registered users can see
+   * Only users of the same role can see
    */
   PROTECTED,
   /**

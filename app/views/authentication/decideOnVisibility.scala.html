@@ -1,0 +1,8 @@
+@(visibility: Visibility, owner: models.User, role: security.Role = null)(content: => Html)
+@defining(Authentication.getLocalUser()) { subject =>
+  @if(global.Util.canAccess(subject, owner, visibility)) {
+    @if(role == null || subject.hasRole(role)) {
+      @content
+    }
+  }
+}
