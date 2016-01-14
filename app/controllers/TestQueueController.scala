@@ -2,19 +2,15 @@ package controllers
 
 import java.util.Date
 import java.util.concurrent.LinkedBlockingQueue
+
+import com.gitb.core.v1.StepStatus
 import controllers.LogFeeder.LogRecord
 import controllers.common.enumeration.OperationType
 import minderengine.{MinderSignalRegistry, SessionMap}
 import models._
 import play.Logger
-import play.api.libs.EventSource
-import play.api.libs.iteratee.{Enumeratee, Concurrent}
 import play.api.mvc._
-import play.mvc.Http
-import views.html.job._
 import rest.controllers.GitbTestbedController
-import com.gitb.core.v1.StepStatus
-import scala.concurrent.ExecutionContext.Implicits.global
 
 /**
   * Manages the job lifecycle.
@@ -46,13 +42,15 @@ object TestQueueController extends Controller {
         var run1: TestRun = null;
         try {
           LogFeeder.log("--> Test Thread waiting on job queue");
-          activeRunContext = TestQueueController.jobQueue.take();
+          jobQueue.synchronized {
+            activeRunContext = TestQueueController.jobQueue.take();
+          }
+          TestRunFeeder.jobQueueUpdate()
           run1 = activeRunContext.testRun
           SessionMap.registerObject(run1.runner.email, "signalRegistry", new MinderSignalRegistry());
 
-          TestRunFeeder.jobQueueUpdate()
           LogFeeder.log("--> Job with id [" + run1.job.id + "] arrived. Start in 5 seconds...");
-          Thread.sleep(5000);
+          Thread.sleep(50000);
           activeRunContext.updateNumber()
           LogFeeder.log("--> Run Job #[" + run1.number + "]")
           activeRunContext.run()

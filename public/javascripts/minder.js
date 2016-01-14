@@ -213,29 +213,6 @@ function showError(data) {
   dialog[0].innerHTML = data;
 }
 
-function showReportDialog(dialogId, id) {
-  var dialog = $("#" + dialogId).dialog({
-    autoOpen: true,
-    title: "Select report type",
-    modal: true,
-    buttons: {
-      "Ok": function () {
-        if ($("#isPdf").is(':checked')) {
-          window.location.href = "/viewReport?testRunId=" + id + "&type=pdf";
-        } else {
-          window.location.href = "/viewReport?testRunId=" + id + "&type=xml";
-        }
-      },
-      Cancel: function () {
-        dialog.dialog("close");
-      }
-    },
-    close: function () {
-    }
-  });
-}
-
-
 function deleteWithDialog2(action, dialog, title, category, item) {
   var deleteUrl;
   var deleteDialog = dialog.dialog({

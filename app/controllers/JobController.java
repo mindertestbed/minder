@@ -181,7 +181,7 @@ public class JobController extends Controller {
 
 
     if (!Util.canAccess(Authentication.getLocalUser(), rc.owner))
-      return badRequest("You don't have permission to modify this resource");
+      return unauthorized("You don't have permission to modify this resource");
 
 
     try {
@@ -317,7 +317,12 @@ public class JobController extends Controller {
     if (tr == null) {
       return badRequest("Test Run with id [" + testRunId + "] not found!");
     } else {
-      return ok(testRunViewer.render(tr, null));
+      final User localUser = Authentication.getLocalUser();
+      if (Util.canAccess(localUser, tr.runner, tr.visibility)) {
+        return ok(testRunViewer.render(tr, null));
+      } else {
+        return unauthorized("You don't have permission to modify this resource");
+      }
     }
   }
 
@@ -326,23 +331,30 @@ public class JobController extends Controller {
     TestRun tr = TestRun.findById(testRunId);
     if (tr == null)
       return badRequest("A test run with id " + testRunId + " was not found");
-    response().setContentType("application/x-download");
-    String fileName = tr.id + ".report";
-    byte[] data = tr.report;
-    if ("pdf".equals(type)) {
-      //
-      fileName += ".pdf";
-      data = toPdf(data, tr);
+
+
+    System.out.println("Type: " + type);
+    final User localUser = Authentication.getLocalUser();
+    if (Util.canAccess(localUser, tr.runner, tr.visibility)) {
+      response().setContentType("application/x-download");
+      String fileName = tr.job.name + "." + tr.number + ".report";
+      byte[] data = tr.report;
+      if ("pdf".equals(type)) {
+        //
+        fileName += ".pdf";
+        data = toPdf(data, tr);
+      } else {
+        fileName += ".xml";
+      }
+      response().setHeader("Content-disposition", "attachment; filename=" + fileName);
+      return ok(data);
     } else {
-      fileName += ".xml";
+      return unauthorized("You don't have permission to modify this resource");
     }
-    response().setHeader("Content-disposition", "attachment; filename=" + fileName);
-    return ok(data);
   }
 
 
   @SuppressWarnings({"DEPRECATION"})
-  @AllowedRoles(Role.TEST_DESIGNER)
   private static byte[] toPdf(byte[] data, TestRun tr) {
     try {
       JasperReport report = JasperCompileManager.compileReport(WrapperController.class.getResourceAsStream("/taReport.jrxml"));

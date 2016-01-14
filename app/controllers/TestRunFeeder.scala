@@ -27,7 +27,7 @@ object TestRunFeeder extends Controller {
       if (id == null) id = -1L
       JsObject(Seq(
         "success" -> JsBoolean(testRun.success),
-        "no" -> JsString(testRun.number+""),
+        "no" -> JsString(testRun.number + ""),
         "id" -> JsString(id + ""),
         "jobId" -> JsString(testRun.job.id + ""),
         "visibility" -> JsString(testRun.visibility.name()),
@@ -38,20 +38,46 @@ object TestRunFeeder extends Controller {
 
   def queueRenderer(user: models.User): Enumeratee[String, String] = Enumeratee.map[String] {
     dummy => {
-      val queue = TestQueueController.jobQueue
+      TestQueueController.jobQueue.synchronized {
+        val queue = TestQueueController.jobQueue
 
-      if (queue.isEmpty)
-        ""
-      else {
-        val sb = new StringBuilder
-        sb.append("[")
-        for (cotx <- queue) {
-          sb.append("{\"id\":\"").append(cotx.testRun.id).append("\",\"name\":\"").append(cotx.testRun.job.name)
-            .append("\"},")
+        if (queue.isEmpty && TestQueueController.activeRunContext == null)
+          ""
+        else {
+          val sb = new StringBuilder
+          sb.append("[")
+
+          //if we have an active run context, send it with an -1 index.
+          if (TestQueueController.activeRunContext != null) {
+            val cotx = TestQueueController.activeRunContext
+            sb.append("{\"jobId\":\"").append(cotx.testRun.job.id).append("\",").
+              append("\"jobName\":\"").append(cotx.testRun.job.name).append("\",").
+              append("\"email\":\"").append(cotx.testRun.runner.email).append("\",").
+              append("\"progress\":\"").append(cotx.progressPercent).append("\",").
+              append("\"index\":\"").append(-1).append("\"").
+              append("}")
+            if (!queue.isEmpty) {
+              sb.append(",")
+            }
+          }
+
+          var index = 0
+          for (cotx <- queue) {
+            sb.append("{\"jobId\":\"").append(cotx.testRun.job.id).append("\",").
+              append("\"jobName\":\"").append(cotx.testRun.job.name).append("\",").
+              append("\"email\":\"").append(cotx.testRun.runner.email).append("\",").
+              append("\"progress\":\"").append(cotx.progressPercent).append("\",").
+              append("\"index\":\"").append(index).append("\"").
+              append("}")
+            if (index != queue.size() - 1)
+              sb.append(",")
+
+            index = index + 1
+          }
+          sb.append("]")
+
+          sb.toString()
         }
-        sb.append("]")
-
-        sb.toString()
       }
     }
   }
@@ -80,6 +106,13 @@ object TestRunFeeder extends Controller {
       val java_ctx = play.core.j.JavaHelpers.createJavaContext(request)
       val java_session = java_ctx.session()
       val user = Authentication.getLocalUser(java_session);
+
+      new Thread() {
+        override def run() {
+          Thread.sleep(1000);
+          jobQueueUpdate()
+        }
+      }.start()
       Ok.chunked(jobQueueOut &> queueRenderer(user) &> EventSource()).as("text/event-stream")
   }
 

@@ -1,0 +1,17 @@
+@(testRun: TestRun, renderPrinter: Boolean = false)
+
+<table ><tr>
+  @if(renderPrinter) {
+    <td style="padding:5px ;"><img src="@routes.Assets.versioned("/images/print-64.png")" height="16px" alt='@testRun.id'/></td>
+    <td style="padding:5px ;">View Report:</td>
+  }
+  <td style="padding:5px;"><a href="/viewReport?testRunId=@testRun.id&type=pdf">
+    <div class="bevel2 celldiv" style="text-align: center ; padding:5px ;">
+      <img src="@routes.Assets.versioned("/images/pdf-2-64.png")" height="16px"/>
+    </div></a></td>
+  <td style="padding:5px;"><a href="/viewReport?testRunId=@testRun.id&type=xml">
+    <div class="bevel2 celldiv" style="text-align: center ; padding:5px ;">
+      <img src="@routes.Assets.versioned("/images/xml-64.png")" height="16px"/>
+    </div>
+  </a></td>
+</tr></table>

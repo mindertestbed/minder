@@ -4,27 +4,14 @@
   Array(("Job Queue", controllers.routes.Application.jobFeed().path()))) {
   <script>
       $ ( function ( ) {
-        var queuefeed = $( "#queuefeed" )[0];
         var statusfeed = $( "#statusfeed" )[0];
         var logfeed = $( "#logfeed" )[0];
         var logpre = $("#logpre")
         var logdiv = $("#logdiv")
 
-        new EventSource ( '@controllers.routes.TestRunFeeder.jobQueueFeed()' ).onmessage = function ( event ) {
-          //var json = JSON.parse ( event.data )
-          //for (indx in json) {
-          //    k = json[indx];
-          //    resolved.append ( k.jobId + " " + k.jobName + " " + k.startedBy + " " + k.progress + " " + k.status + "<br />" )
-          //}
-          queuefeed.innerHTML = event.data
-          console.log("Que " + event.data)
-        }
-
         new EventSource ( '@controllers.routes.TestRunFeeder.testStatusFeed()' ).onmessage = function ( event ) {
           statusfeed.innerHTML = event.data
-          console.log("Sta " + event.data)
         }
-
 
         new EventSource ( '@controllers.routes.LogFeeder.logFeed()' ).onmessage = function ( event ) {
           var newd  = event.data
@@ -39,7 +26,7 @@
     <tr>
       <td style="width:25% ; vertical-align:text-top ; padding:10px ;" rowspan="2">
         <div id="queuefeed">
-        @jobQueueList()
+        @jobQueueFeed()
         </div>
 
         <div id="historyfeed">

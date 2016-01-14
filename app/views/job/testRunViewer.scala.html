@@ -3,8 +3,6 @@
 
 @main(Messages("minder.navigation.restricted.testdesigner"), "User History View") {
     @dialogs()
-    @reportTypeDialog()
-
     <div  class="fullh">
     <table style="width:100%;" class="fullh" class="shaded">
     <tr>
@@ -49,10 +47,10 @@
                   <th>User</th><td>@testRun.runner.email</td>
               </tr>
               <tr>
-                  <th>Date</th><td>@testRun.date</td>
+                  <th>Visibility</th><td>@util.renderVisibilityTag(testRun.visibility) @testRun.visibility</td>
               </tr>
               <tr>
-                  <th>Operation Type</th><td>@testRun.history.operationType.name</td>
+                  <th>Date</th><td>@testRun.date</td>
               </tr>
           </table>
       </td>
