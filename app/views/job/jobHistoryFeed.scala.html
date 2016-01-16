@@ -11,7 +11,7 @@
         '</td><td style="text-align:center ;" class="tabshrink">#$testRunNumber</td>'+
         '<td class="tabexpandNoBorder">'+
         '<span class="$visibilityClass" title="$visibility" style="color:$visibilityColor;">&nbsp; </span> &nbsp;'+
-        '<a href="/viewJob?id=$jobId&showHistory=true">$jobName</a></td>'+
+        '<a href="/viewTestRunHistory?testRunId=$testRunId">$jobName</a></td>'+
         '<td align="center" valign="middle" class="tabshrink">'+
         '<a href="/viewTestRunHistory?testRunId=$testRunId" title="View Log" class="celldiv" style="height:16px ; width:16px ;">'+
         '<img src="@routes.Assets.versioned("/images/console-64.png")" height="12px"/>'+
@@ -80,8 +80,8 @@
                   <td style="text-align:center ;" class="tabshrink">#@testRun.number</td>
                   <td class="tabexpandNoBorder">@if(testRun.job != null) {
                     @visibilityTagFragment(testRun.visibility, testRun.runner)
-                    <a href="/viewJob?id=@{
-                      testRun.job.id
+                    <a href="/viewTestRunHistory?testRunId=@{
+                      testRun.id
                     }&showHistory=true">
                     @testRun.job.name</a>
 
