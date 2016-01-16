@@ -131,8 +131,10 @@ object TestEngine {
 
       //call start test on all adapters and populate the SUT names
       identifierMinderClientMap.values().foreach(pair => {
+        lgr.info("Call start test on " + pair.adapterIdentifier.getName)
         pair.minderClient.startTest(startTestObject)
 
+        lgr.info("Obtain SUT Identifiers from " + pair.adapterIdentifier.getName)
         val sutIdentifiers = pair.minderClient.getSUTIdentifiers;
 
         if (sutIdentifiers != null){
