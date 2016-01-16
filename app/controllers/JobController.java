@@ -314,7 +314,7 @@ public class JobController extends Controller {
     return listOptions;
   }
 
-  @AllowedRoles(Role.TEST_DESIGNER)
+  @AllowedRoles({Role.TEST_DESIGNER, Role.TEST_DEVELOPER, Role.TEST_OBSERVER})
   public static Result viewTestRunHistory(Long testRunId) {
     TestRun tr = TestRun.findById(testRunId);
     if (tr == null) {
@@ -329,7 +329,7 @@ public class JobController extends Controller {
     }
   }
 
-  @AllowedRoles(Role.TEST_DESIGNER)
+  @AllowedRoles({Role.TEST_DESIGNER, Role.TEST_DEVELOPER, Role.TEST_OBSERVER})
   public static Result viewReport(Long testRunId, String type) {
     TestRun tr = TestRun.findById(testRunId);
     if (tr == null)
