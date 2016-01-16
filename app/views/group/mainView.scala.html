@@ -1,4 +1,4 @@
-@(tg: TestGroup, display: String)
+@(tg: TestGroup, display: String="assertions")
 
 @import java.util.concurrent.atomic.AtomicInteger
 @import global.Util._
@@ -69,8 +69,8 @@
     </script>
 
     @ajaxDisplaySelector(display,
-      "details" ->("Details", "showDetails"),
       "assertions" ->("Test Assertions", "showAssertions"),
+      "details" ->("Details", "showDetails"),
       // "suites" -> ("Test Suites", "showSuites"),
       "assets" ->("Test Assets", "showAssets"),
       "utils" ->("Utility Classes", "showUtils"),

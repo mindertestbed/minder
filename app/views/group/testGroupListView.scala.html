@@ -22,7 +22,7 @@
       }
       @for( tg <- TestGroup.findAll()) {
         <tr>
-          <td>@index.getAndIncrement()</td> <td><a href="/getGroupDetailView?id=@tg.id&display=details">@tg.name</a></td> <td>@tg.shortDescription</td>
+          <td>@index.getAndIncrement()</td> <td><a href="/getGroupDetailView?id=@tg.id&display=assertions">@tg.name</a></td> <td>@tg.shortDescription</td>
           <td>@tg.owner.name @tg.owner.email</td>
           @subjectIs(tg.owner) {<td style="border:1px solid white; background-color: white;">
 

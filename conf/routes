@@ -29,7 +29,7 @@ GET         /getCreateGroupEditorView                   controllers.GroupControl
 POST        /doCreateTestGroup                          controllers.GroupController.doCreateTestGroup
 GET         /editGroupForm                              controllers.GroupController.editGroupForm(id: Long)
 GET         /doDeleteGroup                              controllers.GroupController.doDeleteGroup(id: Long)
-GET         /getGroupDetailView                         controllers.GroupController.getGroupDetailView(id: Long, display : String ?= "details")
+GET         /getGroupDetailView                         controllers.GroupController.getGroupDetailView(id: Long, display : String ?= "assertions")
 POST        /doEditGroupField                           controllers.GroupController.doEditGroupField()
 GET         /renderDetails                              controllers.GroupController.renderDetails(id: Long)
 GET         /renderTestAssertionList                    controllers.GroupController.renderTestAssertionList(id: Long)
@@ -43,7 +43,7 @@ GET         /renderDependencies                         controllers.GroupControl
 GET         /getCreateAssertionEditorView               controllers.TestAssertionController.getCreateAssertionEditorView(groupId: Long)
 POST        /doCreateAssertion                          controllers.TestAssertionController.doCreateAssertion
 GET         /doDeleteAssertion                          controllers.TestAssertionController.doDeleteAssertion(id: Long)
-GET         /getAssertionDetailView                     controllers.TestAssertionController.getAssertionDetailView(id: Long, display : String ?= "details")
+GET         /getAssertionDetailView                     controllers.TestAssertionController.getAssertionDetailView(id: Long, display : String ?= "cases")
 POST        /doEditAssertionField                       controllers.TestAssertionController.doEditAssertionField()
 POST        /renderDetails                              controllers.TestAssertionController.renderDetails(id: Long)
 POST        /renderTestCases                            controllers.TestAssertionController.renderTestCases(id: Long)

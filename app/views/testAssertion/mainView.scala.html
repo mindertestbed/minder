@@ -1,4 +1,4 @@
-@(ta: TestAssertion, display: String)
+@(ta: TestAssertion, display: String="cases")
 
 @import java.util.concurrent.atomic.AtomicInteger
 @import global.Util._
@@ -35,8 +35,9 @@
     </script>
 
     @ajaxDisplaySelector(display,
-      "details" ->("Details", "showDetails"),
-      "cases" ->("Test Cases", "showTestCases"))
+      "cases" ->("Test Cases", "showTestCases"),
+      "details" ->("Details", "showDetails")
+    )
 
     <div id="assertionSubItems">
 
