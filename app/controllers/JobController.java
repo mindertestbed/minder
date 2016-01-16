@@ -1,6 +1,9 @@
 package controllers;
 
 import com.avaje.ebean.Ebean;
+import com.fasterxml.jackson.databind.JsonNode;
+import controllers.common.enumeration.Utils;
+import editormodels.AssertionEditorModel;
 import editormodels.JobEditorModel;
 import global.Util;
 import models.*;
@@ -319,7 +322,7 @@ public class JobController extends Controller {
     } else {
       final User localUser = Authentication.getLocalUser();
       if (Util.canAccess(localUser, tr.runner, tr.visibility)) {
-        return ok(testRunViewer.render(tr, null));
+        return ok(testRunDetailView.render(tr, null));
       } else {
         return unauthorized("You don't have permission to modify this resource");
       }
@@ -420,4 +423,46 @@ public class JobController extends Controller {
       return "Invalid".getBytes();
     }
   }
+
+  @AllowedRoles(Role.TEST_DESIGNER)
+  public static Result changeTestRunVisibility(long id, String visibility) {
+    TestRun tr = TestRun.findById(id);
+    if (tr == null)
+      return badRequest("A test run with id " + id + " was not found");
+
+    System.out.println(visibility);
+    final User localUser = Authentication.getLocalUser();
+    if (Util.canAccess(localUser, tr.runner, tr.visibility)) {
+      tr.visibility = Visibility.valueOf(visibility);
+      tr.save();
+      return ok(visibilityTagFragment.render(tr.visibility, tr.runner, true, true));
+    } else {
+      return unauthorized("You don't have permission to modify this resource");
+    }
+  }
+
+  @AllowedRoles(Role.TEST_DESIGNER)
+  public static Result changeJobVisibility(long id, String visibility) {
+    Job job = Job.findById(id);
+    if (job == null)
+      return badRequest("A job with id " + id + " was not found");
+
+    System.out.println(visibility);
+    final User localUser = Authentication.getLocalUser();
+    if (Util.canAccess(localUser, job.owner, job.visibility)) {
+      job.visibility = Visibility.valueOf(visibility);
+      job.save();
+      return ok(visibilityTagFragment.render(job.visibility, job.owner, true, true));
+    } else {
+      return unauthorized("You don't have permission to modify this resource");
+    }
+  }
+
+  @AllowedRoles(Role.TEST_DESIGNER)
+  public static Result doEditJobField() {
+    JsonNode jsonNode = request().body().asJson();
+
+    return Utils.doEditField(JobEditorModel.class, Job.class, jsonNode, Authentication.getLocalUser());
+  }
+
 }

@@ -1,5 +1,4 @@
-@(visibility: Visibility)
-
+@(visibility: Visibility, owner: User, renderName: Boolean = false, renderEditLink: Boolean = false)
 <span
   @visibility match {
     case Visibility.PUBLIC => {
@@ -24,4 +23,14 @@
       #7cd8ff
     }
   }"
->&nbsp; </span> &nbsp;
+  >&nbsp; </span> &nbsp;
+
+@if(renderName) {
+  @visibility
+}
+
+@authentication.subjectIs(owner) {
+  @if(renderEditLink) {
+    <a href="#" style="text-decoration: none" onclick='changeTestRunVisibility()' class="fa-edit"></a>
+  }
+}

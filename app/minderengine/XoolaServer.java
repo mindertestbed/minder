@@ -45,12 +45,6 @@ public class XoolaServer{
         properties.load(this.getClass().getResourceAsStream("/application.conf"));
         properties.setProperty(XoolaProperty.MODE, XoolaTierMode.SERVER);
 
-        try {
-          PropertyConfigurator.configure(this.getClass().getResource("/logging.properties"));
-        } catch (Throwable ex) {
-          System.err.println("WARN " + ex.getMessage());
-        }
-
         ServerRegistry.classLoader = Play.classloader(Play.current());
         server = Xoola.init(properties);
         System.out.println(properties.getProperty("PORT"));
@@ -60,7 +54,7 @@ public class XoolaServer{
 
         server.addConnectionListener(new XoolaConnectionListener() {
           @Override
-          public void connected(XoolaInvocationHandler xoolaInvocationHandler, XoolaChannelState xoolaChannelState) {
+          public synchronized void connected(XoolaInvocationHandler xoolaInvocationHandler, XoolaChannelState xoolaChannelState) {
             System.out.println("CLIENT: " + xoolaChannelState.remoteId + " connected");
             MinderWrapperRegistry.get().setWrapperAvailable(xoolaChannelState.remoteId, true);
           }

@@ -13,47 +13,96 @@
 
 @defining(Authentication.getLocalUser(session())) { localUser =>
   <table class="shaded datatable topcell">
-    <tr><th>Adapter Name</th><th>Creator</th><th>Short Description</th></tr>
+    <tr><th>Adapter Name</th><th>Creator</th><th>Short Description</th><th>Version</th><th>Status</th></tr>
     @for( currentWrapper <- Wrapper.getAll()) {
-      <tr>
-        <td>@currentWrapper.name</td>
-        <td>@currentWrapper.user.email</td>
-        <td style="max-width: 200px ;">@currentWrapper.shortDescription</td>
-        @subjectIs(currentWrapper.user) {
-        <td style="width:3% ;" align="center" valign="middle" >
+      @defining(WrapperVersion.getAllByWrapper(currentWrapper)) { versionList =>
+        @if(versionList == null || versionList.isEmpty) {
+          <tr>
+            <td>@currentWrapper.name</td>
+            <td>@currentWrapper.user.email</td>
+            <td style="max-width: 200px ;">@currentWrapper.shortDescription</td>
+            <td>NA</td><td style="text-align: center"><img src="@routes.Assets.versioned("/images/Pc_Offline.png")"/></td>
+            @subjectIs(currentWrapper.user) {
+              <td style="width:3% ;" align="center" valign="middle" >
 
-          <table><tr><td style="border:none">
-            <div id="editWrapper@currentWrapper.id" title="Edit" class="celldiv bevel2" style="padding:5px">
-              <img src="@routes.Assets.versioned("/images/edit_property-64.png")" height="16px" alt='@localUser.id'/>
-              <script>
-                  createFormDialog($("#editWrapper@currentWrapper.id"),
-                      "/editWrapperForm?id=@currentWrapper.id",
-                      "/doEditWrapper", "mainDialog", "Edit Adapter", $("#WrapperListDiv@localUser.id").parent())
-              </script>
-            </div>
-              &nbsp;&nbsp;
+                <table><tr><td style="border:none">
+                  <div id="editWrapper@currentWrapper.id" title="Edit" class="celldiv bevel2" style="padding:5px">
+                    <img src="@routes.Assets.versioned("/images/edit_property-64.png")" height="16px" alt='@localUser.id'/>
+                    <script>
+                        createFormDialog($("#editWrapper@currentWrapper.id"),
+                            "/editWrapperForm?id=@currentWrapper.id",
+                            "/doEditWrapper", "mainDialog", "Edit Adapter", $("#WrapperListDiv@localUser.id").parent())
+                    </script>
+                  </div>
+                    &nbsp;&nbsp;
 
-          </td><td style="border:none">
-            <div id="deleteWrapper@currentWrapper.id" title="Delete" class="celldiv bevel2" style="padding:5px ;">
-              <img src="@routes.Assets.versioned("/images/trash2-64.png")" height="16px" alt='@localUser.id'/>
-              <script>
-                  var elm = $("#deleteWrapper@currentWrapper.id");
-                  deleteWithDialog(elm, "/doDeleteWrapper?id=@currentWrapper.id", $("#dialog-confirm"),
-                      "Delete Adapter", "wrapper", "@currentWrapper.name", $("#WrapperListDiv@localUser.id").parent())
-              </script>
-            </div>
-          </td></tr></table>
-        </td>
+                </td><td style="border:none">
+                  <div id="deleteWrapper@currentWrapper.id" title="Delete" class="celldiv bevel2" style="padding:5px ;">
+                    <img src="@routes.Assets.versioned("/images/trash2-64.png")" height="16px" alt='@localUser.id'/>
+                    <script>
+                        var elm = $("#deleteWrapper@currentWrapper.id");
+                        deleteWithDialog(elm, "/doDeleteWrapper?id=@currentWrapper.id", $("#dialog-confirm"),
+                            "Delete Adapter", "wrapper", "@currentWrapper.name", $("#WrapperListDiv@localUser.id").parent())
+                    </script>
+                  </div>
+                </td></tr></table>
+              </td>
+            }
+          </tr>
+        } else {
+          @for( wrapperVersion <- versionList) {
+            <tr>
+              <td>@currentWrapper.name</td>
+              <td>@currentWrapper.user.email</td>
+              <td style="max-width: 200px ;">@currentWrapper.shortDescription</td>
+              <td>@wrapperVersion.version</td><td style="text-align: center">
+
+              @if(MinderWrapperRegistry.get().isWrapperAvailable(wrapperVersion)) {
+                <img src="@routes.Assets.versioned("/images/Pc_Online.png")"/>
+              }else{
+                <img src="@routes.Assets.versioned("/images/Pc_Offline.png")"/>
+              }
+
+            </td>
+              @subjectIs(currentWrapper.user) {
+                <td style="width:3% ;" align="center" valign="middle" >
+
+                  <table><tr><td style="border:none">
+                    <div id="editWrapper@currentWrapper.id" title="Edit" class="celldiv bevel2" style="padding:5px">
+                      <img src="@routes.Assets.versioned("/images/edit_property-64.png")" height="16px" alt='@localUser.id'/>
+                      <script>
+                          createFormDialog($("#editWrapper@currentWrapper.id"),
+                              "/editWrapperForm?id=@currentWrapper.id",
+                              "/doEditWrapper", "mainDialog", "Edit Adapter", $("#WrapperListDiv@localUser.id").parent())
+                      </script>
+                    </div>
+                      &nbsp;&nbsp;
+
+                  </td><td style="border:none">
+                    <div id="deleteWrapper@currentWrapper.id" title="Delete" class="celldiv bevel2" style="padding:5px ;">
+                      <img src="@routes.Assets.versioned("/images/trash2-64.png")" height="16px" alt='@localUser.id'/>
+                      <script>
+                          var elm = $("#deleteWrapper@currentWrapper.id");
+                          deleteWithDialog(elm, "/doDeleteWrapper?id=@currentWrapper.id", $("#dialog-confirm"),
+                              "Delete Adapter", "wrapper", "@currentWrapper.name", $("#WrapperListDiv@localUser.id").parent())
+                      </script>
+                    </div>
+                  </td></tr></table>
+                </td>
+              }
+            </tr>
+          }
         }
-      </tr>
+      }
     }
     </table>
 
   <script>
       createFormDialog($("#createWr"),
           "/createNewWrapperForm" ,
-          "/doCreateWrapper", "mainDialog", "Create Wrapper", $("#WrapperListDiv@localUser.id").parent())
+          "/doCreateWrapper", "mainDialog", "Create Wrapper", $("#wrapperLister"))
 
 
   </script>
 }
+@import minderengine.MinderWrapperRegistry

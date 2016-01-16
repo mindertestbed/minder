@@ -376,6 +376,8 @@ object TestEngine {
 
 
   private def initializeFunctionsAndParameters(params: String, lgr: org.apache.log4j.Logger): Unit = {
+    lgr.debug("Parameters")
+    lgr.debug(params)
     minderTDL.debug = (any: Any) => {
       lgr.debug(any)
     }

@@ -50,7 +50,6 @@ public class Utils extends Controller{
                 query.setParameter("id", id);
                 Object o = query.findUnique();
                 User user = (User) fld.get(o);
-                System.out.println("UNique " + user.email);
 
 
                 if (localUser == null || !localUser.email.equals(user.email)) {

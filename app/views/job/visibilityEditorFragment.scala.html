@@ -1,0 +1,46 @@
+@(jsFunction: String, id: Long, visibility: Visibility, targetTag: String)
+<div id="visibilityQuestion" style="display: none ; width:500px ; height:400px ;">
+  <span style="color:#1C005A">Select Visibility Level:</span>
+  <select id="visibilitySel" name="visibility" >
+    @for( vis <- Visibility.values()) {
+      @if(vis == visibility) {
+        <option selected="selected" value="@vis">@vis</option>
+      } else {
+        <option value="@vis">@vis</option>
+      }
+    }
+  </select>
+</div>
+<script>
+    function changeTestRunVisibility(){
+      var dialog = $("#visibilityQuestion").dialog({
+        autoOpen: false,
+        title: 'Change Visibility',
+        modal: true,
+        width: 550,
+        height: 400,
+        buttons: {
+          "Ok": function () {
+            var theUrl = @{jsFunction}(@{id}, $('#visibilitySel').val())
+            $.ajax({
+              type: 'GET',
+              url: theUrl.url,
+              success: function (data) {
+                dialog.dialog("close");
+                $("#@{targetTag}").html(data)
+              },
+              error: function (jqXHR, textStatus, errorMessage) {
+                showError(jqXHR.responseText)
+                dialog.dialog("close");
+              }
+            });
+          },
+          Cancel: function () {
+            dialog.dialog("close");
+          }
+        }
+      });
+
+      dialog.dialog("open");
+    }
+</script>

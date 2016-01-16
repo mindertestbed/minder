@@ -14,7 +14,7 @@ import scala.collection.JavaConversions._
 
 object TestRunFeeder extends Controller {
   val (jobQueueOut, jobQueueChannel) = Concurrent.broadcast[String];
-  val (testStatusOut, testStatusChannel) = Concurrent.broadcast[String];
+  val (testStatusOut, testProgressChannel) = Concurrent.broadcast[String];
   val (jobHistoryOut, jobHistoryChannel) = Concurrent.broadcast[TestRun];
 
   def historyFilter(user: models.User) = Enumeratee.filter[TestRun] {
@@ -122,7 +122,7 @@ object TestRunFeeder extends Controller {
     * running job.
     * @return
     */
-  def testStatusFeed() = Action {
+  def testProgressFeed() = Action {
     Ok.chunked(testStatusOut &> EventSource()).as("text/event-stream")
   }
 
@@ -135,7 +135,7 @@ object TestRunFeeder extends Controller {
     jobQueueChannel.push("")
   }
 
-  def testStatusUpdate(progress: Int): Unit = {
-    testStatusChannel.push(progress + "");
+  def testProgressUpdate(progress: Int): Unit = {
+    testProgressChannel.push(progress + "");
   }
 }

@@ -14,7 +14,8 @@
     @dialogs()
     <script>
         $ ( function ( ) {
-          new EventSource ( '/wrapperStatusFeed?id=@job.id' ).onmessage = function ( event ) {
+          new EventSource ( '@controllers.routes.AdapterStatusFeeder.adapterJobStatusFeed(job.id)'
+          ).onmessage = function ( event ) {
             var kk = JSON.parse ( event.data )
             if ( kk.online == true ) {
               $ ( "span.onStatus" + kk.id ).show ( )
@@ -26,9 +27,18 @@
           }
         });
     </script>
-    <h3>Job <span class="hl">@{
-      job.name
-    }</span></h3>
+
+
+    <h3 style="display:table-cell">Job
+      <div id="name@{
+        job.id
+      }"
+        @subjectIs(job.owner) {
+          onclick='showUpdateInputTextDialog(@job.id, "name", $(this).next(), "/doEditJobField")'
+        }
+      class="hl editable"></div>
+      <input type="hidden" value="@job.name"/>
+    </h3>
 
     <table style="width:100% ;"><tr><td style="vertical-align:text-top ; padding:10px ;" >
       <div class="indent">
@@ -67,9 +77,7 @@
               </td>
             </tr>
             <tr><th>Visibility:</th>
-              <td>@util.renderVisibilityTag(job.visibility)
-              @job.visibility
-              </td>
+              <td id="visibilityTd">@visibilityTagFragment(job.visibility, job.owner, true, true)</td>
             </tr>
           </table>
         </td><td>
@@ -93,10 +101,16 @@
           </table>
         </td>
           <td>
-            <h4>Parameters</h4>
-            <pre>@{
-              job.mtdlParameters
-            }</pre>
+            <h4 style="display:table-cell">Parameters</h4>
+            <div id="params@{
+              job.id
+            }"
+              @subjectIs(job.owner) {
+                onclick='showUpdateTextAreaDialog(@job.id, "mtdlParameters", $(this).next(), "@controllers.routes.JobController.doEditJobField()")'
+              }
+            class="hl editable"></div>
+            <input type="hidden" value="@job.mtdlParameters"/>
+
           </td>
         </tr></table>
         <hr/>
@@ -109,7 +123,7 @@
               <img src='@routes.Assets.versioned("/images/running-64.png")' height='16px'/>
             </button>
           }
-          <button type="button" onclick='window.location="@controllers.routes.Application.jobFeed()"'>
+          <button type="button" onclick='window.location="@controllers.routes.Application.jobQueue()"'>
             Show Running Jobs <img src="@routes.Assets.versioned("/images/rules-64.png")" height="16px"/>
           </button></td></tr>
         </table>
@@ -179,5 +193,17 @@
           dialog.dialog("open");
 
         }
+    </script>
+
+
+    @subjectIs(job.owner) {
+      @visibilityEditorFragment("jsRoutes.controllers.JobController.changeJobVisibility", job.id, job.visibility, "visibilityTd")
+    }
+
+    <script>
+        $(function(){
+          bindValues($("#name@{job.id}"))
+          bindValues($("#params@{job.id}"))
+        })
     </script>
   }

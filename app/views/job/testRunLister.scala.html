@@ -7,7 +7,7 @@
   <div>
     <table class="shaded fullw">
       <tr>
-        <th>#</th> <th>Status</th> <th>Date</th> <th>Visibility</th> <th>Run by</th> <th>Log</th> <th>Report</th>
+        <th>#</th> <th>Status</th> <th>Date</th> <th>Visibility</th> <th>Run by</th> <th>Details</th> <th>Report</th>
       </tr>
       @defining(TestRun.findByJob(configurationId)) { testRunList =>
         @for( testRun <- testRunList) {
@@ -24,12 +24,12 @@
               }
               </td>
               <td style="text-align:left ;" class="tabshrink">@testRun.date</td>
-              <td style="text-align:center ; font-size:20px ;" class="tabshrink">@util.renderVisibilityTag(testRun.visibility)</td>
+              <td style="text-align:center ; font-size:20px ;" class="tabshrink">@visibilityTagFragment(testRun.visibility, testRun.runner)</td>
               <td style="text-align:left ;" class="tabexpand">@testRun.runner.email</td>
               <td align="center" valign="middle" class="tabshrink">
-                <a href="/viewTestRunHistory?testRunId=@testRun.id" title="View Log" class="celldiv bevel2" style="height:26px ; width:26px ;">
-                  <img src="@routes.Assets.versioned("/images/console-64.png")" height="16px"/>
-                </a>
+                <a  href="/viewTestRunHistory?testRunId=@testRun.id" ><div class="bevel2 celldiv" style="text-align: center ; padding:5px ;" title="Details">
+                <img src="@routes.Assets.versioned("/images/Details-50.png")" height="24px" alt='G'/>
+                </div></a>
               </td>
               <td align="center" class="tabshrink">
               @reportMenu(testRun)

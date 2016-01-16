@@ -58,8 +58,7 @@ function createFormDialog(elm, sourceUrl, action, dialogId, titl, target, w, h) 
               url: frm.attr('action'),
               data: frm.serialize(),
               success: function (data) {
-                target[0].innerHTML = data;
-                executeScripts(target);
+                target.html(data);
                 dialog.dialog("close");
               },
               error: function (jqXHR, textStatus, errorMessage) {
@@ -319,18 +318,18 @@ function ajaxRouteGet(playAjaxObject, params, successTarget, failTarget) {
 
   playAjaxObject.apply(null, params).ajax()
     .done(
-    function (data) {
-      successFunctionDelegate(data)
-    })
+      function (data) {
+        successFunctionDelegate(data)
+      })
     .fail(
-    function (data) {
-      if (typeof failTarget === 'undefined' || failTarget === null) {
-        showError(data.responseText)
-      } else {
-        failTarget(data.responseText);
+      function (data) {
+        if (typeof failTarget === 'undefined' || failTarget === null) {
+          showError(data.responseText)
+        } else {
+          failTarget(data.responseText);
+        }
       }
-    }
-  )
+    )
 }
 
 
@@ -368,7 +367,7 @@ function decorateAsClosable(target, title, close) {
   target.addClass('bevel2')
   target.append('<div class="paddedContentPane"></div>');
   target.contentPane = target.children().last();
-  target.repaint = function(data){
+  target.repaint = function (data) {
     target.contentPane.html(data)
   };
   target[0].closeFunction = close;
@@ -419,4 +418,72 @@ function spin(target) {
   }
 
   target.spinner = new Spinner(opts).spin(target);
+}
+
+
+function ajaxCancelJob(index, name) {
+
+  var dlgSel = $("#canceldiv")
+  dlgSel.html('The job with [' + name + '] will be removed from the queue. <br />Do you want to continue?')
+
+  var dialog = dlgSel.dialog({
+    autoOpen: false,
+    title: 'Remove Job From the Queue',
+    modal: true,
+    buttons: {
+      "Ok": function () {
+        $.ajax({
+          type: 'GET',
+          url: '/cancelJob?index=' + index,
+          success: function (data) {
+            dialog.dialog("close");
+          },
+          error: function (jqXHR, textStatus, errorMessage) {
+            showError(jqXHR.responseText)
+            dialog.dialog("close");
+          }
+        });
+      },
+      Cancel: function () {
+        dialog.dialog("close");
+      }
+    }
+  });
+
+  dialog.dialog("open");
+
+}
+
+function ajaxCancelActiveJob(name) {
+  var dlgSel = $("#canceldiv")
+  dlgSel.html('The job [' + name +
+    '] is running. <br /> It might be waiting for manual interaction. <br />' +
+    'Are you still sure that you want to cancel it?');
+
+  var dialog = dlgSel.dialog({
+    autoOpen: false,
+    title: 'Cancel Active Job',
+    modal: true,
+    buttons: {
+      "Ok": function () {
+        $.ajax({
+          type: 'GET',
+          url: '/cancelActiveJob',
+          success: function (data) {
+            dialog.dialog("close");
+          },
+          error: function (jqXHR, textStatus, errorMessage) {
+            showError(jqXHR.responseText)
+            dialog.dialog("close");
+          }
+        });
+      },
+      Cancel: function () {
+        dialog.dialog("close");
+      }
+    }
+  });
+
+  dialog.dialog("open");
+
 }
