@@ -47,13 +47,13 @@ public class Application extends Controller {
   }
 
   @AllowedRoles({Role.TEST_DESIGNER, Role.TEST_OBSERVER})
-  public static Result jobFeed() {
+  public static Result jobQueue() {
     final User localUser = Authentication.getLocalUser();
 
     if (!session().containsKey("testPageMode")) {
       session().put("testPageMode", "none");
     }
-    return ok(views.html.job.jobFeed.render());
+    return ok(views.html.job.jobQueue.render());
   }
 
   @AllowedRoles({Role.TEST_DEVELOPER, Role.TEST_DESIGNER, Role.TEST_OBSERVER})
@@ -82,6 +82,8 @@ public class Application extends Controller {
             routes.javascript.TestAssertionController.renderTestCases(),
             routes.javascript.TestCaseController.renderJobs(),
             routes.javascript.TestCaseController.renderCode(),
+            routes.javascript.JobController.changeTestRunVisibility(),
+            routes.javascript.JobController.changeJobVisibility(),
             routes.javascript.TestQueueController.enqueueJob()
         ))
         .as("text/javascript");

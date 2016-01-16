@@ -83,7 +83,7 @@ function updateBr(value, target) {
   var newd = newd.replace(/>/g, '&lt;')
   var newd = newd.split(/\n/g).join("<br/>");
   var newd = newd.replace(/ /g, '&nbsp;')
-  target[0].innerHTML = newd;
+  target.html(newd);
 }
 
 function bindValues(elem) {
@@ -97,7 +97,7 @@ function bindValues(elem) {
 
 function smartUpdate(selnext, elem) {
   var slnv = selnext.val()
-  if (slnv == null || slnv.length == 0) elem[0].innerHTML = '<i style="color:gray;">No Content. Click To Add</i>'
+  if (slnv == null || slnv.length == 0) elem.html('<i style="color:gray;">No Content. Click To Add</i>')
   else
     updateBr(slnv, elem)
 }

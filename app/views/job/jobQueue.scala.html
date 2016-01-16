@@ -1,0 +1,36 @@
+@import authentication._
+
+@main("Job Queue", "jobQueue",
+  Array(("Job Queue", controllers.routes.Application.jobQueue().path()))) {
+  <script>
+      $ ( function ( ) {
+        var logfeed = $( "#logfeed" )[0];
+        var logpre = $("#logpre")
+        var logdiv = $("#logdiv")
+
+        new EventSource ( '@controllers.routes.LogFeeder.logFeed()' ).onmessage = function ( event ) {
+          var newd  = event.data
+          logpre[0].textContent += "\n" + newd;
+          logdiv.scrollTop(logdiv.prop("scrollHeight"));
+          console.log("Log " + event.data)
+        }
+      });
+  </script>
+
+  <div style="position: absolute ; top:4px ; left:4px ; bottom:4px ; right:4px ; padding: 4px ;">
+    <div style="position: absolute ; top:4px ; left:4px ; bottom:4px ; width:30% ; padding: 4px ; overflow:auto ;">
+      @jobQueueFeed()
+      <hr/>
+      @jobHistoryFeed()
+    </div>
+    <div style="position: absolute ; top:4px ; left:31% ; bottom:4px ; right:4px ; padding: 4px ;">
+      <label>Log</label>
+      <pre id="logpre" style="height:calc(100% - 2em) ; border:1px solid gray ; border-radius:2px ; overflow:scroll"></pre>
+      <script>
+          var log = "";
+          @for(logRecord <- LogFeeder.currentLog){@if(logRecord.testRun != null){@decideOnVisibility(logRecord.testRun.visibility, logRecord.testRun.runner){log += '@{Html(logRecord.log)}\n';}}else{log += '@{Html(logRecord.log)}\n';}}
+          $('#logpre').text(log)
+      </script>
+    </div>
+  </div>
+}

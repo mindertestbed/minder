@@ -6,7 +6,7 @@
 GET         /                                           controllers.Application.testGroups()
 GET         /root                                       controllers.Application.root(display: String ?= "users")
 GET         /listTestGroups                             controllers.Application.testGroups()
-GET         /jobFeed                                    controllers.Application.jobFeed()
+GET         /jobQueue                                   controllers.Application.jobQueue()
 GET         /adapters                                   controllers.Application.adapters()
 GET         /assets/javascript/routes.js                controllers.Application.jsRoutes
 GET         /profile                                    controllers.Application.profile
@@ -67,6 +67,9 @@ GET         /getEditJobEditorView                       controllers.JobControlle
 GET         /viewJob                                    controllers.JobController.displayJob(id: Long, showHistory: Boolean)
 GET         /doDeleteJob                                controllers.JobController.doDeleteJob(id: Long)
 GET         /viewTestRunHistory                         controllers.JobController.viewTestRunHistory(testRunId: Long)
+GET         /changeTestRunVisibility                    controllers.JobController.changeTestRunVisibility(id: Long, visibility : String)
+GET         /changeJobVisibility                        controllers.JobController.changeJobVisibility(id: Long, visibility : String)
+POST        /doEditJobField                             controllers.JobController.doEditJobField()
 
 
 #test asset management
@@ -94,9 +97,10 @@ GET         /editWrapperForm                            controllers.WrapperContr
 POST        /doEditWrapper                              controllers.WrapperController.doEditWrapper
 
 #SSE Test
-GET         /wrapperStatusFeed                          controllers.AdapterStatusFeeder.wrapperStatusFeed(id: Long)
+GET         /adapterJobStatusFeed                       controllers.AdapterStatusFeeder.adapterJobStatusFeed(jobId: Long)
+GET         /adapterStatusFeed                          controllers.AdapterStatusFeeder.adapterStatusFeed(id: Long)
 GET         /jobQueueFeed                               controllers.TestRunFeeder.jobQueueFeed
-GET         /testStatusFeed                              controllers.TestRunFeeder.testStatusFeed
+GET         /testProgressFeed                           controllers.TestRunFeeder.testProgressFeed
 GET         /historyFeed                                controllers.TestRunFeeder.jobHistoryFeed
 GET         /logFeed                                    controllers.LogFeeder.logFeed
 GET         /cancelJob                                  controllers.TestQueueController.cancelJob(index: Int)

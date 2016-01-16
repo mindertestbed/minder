@@ -103,7 +103,7 @@ class TestRunContext(val testRun: TestRun) extends Runnable with TestProcessWatc
     if (progressPercent > 100)
       progressPercent = 100
 
-    TestRunFeeder.testStatusUpdate(progressPercent)
+    TestRunFeeder.testProgressUpdate(progressPercent)
   }
 
   override def rivetFinished(rivetIndex: Int): Unit = {

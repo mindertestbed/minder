@@ -21,15 +21,8 @@ bin
 tdlsrc
 tdlcls
 *.iml
-
 *.orig
-assets
+/assets
 release
-dependencies
-domibus-debug/domibus.jar
-domibus-debug/domibus.war
-eskiKodlar.7z
-domibus-debug
-*.iml
+/dependencies
 *.7z
-*.iml

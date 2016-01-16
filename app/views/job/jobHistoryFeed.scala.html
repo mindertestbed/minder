@@ -79,7 +79,7 @@
                   </td>
                   <td style="text-align:center ;" class="tabshrink">#@testRun.number</td>
                   <td class="tabexpandNoBorder">@if(testRun.job != null) {
-                    @util.renderVisibilityTag(testRun.visibility)
+                    @visibilityTagFragment(testRun.visibility, testRun.runner)
                     <a href="/viewJob?id=@{
                       testRun.job.id
                     }&showHistory=true">

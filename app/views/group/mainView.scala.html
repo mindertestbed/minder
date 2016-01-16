@@ -11,39 +11,43 @@
   Array(("Test Groups", controllers.routes.Application.testGroups().path()),
     (tg.name, controllers.routes.GroupController.getGroupDetailView(tg.id, "details").path()))) {
 
-    @dialogs()
+  @dialogs()
 
-    <h3 style="display:table-cell">Test Group
-        <div id="name@{tg.id}"
-        @subjectIs(tg.owner) {
-          onclick='showUpdateInputTextDialog(@tg.id, "name", $(this).next(), "/doEditGroupField")'
-        }
-          class="hl editable"></div>
-        <input type="hidden" value="@tg.name"/>
-        </h3>
+  <h3 style="display:table-cell">Test Group
+    <div id="name@{
+      tg.id
+    }"
+      @subjectIs(tg.owner) {
+        onclick='showUpdateInputTextDialog(@tg.id, "name", $(this).next(), "/doEditGroupField")'
+      }
+    class="hl editable"></div>
+    <input type="hidden" value="@tg.name"/>
+  </h3>
 
-    <div class="indent">
+  <div class="indent">
 
-      <h4>Owner</h4>
-      <p>
-        @tg.owner.name @tg.owner.email
-      </p>
+    <h4>Owner</h4>
+    <p>
+      @tg.owner.name @tg.owner.email
+    </p>
 
-      <h4>Short Description</h4>
-      <div id="shortDescription@{tg.id}"
-        @subjectIs(tg.owner) {
-          onclick='showUpdateInputTextDialog(@tg.id, "shortDescription", $(this).next(), "/doEditGroupField")'
-        } class="editable"></div>
-      <input type="hidden" value="@tg.shortDescription"/>
+    <h4>Short Description</h4>
+    <div id="shortDescription@{
+      tg.id
+    }"
+      @subjectIs(tg.owner) {
+        onclick='showUpdateInputTextDialog(@tg.id, "shortDescription", $(this).next(), "/doEditGroupField")'
+      } class="editable"></div>
+    <input type="hidden" value="@tg.shortDescription"/>
 
-      <script>
+    <script>
         $(function(){
-            bindValues($("#name@{tg.id}"))
-            bindValues($("#shortDescription@{tg.id}"))
+          bindValues($("#name@{tg.id}"))
+          bindValues($("#shortDescription@{tg.id}"))
         })
-        </script>
+    </script>
 
-      <script>
+    <script>
         function showDetails(){
           ajaxRouteGet(jsRoutes.controllers.GroupController.renderDetails, @tg.id, $("#groupSubItems"))
         }
@@ -62,20 +66,20 @@
         function showDependencies(){
           ajaxRouteGet(jsRoutes.controllers.GroupController.renderDependencies, @tg.id, $("#groupSubItems"))
         }
-      </script>
+    </script>
 
-      @ajaxDisplaySelector(display,
-        "details" -> ("Details", "showDetails"),
-        "assertions" -> ("Test Assertions", "showAssertions"),
-       // "suites" -> ("Test Suites", "showSuites"),
-        "assets" -> ( "Test Assets", "showAssets"),
-        "utils" -> ( "Utility Classes", "showUtils"),
-        "deps" -> ( "Dependencies", "showDependencies"))
+    @ajaxDisplaySelector(display,
+      "details" ->("Details", "showDetails"),
+      "assertions" ->("Test Assertions", "showAssertions"),
+      // "suites" -> ("Test Suites", "showSuites"),
+      "assets" ->("Test Assets", "showAssets"),
+      "utils" ->("Utility Classes", "showUtils"),
+      "deps" ->("Dependencies", "showDependencies"))
 
-      <br />
-      <div id="groupSubItems">
+    <br />
+    <div id="groupSubItems">
 
-      </div>
     </div>
+  </div>
 
 }

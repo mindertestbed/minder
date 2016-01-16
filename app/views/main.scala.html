@@ -31,7 +31,7 @@
           <ul class="nav navbar-nav">
             <li class="@("active".when(nav == "testGroups"))"><a href="@routes.Application.testGroups()">
               Test Groups</a></li>
-            <li class="@("active".when(nav == "jobFeed"))"><a href="@routes.Application.jobFeed()">Job Queue</a></li>
+            <li class="@("active".when(nav == "jobQueue"))"><a href="@routes.Application.jobQueue()">Job Queue</a></li>
             <li class="@("active".when(nav == "adapters"))"><a href="@routes.Application.adapters()">Adapters</a></li>
 
             @defining(Authentication.getLocalUser()) { user =>
@@ -69,7 +69,7 @@
 
     @drawNavigation(currentPath)
 
-    <div style="position: absolute ; top:80px ; left:0px ; right:0px ; bottom:0px ; overflow:auto ; padding: 10px ;">
+    <div style="position: absolute ; top:80px ; left:0px ; right:0px ; bottom:5px ; overflow:auto ; padding: 10px ;">
       @if(flash.contains(Authentication.FLASH_ERROR_KEY)) {
         <div class="alert alert-danger" role="alert">
           <button type="button" class="close" data-dismiss="alert"><span aria-hidden="true">&times;</span><span class="sr-only">

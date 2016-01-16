@@ -44,20 +44,21 @@ object TestQueueController extends Controller {
           LogFeeder.log("--> Test Thread waiting on job queue");
           jobQueue.synchronized {
             activeRunContext = TestQueueController.jobQueue.take();
+            activeRunContext.updateNumber()
           }
           TestRunFeeder.jobQueueUpdate()
           run1 = activeRunContext.testRun
           SessionMap.registerObject(run1.runner.email, "signalRegistry", new MinderSignalRegistry());
 
           LogFeeder.log("--> Job with id [" + run1.job.id + "] arrived. Start in 5 seconds...");
-          Thread.sleep(50000);
-          activeRunContext.updateNumber()
+          Thread.sleep(5000);
           LogFeeder.log("--> Run Job #[" + run1.number + "]")
           activeRunContext.run()
         } catch {
           case inter: InterruptedException => {
             //someone interrupted me.
             //check the exit flag and go back.
+            activeRunContext.failed("Job Cancelled", inter)
             LogFeeder.log(LogRecord(run1, "<-- Job Interrupted"))
           }
           case t: Throwable => {
