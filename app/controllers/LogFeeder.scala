@@ -81,11 +81,9 @@ object LogFeeder extends Controller {
       if (logRecord.testRun != null) {
         if (global.Util.canAccess(localUser, logRecord.testRun.runner, logRecord.testRun.visibility)) {
           stringBuilder append logRecord.log
-          stringBuilder append "\n"
         }
       } else {
         stringBuilder append logRecord.log
-        stringBuilder append "\n"
       }
     }
     stringBuilder toString
