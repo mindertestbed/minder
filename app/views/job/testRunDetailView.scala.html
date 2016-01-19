@@ -1,14 +1,20 @@
 @(testRun: TestRun, localUser: models.User = null)
 @import views.html.util._
 
-@main(Messages("minder.navigation.restricted.testdesigner"), "User History View") {
+@main(Messages("minder.navigation.restricted.testdesigner"), "User History View",
+  Array(("Test Groups", controllers.routes.Application.testGroups().path()),
+    (testRun.job.tdl.testCase.testAssertion.testGroup.name, controllers.routes.GroupController.getGroupDetailView(testRun.job.tdl.testCase.testAssertion.testGroup.id, "assertions").path()),
+    (testRun.job.tdl.testCase.testAssertion.taId, controllers.routes.TestAssertionController.getAssertionDetailView(testRun.job.tdl.testCase.testAssertion.id, "cases").path()),
+    (testRun.job.tdl.testCase.name, controllers.routes.TestCaseController.viewTestCase(testRun.job.tdl.testCase.id, "jobs").path()),
+    (testRun.job.name, controllers.routes.JobController.displayJob(testRun.job.id, true).path()),
+    ("Test Run Details", "")
+  )
+) {
   @dialogs()
 
   <div style="position:absolute ; top:0 ; left:0 ; bottom:5px ; right:0 ; padding:5px ;">
-    <div style="position:absolute ; top:0 ; left:0 ; height:39px ; right:0 ;">
+    <div style="position:absolute ; top:2px ; left:0 ; bottom:5px ; width:300px ;">
       <h4>Test Run Details</h4>
-    </div>
-    <div style="position:absolute ; top:40px ; left:0 ; bottom:0 ; width:300px ;">
       <table class="shaded">
         @if(testRun.job != null) {
           <tr>
@@ -71,11 +77,11 @@
         </tr>
       </table>
     </div>
-    <div style="position:absolute ; top:40px ; left:305px ; bottom:0 ; right:0 ; padding: 5px ;">
-      <label>Log</label>
-      <div class="tipitip" style="height:100% ; border:1px solid gray ; border-radius:2px ; overflow: scroll ;">
-        <pre>@testRun.history.extractSystemOutputLog()</pre>
-      </div>
+    <div style="position:absolute ; top:2px ; left:300px ; bottom:4px ; right:0 ; padding: 5px ;">
+      <h4>Log</h4>
+      <textarea readonly="readonly" id="logpre"
+      style="background-color:#faffe1 ; resize: none; font-family:monospace; height:calc(100% - 1em) ; width:100%; border:1px solid #ddeee6 ; border-radius:2px ; overflow:scroll">@testRun.history.extractSystemOutputLog()</textarea>
+
     </div>
   </div>
 

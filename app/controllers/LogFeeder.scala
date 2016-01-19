@@ -3,7 +3,7 @@ package controllers
 import java.util
 import java.util.Collections
 
-import models.TestRun
+import models.{User, TestRun}
 import play.Logger
 import play.api.libs.EventSource
 import play.api.libs.concurrent.Execution.Implicits._
@@ -12,15 +12,15 @@ import play.api.mvc._
 import scala.collection.JavaConversions._
 
 object LogFeeder extends Controller {
-
   val (logOut, logChannel) = Concurrent.broadcast[LogRecord];
 
-  val currentLog =  Collections.synchronizedList(new util.ArrayList[LogRecord]())
+  val currentLog = Collections.synchronizedList(new util.ArrayList[LogRecord]())
 
   def clear() = currentLog.clear()
 
   /**
     * This filter makes sure that only the people allowed will see the log record
+    *
     * @param user
     * @return
     */
@@ -35,6 +35,7 @@ object LogFeeder extends Controller {
 
   /**
     * This filter renders the log
+    *
     * @return
     */
   def logRenderer(): Enumeratee[LogRecord, String] = Enumeratee.map[LogRecord] {
@@ -44,6 +45,7 @@ object LogFeeder extends Controller {
   /**
     * An action that provides information about the current
     * running job.
+    *
     * @return
     */
   def logFeed() = Action {
@@ -66,6 +68,27 @@ object LogFeeder extends Controller {
     Logger.debug(log)
     currentLog.add(logRecord)
     logChannel.push(logRecord)
+  }
+
+  /**
+    * Renders the current log with respect to the user access
+    *
+    * @return
+    */
+  def currentLogString(localUser: User): String = {
+    val stringBuilder = new StringBuilder
+    for (logRecord <- currentLog) {
+      if (logRecord.testRun != null) {
+        if (global.Util.canAccess(localUser, logRecord.testRun.runner, logRecord.testRun.visibility)) {
+          stringBuilder append logRecord.log
+          stringBuilder append "\n"
+        }
+      } else {
+        stringBuilder append logRecord.log
+        stringBuilder append "\n"
+      }
+    }
+    stringBuilder toString
   }
 
   case class LogRecord(testRun: TestRun, log: String) {

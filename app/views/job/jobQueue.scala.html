@@ -24,13 +24,9 @@
       @jobHistoryFeed()
     </div>
     <div style="position: absolute ; top:4px ; left:31% ; bottom:4px ; right:4px ; padding: 4px ;">
-      <label>Log</label>
-      <pre id="logpre" style="height:calc(100% - 2em) ; border:1px solid gray ; border-radius:2px ; overflow:scroll"></pre>
-      <script>
-          var log = "";
-          @for(logRecord <- LogFeeder.currentLog){@if(logRecord.testRun != null){@decideOnVisibility(logRecord.testRun.visibility, logRecord.testRun.runner){log += '@{Html(logRecord.log)}\n';}}else{log += '@{Html(logRecord.log)}\n';}}
-          $('#logpre').text(log)
-      </script>
+      <h4>Log</h4>
+      <textarea readonly="readonly" id="logpre"
+      style="background-color:#faffe1 ; resize: none; font-family:monospace; height:calc(100% - 2em) ; width:100%; border:1px solid #ddeee6 ; border-radius:2px ; overflow:scroll">@LogFeeder.currentLogString(Authentication.getLocalUser)</textarea>
     </div>
   </div>
 }
