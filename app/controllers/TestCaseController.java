@@ -170,25 +170,27 @@ public class TestCaseController extends Controller {
           return badRequest(testCaseEditor.render(filledForm, true));
         }
         tdl.update();
-        return redirect(routes.TestCaseController.viewTestCase(tc.id, "mtdl"));
+        return redirect(routes.TestCaseController.viewTestCase(tc.id, "code"));
       } else {
 
-        Tdl newTdl = new Tdl();
-        newTdl.creationDate = new Date();
-        newTdl.version = model.version;
-        newTdl.testCase = tc;
-        newTdl.tdl = model.tdl;
-        newTdl.save();
-
         try {
+          Ebean.beginTransaction();
+          Tdl newTdl = new Tdl();
+          newTdl.creationDate = new Date();
+          newTdl.version = model.version;
+          newTdl.testCase = tc;
+          newTdl.tdl = model.tdl;
+          newTdl.save();
           detectAndSaveParameters(newTdl);
+          Ebean.commitTransaction();
         } catch (Exception ex) {
           filledForm.reject(ex.getMessage());
           return badRequest(testCaseEditor.render(filledForm, true));
+        } finally {
+          Ebean.endTransaction();
         }
 
-
-        return redirect(routes.TestCaseController.viewTestCase(tc.id, "mtdl"));
+        return redirect(routes.TestCaseController.viewTestCase(tc.id, "code"));
       }
     }
   }

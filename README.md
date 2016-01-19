@@ -1,2 +1,2 @@
 # minder
-Minder Conformance and Interoperability Tetstbed
+the core minder testbed services and test engine
