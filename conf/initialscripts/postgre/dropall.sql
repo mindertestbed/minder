@@ -1,6 +1,11 @@
+
+drop table if exists abstract_job cascade;
+
 drop table if exists dbrole cascade;
 
-drop table if exists Job cascade;
+drop table if exists GitbEndpoint cascade;
+
+drop table if exists GitbParameter cascade;
 
 drop table if exists MappedWrapper cascade;
 
@@ -24,9 +29,11 @@ drop table if exists TestGroup cascade;
 
 drop table if exists TestRun cascade;
 
-drop table if exists TokenAction cascade;
+drop table if exists TestSuite cascade;
 
 drop table if exists Users cascade;
+
+drop table if exists UserAuthentication cascade;
 
 drop table if exists UserHistory cascade;
 
