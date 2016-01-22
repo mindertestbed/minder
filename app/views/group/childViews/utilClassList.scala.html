@@ -25,13 +25,15 @@
             <td><a href="/viewUtilClass?id=@tc.id">@tc.name</a></td>
             <td>@tc.shortDescription</td>
             <td>@tc.owner.email</td>
-            @subjectIs(tc.owner){
+            @subjectIsOr(tc.owner){
             <td style="border:1px solid white;background-color:white;">
               <div title="Delete" class="bevel2 celldiv" style="height:30px ; width:30px ; cursor:hand ;"
               onclick='deleteWithDialog2("/doDeleteUtilClass?id=@tc.id", $("#dialog-confirm"), "Delete Utility Class", "util class", "@tc.name")'>
                 <img src="@routes.Assets.versioned("/images/trash2-64.png")" height="16px" alt='@tc.id'/>
               </div>
             </td>
+            } {
+              <td style="background-color:transparent ; border:1px solid white ;">&nbsp;</td>
             }
           </tr>
         }

@@ -621,7 +621,6 @@ li.breadactive {
     font-weight: bold;
 }
 
-
 select {
     /* styling */
     background-color: white;
@@ -658,4 +657,8 @@ select:focus {
 select:-moz-focusring {
     color: transparent;
     text-shadow: 0 0 0 #000;
+}
+
+a {
+    text-decoration: none;
 }

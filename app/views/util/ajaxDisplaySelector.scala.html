@@ -12,7 +12,7 @@
         *@
         <td id="@{displayKey}Td" class='tabshrink'>
           <h4>
-            <a onclick='tabClickHandler(event, @{targetFunction}, $("#@{displayKey}Td"))' href="#">@label</a>
+            <a onclick='tabClickHandler(@{targetFunction}, $("#@{displayKey}Td"), event)' href="#">@label</a>
           </h4>
         </td>
       }
@@ -21,9 +21,14 @@
   </table>
 
   <script>
-    function tabClickHandler(event, targetFunction, target){
-      event.stopImmediatePropagation();
-      event.preventDefault();
+    function tabClickHandler(targetFunction, target, event){
+      if (event !== undefined){
+        event.stopImmediatePropagation();
+        event.preventDefault();
+      } else {
+        var vnt = $(window.event);
+        vnt.stop();
+      }
       deactivateAll()
       target.removeClass("passivetab");
       target.addClass("activetab");
@@ -49,14 +54,14 @@
             var targetFunction = @{jsFunctionName}
             var displayKeyName = "@{displayKey}"
             var jsSelector = "#" + displayKeyName + "Td"
-            tabClickHandler(event, targetFunction, $(jsSelector));
+            tabClickHandler(targetFunction, $(jsSelector));
           }
         }
       } else {
         var targetFunction = @{pairs.head._2}
         var displayKeyName = "@{pairs.head._1}"
         var jsSelector = "#" + displayKeyName + "Td"
-        tabClickHandler(event, targetFunction, $(jsSelector));
+        tabClickHandler(targetFunction, $(jsSelector));
       }
     })
   </script>
