@@ -37,6 +37,7 @@ public class UtilClassController extends Controller {
       Form<UtilClassEditorModel> bind = UTIL_CLASS_FORM
           .fill(utilClassEditorModel);
       return ok(utilClassEditor.render(bind, false));
+
     }
   }
 
@@ -48,6 +49,7 @@ public class UtilClassController extends Controller {
     if (filledForm.hasErrors()) {
       Util.printFormErrors(filledForm);
       return badRequest(utilClassEditor.render(filledForm, false));
+
     } else {
 
       UtilClassEditorModel model = filledForm.get();
@@ -60,12 +62,14 @@ public class UtilClassController extends Controller {
         filledForm.reject("A util class with name [" + utilClass.name
             + "] already exists");
         return badRequest(utilClassEditor.render(filledForm, false));
+
       }
 
       TestGroup tg = TestGroup.findById(model.groupId);
       if (tg == null) {
         filledForm.reject("No test group found with id [" + tg.id + "]");
         return badRequest(utilClassEditor.render(filledForm, false));
+
       }
 
       final User localUser = Authentication.getLocalUser();
@@ -82,6 +86,7 @@ public class UtilClassController extends Controller {
         filledForm.reject("Compilation Failed [" + ex.getMessage() + "]");
         Logger.error(ex.getMessage(), ex);
         return badRequest(utilClassEditor.render(filledForm, false));
+
       }
 
       utilClass = UtilClass.findByGroupIdAndName(model.groupId, utilClass.name);
@@ -107,6 +112,7 @@ public class UtilClassController extends Controller {
 
       Form<UtilClassEditorModel> bind = UTIL_CLASS_FORM.fill(ucModel);
       return ok(utilClassEditor.render(bind, true));
+
     }
   }
 
@@ -118,6 +124,7 @@ public class UtilClassController extends Controller {
     if (filledForm.hasErrors()) {
       Util.printFormErrors(filledForm);
       return badRequest(utilClassEditor.render(filledForm, true));
+
     } else {
       UtilClassEditorModel model = filledForm.get();
 
@@ -126,6 +133,7 @@ public class UtilClassController extends Controller {
         filledForm.reject("A util class with ID [" + model.id
             + "] does not exist");
         return badRequest(utilClassEditor.render(filledForm, true));
+
       }
 
       uc.name = model.name;
@@ -143,6 +151,7 @@ public class UtilClassController extends Controller {
           Logger.error(ex.getMessage(), ex);
           filledForm.reject(ex.getMessage());
           return badRequest(utilClassEditor.render(filledForm, true));
+
         }
         Logger.info("Test Util Class " + uc.id + ":" + uc.name
             + " was updated");
@@ -151,6 +160,7 @@ public class UtilClassController extends Controller {
         filledForm.reject("The Name [" + model.name
             + "] is used by another test case");
         return badRequest(utilClassEditor.render(filledForm, true));
+
       }
 
     }
@@ -181,6 +191,7 @@ public class UtilClassController extends Controller {
       return badRequest("No util class id " + id + ".");
     }
     return ok(utilClassView.render(uc));
+
   }
 
   @Security.Authenticated(Secured.class)
