@@ -1,13 +1,10 @@
-@(href: String, title: String)
-      <a href="@href">
-      <div class="title styledtitleinverse hand create bevel2" style="margin:0;display:table-cell;border: none;" align="center">
-      <table><tr>
-            <td style="height:23px;vertical-align:top; text-align:right;">
-              +
-            </td>
-            <td style="height:23px;">
-            @title
-            </td>
-          </tr>
-        </table>
-  </div></a>
+@(title: String, cssIconClass: String, cssClass: String)(onClick : Html = null)
+<button type="button" class="btn @cssClass"
+@if(onClick!=null) {
+  onClick='@onClick'
+}
+style="padding-left: 15px;padding-right: 15px;">
+<span class="glyphicon @cssIconClass"></span>
+@title
+</button>
+

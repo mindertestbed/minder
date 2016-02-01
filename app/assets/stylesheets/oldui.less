@@ -1,0 +1,112 @@
+@minderGreen: #aed2b4;
+@minderBlue: #337ab7;
+
+
+a {
+  text-decoration: none;
+}
+.navbar-inverse .navbar-nav > li > a {
+  color: #fff
+}
+
+.navbar-inverse .navbar-nav > .active > a, .navbar-inverse .navbar-nav > .active > a:focus, .navbar-inverse .navbar-nav > .active > a:hover {
+  color: #fff;
+  background-color: @minderBlue;
+}
+
+.navbar-inverse {
+  background-color: shade(@minderBlue, 40%);
+  border-bottom: none;
+}
+
+h3 {
+  color: shade(@minderBlue, 40%);
+}
+
+h4 {
+  color: shade(@minderBlue, 20%);
+}
+
+.inline {
+  display: inline;
+}
+
+.editable {
+  border: 1px solid transparent;
+  border-radius: 2px;
+  padding: 3px;
+  display: inline-block;
+  color: #222222
+}
+
+.editable:hover {
+  border: 1px solid #ccc;
+  border-radius: 2px;
+}
+
+.zeropad{
+  padding: 0px;
+}
+
+.lightMinderBlue{
+  background-color: tint(@minderBlue, 98%);
+}
+
+.fullw{
+  width:100%;
+}
+.fullh{
+  height:100%;
+}
+
+.breadcrumb{
+  background-color: whitesmoke;//shade(@minderBlue, 30%);
+  margin: 0px;
+  border-radius: 0px;
+  box-shadow: inset -1px 0px 4px rgba(0, 0, 0, 0.4), rgba(255, 255, 255, 0.1) 0 0px 0;
+  font-size: smaller;
+  padding-top: 3px;
+  padding-bottom: 3px;
+}
+
+.panel-heading{
+  padding: 3px;
+}
+
+select {
+  /* styling */
+  background-color: white;
+  border-radius: 4px;
+  display: inline-block;
+  font: inherit;
+  line-height: 1.3em;
+  padding: 3px 10px 3px 5px;
+
+  /* reset */
+
+  margin: 0;
+  -webkit-box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  box-sizing: border-box;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+
+  background-image: url("/assets/images/Expand Arrow-50.png");
+  background-position: calc(100% - 7px) 7px;
+  background-size: 10px 10px;
+  background-repeat: no-repeat;
+  outline: 0;
+}
+
+select:focus {
+  background-image: url("/assets/images/Collapse Arrow-50.png");
+  background-position: calc(100% - 7px) 7px;
+  background-size: 10px 10px;
+  background-repeat: no-repeat;
+  outline: 0;
+}
+
+select:-moz-focusring {
+  color: transparent;
+  text-shadow: 0 0 0 #000;
+}

@@ -15,8 +15,6 @@
           '</td> </tr> </table> </div> </div>'
 
       var queueItemTemplate =
-          '<table class="fullw"><tr><td>'+
-          '<div class="fullw" style="padding:5px ; padding-left:10px ; padding-right:10px ;">'+
           '<div class="fullw bevel2" style="padding:10px ;" title="$jobId $jobName $email">'+
           '<a href="/viewJob?id=$jobId&showHistory=true" title="View Job">'+
           '<span class="title">$jobName</span></a>'+
@@ -26,7 +24,7 @@
           '</div></td> <td style="width:20px ; vertical-align:text-top ;">'+
           '&nbsp; <span title="Cancel $jobName" style="cursor:hand" onclick=ajaxCancelJob("$index", "$jobName")>'+
           '<img src="@routes.Assets.versioned("/images/Delete-icon.png")" height="12px"/></span>'+
-          '</td> </tr> </table> </div> </div> </td> </tr> </table><br />'
+          '</td> </tr> </table> </div>'
 
       var activeJobDiv = $("#activeJobDiv")
       var sleepingDiv = $("#sleepingDiv")
@@ -77,45 +75,38 @@
 
           queueDiv.html(toRep)
         }
-
         progressDiv = $("#progressDiv")
       }
-
-
 
       var statusfeed = $( "#statusfeed" )[0];
 
       new EventSource ( '@controllers.routes.TestRunFeeder.testProgressFeed()' ).onmessage = function ( event ) {
         progressDiv.css('width', event.data + "%")
-        //console.log(progressDiv.html())
       }
     });
 </script>
 <div id="canceldiv" style="display:none">
 
 </div>
-<table class="fullw">
-  <tr>
-    <td id="queuefeed" style="vertical-align:text-top ;">
-      <div id="activeJobDiv" style="display: none">
+
+<td id="queuefeed" style="vertical-align:text-top ;">
+  <div class="panel  panel-info">
+    <div class="panel-heading">Job Queue
+    </div>
+
+    <div id="activeJobDiv" style="display: none">
 
       </div>
-
+    <div class="panel-body" id="queueDiv">
       <div id="sleepingDiv" style="display: none ;">
         <div style="overflow: hidden ; height:50px ;"><img style="position: relative ; top:0" src="@routes.Assets.versioned("/images/sleeping.png")"
         alt="http://www.cliparthut.com/clip-arts/481/people-sleeping-clip-art-481711.jpeg" height="70" width="250">
         </div>
       </div>
-
-      <div>
-        <label>Job Queue</label>
-        <div id="queueDiv">
-          Empty
-        </div>
-      </div>
-    </td>
-  </tr>
-</table>
+      <div id="queueDiv"></div>
+    </div>
+  </div>
+</td>
 
 
 

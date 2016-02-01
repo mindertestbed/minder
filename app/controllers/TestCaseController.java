@@ -323,29 +323,4 @@ public class TestCaseController extends Controller {
       }
     }
   }
-
-  public static Result renderJobs(long id, long tdlId) {
-    TestCase tc = TestCase.findById(id);
-    Tdl tdl = Tdl.findById(tdlId);
-    if (tc == null) {
-      return badRequest("No test case with id " + id + ".");
-    }
-    if (tdl == null) {
-      return badRequest("No tdl with id " + id + ".");
-    }
-    return ok(testCaseJobList.render(tc, tdl));
-  }
-
-
-  public static Result renderCode(long id, long tdlId) {
-    TestCase tc = TestCase.findById(id);
-    Tdl tdl = Tdl.findById(tdlId);
-    if (tc == null) {
-      return badRequest("No test case with id " + id + ".");
-    }
-    if (tdl == null) {
-      return badRequest("No tdl with id " + id + ".");
-    }
-    return ok(testCaseCodeDisplay.render(tc, tdl));
-  }
 }

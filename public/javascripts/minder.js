@@ -96,124 +96,66 @@ function createFormDialog(elm, sourceUrl, action, dialogId, titl, target, w, h) 
 }
 
 
-function createMultipartFormDialog(elm, sourceUrl, action, dialogId, titl, target, w, h) {
+function createMultipartFormDialog(sourceUrl, action, dialogId, titl, target, w, h) {
   if (typeof(w) === 'undefined') w = '50%';
   if (typeof(h) === 'undefined') h = '500';
 
   //
   var frm = $("#" + dialogId + " > form");
-  elm.on('click', function (event) {
-    event.stopPropagation();
-    var dialog = $("#" + dialogId).dialog({
-      autoOpen: false,
-      height: h,
-      width: w,
-      title: titl,
-      modal: true,
-      buttons: {
-        "Ok": function () {
-          var processedData = new FormData(frm[0]);
-          frm.html("<div align='center'><i>Sending Data...</i></div>")
-          $.ajax({
-            type: frm.attr('method'),
-            url: frm.attr('action'),
-            data: processedData,
-            contentType: false,
-            processData: false,
-            success: function (data) {
-              target.html(data);
-              dialog.dialog("close");
-            },
-            error: function (jqXHR, textStatus, errorMessage) {
-              frm.html(jqXHR.responseText);
-              frm[0].reset();
-            }
-          });
-        },
-        Cancel: function () {
-          dialog.dialog("close");
-        }
-      },
-      close: function () {
-        frm[0].reset();
-      }
-    });
-
-    frm[0].setAttribute('action', action);
-    frm[0].setAttribute('enctype', 'multipart/form-data')
-    $.ajax({
-      type: 'GET',
-      url: sourceUrl,
-      success: function (data) {
-        frm[0].innerHTML = data;
-        executeScripts(frm);
-      },
-      error: function (jqXHR, textStatus, errorMessage) {
-        frm[0].innerHTML = jqXHR.responseText;
-      }
-    });
-    frm[0].innerHTML = "<div align='center'><i>Loading...</i></div>"
-    dialog.dialog("open", titl);
-  });
-}
-
-function deleteWithDialog(elm, action, dialog, title, category, item, target) {
-  var deleteUrl;
-
-  //select all deletegroup divs and register delete event on them.
-  elm.on('click', function () {
-    var deleteDialog = dialog.dialog({
-      resizable: false,
-      height: 200,
-      width: "50%",
-      title: title,
-      autoOpen: false,
-      modal: true,
-      buttons: {
-        "Delete": function () {
-          $.ajax({
-            type: 'GET',
-            url: action,
-            success: function (data) {
-              target.html(data);
-            },
-            error: function (jqXHR, textStatus, errorMessage) {
-              showError(jqXHR.responseText);
-            }
-          });
-
-          $(this).dialog("close");
-        },
-        Cancel: function () {
-          $(this).dialog("close");
-        }
-      }
-    });
-
-    dialog.find("span.itemtype")[0].innerHTML = category;
-    dialog.find("span.itemname")[0].innerHTML = item;
-    deleteDialog.dialog("open");
-  });
-}
-
-function showError(data) {
-  var dialog = $("#errorDialog").dialog({
-    resizable: false,
-    height: "600",
-    width: "800",
-    autoOpen: true,
+  event.stopPropagation();
+  var dialog = $("#" + dialogId).dialog({
+    autoOpen: false,
+    height: h,
+    width: w,
+    title: titl,
     modal: true,
     buttons: {
-      'Ok': function () {
-        $(this).dialog("close");
+      "Ok": function () {
+        var processedData = new FormData(frm[0]);
+        frm.html("<div align='center'><i>Sending Data...</i></div>")
+        $.ajax({
+          type: frm.attr('method'),
+          url: frm.attr('action'),
+          data: processedData,
+          contentType: false,
+          processData: false,
+          success: function (data) {
+            target.html(data);
+            dialog.dialog("close");
+          },
+          error: function (jqXHR, textStatus, errorMessage) {
+            frm.html(jqXHR.responseText);
+            frm[0].reset();
+          }
+        });
+      },
+      Cancel: function () {
+        dialog.dialog("close");
       }
+    },
+    close: function () {
+      frm[0].reset();
     }
   });
-  dialog[0].innerHTML = data;
+
+  frm[0].setAttribute('action', action);
+  frm[0].setAttribute('enctype', 'multipart/form-data')
+  $.ajax({
+    type: 'GET',
+    url: sourceUrl,
+    success: function (data) {
+      frm[0].innerHTML = data;
+      executeScripts(frm);
+    },
+    error: function (jqXHR, textStatus, errorMessage) {
+      frm[0].innerHTML = jqXHR.responseText;
+    }
+  });
+  frm[0].innerHTML = "<div align='center'><i>Loading...</i></div>"
+  dialog.dialog("open", titl);
 }
 
-function deleteWithDialog2(action, dialog, title, category, item) {
-  var deleteUrl;
+function deleteWithDialog(action, dialog, title, category, item, target) {
   var deleteDialog = dialog.dialog({
     resizable: false,
     height: 200,
@@ -227,7 +169,11 @@ function deleteWithDialog2(action, dialog, title, category, item) {
           type: 'GET',
           url: action,
           success: function (data) {
-            location.reload()
+            if (target !== undefined) {
+              target.html(data);
+            } else {
+              location.reload()
+            }
           },
           error: function (jqXHR, textStatus, errorMessage) {
             showError(jqXHR.responseText);
@@ -247,6 +193,21 @@ function deleteWithDialog2(action, dialog, title, category, item) {
   deleteDialog.dialog("open");
 }
 
+function showError(data) {
+  var dialog = $("#errorDialog").dialog({
+    resizable: false,
+    height: "600",
+    width: "800",
+    autoOpen: true,
+    modal: true,
+    buttons: {
+      'Ok': function () {
+        $(this).dialog("close");
+      }
+    }
+  });
+  dialog[0].innerHTML = data;
+}
 
 function simpleAjaxGet(dialogId, url, title, message) {
   var dlgSel = $("#" + dialogId)

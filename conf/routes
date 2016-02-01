@@ -57,8 +57,6 @@ GET         /doDeleteCase                               controllers.TestCaseCont
 GET         /viewTestCase                               controllers.TestCaseController.viewTestCase(id: Long, display: String ?= "jobs")
 GET         /viewTestCase2                              controllers.TestCaseController.viewTestCase2(id: Long, tdlId: Long, display: String ?= "jobs")
 POST        /doEditCaseField                            controllers.TestCaseController.doEditCaseField()
-GET         /renderJobs                                 controllers.TestCaseController.renderJobs(id: Long, tdlId: Long)
-GET         /renderCode                                 controllers.TestCaseController.renderCode(id: Long, tdlId: Long)
 #JOB management
 
 GET         /getCreateJobEditorView                     controllers.JobController.getCreateJobEditorView(tdlID: Long)

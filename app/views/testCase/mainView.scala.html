@@ -9,7 +9,7 @@
   Array(("Test Groups", controllers.routes.Application.testGroups().path()),
     (tc.testAssertion.testGroup.name, controllers.routes.GroupController.getGroupDetailView(tc.testAssertion.testGroup.id, "assertions").path()),
     (tc.testAssertion.taId, controllers.routes.TestAssertionController.getAssertionDetailView(tc.testAssertion.id, "cases").path()),
-    (tc.name, controllers.routes.TestCaseController.viewTestCase(tc.id, "jobs").path()))){
+    (tc.name, controllers.routes.TestCaseController.viewTestCase(tc.id, "jobs").path()))) {
   @dialogs()
 
   <h3>Test Case
@@ -37,7 +37,7 @@
 
   <h4>Version</h4>
   <select id="version" style="width:100px ;">
-  @for( tdl <- Tdl.findByTestCase(tc)) {
+  @for(tdl <- Tdl.findByTestCase(tc)) {
     <option value="@tdl.id"
       @if(tdl.id == selectedTdl.id) {
         selected="selected" }>@{
@@ -56,7 +56,7 @@
   @if(selectedTdl.parameters != null && selectedTdl.parameters.size() > 0) {
     <h4>Parametric Wrapper Names</h4>
     <ul>
-    @for( pm <- selectedTdl.parameters) {
+    @for(pm <- selectedTdl.parameters) {
       <li>
       @pm.name
       </li>
@@ -67,23 +67,15 @@
   <hr />
 
 
-  <div class="indent">
-    <script>
-        function showJobs(){
-          ajaxRouteGet(jsRoutes.controllers.TestCaseController.renderJobs, [@tc.id, @selectedTdl.id], $("#caseSubItems"))
-        }
-        function showCode(){
-          ajaxRouteGet(jsRoutes.controllers.TestCaseController.renderCode, [@tc.id, @selectedTdl.id], $("#caseSubItems"))
-        }
-    </script>
+  <div class="container-fluid">
 
-    @ajaxDisplaySelector(display,
-      "jobs" ->("Jobs", "showJobs"),
-      "code" ->("MTDL Code", "showCode"))
+    <h4>Jobs</h4>
+    @childViews.testCaseJobList(tc, selectedTdl)
 
-    <div id="caseSubItems" style="padding: 5px ;">
+    <hr />
+    <h4>MTDL Code</h4>
+    @childViews.testCaseCodeDisplay(tc, selectedTdl)
 
-    </div>
   </div>
   <script>
       $(function(){

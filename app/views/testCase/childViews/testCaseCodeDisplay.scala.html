@@ -5,40 +5,39 @@
 @import authentication._
 
 @subjectIs(tc.owner) {
-@if(Tdl.getLatestTdl(tc).id == selectedTdl.id) {
-<input type="button" onclick='window.location="/getEditCaseEditorView?id=@{selectedTdl.id}"'
-       value="         Edit         "/> &nbsp;
-&nbsp;
-&nbsp;
-&nbsp;}
+  @if(Tdl.getLatestTdl(tc).id == selectedTdl.id) {
+    @createLinkButton("/getEditCaseEditorView?id=" + selectedTdl.id, "Edit", "glyphicon-pencil")
+    &nbsp;
+    &nbsp;
+    &nbsp;
+  }
 }
-Theme: <select id="select">
-    <option>3024-day</option>
-    <option>ambiance</option>
-    <option>cobalt</option>
-    <option>eclipse</option>
-    <option selected>mdn-like</option>
-    <option>neat</option>
-    <option>neo</option>
+  Theme: <select id="select" class="dropdown">
+  <option>3024-day</option>
+  <option>ambiance</option>
+  <option>cobalt</option>
+  <option>eclipse</option>
+  <option selected>mdn-like</option>
+  <option>neat</option>
+  <option>neo</option>
 </select>
-</div>
 <form>
-    <textarea id="code" name="code" class="CodeMirror fullw">@selectedTdl.tdl</textarea>
+  <textarea id="code" name="code" class="CodeMirror fullw">@selectedTdl.tdl</textarea>
 </form>
 <script>
     var editor = CodeMirror.fromTextArea(document.getElementById("code"), {
-        lineWrapping: true,
-        lineNumbers: true,
-        styleActiveLine: true,
-        readOnly: true,
-        viewportMargin: Infinity,
-        mode: {name: "text/x-scala", globalVars: true},
-        theme: "neo"
+      lineWrapping: true,
+      lineNumbers: true,
+      styleActiveLine: true,
+      readOnly: true,
+      viewportMargin: Infinity,
+      mode: {name: "text/x-scala", globalVars: true},
+      theme: "neo"
     });
 
     $("#select").change(function () {
-        $("#select option:selected").each(function () {
-            editor.setOption("theme", $(this).text());
-        });
+      $("#select option:selected").each(function () {
+        editor.setOption("theme", $(this).text());
+      });
     });
 </script>

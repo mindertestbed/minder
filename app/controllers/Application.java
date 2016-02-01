@@ -80,8 +80,6 @@ public class Application extends Controller {
             routes.javascript.GroupController.renderDependencies(),
             routes.javascript.TestAssertionController.renderDetails(),
             routes.javascript.TestAssertionController.renderTestCases(),
-            routes.javascript.TestCaseController.renderJobs(),
-            routes.javascript.TestCaseController.renderCode(),
             routes.javascript.JobController.changeTestRunVisibility(),
             routes.javascript.JobController.changeJobVisibility(),
             routes.javascript.TestQueueController.enqueueJob()

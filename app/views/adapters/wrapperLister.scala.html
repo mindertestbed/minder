@@ -1,18 +1,24 @@
 @import authentication._
+@import views.html.util._
 
 <script>
   $(function() {
     $( document ).tooltip();
   });
   </script>
-@subjectHasRole(security.Role.TEST_DEVELOPER) {
-  <input type="button" id="createWr" value="Create New Adapter" />
-  <br/>
-  <br/>
+
+<h3>Adapters</h3>
+
+
+@subjectHasRole(security.Role.TEST_DESIGNER) {
+  @createButton("Create New Adapter", "glyphicon-plus", "btn-primary"){
+  }
+  <br />
+  <br />
 }
 
 @defining(Authentication.getLocalUser(session())) { localUser =>
-  <table class="shaded datatable topcell">
+  <table class="table table-hover table-condensed  table-striped ">
     <tr><th>Adapter Name</th><th>Creator</th><th>Short Description</th><th>Version</th><th>Status</th></tr>
     @for( currentWrapper <- Wrapper.getAll()) {
       @defining(WrapperVersion.getAllByWrapper(currentWrapper)) { versionList =>

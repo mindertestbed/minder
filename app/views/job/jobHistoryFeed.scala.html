@@ -58,47 +58,63 @@
 </script>
 
 
-<table class="fullw">
-  <tr>
-    <td id="historyfeed" style="vertical-align:text-top ;">
-      <label>Job History</label>
-      <br />
-      <div>
-        <table class="padabit">
-          <tbody id="updatableTbody">
-          @defining(TestRun.getRecentRuns(40)) { testRunList =>
-            @for( testRun <- testRunList) {
-              @authentication.decideOnVisibility(testRun.visibility, testRun.runner) {
-                <tr class="@if(testRun.success) {goodTestRun} else {badTestRun}" style="border:1px solid #eee ; border-radius: 2px">
-                  <td style="text-align:left ;" class="tabshrink">
-                  @if(testRun.success) {
-                    <img src="@routes.Assets.versioned("/images/Check-icon.png")" height="12px" alt='G'/>
-                  } else {
-                    <img src="@routes.Assets.versioned("/images/Delete-icon.png")" height="12px" alt='B'/>
-                  }
-                  </td>
-                  <td style="text-align:center ;" class="tabshrink">#@testRun.number</td>
-                  <td class="tabexpandNoBorder">@if(testRun.job != null) {
-                    @visibilityTagFragment(testRun.visibility, testRun.runner)
-                    <a href="/viewTestRunHistory?testRunId=@{
-                      testRun.id
-                    }&showHistory=true">
-                    @testRun.job.name</a>
+<div class="panel panel-info">
 
-                  }</td>
-                  <td align="center" valign="middle" class="tabshrink">
-                    <a href="/viewTestRunHistory?testRunId=@testRun.id" title="View Log" class="celldiv" style="height:16px ; width:16px ;">
-                      <img src="@routes.Assets.versioned("/images/console-64.png")" height="12px"/>
-                    </a>
-                  </td>
-                </tr>
+  <div class="panel-heading">Job History</div>
+  <div class="panel-body zeropad">
+    <div align="center">
+      <nav style="padding-top: 2px;">
+        <ul class="pagination pagination-sm" style="margin:0px;display: none">
+          <li>
+            <a href="#" aria-label="Previous">
+              <span aria-hidden="true">&laquo;</span>
+            </a>
+          </li>
+          <li><a href="#">1</a></li>
+          <li><a href="#">2</a></li>
+          <li><a href="#">3</a></li>
+          <li><a href="#">4</a></li>
+          <li><a href="#">5</a></li>
+          <li>
+            <a href="#" aria-label="Next">
+              <span aria-hidden="true">&raquo;</span>
+            </a>
+          </li>
+        </ul>
+      </nav>
+    </div>
+
+    <table class="table table-hover table-condensed table-striped" style="border:none ;">
+      <tbody id="updatableTbody">
+      @defining(TestRun.getRecentRuns(40)) { testRunList =>
+        @for(testRun <- testRunList) {
+          @authentication.decideOnVisibility(testRun.visibility, testRun.runner) {
+            <tr class="@if(testRun.success) {goodTestRun} else {badTestRun}">
+              <td style="text-align:left ;" class="tabshrink">
+              @if(testRun.success) {
+                <img src="@routes.Assets.versioned("/images/Check-icon.png")" height="12px" alt='G'/>
+              } else {
+                <img src="@routes.Assets.versioned("/images/Delete-icon.png")" height="12px" alt='B'/>
               }
-            }
-          }
-          </tbody>
-        </table>
-      </div>
+              </td>
+              <td style="text-align:center ;" class="tabshrink">#@testRun.number</td>
+              <td class="tabexpandNoBorder">@if(testRun.job != null) {
+                @visibilityTagFragment(testRun.visibility, testRun.runner)
+                <a href="@controllers.routes.JobController.displayJob(testRun.job.id, true)">@testRun.job.name</a>
 
-    </td>
-  </tr>
-</table>
+              }</td>
+              <td align="center" valign="middle" class="tabshrink">
+                <a href="/viewTestRunHistory?testRunId=@testRun.id" title="View Log" class="celldiv" style="height:16px ; width:16px ;">
+                  <img src="@routes.Assets.versioned("/images/console-64.png")" height="12px"/>
+                </a>
+              </td>
+            </tr>
+          }
+        }
+      }
+      </tbody>
+    </table>
+
+  </div>
+
+</div>
