@@ -1,0 +1,9 @@
+@(target: models.User)(content: => Html)(content2 : => Html)
+
+@defining(Authentication.getLocalUser) { user =>
+  @if(user != null && target != null && (user.email == target.email)) {
+    @content
+  } else{
+    @content2
+  }
+}

@@ -68,7 +68,7 @@
           var toRep=''
           for (; startIndex < len; startIndex++){
             var q = que[startIndex]
-            toRep += activeJobTemplate.replace(/\$jobId/g, q.jobId).
+            toRep += queueItemTemplate.replace(/\$jobId/g, q.jobId).
             replace(/\$jobName/g, q.jobName).
             replace(/\$email/g, q.email).
             replace(/\$jobName/g, q.jobName).

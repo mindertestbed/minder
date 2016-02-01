@@ -67,8 +67,9 @@ object TestQueueController extends Controller {
         } finally {
           LogFeeder.log(">>> Test Run  #[" + run1.number + "] finished.")
           activeRunContext = null
-          TestRunFeeder.jobHistoryUpdate(run1)
           TestRunFeeder.jobQueueUpdate()
+          Thread.sleep(1000)
+          TestRunFeeder.jobHistoryUpdate(run1)
         }
       }
     }
