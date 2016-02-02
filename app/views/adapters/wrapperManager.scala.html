@@ -1,18 +1,9 @@
+@import views.html.util._
+
 @main("Adapters", "adapters",
   Array(("Adapters", controllers.routes.Application.adapters().path()))) {
-  <div id="dialog-confirm" title="Delete Wrapper?" style="display:none">
-    <p><span class="ui-icon ui-icon-alert" style="float:left ; margin:0 7px 20px 0 ;"></span>
-      The <span class="itemtype"></span> <b><span class="itemname"></span></b> will be deleted. Are you sure?</p>
-  </div>
 
-  <div id="mainDialog" title="main dialog" style="display:none">
-    <form method="post" id="mainForm">
-    </form>
-  </div>
-
-
-  <div id="errorDialog" title="Error" style="display:none">
-  </div>
+  @dialogs()
 
   <div id="wrapperLister" style="padding:0px ;">
   @wrapperLister()

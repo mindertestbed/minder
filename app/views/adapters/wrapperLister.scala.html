@@ -1,5 +1,6 @@
 @import authentication._
 @import views.html.util._
+@import minderengine.MinderWrapperRegistry
 
 <script>
   $(function() {
@@ -9,9 +10,13 @@
 
 <h3>Adapters</h3>
 
-
 @subjectHasRole(security.Role.TEST_DESIGNER) {
-  @createButton("Create New Adapter", "glyphicon-plus", "btn-primary"){
+  @createButton("Create New Adapter", "glyphicon-plus", "btn-primary") {
+    createFormDialog(
+    "@controllers.routes.WrapperController.createNewAdapterForm()", //form url
+    "/doCreateWrapper", //action url
+    "Create Wrapper",
+    $("#wrapperLister"))
   }
   <br />
   <br />
@@ -20,7 +25,7 @@
 @defining(Authentication.getLocalUser(session())) { localUser =>
   <table class="table table-hover table-condensed  table-striped ">
     <tr><th>Adapter Name</th><th>Creator</th><th>Short Description</th><th>Version</th><th>Status</th></tr>
-    @for( currentWrapper <- Wrapper.getAll()) {
+    @for(currentWrapper <- Wrapper.getAll()) {
       @defining(WrapperVersion.getAllByWrapper(currentWrapper)) { versionList =>
         @if(versionList == null || versionList.isEmpty) {
           <tr>
@@ -56,18 +61,18 @@
             }
           </tr>
         } else {
-          @for( wrapperVersion <- versionList) {
+          @for(wrapperVersion <- versionList) {
             <tr>
               <td>@currentWrapper.name</td>
               <td>@currentWrapper.user.email</td>
               <td style="max-width: 200px ;">@currentWrapper.shortDescription</td>
-              <td>@wrapperVersion.version</td><td style="text-align: center">
+              <td>@wrapperVersion.version</td> <td style="text-align: center">
 
-              @if(MinderWrapperRegistry.get().isWrapperAvailable(wrapperVersion)) {
-                <img src="@routes.Assets.versioned("/images/Pc_Online.png")"/>
-              }else{
-                <img src="@routes.Assets.versioned("/images/Pc_Offline.png")"/>
-              }
+            @if(MinderWrapperRegistry.get().isWrapperAvailable(wrapperVersion)) {
+              <img src="@routes.Assets.versioned("/images/Pc_Online.png")"/>
+            } else {
+              <img src="@routes.Assets.versioned("/images/Pc_Offline.png")"/>
+            }
 
             </td>
               @subjectIs(currentWrapper.user) {
@@ -77,8 +82,7 @@
                     <div id="editWrapper@currentWrapper.id" title="Edit" class="celldiv bevel2" style="padding:5px">
                       <img src="@routes.Assets.versioned("/images/edit_property-64.png")" height="16px" alt='@localUser.id'/>
                       <script>
-                          createFormDialog($("#editWrapper@currentWrapper.id"),
-                              "/editWrapperForm?id=@currentWrapper.id",
+                          createFormDialog("/editWrapperForm?id=@currentWrapper.id",
                               "/doEditWrapper", "mainDialog", "Edit Adapter", $("#WrapperListDiv@localUser.id").parent())
                       </script>
                     </div>
@@ -101,14 +105,5 @@
         }
       }
     }
-    </table>
-
-  <script>
-      createFormDialog($("#createWr"),
-          "/createNewWrapperForm" ,
-          "/doCreateWrapper", "mainDialog", "Create Wrapper", $("#wrapperLister"))
-
-
-  </script>
+  </table>
 }
-@import minderengine.MinderWrapperRegistry

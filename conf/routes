@@ -88,7 +88,7 @@ GET         /listTestRunsForm                           controllers.JobControlle
 GET         /viewReport                                 controllers.JobController.viewReport(testRunId: Long, type: String)
 
 #Wrappers
-GET         /createNewWrapperForm                       controllers.WrapperController.createNewWrapperForm
+GET         /createNewAdapterForm                       controllers.WrapperController.createNewAdapterForm
 POST        /doCreateWrapper                            controllers.WrapperController.doCreateWrapper
 GET         /doDeleteWrapper                            controllers.WrapperController.doDeleteWrapper(id: Long)
 GET         /editWrapperForm                            controllers.WrapperController.editWrapperForm(id: Long)
