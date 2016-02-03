@@ -14,18 +14,17 @@
   @dialogs()
 
   <h3 class="inline">Test Group
-    <mark id="name@{
+    <span id="name@{
       tg.id
     }"
       @subjectIs(tg.owner) {
         onclick='showUpdateInputTextDialog(@tg.id, "name", $(this).next(), "/doEditGroupField")'
       }
-    class="hl editable"></mark>
+    class="hl editable"></span>
     <input type="hidden" value="@tg.name"/>
   </h3>
 
-  <br />
-  <hr/>
+  <hr />
 
   <h4>Owner</h4>
   <span>
@@ -33,16 +32,15 @@
   </span>
 
   <h4>Short Description</h4>
-  <mark id="shortDescription@{
+  <span id="shortDescription@{
     tg.id
   }"
     @subjectIs(tg.owner) {
       onclick='showUpdateInputTextDialog(@tg.id, "shortDescription", $(this).next(), "/doEditGroupField")'
-    } class="editable"></mark>
+    } class="editable"></span>
   <input type="hidden" value="@tg.shortDescription"/>
 
-  <br />
-  <hr/>
+  @putSpace()
 
   <script>
       $(function(){

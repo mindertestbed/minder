@@ -4,72 +4,72 @@
 @import global.Util._
 @import authentication._
 
-        <style type="text/css" media="screen">
-        #editor {
-        position: relative;
-        top: 10px;
-        right: 0;
-        bottom: 0;
-        left: 0px;
-        height:350px;
-        }
-        </style>
-    </head>
-    <body>
-        @subjectIs(tc.owner) {
-            @if(Tdl.getLatestTdl(tc).id == selectedTdl.id) {
-                @createLinkButton("/getEditCaseEditorView?id=" + selectedTdl.id, "Edit", "glyphicon-pencil")
-                    &nbsp;
-                    &nbsp;
-                    &nbsp;}
-        }
-    Theme: <select id="select">
-        <option>chrome</option>
-        <option>eclipse</option>
-        <option>monokai</option>
-        <option>sqlserver</option>
-        <option selected>clouds</option>
-        <option>textmate</option>
-        <option>xcode</option>
-    </select>
-        Font Size: <select id="fontsize">
-        <option value="10px">10px</option>
-        <option value="11px">11px</option>
-        <option value="12px" selected="selected">12px</option>
-        <option value="13px">13px</option>
-        <option value="14px">14px</option>
-        <option value="16px">16px</option>
-        <option value="18px">18px</option>
-        <option value="20px">20px</option>
-        <option value="24px">24px</option>
-    </select>
+<style type="text/css" media="screen">
+#editor {
+position: relative ;
+top: 10px ;
+right: 0 ;
+bottom: 0 ;
+left: 0px ;
+height:350px ;
+}
+</style>
+  </head>
+<body>
+  @subjectIs(tc.owner) {
+    @if(Tdl.getLatestTdl(tc).id == selectedTdl.id) {
+      @createLinkButton("/getEditCaseEditorView?id=" + selectedTdl.id, "Edit", "glyphicon-pencil")
+        &nbsp;
+        &nbsp;
+        &nbsp;}
+  }
+Theme: <select id="select">
+  <option>chrome</option>
+  <option>eclipse</option>
+  <option>monokai</option>
+  <option>sqlserver</option>
+  <option selected>clouds</option>
+  <option>textmate</option>
+  <option>xcode</option>
+</select>
+  Font Size: <select id="fontsize">
+  <option value="10px">10px</option>
+  <option value="11px">11px</option>
+  <option value="12px" selected="selected">12px</option>
+  <option value="13px">13px</option>
+  <option value="14px">14px</option>
+  <option value="16px">16px</option>
+  <option value="18px">18px</option>
+  <option value="20px">20px</option>
+  <option value="24px">24px</option>
+</select>
 
-            <div id="editor-container">
-                <pre id="editor">@selectedTdl.tdl</pre>
-            </div>
-
-
-        <script type="text/javascript" src="@routes.Assets.versioned("javascripts/ace/ace.js")"></script>
-        <script>
+  <div id="editor-container">
+    <pre id="editor">@selectedTdl.tdl</pre>
+  </div>
 
 
-                var editor = ace.edit("editor");
-                editor.setTheme("ace/theme/clouds");
-                editor.getSession().setMode("ace/mode/scala");
-                editor.setReadOnly(true);
+  <script type="text/javascript" src="@routes.Assets.versioned("javascripts/ace/ace.js")"></script>
+  <script>
 
-                $("#fontsize").change(function () {
-                    $("#fontsize option:selected").each(function () {
-                        editor.setTheme($(this).text());
-                        document.getElementById('editor').style.fontSize=$(this).text();
-                    });
-                });
 
-                $("#select").change(function () {
-                    $("#select option:selected").each(function () {
-                        var theme = "ace/theme/".concat($(this).text()) ;
-                        editor.setTheme(theme);
+      var editor = ace.edit("editor");
+      editor.setTheme("ace/theme/clouds");
+      editor.getSession().setMode("ace/mode/scala");
+      editor.setReadOnly(true);
 
-                    });
-                });
-        </script>
+      $("#fontsize").change(function () {
+        $("#fontsize option:selected").each(function () {
+          editor.setTheme($(this).text());
+          document.getElementById('editor').style.fontSize=$(this).text();
+        });
+      });
+
+      $("#select").change(function () {
+        $("#select option:selected").each(function () {
+          var theme = "ace/theme/".concat($(this).text()) ;
+          editor.setTheme(theme);
+
+        });
+      });
+  </script>

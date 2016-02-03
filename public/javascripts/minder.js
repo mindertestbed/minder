@@ -36,123 +36,92 @@ function executeScripts(target) {
   });
 }
 
-function createFormDialog(elm, sourceUrl, action, dialogId, titl, target, w, h) {
-  if (typeof(w) === 'undefined') w = '50%';
-  if (typeof(h) === 'undefined') h = '500';
+/**
+ * Creates a form rendering its contents from sourceUrl and
+ * setting its action (post) to action
+ * @param sourceUrl
+ * @param action
+ * @param titl
+ * @param target
+ * @param w
+ * @param h
+ */
+function createFormDialog(sourceUrl, action, titl, target, multiPart, w, h) {
+  if (typeof(w) === 'undefined' || w === null) w = '50%';
+  if (typeof(h) === 'undefined' || h === null) h = '500';
+  if (multiPart === undefined || multiPart === null) multiPart = false;
 
-  var frm = $("#" + dialogId + " > form");
-  elm.on('click', function (event) {
-    event.stopPropagation();
-
-    var dialog = $("#" + dialogId).dialog({
-      autoOpen: false,
-      title: titl,
-      modal: true,
-      buttons: {
-        "Ok": function () {
-          if (typeof(target) === 'undefined' || target == null) {
-            dialog.dialog("close");
-          } else {
-            $.ajax({
-              type: frm.attr('method'),
-              url: frm.attr('action'),
-              data: frm.serialize(),
-              success: function (data) {
-                target.html(data);
-                dialog.dialog("close");
-              },
-              error: function (jqXHR, textStatus, errorMessage) {
-                frm[0].innerHTML = jqXHR.responseText;
-                frm[0].reset();
-              }
-            });
-          }
-        },
-        Cancel: function () {
-          dialog.dialog("close");
-        }
-      },
-      close: function () {
-        frm[0].reset();
-      }
-    });
-
-    frm[0].setAttribute('action', action);
-
-    $.ajax({
-      type: 'GET',
-      url: sourceUrl,
-      success: function (data) {
-        frm[0].innerHTML = data;
-        executeScripts(frm);
-      },
-      error: function (jqXHR, textStatus, errorMessage) {
-        frm[0].innerHTML = jqXHR.responseText;
-      }
-    });
-    frm[0].innerHTML = "..."
-    dialog.dialog("open", titl);
-  });
-}
-
-
-function createMultipartFormDialog(sourceUrl, action, dialogId, titl, target, w, h) {
-  if (typeof(w) === 'undefined') w = '50%';
-  if (typeof(h) === 'undefined') h = '500';
-
-  //
-  var frm = $("#" + dialogId + " > form");
+  var frm = $("#mainDialog > form");
   event.stopPropagation();
-  var dialog = $("#" + dialogId).dialog({
+
+  var dialog = $("#mainDialog").dialog({
     autoOpen: false,
+    title: titl,
     height: h,
     width: w,
-    title: titl,
     modal: true,
     buttons: {
       "Ok": function () {
-        var processedData = new FormData(frm[0]);
-        frm.html("<div align='center'><i>Sending Data...</i></div>")
-        $.ajax({
-          type: frm.attr('method'),
-          url: frm.attr('action'),
-          data: processedData,
-          contentType: false,
-          processData: false,
-          success: function (data) {
-            target.html(data);
-            dialog.dialog("close");
-          },
-          error: function (jqXHR, textStatus, errorMessage) {
-            frm.html(jqXHR.responseText);
-            frm[0].reset();
+        if (typeof(target) === 'undefined' || target == null) {
+          dialog.dialog("close");
+        } else {
+
+          var ajaxObject = {
+            type: frm.attr('method'),
+            url: frm.attr('action'),
+            success: function (data) {
+              target.html(data);
+              frm.html("")
+              dialog.dialog("close");
+            },
+            error: function (jqXHR, textStatus, errorMessage) {
+              frm.html(jqXHR.responseText)
+            },
           }
-        });
+
+          if(multiPart) {
+            ajaxObject.data = new FormData(frm[0]);
+            ajaxObject.contentType=false;
+            ajaxObject.processData=false;
+          } else {
+            ajaxObject.data = frm.serialize();
+          }
+
+          $.ajax(ajaxObject);
+
+        }
       },
       Cancel: function () {
         dialog.dialog("close");
       }
     },
     close: function () {
-      frm[0].reset();
+      frm.html("")
+      frm[0].removeAttribute('action')
+      frm[0].removeAttribute('enctype')
     }
   });
 
   frm[0].setAttribute('action', action);
-  frm[0].setAttribute('enctype', 'multipart/form-data')
+  if(multiPart)
+    frm[0].setAttribute('enctype', 'multipart/form-data');
+
+  spin(frm[0])
+  dialog.dialog("open", titl);
+
   $.ajax({
     type: 'GET',
     url: sourceUrl,
     success: function (data) {
-      frm[0].innerHTML = data;
-      executeScripts(frm);
+      stopSpin(frm[0])
+      frm.html(data);
     },
     error: function (jqXHR, textStatus, errorMessage) {
-      frm[0].innerHTML = jqXHR.responseText;
+      dialog.dialog('close')
+      showError(jqXHR.responseText);
     }
   });
-  frm[0].innerHTML = "<div align='center'><i>Loading...</i></div>"
-  dialog.dialog("open", titl);
+
 }
 
 function deleteWithDialog(action, dialog, title, category, item, target) {
@@ -176,6 +145,7 @@ function deleteWithDialog(action, dialog, title, category, item, target) {
             }
           },
           error: function (jqXHR, textStatus, errorMessage) {
+            dialog.dialog('close')
             showError(jqXHR.responseText);
           }
         });
@@ -188,8 +158,8 @@ function deleteWithDialog(action, dialog, title, category, item, target) {
     }
   });
 
-  dialog.find("span.itemtype")[0].innerHTML = category;
-  dialog.find("span.itemname")[0].innerHTML = item;
+  dialog.find("span.itemtype").html(category);
+  dialog.find("span.itemname").html(item);
   deleteDialog.dialog("open");
 }
 
@@ -206,12 +176,12 @@ function showError(data) {
       }
     }
   });
-  dialog[0].innerHTML = data;
+  dialog.html(data);
 }
 
 function simpleAjaxGet(dialogId, url, title, message) {
   var dlgSel = $("#" + dialogId)
-  dlgSel[0].innerHTML = message
+  dlgSel.html(message)
 
   var dialog = dlgSel.dialog({
     autoOpen: false,
@@ -379,6 +349,10 @@ function spin(target) {
   }
 
   target.spinner = new Spinner(opts).spin(target);
+}
+
+function stopSpin(target) {
+  target.spinner.stop()
 }
 
 

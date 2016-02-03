@@ -28,6 +28,7 @@
   </h3>
 
 
+  <hr />
 
 
   <h4>Owner</h4>
@@ -64,15 +65,14 @@
     </ul>
   }
 
-  <hr />
-
+  @putSpace()
 
   <div class="container-fluid">
 
     <h4>Jobs</h4>
     @childViews.testCaseJobList(tc, selectedTdl)
 
-    <hr />
+    @putSpace()
     <h4>MTDL Code</h4>
     @childViews.testCaseCodeDisplay(tc, selectedTdl)
 
