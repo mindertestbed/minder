@@ -15,7 +15,7 @@
     createFormDialog(
     "@controllers.routes.WrapperController.createNewAdapterForm()", //form url
     "/doCreateWrapper", //action url
-    "Create Wrapper",
+    "Create New Adapter",
     $("#wrapperLister"))
   }
   <br />
@@ -35,27 +35,22 @@
             <td>NA</td><td style="text-align: center"><img src="@routes.Assets.versioned("/images/Pc_Offline.png")"/></td>
             @subjectIs(currentWrapper.user) {
               <td style="width:3% ;" align="center" valign="middle" >
-
-                <table><tr><td style="border:none">
-                  <div id="editWrapper@currentWrapper.id" title="Edit" class="celldiv bevel2" style="padding:5px">
-                    <img src="@routes.Assets.versioned("/images/edit_property-64.png")" height="16px" alt='@localUser.id'/>
-                    <script>
-                        createFormDialog($("#editWrapper@currentWrapper.id"),
-                            "/editWrapperForm?id=@currentWrapper.id",
-                            "/doEditWrapper", "mainDialog", "Edit Adapter", $("#WrapperListDiv@localUser.id").parent())
-                    </script>
-                  </div>
-                    &nbsp;&nbsp;
-
-                </td><td style="border:none">
-                  <div id="deleteWrapper@currentWrapper.id" title="Delete" class="celldiv bevel2" style="padding:5px ;">
-                    <img src="@routes.Assets.versioned("/images/trash2-64.png")" height="16px" alt='@localUser.id'/>
-                    <script>
-                        var elm = $("#deleteWrapper@currentWrapper.id");
-                        deleteWithDialog(elm, "/doDeleteWrapper?id=@currentWrapper.id", $("#dialog-confirm"),
-                            "Delete Adapter", "wrapper", "@currentWrapper.name", $("#WrapperListDiv@localUser.id").parent())
-                    </script>
-                  </div>
+                <table><tr><td>
+                @createButton("", "glyphicon-pencil", "btn-default") {
+                  createFormDialog(
+                  "@controllers.routes.WrapperController.editWrapperForm(currentWrapper.id)", //form url
+                  "@controllers.routes.WrapperController.doEditWrapper()", //action url
+                  "Edit Adapter",
+                  $("#wrapperLister"))
+                }
+                </td><td>
+                @createButton("", "glyphicon-trash", "btn-default") {
+                  deleteWithDialog(
+                  "@controllers.routes.WrapperController.doDeleteWrapper(currentWrapper.id)", //form url
+                  $("#dialog-confirm"),
+                  "Delete Adapter", "wrapper", "@currentWrapper.name",
+                  $("#wrapperLister"))
+                }
                 </td></tr></table>
               </td>
             }
@@ -77,26 +72,22 @@
             </td>
               @subjectIs(currentWrapper.user) {
                 <td style="width:3% ;" align="center" valign="middle" >
-
-                  <table><tr><td style="border:none">
-                    <div id="editWrapper@currentWrapper.id" title="Edit" class="celldiv bevel2" style="padding:5px">
-                      <img src="@routes.Assets.versioned("/images/edit_property-64.png")" height="16px" alt='@localUser.id'/>
-                      <script>
-                          createFormDialog("/editWrapperForm?id=@currentWrapper.id",
-                              "/doEditWrapper", "mainDialog", "Edit Adapter", $("#WrapperListDiv@localUser.id").parent())
-                      </script>
-                    </div>
-                      &nbsp;&nbsp;
-
-                  </td><td style="border:none">
-                    <div id="deleteWrapper@currentWrapper.id" title="Delete" class="celldiv bevel2" style="padding:5px ;">
-                      <img src="@routes.Assets.versioned("/images/trash2-64.png")" height="16px" alt='@localUser.id'/>
-                      <script>
-                          var elm = $("#deleteWrapper@currentWrapper.id");
-                          deleteWithDialog(elm, "/doDeleteWrapper?id=@currentWrapper.id", $("#dialog-confirm"),
-                              "Delete Adapter", "wrapper", "@currentWrapper.name", $("#WrapperListDiv@localUser.id").parent())
-                      </script>
-                    </div>
+                  <table><tr><td>
+                  @createButton("", "glyphicon-pencil", "btn-default") {
+                    createFormDialog(
+                    "@controllers.routes.WrapperController.editWrapperForm(currentWrapper.id)", //form url
+                    "@controllers.routes.WrapperController.doEditWrapper()", //action url
+                    "Edit Wrapper",
+                    $("#wrapperLister"))
+                  }
+                  </td><td>
+                  @createButton("", "glyphicon-trash", "btn-default") {
+                    deleteWithDialog(
+                    "@controllers.routes.WrapperController.doDeleteWrapper(currentWrapper.id)", //form url
+                    $("#dialog-confirm"),
+                    "Delete Adapter", "wrapper", "@currentWrapper.name",
+                    $("#wrapperLister"))
+                  }
                   </td></tr></table>
                 </td>
               }

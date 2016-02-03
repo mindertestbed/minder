@@ -103,6 +103,7 @@ public class WrapperController extends Controller {
       WrapperEditorModel model = filledForm.get();
       Wrapper wr = Wrapper.find.byId(model.id);
       wr.shortDescription = model.shortDescription;
+      wr.name = model.name;
       wr.update();
 
       Logger.info("Done updating wrapper " + model.name);

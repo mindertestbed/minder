@@ -46,9 +46,10 @@ function executeScripts(target) {
  * @param w
  * @param h
  */
-function createFormDialog(sourceUrl, action, titl, target, w, h, formAttributes) {
+function createFormDialog(sourceUrl, action, titl, target, multiPart, w, h) {
   if (typeof(w) === 'undefined' || w === null) w = '50%';
   if (typeof(h) === 'undefined' || h === null) h = '500';
+  if (multiPart === undefined || multiPart === null) multiPart = false;
 
   var frm = $("#mainDialog > form");
   event.stopPropagation();
@@ -64,20 +65,30 @@ function createFormDialog(sourceUrl, action, titl, target, w, h, formAttributes)
         if (typeof(target) === 'undefined' || target == null) {
           dialog.dialog("close");
         } else {
-          $.ajax({
+
+          var ajaxObject = {
             type: frm.attr('method'),
             url: frm.attr('action'),
-            data: frm.serialize(),
             success: function (data) {
               target.html(data);
+              frm.html("")
               dialog.dialog("close");
             },
             error: function (jqXHR, textStatus, errorMessage) {
-              frm[0].reset();
-              dialog.dialog("close");
-              showError(jqXHR.responseText)
-            }
-          });
+              frm.html(jqXHR.responseText)
+            },
+          }
+
+          if(multiPart) {
+            ajaxObject.data = new FormData(frm[0]);
+            ajaxObject.contentType=false;
+            ajaxObject.processData=false;
+          } else {
+            ajaxObject.data = frm.serialize();
+          }
+
+          $.ajax(ajaxObject);
+
         }
       },
       Cancel: function () {
@@ -85,18 +96,15 @@ function createFormDialog(sourceUrl, action, titl, target, w, h, formAttributes)
       }
     },
     close: function () {
-      frm[0].reset();
+      frm.html("")
+      frm[0].removeAttribute('action')
+      frm[0].removeAttribute('enctype')
     }
   });
 
   frm[0].setAttribute('action', action);
-
-  if (formAttributes !== undefined){
-    for(key in formAttributes){
-      console.log(key + " " + formAttributes[key])
-      frm[0].setAttribute(key, formAttributes[key]);
-    }
-  }
+  if(multiPart)
+    frm[0].setAttribute('enctype', 'multipart/form-data');
 
   spin(frm[0])
   dialog.dialog("open", titl);

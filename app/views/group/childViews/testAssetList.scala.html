@@ -18,10 +18,7 @@
       "/createNewAssetForm",
       "/doCreateTestAsset?groupId=@{testGroup.id}",
       "Create Asset",
-      $("#testGroupAsset@{testGroup.id}").parent(),
-      null,null,
-      {"enctype":"multipart/form-data"}
-    )
+      $("#testGroupAsset@{testGroup.id}").parent(),true)
   }
   <br />
   <br />
@@ -54,9 +51,7 @@
                     "/editAssetForm?id=@{asset.id}",
                     "/doEditAsset",
                     "Edit Asset",
-                    $("#testGroupAsset1").parent(),
-                    null, null,
-                    {"enctype":"multipart/form-data"})
+                    $("#testGroupAsset1").parent(),true)
                   }</td>
 
                   <td>@createButton("", "glyphicon-trash", "btn-default") {
