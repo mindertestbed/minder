@@ -1,7 +1,6 @@
 @import authentication._
 
-@main("Job Queue", "jobQueue",
-  Array(("Test Monitor", controllers.routes.Application.jobQueue().path()))) {
+@main("Job Queue", "jobQueue", "Test Monitor") {
   <script>
       $ ( function ( ) {
         var logfeed = $( "#logfeed" )[0];

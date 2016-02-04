@@ -1,7 +1,7 @@
 @import authentication._
 @import util._
 
-@(title: String, nav: String = "", currentPath: Array[(String, String)] = null)(content: Html)
+@(title: String, nav: String = "", navObject: Object = null)(content: Html)
 
 
 <!DOCTYPE html>
@@ -71,7 +71,7 @@
       </div> <!-- /.container-fluid -->
 
       <div>
-      @drawNavigation(currentPath)
+      @drawNavigation(navObject)
       </div>
     </nav>
 

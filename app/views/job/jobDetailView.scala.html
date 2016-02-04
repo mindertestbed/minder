@@ -3,7 +3,7 @@
 @import security.Role
 
 @(job: Job, showHistory: Boolean = true, localUser: models.User = null)
-  @main(Messages("minder.navigation.restricted.testdesigner"), "mainNavigation",
+  @main(Messages("minder.navigation.restricted.testdesigner"), "testGroups",
     Array(("Test Groups", controllers.routes.Application.testGroups().path()),
       (job.tdl.testCase.testAssertion.testGroup.name, controllers.routes.GroupController.getGroupDetailView(job.tdl.testCase.testAssertion.testGroup.id, "assertions").path()),
       (job.tdl.testCase.testAssertion.taId, controllers.routes.TestAssertionController.getAssertionDetailView(job.tdl.testCase.testAssertion.id, "cases").path()),
@@ -29,172 +29,127 @@
     </script>
 
 
-    <h3 style="display:table-cell">Job
-      <div id="name@{
+    <h3>Job
+      <span id="name@{
         job.id
       }"
         @subjectIs(job.owner) {
           onclick='showUpdateInputTextDialog(@job.id, "name", $(this).next(), "/doEditJobField")'
         }
-      class="hl editable"></div>
+      class="hl editable"></span>
       <input type="hidden" value="@job.name"/>
+
     </h3>
 
-    <table style="width:100% ;"><tr><td style="vertical-align:text-top ; padding:10px ;" >
-      <div class="indent">
-        <table class="section"><tr><td>
-          <h4>Test Case Details</h4>
-          <table class="shaded">
-            <tr>
-              <th>Test Group:</th>
-              <td>
-                <a href="/getGroupDetailView?id=@{
-                  job.tdl.testCase.testAssertion.testGroup.id
-                }&display=assertions">
-                @job.tdl.testCase.testAssertion.testGroup.name
-                </a>
-              </td>
-            </tr>
-            <tr>
-              <th>Test Assertion:</th>
-              <td>
-                <a href="/getAssertionDetailView?id=@{
-                  job.tdl.testCase.testAssertion.id
-                }">
-                @job.tdl.testCase.testAssertion.taId
-                </a>
-              </td>
-            </tr>
-            <tr><th>Test Case:</th>
-              <td>
-                <a href="/viewTestCase2?id=@{
-                  job.tdl.testCase.id
-                }&tdlId=@{
-                  job.tdl.id
-                }&display=jobs">
-                @job.tdl.testCase.name
-                </a>
-              </td>
-            </tr>
-            <tr><th>Visibility:</th>
-              <td id="visibilityTd">@visibilityTagFragment(job.visibility, job.owner, true, true)</td>
-            </tr>
-          </table>
-        </td><td>
-          <h4>Wrapper Mappings</h4>
-          <table class="shaded">
-            <tr><th>Variable</th><th>Actual Wrapper</th><th>Status</th></tr>
-            @defining(job.mappedWrappers) { lst =>
-              @for( mw <- job.mappedWrappers) {
+    <div class="container-fluid">
+      <div class="row">
+        <div class="col-md-8">
+          <div class="row">
+            <div class="col-md-12">
+              <table class="table table-condensed table-striped table-hover">
+                <tr><th>Visibility:</th>
+                  <td id="visibilityTd">@visibilityTagFragment(job.visibility, job.owner, true, true)</td>
+                </tr>
                 <tr>
-                  <td>@mw.parameter.name</td> <td>@mw.wrapperVersion.wrapper.name</td>
-                  <td align="center">
-                    <span class="onStatus@{
-                      mw.wrapperVersion.id
-                    }" style="display:none" class="bignobold online"> <img src="@routes.Assets.versioned("/images/Pc_Online.png")"/></span>
-                    <span class="offStatus@{
-                      mw.wrapperVersion.id
-                    }" style="display:none" class="bignobold offline"> <img src="@routes.Assets.versioned("/images/Pc_Offline.png")"/></span>
-                  </td></tr>
+                  <th>Test Group:</th>
+                  <td>
+                    <a href="/getGroupDetailView?id=@{
+                      job.tdl.testCase.testAssertion.testGroup.id
+                    }&display=assertions">
+                    @job.tdl.testCase.testAssertion.testGroup.name
+                    </a>
+                  </td>
+                </tr>
+                <tr>
+                  <th>Test Assertion:</th>
+                  <td>
+                    <a href="/getAssertionDetailView?id=@{
+                      job.tdl.testCase.testAssertion.id
+                    }">
+                    @job.tdl.testCase.testAssertion.taId
+                    </a>
+                  </td>
+                </tr>
+                <tr><th>Test Case:</th>
+                  <td>
+                    <a href="/viewTestCase2?id=@{
+                      job.tdl.testCase.id
+                    }&tdlId=@{
+                      job.tdl.id
+                    }&display=jobs">
+                    @job.tdl.testCase.name
+                    </a>
+                  </td>
+                </tr>
+                <tr><th>Parameters:</th>
+                  <td>
+                    <span id="params@{
+                      job.id
+                    }"
+                      @subjectIs(job.owner) {
+                        onclick='showUpdateTextAreaDialog(@job.id, "mtdlParameters", $(this).next(), "@controllers.routes.JobController.doEditJobField()")'
+                      }
+                    class="hl editable"></span>
+                    <input type="hidden" value="@job.mtdlParameters"/>
+                  </td>
+                </tr>
+
+                @if(job.mappedWrappers != null && job.mappedWrappers.size() > 0) {
+                  <tr>
+                    <th>Adapter Mapping:</th>
+                    <td>
+                      <table class="table-condensed table-bordered">
+                        <tr><th>Variable</th><th>Actual Wrapper</th><th>Status</th></tr>
+                        @defining(job.mappedWrappers) { lst =>
+                          @for(mw <- job.mappedWrappers) {
+                            <tr>
+                              <td>@mw.parameter.name</td> <td>@mw.wrapperVersion.wrapper.name</td>
+                              <td align="center">
+                                <span class="onStatus@{
+                                  mw.wrapperVersion.id
+                                }" style="display:none" class="bignobold online"> <img src="@routes.Assets.versioned("/images/Pc_Online.png")"/></span>
+                                <span class="offStatus@{
+                                  mw.wrapperVersion.id
+                                }" style="display:none" class="bignobold offline"> <img src="@routes.Assets.versioned("/images/Pc_Offline.png")"/></span>
+                              </td></tr>
+                          }
+                        }
+                      </table>
+                    </td>
+                  </tr>
+                }
+              </table>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-md-12">
+              @decideOnVisibility(job.visibility, job.owner, security.Role.TEST_DESIGNER) {
+                <button id="enqueue" type="button" class="btn btn-success" onclick='enqueue()' title="Enqueue">
+                  <span class="glyphicon glyphicon-play"></span>
+                </button>
               }
-            }
-          </table>
-        </td>
-          <td>
-            <h4 style="display:table-cell">Parameters</h4>
-            <div id="params@{
-              job.id
-            }"
-              @subjectIs(job.owner) {
-                onclick='showUpdateTextAreaDialog(@job.id, "mtdlParameters", $(this).next(), "@controllers.routes.JobController.doEditJobField()")'
-              }
-            class="hl editable"></div>
-            <input type="hidden" value="@job.mtdlParameters"/>
+              <button type="button" class="btn btn-primary" onclick='window.location="@controllers.routes.Application.jobQueue()"' title="Test Monitor">
+                <span class="glyphicon glyphicon-tasks"></span>
+              </button>
+            </div>
+          </div>
 
-          </td>
-        </tr></table>
-        <hr/>
+          <div class="row">
+            <div class="col-md-12">
+              @testRunLister(job.id)
+            </div>
+          </div>
+        </div>
+        <div class="col-md-4">
+          @*Right side of the page, up *@
+          @jobQueueFeed()
+          @*Right side of the page, down *@
+          @jobHistoryFeed()
+        </div>
       </div>
-      <div class="indent">
-        <table class="section"><tr><td>
-          @decideOnVisibility(job.visibility, job.owner, security.Role.TEST_DESIGNER) {
-            <button id="enqueue" type="button" onclick='enqueue()'>
-              Enqueue Job
-              <img src='@routes.Assets.versioned("/images/running-64.png")' height='16px'/>
-            </button>
-          }
-          <button type="button" onclick='window.location="@controllers.routes.Application.jobQueue()"'>
-            Show Running Jobs <img src="@routes.Assets.versioned("/images/rules-64.png")" height="16px"/>
-          </button></td></tr>
-        </table>
-      </div>
-
-      <table class="section fullw" style="margin-top:2px ;">
-        <tr>
-          <td>
-          @testRunLister(job.id)
-          </td>
-        </tr>
-      </table>
-    </td><td style="vertical-align:text-top ; border-left:1px solid #ccc ; width:25% ; padding:10px ;">
-      @*Right side of the page, up *@
-      @jobQueueFeed()
-      @*Right side of the page, down *@
-      <hr />
-      @jobHistoryFeed()
-
-    </td></tr></table>
-
-
-    <div id="enqueQuestion" style="display: none ; width:500px ; height:400px ;">
-      <span style="color:#1C005A">Please select visibility level for the test run:</span>
-      <select id="visibility" name="visibility" >
-      @for( vis <- Visibility.values()) {
-        @if(vis == job.visibility) {
-          <option selected="selected" value="@vis">@vis</option>
-        } else {
-          <option value="@vis">@vis</option>
-        }
-      }
-      </select>
     </div>
-    <script>
-        function enqueue(){
-          var dialog = $("#enqueQuestion").dialog({
-            autoOpen: false,
-            title: 'Enqueue job [@{job.name}]?',
-            modal: true,
-            width: 550,
-            height: 400,
-            buttons: {
-              "Ok": function () {
 
-
-                var theUrl = jsRoutes.controllers.TestQueueController.enqueueJob(@{job.id}, $('#visibility').val())
-
-                $.ajax({
-                  type: 'GET',
-                  url: theUrl.url,
-                  success: function (data) {
-                    dialog.dialog("close");
-                  },
-                  error: function (jqXHR, textStatus, errorMessage) {
-                    showError(jqXHR.responseText)
-                    dialog.dialog("close");
-                  }
-                });
-              },
-              Cancel: function () {
-                dialog.dialog("close");
-              }
-            }
-          });
-
-          dialog.dialog("open");
-
-        }
-    </script>
-
+    @enqueueTemplate(job)
 
     @subjectIs(job.owner) {
       @visibilityEditorFragment("jsRoutes.controllers.JobController.changeJobVisibility", job.id, job.visibility, "visibilityTd")

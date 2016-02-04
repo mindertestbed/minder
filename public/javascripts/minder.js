@@ -422,3 +422,4 @@ function ajaxCancelActiveJob(name) {
   dialog.dialog("open");
 
 }
+

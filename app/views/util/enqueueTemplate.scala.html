@@ -1,0 +1,46 @@
+@(job: AbstractJob)
+
+<div id="enqueQuestion" style="display: none ; width:500px ; height:400px ;">
+  <span style="color:#1C005A">Please select visibility level for the test run:</span>
+  <select id="visibility" name="visibility" >
+    @for(vis <- Visibility.values()) {
+      @if(vis == job.visibility) {
+        <option selected="selected" value="@vis">@vis</option>
+      } else {
+        <option value="@vis">@vis</option>
+      }
+    }
+  </select>
+</div>
+
+<script>
+    function enqueue(jobName, jobId){
+      var dialog = $("#enqueQuestion").dialog({
+        autoOpen: false,
+        title: 'Enqueue job ' + jobName + '?',
+        modal: true,
+        width: 550,
+        height: 400,
+        buttons: {
+          "Ok": function () {
+            var theUrl = jsRoutes.controllers.TestQueueController.enqueueJob(jobId, visibility)
+            $.ajax({
+              type: 'GET',
+              url: theUrl.url,
+              success: function (data) {
+                dialog.dialog("close");
+              },
+              error: function (jqXHR, textStatus, errorMessage) {
+                showError(jqXHR.responseText)
+                dialog.dialog("close");
+              }
+            });
+          },
+          Cancel: function () {
+            dialog.dialog("close");
+          }
+        }
+      });
+      dialog.dialog("open");
+    }
+</script>

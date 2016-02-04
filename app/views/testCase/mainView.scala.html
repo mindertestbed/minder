@@ -5,7 +5,7 @@
 @import authentication._
 
 
-@main(Messages("minder.navigation.restricted.testdesigner"), "mainNavigation",
+@main(Messages("minder.navigation.restricted.testdesigner"), "testGroups",
   Array(("Test Groups", controllers.routes.Application.testGroups().path()),
     (tc.testAssertion.testGroup.name, controllers.routes.GroupController.getGroupDetailView(tc.testAssertion.testGroup.id, "assertions").path()),
     (tc.testAssertion.taId, controllers.routes.TestAssertionController.getAssertionDetailView(tc.testAssertion.id, "cases").path()),

@@ -24,7 +24,7 @@
 
 @defining(Authentication.getLocalUser(session())) { localUser =>
   <table class="table table-hover table-condensed  table-striped ">
-    <tr><th>Adapter Name</th><th>Creator</th><th>Short Description</th><th>Version</th><th>Status</th></tr>
+    <tr><th>Adapter Name</th><th>Creator</th><th>Short Description</th><th>Version</th><th>Status</th><th></th></tr>
     @for(currentWrapper <- Wrapper.getAll()) {
       @defining(WrapperVersion.getAllByWrapper(currentWrapper)) { versionList =>
         @if(versionList == null || versionList.isEmpty) {

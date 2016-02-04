@@ -7,7 +7,7 @@
 @import views.html.testAssertion._
 @import views.html.util._
 
-@main(Messages("minder.navigation.restricted.testdesigner"), "mainNavigation",
+@main(Messages("minder.navigation.restricted.testdesigner"), "testGroups",
     Array(("Test Groups", controllers.routes.Application.testGroups().path()),
     (ta.testGroup.name, controllers.routes.GroupController.getGroupDetailView(ta.testGroup.id, "assertions").path()),
     (ta.taId, controllers.routes.TestAssertionController.getAssertionDetailView(ta.id, "details").path()))) {
