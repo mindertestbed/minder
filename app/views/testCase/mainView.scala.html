@@ -14,7 +14,7 @@
 
     <div class="container-fluid">
       <div class="row">
-        <div class="col-md-9">
+        <div class="col-md-@{global.Util.remaining}">
           <h3>Test Case
             <div id="name@{
               tc.id
@@ -82,7 +82,7 @@
           </div>
         </div>
 
-        <div class="col-md-3">
+        <div class="col-md-@{global.Util.feedWidth}">
           @views.html.job.jobQueueFeed()
           <hr />
 
