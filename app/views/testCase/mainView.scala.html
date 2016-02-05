@@ -1,85 +1,99 @@
 @(tc: TestCase, selectedTdl: Tdl, localUser: models.User = null, display: String = "jobs")
-@import java.util.concurrent.atomic.AtomicInteger
-@import views.html.util._
-@import global.Util._
-@import authentication._
+  @import java.util.concurrent.atomic.AtomicInteger
+  @import views.html.util._
+  @import global.Util._
+  @import authentication._
 
 
-@main(Messages("minder.navigation.restricted.testdesigner"), "testGroups",
-  Array(("Test Groups", controllers.routes.Application.testGroups().path()),
-    (tc.testAssertion.testGroup.name, controllers.routes.GroupController.getGroupDetailView(tc.testAssertion.testGroup.id, "assertions").path()),
-    (tc.testAssertion.taId, controllers.routes.TestAssertionController.getAssertionDetailView(tc.testAssertion.id, "cases").path()),
-    (tc.name, controllers.routes.TestCaseController.viewTestCase(tc.id, "jobs").path()))) {
-  @dialogs()
+  @main(Messages("minder.navigation.restricted.testdesigner"), "testGroups",
+    Array(("Test Groups", controllers.routes.Application.testGroups().path()),
+      (tc.testAssertion.testGroup.name, controllers.routes.GroupController.getGroupDetailView(tc.testAssertion.testGroup.id, "assertions").path()),
+      (tc.testAssertion.taId, controllers.routes.TestAssertionController.getAssertionDetailView(tc.testAssertion.id, "cases").path()),
+      (tc.name, controllers.routes.TestCaseController.viewTestCase(tc.id, "jobs").path()))) {
+    @dialogs()
 
-  <h3>Test Case
-    <div id="name@{
-      tc.id
-    }"
-      @subjectIs(tc.owner) {
-        onclick='showUpdateInputTextDialog(@tc.id, "name", $(this).next(), "/doEditCaseField")'
-      }
+    <div class="container-fluid">
+      <div class="row">
+        <div class="col-md-9">
+          <h3>Test Case
+            <div id="name@{
+              tc.id
+            }"
+              @subjectIs(tc.owner) {
+                onclick='showUpdateInputTextDialog(@tc.id, "name", $(this).next(), "/doEditCaseField")'
+              }
 
-    class="hl editable">
-    @tc.name
+            class="hl editable">
+            @tc.name
 
+            </div>
+            <input type="hidden" value="@tc.name"/>
+          </h3>
+
+
+          <hr />
+
+
+          <h4>Owner</h4>
+          @{
+            tc.owner.email
+          }
+
+          <h4>Version</h4>
+          <select id="version" style="width:100px ;">
+          @for(tdl <- Tdl.findByTestCase(tc)) {
+            <option value="@tdl.id"
+              @if(tdl.id == selectedTdl.id) {
+                selected="selected" }>@{
+              tdl.version
+            }</option>
+          }
+          </select>
+
+          <script>
+              $( "#version" ).change(function(data) {
+                var vl=$("#version" ).val()
+                document.location="viewTestCase2?id=@{tc.id}&tdlId="+vl+"&display=@{display}"
+              });
+          </script>
+
+          @if(selectedTdl.parameters != null && selectedTdl.parameters.size() > 0) {
+            <h4>Parametric Wrapper Names</h4>
+            <ul>
+            @for(pm <- selectedTdl.parameters) {
+              <li>
+              @pm.name
+              </li>
+            }
+            </ul>
+          }
+
+          <hr />
+
+          <div class="container-fluid">
+
+            <h4>Jobs</h4>
+            @childViews.testCaseJobList(tc, selectedTdl)
+
+            @putSpace()
+            <h4>MTDL Code</h4>
+            @childViews.testCaseCodeDisplay(tc, selectedTdl)
+
+          </div>
+        </div>
+
+        <div class="col-md-3">
+          @views.html.job.jobQueueFeed()
+          <hr />
+
+          @views.html.job.jobHistoryFeed()
+
+        </div>
+      </div>
     </div>
-    <input type="hidden" value="@tc.name"/>
-  </h3>
-
-
-  <hr />
-
-
-  <h4>Owner</h4>
-  @{
-    tc.owner.email
+    <script>
+        $(function(){
+          bindValues($("#name@{tc.id}"))
+        })
+    </script>
   }
-
-  <h4>Version</h4>
-  <select id="version" style="width:100px ;">
-  @for(tdl <- Tdl.findByTestCase(tc)) {
-    <option value="@tdl.id"
-      @if(tdl.id == selectedTdl.id) {
-        selected="selected" }>@{
-      tdl.version
-    }</option>
-  }
-  </select>
-
-  <script>
-      $( "#version" ).change(function(data) {
-        var vl=$("#version" ).val()
-        document.location="viewTestCase2?id=@{tc.id}&tdlId="+vl+"&display=@{display}"
-      });
-  </script>
-
-  @if(selectedTdl.parameters != null && selectedTdl.parameters.size() > 0) {
-    <h4>Parametric Wrapper Names</h4>
-    <ul>
-    @for(pm <- selectedTdl.parameters) {
-      <li>
-      @pm.name
-      </li>
-    }
-    </ul>
-  }
-
-  @putSpace()
-
-  <div class="container-fluid">
-
-    <h4>Jobs</h4>
-    @childViews.testCaseJobList(tc, selectedTdl)
-
-    @putSpace()
-    <h4>MTDL Code</h4>
-    @childViews.testCaseCodeDisplay(tc, selectedTdl)
-
-  </div>
-  <script>
-      $(function(){
-        bindValues($("#name@{tc.id}"))
-      })
-  </script>
-}

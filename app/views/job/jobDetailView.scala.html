@@ -12,6 +12,8 @@
     )) {
 
     @dialogs()
+    @jobEnqueueDialog()
+
     <script>
         $ ( function ( ) {
           new EventSource ( '@controllers.routes.AdapterStatusFeeder.adapterJobStatusFeed(job.id)'
@@ -124,7 +126,7 @@
           <div class="row">
             <div class="col-md-12">
               @decideOnVisibility(job.visibility, job.owner, security.Role.TEST_DESIGNER) {
-                <button id="enqueue" type="button" class="btn btn-success" onclick='enqueue()' title="Enqueue">
+                <button id="enqueue" type="button" class="btn btn-success" onclick='enqueue("@{job.name}", @{job.id}, "@{job.visibility}")' title="Enqueue">
                   <span class="glyphicon glyphicon-play"></span>
                 </button>
               }
@@ -148,8 +150,6 @@
         </div>
       </div>
     </div>
-
-    @enqueueTemplate(job)
 
     @subjectIs(job.owner) {
       @visibilityEditorFragment("jsRoutes.controllers.JobController.changeJobVisibility", job.id, job.visibility, "visibilityTd")

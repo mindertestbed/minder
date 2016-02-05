@@ -5,17 +5,7 @@
     var successImage = '<img src="@routes.Assets.versioned("/images/Check-icon.png")" height="12px" alt="G"/>'
     var failImage = '<img src="@routes.Assets.versioned("/images/Delete-icon.png")" height="12px" alt="B"/>'
 
-    var rowTemplate = '<tr class="$trclass" style="border:1px solid #eee ; border-radius: 2px">'+
-        '<td style="text-align:left ;" class="tabshrink">'+
-        '$image' +
-        '</td><td style="text-align:center ;" class="tabshrink">#$testRunNumber</td>'+
-        '<td class="tabexpandNoBorder">'+
-        '<span class="$visibilityClass" title="$visibility" style="color:$visibilityColor;">&nbsp; </span> &nbsp;'+
-        '<a href="/viewTestRunHistory?testRunId=$testRunId">$jobName</a></td>'+
-        '<td align="center" valign="middle" class="tabshrink">'+
-        '<a href="/viewTestRunHistory?testRunId=$testRunId" title="View Log" class="celldiv" style="height:16px ; width:16px ;">'+
-        '<img src="@routes.Assets.versioned("/images/console-64.png")" height="12px"/>'+
-        '</a></td></tr>'
+    var rowTemplate = $("#historyRowTemplate").html()
 
     historyTableBody = $( "#updatableTbody" )
     new EventSource ('@{controllers.routes.TestRunFeeder.jobHistoryFeed()}' ).onmessage =
@@ -52,6 +42,7 @@
           replace('$visibility', json.visibility)
 
 
+          console.log(newRow)
           historyTableBody.prepend(newRow)
         }
   });
@@ -63,8 +54,8 @@
   <div class="panel-heading">Job History</div>
   <div class="panel-body zeropad">
     <div align="center">
-      <nav style="padding-top: 2px;">
-        <ul class="pagination pagination-sm" style="margin:0px;display: none">
+      <nav style="padding-top: 2px ;">
+        <ul class="pagination pagination-sm" style="margin:0px ; display: none">
           <li>
             <a href="#" aria-label="Previous">
               <span aria-hidden="true">&laquo;</span>
@@ -104,6 +95,11 @@
 
               }</td>
               <td align="center" valign="middle" class="tabshrink">
+                <a href="/viewReport?testRunId=@testRun.id&type=pdf" title="View Report" class="celldiv" style="height:16px ; width:16px ;">
+                  <img src="@routes.Assets.versioned("/images/pdf-2-64.png")" height="12px"/>
+                </a>
+              </td>
+              <td align="center" valign="middle" class="tabshrink">
                 <a href="/viewTestRunHistory?testRunId=@testRun.id" title="View Log" class="celldiv" style="height:16px ; width:16px ;">
                   <img src="@routes.Assets.versioned("/images/console-64.png")" height="12px"/>
                 </a>
@@ -116,5 +112,30 @@
     </table>
 
   </div>
+
+</div>
+
+
+<div style="display: none">
+  <table>
+    <tbody id="historyRowTemplate" >
+      <tr class="$trclass" style="border:1px solid #eee ; border-radius: 2px">
+        <td style="text-align:left ;" class="tabshrink">
+   $image
+        </td> <td style="text-align:center ;" class="tabshrink">#$testRunNumber</td>
+        <td class="tabexpandNoBorder">
+          <span class="$visibilityClass" title="$visibility" style="color:$visibilityColor ;">&nbsp; </span> &nbsp;
+          <a href="/viewTestRunHistory?testRunId=$testRunId">$jobName</a></td>
+        <td align="center" valign="middle" class="tabshrink">
+          <a href="/viewReport?testRunId=$testRunId&type=pdf" title="View Report" class="celldiv" style="height:16px ; width:16px ;">
+            <img src="@routes.Assets.versioned("/images/pdf-2-64.png")" height="12px"/>
+          </a>
+        </td>
+        <td align="center" valign="middle" class="tabshrink">
+          <a href="/viewTestRunHistory?testRunId=$testRunId" title="View Log" class="celldiv" style="height:16px ; width:16px ;">
+            <img src="@routes.Assets.versioned("/images/console-64.png")" height="12px"/>
+          </a></td></tr>
+    </tbody>
+  </table>
 
 </div>

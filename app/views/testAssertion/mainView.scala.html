@@ -1,47 +1,58 @@
-@(ta: TestAssertion, display: String="cases")
+@(ta: TestAssertion, display: String = "cases")
 
-@import java.util.concurrent.atomic.AtomicInteger
-@import global.Util._
-@import authentication._
-@import views.html._
-@import views.html.testAssertion._
-@import views.html.util._
+  @import java.util.concurrent.atomic.AtomicInteger
+  @import global.Util._
+  @import authentication._
+  @import views.html._
+  @import views.html.testAssertion._
+  @import views.html.util._
 
-@main(Messages("minder.navigation.restricted.testdesigner"), "testGroups",
+  @main(Messages("minder.navigation.restricted.testdesigner"), "testGroups",
     Array(("Test Groups", controllers.routes.Application.testGroups().path()),
-    (ta.testGroup.name, controllers.routes.GroupController.getGroupDetailView(ta.testGroup.id, "assertions").path()),
-    (ta.taId, controllers.routes.TestAssertionController.getAssertionDetailView(ta.id, "details").path()))) {
+      (ta.testGroup.name, controllers.routes.GroupController.getGroupDetailView(ta.testGroup.id, "assertions").path()),
+      (ta.taId, controllers.routes.TestAssertionController.getAssertionDetailView(ta.id, "details").path()))) {
 
-  @dialogs()
+    @dialogs()
 
-  <h3>Test Assertion
-    <div id="taId@{
-      ta.id
-    }"
-      @subjectIs(ta.owner) {
-        onclick='showUpdateInputTextDialog(@ta.id, "taId", $(this).next(), "/doEditAssertionField")'
-      }
-    class="hl editable">@ta.taId</div>
-    <input type="hidden" value="@ta.taId"/>
-  </h3>
-  <div class="indent">
-    <script>
-        function showDetails(){
-          ajaxRouteGet(jsRoutes.controllers.TestAssertionController.renderDetails, @ta.id, $("#assertionSubItems"))
-        }
-        function showTestCases(){
-          ajaxRouteGet(jsRoutes.controllers.TestAssertionController.renderTestCases, @ta.id, $("#assertionSubItems"))
-        }
-    </script>
+    <div class="container-fluid">
+      <div class="row">
+        <div class="col-md-9">
+          <h3>Test Assertion
+            <div id="taId@{
+              ta.id
+            }"
+              @subjectIs(ta.owner) {
+                onclick='showUpdateInputTextDialog(@ta.id, "taId", $(this).next(), "/doEditAssertionField")'
+              }
+            class="hl editable">@ta.taId</div>
+            <input type="hidden" value="@ta.taId"/>
+          </h3>
+          <div class="indent">
+            <script>
+                function showDetails(){
+                  ajaxRouteGet(jsRoutes.controllers.TestAssertionController.renderDetails, @ta.id, $("#assertionSubItems"))
+                }
+                function showTestCases(){
+                  ajaxRouteGet(jsRoutes.controllers.TestAssertionController.renderTestCases, @ta.id, $("#assertionSubItems"))
+                }
+            </script>
 
-    @ajaxDisplaySelector(display,
-      "cases" ->("Test Cases", "showTestCases"),
-      "details" ->("Details", "showDetails")
-    )
+            @ajaxDisplaySelector(display,
+              "cases" ->("Test Cases", "showTestCases"),
+              "details" ->("Details", "showDetails")
+            )
 
-    <div id="assertionSubItems" style="padding: 4px;">
+            <div id="assertionSubItems" style="padding: 4px ;">
 
+            </div>
+          </div>
+        </div>
+
+        <div class="col-md-3">
+          @views.html.job.jobQueueFeed()
+          <hr />
+          @views.html.job.jobHistoryFeed()
+        </div>
+      </div>
     </div>
-  </div>
-
-}
+  }
