@@ -104,6 +104,14 @@ object Util {
     }
   }
 
+  def getBooleanTick(flag: Boolean): String = {
+    if (flag) {
+      "/images/black-check-mark.png"
+    } else {
+      "/images/black-cross-mark.png"
+    }
+  }
+
 
   def canAccess(localUser: User, owner: User): Boolean = {
     println(localUser.email + " vs. " + owner.email)

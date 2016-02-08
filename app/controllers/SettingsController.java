@@ -2,10 +2,14 @@ package controllers;
 
 import minderengine.XoolaServer;
 import org.interop.xoola.core.XoolaProperty;
+import org.omg.CORBA.portable.OutputStream;
 import play.data.Form;
 import play.mvc.Controller;
 import play.mvc.Result;
 import play.mvc.Security;
+
+import java.io.FileOutputStream;
+import java.io.IOException;
 
 import static play.data.Form.form;
 
@@ -26,6 +30,14 @@ public class SettingsController extends Controller {
     System.out.println(model.timeout);
 
     XoolaServer.properties.setProperty(XoolaProperty.NETWORK_RESPONSE_TIMEOUT, model.timeout +"");
+    java.io.OutputStream out= null;
+    try {
+      out = new FileOutputStream("XoolaServer.properties");
+      XoolaServer.properties.store(out, null);
+    }
+    catch(IOException io){
+      io.printStackTrace();
+    }
     return redirect(routes.Application.root("settings"));
   }
 }

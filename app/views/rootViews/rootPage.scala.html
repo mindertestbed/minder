@@ -4,89 +4,33 @@
 @import global.Util._
 
 @main(Messages("minder.restricted.root"), "Root") {
-    <h3 class="explanation"><img src="@routes.Assets.versioned("../../../public/images/about-64.png")" height="24px"/></h3>
+    <h3 class="explanation"><img src="@routes.Assets.versioned("images/about-64.png")" height="24px"/></h3>
     <p>
         Welcome ROOT!. Wazzzzzup?
     </p>
 
     @dialogs()
 
+    <div class="indent">
+        <script>
+                function showUsers(){
+                    var obj = jsRoutes.controllers.UserController.listUsers;
+                    ajaxRouteGet(obj,"users",$("#rootSubItems"))
+                }
+                function showSettings(){
+                    ajaxRouteGet(jsRoutes.controllers.UserController.viewSettings,"settings",$("#rootSubItems"))
+                }
+        </script>
 
-    <table>
-        <tr>
-            <td style="width : 10 px ; border-bottom : 1 px solid gray ;">&nbsp;</td>
-            <td class='@choose(display, "users") tabshrink'>
-                <h4>
-                    <a href="/root?display=users">Users</a>
-                </h4>
-            </td>
-            <td class="@choose(display, "settings") tabshrink">
-                <h4>
-                    <a href="/root?display=settings">Settings</a>
-                </h4>
-            </td>
-            <td class="tabexpand">&nbsp;</td>
-        </tr>
-    </table>
+        @ajaxDisplaySelector(display,
+            "users" ->("Users", "showUsers"),
+            "settings" ->("Settings", "showSettings")
+        )
 
+        <div id="rootSubItems" style="padding: 4px;">
 
-    <div class="fullw fullh" style="padding : 10 px ;">
-    @display match {
-        case "users" => {
-            @userListView()
-        }
-        case "settings" => {
-            <table>
-                <tr>
-                    <td  style="vertical-align:text-top;"><br />
-                        <form action="@routes.SettingsController.updateSettings()" method="POST">
-                            <label>Slot Call,Signal Wait Timeout:</label> &nbsp;
-                            <input type="number" id="timeout" name="timeout"
-                            value="@minderengine.XoolaServer.properties.get("NETWORK_RESPONSE_TIMEOUT")" /> (ms)
-                            <br />
-                            <br />
-                            <br />
-                            <br />
-                            <br />
-                            <button type="submit">Update</button>
-                        </form>
-                    </td>
-                    <style>
-                        .settime{
-                            width:100px;
-                        }
-                    </style>
-                    <td  style="vertical-align:text-top;">
-                        <table>
-                            <tr><td><button type="button" class="settime">1 min</button><input type="hidden" value="60000" /></td>
-                                <td><button type="button" class="settime">5 min</button><input type="hidden" value="300000"/></td>
-                                <td><button type="button" class="settime">10 min</button><input type="hidden" value="600000"/></td>
-                            </tr>
-                            <tr><td><button type="button" class="settime">15 min</button><input type="hidden" value="900000"/></td>
-                                <td><button type="button" class="settime">30 min</button><input type="hidden" value="1800000"/></td>
-                                <td><button type="button" class="settime">1 hour</button><input type="hidden" value="3600000"/></td>
-                            </tr>
-                            <tr>
-                                <td><button type="button" class="settime">5 hours</button><input type="hidden" value="18000000"/></td>
-                                <td><button type="button" class="settime">10 hours</button><input type="hidden" value="36000000"/></td>
-                                <td><button type="button" class="settime">1 day</button><input type="hidden" value="86400000"/></td>
-                            </tr>
-                        </table>
-
-                    </td>
-
-                    <script>
-                        var timeout = $("#timeout")
-                        $(".settime" ).click(function(){
-                           timeout.val($(this).next( ).val())
-                        })
-                    </script>
-                </tr>
-            </table>
-
-
-        }
-    }
+        </div>
     </div>
+
 
 }
