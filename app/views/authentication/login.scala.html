@@ -2,9 +2,11 @@
 
 @import helper._
 @import views.html.util._
-@implicitFieldConstructor = @{ FieldConstructor(twitterBootstrapBasic.f) }
+@implicitFieldConstructor = @{
+  FieldConstructor(twitterBootstrapBasic.f)
+}
 
-@main(Messages("authenticate.title"),"login") {
+@main(Messages("authenticate.title"), "login", "Login") {
 
   <div class="row">
     <div class="col-xs-6 col-sm-4">
@@ -13,14 +15,14 @@
   </div>
 
   <div id="login" class="row">
-    <div class="col-xs-6 col-sm-4" style="position:absolute;left:30%;top:30%;width:40%;height:40%;">
+    <div class="col-xs-6 col-sm-4" style="position:absolute ; left:30% ; top:30% ; width:40% ; height:40% ;">
       @* Display proprietary login form *@
-    	@helper.form(routes.Authentication.doLogin, 'role -> "form") {
+      @helper.form(routes.Authentication.doLogin, 'role -> "form") {
 
         @if(loginForm.hasGlobalErrors) {
-          	<p class="alert alert-danger">
-	          @loginForm.globalError.message
-	     	</p>
+          <p class="alert alert-danger">
+          @loginForm.globalError.message
+          </p>
         }
 
         @_emailPartial(loginForm)
@@ -31,11 +33,11 @@
           '_label -> Messages("authenticate.password")
         )
 
-            <button type="submit" class="btn btn-default">@Messages("authenticate.login")</button>
+        <button type="submit" class="btn btn-default">@Messages("authenticate.login")</button>
 
         <a href="javascript:void(0);" onclick="window.location.href = jsRoutes.controllers.Signup.forgotPassword($('#email').val() || null).absoluteURL();">@Messages("authenticate.login.forgot.password")</a>
 
-    	}
+      }
     </div>
 
 

@@ -1,27 +1,47 @@
-@(currentPath: Array[(String, String)] = null)
-
-
-<div class="breadcrumbParent">
+@(navObject: Object = null)
+  @*
+  * If the nav object is an instance of an Array, create the breadcrump in the old way
+  *@
 <ol class="breadcrumb">
-  @{
-    val sb = new StringBuilder
-    if(currentPath != null) {
-      var size = currentPath.length - 1;
-      for( i <- 0 until currentPath.length) {
-        val path = currentPath(i);
-        if(i == size) {
-          sb.append("<li class='breadactive'>")
-          sb.append(path._1)
-          sb.append("</li>")
-        } else {
-          sb.append("<li>")
-          sb.append("<a class=\"\" style=\"padding: 5px;\" href=").append(path._2).append(">").append(path._1).append("</a>")
-          sb.append("</li>")
-          sb.append("&nbsp;<span class='fa-play' style='color:gray;font-size:8pt;'>&nbsp;&nbsp;</span>")
+  @if(navObject.isInstanceOf[Array[(String, String)]]) {
+    @defining(navObject.asInstanceOf[Array[(String, String)]]) { currentPath =>
+      @{
+        val sb = new StringBuilder
+        if(currentPath != null) {
+          var size = currentPath.length - 1;
+          for(i <- 0 until currentPath.length) {
+            val path = currentPath(i);
+            if(i == size) {
+              sb.append("<li class='active'>")
+              sb.append(path._1)
+              sb.append("</li>")
+            } else {
+              sb.append("<li>")
+              sb.append("<a class=\"\" style=\"padding: 5px;\" href=").append(path._2).append(">").append(path._1).append("</a>")
+              sb.append("</li>")
+            }
+          }
         }
+        Html(sb.toString())
       }
     }
-    Html(sb.toString())
+  } else {
+    @if(navObject.isInstanceOf[String]) {
+      <li class='active'>@navObject</li>
+    } else {
+
+      <li>Test Groups</li>
+      @*
+      @defining(navObject.asInstanceOf[ModelNavigation]) { navigation =>
+        @if(navigation.testGroup == null){
+
+        }
+      }
+      *@
+
+
+
+    }
   }
 
-</ol></div>
+</ol>

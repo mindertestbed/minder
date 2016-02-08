@@ -2,7 +2,7 @@ organization := "gov.tubitak.minder"
 
 name := """minder"""
 
-version := "1.4.4"
+version := "1.5.0"
 
 lazy val minder = (project in file(".")).enablePlugins(PlayJava, PlayEbean)
 
@@ -33,7 +33,7 @@ libraryDependencies ++= Seq(
   "gov.tubitak.minder" % "minder-common" % "0.4.2",
   "gov.tubitak.minder" %% "minder-tdl" % "0.4.0",
   "org.webjars" % "webjars-play_2.11" % "2.4.0-1",
-  "org.webjars" % "bootstrap" % "3.3.5",
+  "org.webjars" % "bootstrap" % "3.3.6",
   "net.sf.jasperreports" % "jasperreports" % "6.0.0",
   "net.sourceforge.barbecue" % "barbecue" % "1.5-beta1",
   "org.codehaus.groovy" % "groovy" % "2.3.9",
@@ -51,7 +51,7 @@ resolvers ++= Seq(
   "jasper" at "http://jaspersoft.artifactoryonline.com/jaspersoft/third-party-ce-artifacts/"
 )
 
-includeFilter in (Assets, LessKeys.less) := "ui2.less"
+includeFilter in (Assets, LessKeys.less) := "ui2.less" | "oldui.less"
 
 import com.typesafe.sbt.SbtAspectj.AspectjKeys.{binaries, inputs}
 import com.typesafe.sbt.SbtAspectj.{Aspectj, aspectjSettings, compiledClasses}

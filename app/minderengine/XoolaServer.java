@@ -5,6 +5,7 @@ import org.interop.xoola.core.*;
 import org.interop.xoola.tcpcom.connmanager.server.ServerRegistry;
 import play.api.Play;
 
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.Properties;
 
@@ -42,7 +43,7 @@ public class XoolaServer{
       try {
         //load the xoola properties from resource "xoola.properties"
         properties = new java.util.Properties();
-        properties.load(this.getClass().getResourceAsStream("/application.conf"));
+        properties.load(new FileInputStream("XoolaServer.properties"));
         properties.setProperty(XoolaProperty.MODE, XoolaTierMode.SERVER);
 
         ServerRegistry.classLoader = Play.classloader(Play.current());

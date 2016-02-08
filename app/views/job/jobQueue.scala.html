@@ -1,7 +1,6 @@
 @import authentication._
 
-@main("Job Queue", "jobQueue",
-  Array(("Job Queue", controllers.routes.Application.jobQueue().path()))) {
+@main("Job Queue", "jobQueue", "Test Monitor") {
   <script>
       $ ( function ( ) {
         var logfeed = $( "#logfeed" )[0];
@@ -16,16 +15,27 @@
       });
   </script>
 
-  <div style="position: absolute ; top:4px ; left:4px ; bottom:4px ; right:4px ; padding: 4px ;">
-    <div style="position: absolute ; top:4px ; left:4px ; bottom:4px ; width:30% ; padding: 4px ; overflow:auto ;">
+  <h3>Test Monitor</h3>
+  <div class="row" style="height:95% ;">
+    <div class=" col-md-@{
+      global.Util.remaining
+    }" style="height:100% ;">
+      <div class="panel panel-info" style="height:97% ; padding: 0px ;">
+        <div class="panel-heading">Log</div>
+        <div class="panel-body zeropad" style="height:100%;">
+
+          <textarea readonly="readonly" id="logarea" class="lightMinderBlue"
+          style="resize: none ; font-family:monospace ; height:calc(100% - 2em) ; width:100% ; border:1px solid #ddeee6 ; border-radius:2px ; overflow:scroll">@LogFeeder.currentLogString(Authentication.getLocalUser)</textarea>
+
+        </div>
+      </div>
+    </div>
+    <div class="col-md-@{
+      global.Util.feedWidth
+    }">
       @jobQueueFeed()
       <hr/>
       @jobHistoryFeed()
-    </div>
-    <div style="position: absolute ; top:4px ; left:31% ; bottom:4px ; right:4px ; padding: 4px ;">
-      <h4>Log</h4>
-      <textarea readonly="readonly" id="logarea"
-      style="background-color:#faffe1 ; resize: none; font-family:monospace; height:calc(100% - 2em) ; width:100%; border:1px solid #ddeee6 ; border-radius:2px ; overflow:scroll">@LogFeeder.currentLogString(Authentication.getLocalUser)</textarea>
     </div>
   </div>
 }

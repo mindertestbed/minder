@@ -98,7 +98,8 @@ public class TestAssetController extends Controller {
   public static Result editAssetForm(Long id) {
     User localUser = Authentication.getLocalUser();
 
-    TestGroup group = TestGroup.findById(id);
+    TestAsset asset = TestAsset.findById(id);
+    TestGroup group = asset.testGroup;
     if (localUser == null || (!localUser.email.equals("root@minder") && !group.owner.email.equals(localUser.email))) {
       return badRequest("You can't use this resource");
     }

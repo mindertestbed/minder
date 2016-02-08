@@ -1,7 +1,7 @@
 @import authentication._
 @import util._
 
-@(title: String, nav: String = "", currentPath: Array[(String, String)] = null)(content: Html)
+@(title: String, nav: String = "", navObject: Object = null)(content: Html)
 
 
 <!DOCTYPE html>
@@ -23,16 +23,19 @@
             <span class="icon-bar"></span>
             <span class="icon-bar"></span>
           </button>
-          <span class="navbar-brand">Minder</span>
+          <span class="navbar-brand">
+            <img src="@routes.Assets.versioned("/images/minder.png")" height="34px"/>
+          </span>
         </div>
 
           <!-- Collect the nav links, forms, and other content for toggling -->
         <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
           <ul class="nav navbar-nav">
             <li class="@("active".when(nav == "testGroups"))"><a href="@routes.Application.testGroups()">
-              Test Groups</a></li>
-            <li class="@("active".when(nav == "jobQueue"))"><a href="@routes.Application.jobQueue()">Job Queue</a></li>
+              Test Groups</a>
+            </li>
             <li class="@("active".when(nav == "adapters"))"><a href="@routes.Application.adapters()">Adapters</a></li>
+            <li class="@("active".when(nav == "jobQueue"))"><a href="@routes.Application.jobQueue()">Test Monitor</a></li>
 
             @defining(Authentication.getLocalUser()) { user =>
               @if(user != null && user.email == "root@minder") {
@@ -42,7 +45,8 @@
               <!--
             @subjectNotPresent {
               SIGNUP DISABLED
-            } -->
+            }
+              -->
           </ul>
 
           @subjectPresentOr {
@@ -65,11 +69,14 @@
 
         </div> <!-- /.navbar-collapse -->
       </div> <!-- /.container-fluid -->
+
+      <div>
+      @drawNavigation(navObject)
+      </div>
     </nav>
 
-    @drawNavigation(currentPath)
+    <div style="position: absolute ; top:85px ; left:0px ; right:0px ; bottom:5px ; overflow:auto ; padding: 10px ;">
 
-    <div style="position: absolute ; top:80px ; left:0px ; right:0px ; bottom:5px ; overflow:auto ; padding: 10px ;">
       @if(flash.contains(Authentication.FLASH_ERROR_KEY)) {
         <div class="alert alert-danger" role="alert">
           <button type="button" class="close" data-dismiss="alert"><span aria-hidden="true">&times;</span><span class="sr-only">
@@ -88,7 +95,7 @@
     </div> <!-- /container -->
     <footer style="position:fixed ; top:calc(100% - 10px) ; left:0 ; width:100% ; height:5px ;">
       <table style="width:97% ;"><tr><td style="text-align:right ; font-size:8px ;">&copy;
-        eSENS 2015, <a href="http://icons8.com">Icon pack by Icons8</a></td>
+        eSENS 2015, icons: <a href="http://glyphicons.com">http://glyphicons.com</a></td>
       </tr>
       </table>
     </footer>

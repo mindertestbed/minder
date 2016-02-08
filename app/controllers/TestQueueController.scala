@@ -42,10 +42,8 @@ object TestQueueController extends Controller {
         var run1: TestRun = null;
         try {
           LogFeeder.log("--> Test Thread waiting on job queue");
-          jobQueue.synchronized {
-            activeRunContext = TestQueueController.jobQueue.take();
-            activeRunContext.updateNumber()
-          }
+          activeRunContext = TestQueueController.jobQueue.take();
+          activeRunContext.updateNumber()
           TestRunFeeder.jobQueueUpdate()
           run1 = activeRunContext.testRun
           SessionMap.registerObject(run1.runner.email, "signalRegistry", new MinderSignalRegistry());
@@ -80,6 +78,7 @@ object TestQueueController extends Controller {
 
   /**
     * an action for enqueuing a new job for test engine running
+    *
     * @return
     */
   def enqueueJob(id: Long, visibility: String) = Action {
@@ -94,7 +93,9 @@ object TestQueueController extends Controller {
           val java_ctx = play.core.j.JavaHelpers.createJavaContext(request)
           val java_session = java_ctx.session()
           val user = Authentication.getLocalUser(java_session);
-          jobQueue.offer(createTestRunContext(job, user, Visibility.valueOf(visibility)))
+          jobQueue.synchronized {
+            jobQueue.offer(createTestRunContext(job, user, Visibility.valueOf(visibility)))
+          }
           TestRunFeeder.jobQueueUpdate()
           Ok;
         }
@@ -103,6 +104,7 @@ object TestQueueController extends Controller {
 
   /**
     * an action for enqueuing a new gitb job for test engine running
+    *
     * @return
     */
   def enqueueGitbJobWithUser(id: Long, user: User, replyToUrlAddress: String) {
@@ -115,7 +117,9 @@ object TestQueueController extends Controller {
       } else {
         var testRunContext = createTestRunContext(job, user, Visibility.PROTECTED);
         testRunContext.gitbReplyToUrlAddress = replyToUrlAddress
-        jobQueue.offer(testRunContext)
+        jobQueue.synchronized {
+          jobQueue.offer(testRunContext)
+        }
         TestRunFeeder.jobQueueUpdate()
       }
     }
@@ -130,6 +134,7 @@ object TestQueueController extends Controller {
 
   /**
     * Utility method to create a test run
+    *
     * @return
     */
 
@@ -170,7 +175,9 @@ object TestQueueController extends Controller {
         val arr = jobQueue.toArray
 
         val tr = arr(index).asInstanceOf[TestRunContext]
-        jobQueue.remove(tr)
+        jobQueue.synchronized {
+          jobQueue.remove(tr)
+        }
         TestRunFeeder.jobQueueUpdate()
       }
       Ok
@@ -204,6 +211,7 @@ object TestQueueController extends Controller {
 
   /**
     * an action for cancelling a given gitb job for test engine running
+    *
     * @return
     */
   def cancelGitbJob(id: Long, user: User) {
@@ -238,7 +246,9 @@ object TestQueueController extends Controller {
       val tr = arr(index).asInstanceOf[TestRunContext]
       if (user.email == "root@minder" || user.email == tr.testRun.runner.email) {
         if (tr.job.isInstanceOf[GitbJob] && tr.job.id == id) {
-          jobQueue.remove(tr)
+         jobQueue.synchronized {
+           jobQueue.remove(tr)
+         }
           TestRunFeeder.jobQueueUpdate()
           return
         }

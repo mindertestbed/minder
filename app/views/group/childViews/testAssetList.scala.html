@@ -10,11 +10,24 @@
     });
 </script>
 
+@subjectIs(testGroup.owner) {
+  @createButton(Messages("restrictedTestPage.createAsset"),
+    "glyphicon-plus",
+    "btn-primary") {
+    createFormDialog(
+      "/createNewAssetForm",
+      "/doCreateTestAsset?groupId=@{testGroup.id}",
+      "Create Asset",
+      $("#testGroupAsset@{testGroup.id}").parent(),true)
+  }
+  <br />
+  <br />
+}
 <div id="testGroupAsset@testGroup.id">
-  <table class="datatable shaded" style="width:1% ;">
+  <table class="table table-hover table-condensed  table-striped " style="width: 50% ;">
     @createFirstRow {
-      <th class="tabshrink" >Name</th>
-      <th class="tabshrink" >Short Description</th>
+      <th >Name</th>
+      <th >Short Description</th>
     }
 
     @defining(new AtomicInteger(1)) { index =>
@@ -29,61 +42,31 @@
             <td class="tabshrink">
             @asset.shortDescription
             </td>
-            <td class="tabshrink" align="center" style="border:1px solid white ; background-color:white ;">
-              <table><tr><td>
-                <div id="downloadAsset@asset.id" title="Download" class="bevel2 celldiv" style="height:30px ; width:30px ; padding-left: 5px ; padding-right: 5px ;">
-                  <a href="/downloadAsset?id=@asset.id"><img src="@routes.Assets.versioned("/images/download-64.png")" height="16px" alt="Download"/></a>
-                </div></td> <td>&nbsp;</td>
-                @subjectIsOr(testGroup.owner) {
-                  <td>
-                    <div id="editAsset@asset.id" class="bevel2 celldiv" style="height:30px ; width:30px ; padding-left: 5px ; padding-right: 5px ;">
-                      <img src="@routes.Assets.versioned("/images/edit_property-64.png")" height="16px"/>
-                      <script>
-                          createMultipartFormDialog($("#editAsset@asset.id"), "/editAssetForm?id=@{asset.id}", "/doEditAsset", "mainDialog",
-                              "Edit Asset", $("#testGroupAsset@{testGroup.id}").parent());
-                      </script>
-                    </div>
-                  </td> <td >&nbsp;</td>
-                  <td style="width:3% ;" align="center">
-                    <div id="deleteAsset@asset.id" class="bevel2 celldiv" style="height:30px ; width:30px ; padding-left: 5px ; padding-right: 5px ;">
-                      <img src="@routes.Assets.versioned("/images/trash2-64.png")" height="16px"/>
-                    </div>
-                    <script>
-                        var elm = $("#deleteAsset@asset.id");
-                        deleteWithDialog(elm, "/doDeleteAsset?id=@asset.id", $("#dialog-confirm"),
-                            "Delete Asset", "asset", "@asset.name", $("#testGroupAsset@{testGroup.id}").parent())
-                    </script>
+            <td class="tabshrink" align="center" width="100px">
+              <table><tr>
+                <td>@createLinkButton("/downloadAsset?id=" + asset.id, "", "glyphicon-download", "btn-default")</td>
+                @subjectIs(testGroup.owner) {
+                  <td>@createButton("", "glyphicon-pencil", "btn-default") {
+                    createFormDialog(
+                    "/editAssetForm?id=@{asset.id}",
+                    "/doEditAsset",
+                    "Edit Asset",
+                    $("#testGroupAsset1").parent(),true)
+                  }</td>
 
-                  </td>
-                } {
-                  <td style="background-color:transparent ; border:1px solid white ;">&nbsp;</td>
+                  <td>@createButton("", "glyphicon-trash", "btn-default") {
+                    deleteWithDialog("/doDeleteAsset?id=@asset.id", $("#dialog-confirm"),
+                    "Delete Asset", "asset", "@asset.name", $("#testGroupAsset@{
+                    testGroup.id
+                  }").parent())
+                  }</td>
                 }
               </tr>
               </table>
+
             </td>
           </tr>
         }
       </table>
-  @subjectIs(testGroup.owner) {
-    <div class="title styledtitleinverse hand create bevel2" style="margin:0 ; display:table-cell ; border: none ;" align="center">
-      <table><tr><td>
-        <table>
-          <tr>
-            <td style="height:23px ; vertical-align:top ; text-align:right ;">
-              <img src="@routes.Assets.versioned("/images/plus-64.png")" height="16px" />
-            </td>
-            <td id="createAsset2" style="height:23px ;">
-            @Messages("restrictedTestPage.createAsset")
-            </td>
-          </tr>
-        </table></td>
-      </tr>
-      </table>
-    </div>
-    <script>
-        createMultipartFormDialog($("#createAsset1, #createAsset2"), "/createNewAssetForm", "/doCreateTestAsset?groupId=@{testGroup.id}", "mainDialog", "Create Asset", $("#testGroupAsset@{testGroup.id}").parent());
-    </script>
-  }
-  }
-  }
+  }}
 </div>

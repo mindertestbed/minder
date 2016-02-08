@@ -22,7 +22,8 @@ GET         /editUserForm                               controllers.UserControll
 POST        /doCreateUser                               controllers.UserController.doCreateUser
 GET         /doDeleteUser                               controllers.UserController.doDeleteUser(id: Long)
 POST        /doEditUser                                 controllers.UserController.doEditUser()
-
+GET         /showUsers                                  controllers.UserController.listUsers(display: String)
+GET         /showSettings                               controllers.UserController.viewSettings(display:String)
 
 #test group management
 GET         /getCreateGroupEditorView                   controllers.GroupController.getCreateGroupEditorView
@@ -57,8 +58,6 @@ GET         /doDeleteCase                               controllers.TestCaseCont
 GET         /viewTestCase                               controllers.TestCaseController.viewTestCase(id: Long, display: String ?= "jobs")
 GET         /viewTestCase2                              controllers.TestCaseController.viewTestCase2(id: Long, tdlId: Long, display: String ?= "jobs")
 POST        /doEditCaseField                            controllers.TestCaseController.doEditCaseField()
-GET         /renderJobs                                 controllers.TestCaseController.renderJobs(id: Long, tdlId: Long)
-GET         /renderCode                                 controllers.TestCaseController.renderCode(id: Long, tdlId: Long)
 #JOB management
 
 GET         /getCreateJobEditorView                     controllers.JobController.getCreateJobEditorView(tdlID: Long)
@@ -90,7 +89,7 @@ GET         /listTestRunsForm                           controllers.JobControlle
 GET         /viewReport                                 controllers.JobController.viewReport(testRunId: Long, type: String)
 
 #Wrappers
-GET         /createNewWrapperForm                       controllers.WrapperController.createNewWrapperForm
+GET         /createNewAdapterForm                       controllers.WrapperController.createNewAdapterForm
 POST        /doCreateWrapper                            controllers.WrapperController.doCreateWrapper
 GET         /doDeleteWrapper                            controllers.WrapperController.doDeleteWrapper(id: Long)
 GET         /editWrapperForm                            controllers.WrapperController.editWrapperForm(id: Long)

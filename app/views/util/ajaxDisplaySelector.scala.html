@@ -1,24 +1,20 @@
 @(default: String, pairs: Tuple2[String, Tuple2[String, String]]*)
 
 @if(pairs != null && pairs.size > 0){
-  <table style="width:100%;">
-    <tr>
-      <td style="width:10px;border-bottom:1px solid gray;">&nbsp;</td>
-      @for((displayKey, (label, targetFunction)) <- pairs) {
-        @*
-        The @{displayKey}Td is a simple DOM id, like 1Td, 2Td ...
-        I use that kind of id mapping to ensure unique DOM ids
-        within the whole APP.
-        *@
-        <td id="@{displayKey}Td" class='tabshrink'>
-          <h4>
-            <a onclick='tabClickHandler(@{targetFunction}, $("#@{displayKey}Td"), event)' href="#">@label</a>
-          </h4>
-        </td>
-      }
-      <td class="tabexpand">&nbsp;</td>
-    </tr>
-  </table>
+  <ul class="nav nav-tabs">
+
+    @for((displayKey, (label, targetFunction)) <- pairs) {
+      @*
+      The @{displayKey}Td is a simple DOM id, like 1Td, 2Td ...
+      I use that kind of id mapping to ensure unique DOM ids
+      within the whole APP.
+      *@
+
+      <li role="presentation" id="@{displayKey}Li">
+          <a onclick='tabClickHandler(@{targetFunction}, $("#@{displayKey}Li"), event)' href="#">@label</a>
+      </li>
+    }
+  </ul>
 
   <script>
     function tabClickHandler(targetFunction, target, event){
@@ -30,15 +26,13 @@
         vnt.stop();
       }
       deactivateAll()
-      target.removeClass("passivetab");
-      target.addClass("activetab");
+      target.addClass("active");
       targetFunction();
     }
 
     function deactivateAll(){
       @for((displayKey, (label, jsFunctionName)) <- pairs){
-       $("#@{displayKey}Td").removeClass("activetab");
-       $("#@{displayKey}Td").addClass("passivetab");
+       $("#@{displayKey}Li").removeClass("active");
       }
     }
 
@@ -53,14 +47,14 @@
           @if(displayKey == default){
             var targetFunction = @{jsFunctionName}
             var displayKeyName = "@{displayKey}"
-            var jsSelector = "#" + displayKeyName + "Td"
+            var jsSelector = "#" + displayKeyName + "Li"
             tabClickHandler(targetFunction, $(jsSelector));
           }
         }
       } else {
         var targetFunction = @{pairs.head._2}
         var displayKeyName = "@{pairs.head._1}"
-        var jsSelector = "#" + displayKeyName + "Td"
+        var jsSelector = "#" + displayKeyName + "Li"
         tabClickHandler(targetFunction, $(jsSelector));
       }
     })

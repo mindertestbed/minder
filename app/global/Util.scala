@@ -16,6 +16,10 @@ import play.mvc.Http
   * Created by yerlibilgin on 02/05/15.
   */
 object Util {
+
+  def feedWidth = 3
+  def remaining = 9
+
   def choose(value: Any, expected: Any, matchValue: String = "activetab", nonMatchValue: String = "passivetab"): String = {
     if (value == expected)
       matchValue
@@ -101,6 +105,14 @@ object Util {
       "/images/Happy-32.png"
     } else {
       "/images/Sad-32.png"
+    }
+  }
+
+  def getBooleanTick(flag: Boolean): String = {
+    if (flag) {
+      "\u2713"
+    } else {
+      "\u2718"
     }
   }
 

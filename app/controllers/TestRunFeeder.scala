@@ -38,13 +38,17 @@ object TestRunFeeder extends Controller {
 
   def queueRenderer(user: models.User): Enumeratee[String, String] = Enumeratee.map[String] {
     dummy => {
+      println("Before render")
       TestQueueController.jobQueue.synchronized {
         val queue = TestQueueController.jobQueue
 
+        println("Render job que")
         if (queue.isEmpty && TestQueueController.activeRunContext == null)
           ""
         else {
           val sb = new StringBuilder
+
+          println("print que")
           sb.append("[")
 
           //if we have an active run context, send it with an -1 index.
@@ -113,6 +117,7 @@ object TestRunFeeder extends Controller {
           jobQueueUpdate()
         }
       }.start()
+      println("Someone asks for que")
       Ok.chunked(jobQueueOut &> queueRenderer(user) &> EventSource()).as("text/event-stream")
   }
 
@@ -132,6 +137,7 @@ object TestRunFeeder extends Controller {
   }
 
   def jobQueueUpdate(): Unit = {
+    println("Update que")
     jobQueueChannel.push("")
   }
 
