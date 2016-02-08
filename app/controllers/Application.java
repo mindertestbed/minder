@@ -26,6 +26,7 @@ public class Application extends Controller {
     }
   }
 
+
   @AllowedRoles({Role.TEST_DESIGNER, Role.TEST_OBSERVER})
   public static Result testGroups() {
     final User localUser = Authentication.getLocalUser();
@@ -82,7 +83,9 @@ public class Application extends Controller {
             routes.javascript.TestAssertionController.renderTestCases(),
             routes.javascript.JobController.changeTestRunVisibility(),
             routes.javascript.JobController.changeJobVisibility(),
-            routes.javascript.TestQueueController.enqueueJob()
+            routes.javascript.TestQueueController.enqueueJob(),
+            routes.javascript.UserController.listUsers(),
+            routes.javascript.UserController.viewSettings()
         ))
         .as("text/javascript");
   }

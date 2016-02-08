@@ -108,6 +108,14 @@ object Util {
     }
   }
 
+  def getBooleanTick(flag: Boolean): String = {
+    if (flag) {
+      "\u2713"
+    } else {
+      "\u2718"
+    }
+  }
+
 
   def canAccess(localUser: User, owner: User): Boolean = {
     println(localUser.email + " vs. " + owner.email)
