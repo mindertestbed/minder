@@ -14,13 +14,11 @@
   @createButton(Messages("restrictedTestPage.createAsset"),
     "glyphicon-plus",
     "btn-primary") {
-    createMultipartFormDialog("/createNewAssetForm",
-    "/doCreateTestAsset?groupId=@{
-      testGroup.id
-    }", "mainDialog", "Create Asset",
-    $("#testGroupAsset@{
-      testGroup.id
-    }").parent())
+    createFormDialog(
+      "/createNewAssetForm",
+      "/doCreateTestAsset?groupId=@{testGroup.id}",
+      "Create Asset",
+      $("#testGroupAsset@{testGroup.id}").parent(),true)
   }
   <br />
   <br />
@@ -49,9 +47,11 @@
                 <td>@createLinkButton("/downloadAsset?id=" + asset.id, "", "glyphicon-download", "btn-default")</td>
                 @subjectIs(testGroup.owner) {
                   <td>@createButton("", "glyphicon-pencil", "btn-default") {
-                    createMultipartFormDialog("/editAssetForm?id=@{
-                    asset.id
-                  }", "/doEditAsset", "mainDialog", "Edit Asset", $("#testGroupAsset1").parent())
+                    createFormDialog(
+                    "/editAssetForm?id=@{asset.id}",
+                    "/doEditAsset",
+                    "Edit Asset",
+                    $("#testGroupAsset1").parent(),true)
                   }</td>
 
                   <td>@createButton("", "glyphicon-trash", "btn-default") {

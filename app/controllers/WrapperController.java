@@ -50,21 +50,21 @@ public class WrapperController extends Controller {
   }
 
   @Security.Authenticated(Secured.class)
-  public static Result createNewWrapperForm() {
+  public static Result createNewAdapterForm() {
     return ok(wrapperEditor.render(WRAPPER_FORM, false));
   }
 
   @Security.Authenticated(Secured.class)
   public static Result doDeleteWrapper(Long id) {
-    System.out.println("Wrapper id:" + id);
+    System.out.println("Adapter id:" + id);
     Wrapper wr = Wrapper.findById(id);
     if (wr == null) {
       // it does not exist. errort
-      return badRequest("Wrapper with id " + id + " does not exist.");
+      return badRequest("An adapter with id " + id + " does not exist.");
     }
 
     try {
-      System.out.println("Wrapper delete");
+      System.out.println("Adapter delete");
       wr.delete();
     } catch (Exception ex) {
       ex.printStackTrace();
@@ -103,6 +103,7 @@ public class WrapperController extends Controller {
       WrapperEditorModel model = filledForm.get();
       Wrapper wr = Wrapper.find.byId(model.id);
       wr.shortDescription = model.shortDescription;
+      wr.name = model.name;
       wr.update();
 
       Logger.info("Done updating wrapper " + model.name);
