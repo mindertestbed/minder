@@ -7,7 +7,7 @@
 @import views.html.group._
 @import views.html.util._
 
-@main(Messages("minder.navigation.restricted.testdesigner"), "mainNavigation",
+@main(Messages("minder.navigation.restricted.testdesigner"), "testGroups",
   Array(("Test Groups", controllers.routes.Application.testGroups().path()),
     (tg.name, controllers.routes.GroupController.getGroupDetailView(tg.id, "details").path()))) {
 

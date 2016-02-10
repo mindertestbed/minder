@@ -1,10 +1,7 @@
 @import views.html.util._
 
-@main("Adapters", "adapters",
-  Array(("Adapters", controllers.routes.Application.adapters().path()))) {
-
+@main("Adapters", "adapters", "Adapters") {
   @dialogs()
-
   <div id="wrapperLister" style="padding:0px ;">
   @wrapperLister()
   </div>

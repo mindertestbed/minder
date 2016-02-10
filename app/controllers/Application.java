@@ -26,6 +26,7 @@ public class Application extends Controller {
     }
   }
 
+
   @AllowedRoles({Role.TEST_DESIGNER, Role.TEST_OBSERVER})
   public static Result testGroups() {
     final User localUser = Authentication.getLocalUser();
@@ -55,6 +56,15 @@ public class Application extends Controller {
     }
     return ok(views.html.job.jobQueue.render());
   }
+  @AllowedRoles({Role.TEST_DESIGNER, Role.TEST_OBSERVER,Role.TEST_DESIGNER})
+  public static Result about() {
+    final User localUser = Authentication.getLocalUser();
+
+    if (!session().containsKey("testPageMode")) {
+      session().put("testPageMode", "none");
+    }
+    return ok(views.html.aboutPage.render());
+  }
 
   @AllowedRoles({Role.TEST_DEVELOPER, Role.TEST_DESIGNER, Role.TEST_OBSERVER})
   public static Result profile() {
@@ -82,7 +92,9 @@ public class Application extends Controller {
             routes.javascript.TestAssertionController.renderTestCases(),
             routes.javascript.JobController.changeTestRunVisibility(),
             routes.javascript.JobController.changeJobVisibility(),
-            routes.javascript.TestQueueController.enqueueJob()
+            routes.javascript.TestQueueController.enqueueJob(),
+            routes.javascript.UserController.listUsers(),
+            routes.javascript.UserController.viewSettings()
         ))
         .as("text/javascript");
   }

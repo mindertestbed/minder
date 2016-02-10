@@ -1,35 +1,11 @@
 <script>
     $ ( function ( ) {
-      var activeJobTemplate =
-          '<div class="fullw" style="padding:10px ;">'+
-          '<div class="fullw bevel2" style="padding:10px ;" title="$jobId $jobName $email $progress">'+
-          '<a href="/viewJob?id=$jobId&showHistory=true" title="View Job">'+
-          '<span class="title">$jobName</span></a>'+
-          '<table class="fullw"><tr><td>'+
-          '<div style="border:1px solid gray ; background-color:white ; height:14px ; width:100% ; padding:0">'+
-          '<div id="progressDiv" style="background-color:lightgreen ; height:12px ; width: $progress% ; margin:0">&nbsp;</div>'+
-          '</div></td> <td style="width:20px ; vertical-align:text-top ;">'+
-          '&nbsp; <span title="Cancel Job $jobName" style="cursor:hand;"'+
-          'onclick=ajaxCancelActiveJob("$jobName")>'+
-          '<img src="@routes.Assets.versioned("/images/Delete-icon.png")" height="12px"/></span>'+
-          '</td> </tr> </table> </div> </div>'
-
-      var queueItemTemplate =
-          '<div class="fullw bevel2" style="padding:10px ;" title="$jobId $jobName $email">'+
-          '<a href="/viewJob?id=$jobId&showHistory=true" title="View Job">'+
-          '<span class="title">$jobName</span></a>'+
-          '<table class="fullw"><tr><td>'+
-          '<div style="border:1px solid #ccc ; background-color:white ; height:14px ; width:100% ; padding:0">'+
-          '<div style="background-color:lightgreen ; height:12px ; width:0% ; margin:0">&nbsp;</div>'+
-          '</div></td> <td style="width:20px ; vertical-align:text-top ;">'+
-          '&nbsp; <span title="Cancel $jobName" style="cursor:hand" onclick=ajaxCancelJob("$index", "$jobName")>'+
-          '<img src="@routes.Assets.versioned("/images/Delete-icon.png")" height="12px"/></span>'+
-          '</td> </tr> </table> </div>'
-
+      var activeJobTemplate = $("#activeJobTemplate").html()
       var activeJobDiv = $("#activeJobDiv")
       var sleepingDiv = $("#sleepingDiv")
       var queueDiv = $("#queueDiv")
       var progressDiv = $("#progressDiv")
+      var queueItemTemplate = $("#queueTemplate").html()
 
       new EventSource ( '@controllers.routes.TestRunFeeder.jobQueueFeed()'
       ).onmessage = function ( event ) {
@@ -110,3 +86,35 @@
 
 
 
+<div id="queueTemplate" style="display:none">
+  <div class="fullw bevel2" style="padding:10px ;" title="$jobId $jobName $email">
+    <a href="/viewJob?id=$jobId&showHistory=true" title="View Job">
+      <span class="title">$jobName</span></a>
+    <table class="fullw"><tr><td>
+      <div style="border:1px solid #ccc ; background-color:white ; height:10px ; width:100% ; padding:0">
+        <div style="background-color:lightgreen ; height:8px ; width:0% ; margin:0">&nbsp;</div>
+      </div></td> <td style="width:20px ; vertical-align:text-top ;">
+        &nbsp; <span title="Cancel $jobName" style="cursor:hand" onclick='ajaxCancelJob("$index", "$jobName")'>
+      <img src="@routes.Assets.versioned("/images/Delete-icon.png")" height="12px"/> </span>
+    </td>
+    </tr>
+    </table> </div>
+</div>
+
+<div id="activeJobTemplate" style="display:none">
+  <div class="fullw" style="padding:10px ;">
+    <div class="fullw bevel2" style="padding:10px ;" title="$jobId $jobName $email $progress">
+      <a href="/viewJob?id=$jobId&showHistory=true" title="View Job">
+        <span class="title">$jobName</span></a>
+      <table class="fullw"><tr><td>
+        <div style="border:1px solid gray ; background-color:white ; height:10px ; width:100% ; padding:0">
+          <div id="progressDiv" style="background-color:lightgreen ; height:8px ; width: $progress% ; margin:0">&nbsp;</div>
+        </div></td> <td style="width:20px ; vertical-align:text-top ;">
+          &nbsp; <span title="Cancel Job $jobName" style="cursor:hand ;"
+      onclick='ajaxCancelActiveJob("$jobName")'>
+        <img src="@routes.Assets.versioned("/images/Delete-icon.png")" height="12px"/></span>
+      </td>
+      </tr>
+      </table> </div> </div>
+
+</div>

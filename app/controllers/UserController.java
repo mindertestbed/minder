@@ -12,7 +12,8 @@ import play.mvc.Result;
 import play.mvc.Security;
 import security.Role;
 import views.html.rootViews.userEditor;
-
+import views.html.rootViews.userListView;
+import views.html.rootViews.settingsView;
 import javax.xml.bind.DatatypeConverter;
 import java.util.ArrayList;
 
@@ -206,6 +207,30 @@ public class UserController extends Controller {
         Ebean.endTransaction();
       }
       return redirect(routes.Application.root("users"));
+    }
+  }
+  @Security.Authenticated(Secured.class)
+  public static Result listUsers(String string) {
+    final User localUser = Authentication.getLocalUser();
+    if (localUser == null)
+      return badRequest("You cannot access this resoruce.");
+
+    if (localUser.email.equals("root@minder")) {
+      return ok(userListView.render());
+    } else {
+      return badRequest("You cannot access this resoruce.");
+    }
+  }
+  @Security.Authenticated(Secured.class)
+  public static Result viewSettings(String string) {
+    final User localUser = Authentication.getLocalUser();
+    if (localUser == null)
+      return badRequest("You cannot access this resoruce.");
+
+    if (localUser.email.equals("root@minder")) {
+      return ok(settingsView.render());
+    } else {
+      return badRequest("You cannot access this resoruce.");
     }
   }
 

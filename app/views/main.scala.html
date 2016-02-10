@@ -1,7 +1,7 @@
 @import authentication._
 @import util._
 
-@(title: String, nav: String = "", currentPath: Array[(String, String)] = null)(content: Html)
+@(title: String, nav: String = "", navObject: Object = null)(content: Html)
 
 
 <!DOCTYPE html>
@@ -31,11 +31,11 @@
           <!-- Collect the nav links, forms, and other content for toggling -->
         <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
           <ul class="nav navbar-nav">
-            <li class="@("active".when(nav == "testGroups"))"><a href="@routes.Application.testGroups()">
-              Test Groups</a>
+            <li class="@("active".when(nav == "testGroups"))"><a href="@routes.Application.testGroups()">Test Groups</a>
             </li>
             <li class="@("active".when(nav == "adapters"))"><a href="@routes.Application.adapters()">Adapters</a></li>
             <li class="@("active".when(nav == "jobQueue"))"><a href="@routes.Application.jobQueue()">Test Monitor</a></li>
+            <li class="@("active".when(nav == "about"))"><a href="@routes.Application.about()">About</a></li>
 
             @defining(Authentication.getLocalUser()) { user =>
               @if(user != null && user.email == "root@minder") {
@@ -71,7 +71,7 @@
       </div> <!-- /.container-fluid -->
 
       <div>
-      @drawNavigation(currentPath)
+      @drawNavigation(navObject)
       </div>
     </nav>
 

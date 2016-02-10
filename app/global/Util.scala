@@ -16,6 +16,10 @@ import play.mvc.Http
   * Created by yerlibilgin on 02/05/15.
   */
 object Util {
+
+  def feedWidth = 3
+  def remaining = 9
+
   def choose(value: Any, expected: Any, matchValue: String = "activetab", nonMatchValue: String = "passivetab"): String = {
     if (value == expected)
       matchValue
@@ -104,7 +108,40 @@ object Util {
     }
   }
 
+  def getBooleanTick(flag: Boolean): String = {
+    if (flag) {
+      "\u2713"
+    } else {
+      "\u2718"
+    }
+  }
+def setVersionInfo(): Any ={
 
+  val p = getClass.getPackage
+  val name = p.getImplementationTitle
+  val version=p.getImplementationVersion
+}
+
+def getVersionInfo(): String = {
+  val versionNo = {
+    try {
+      val prop = new Properties()
+      prop.load(new FileInputStream("AboutMinder.properties"))
+
+
+      prop.getProperty("VERSION")
+
+
+    }
+    catch {case e:Exception =>
+        e.printStackTrace()
+
+    }
+  }
+  return versionNo.toString
+  
+
+}
   def canAccess(localUser: User, owner: User): Boolean = {
     println(localUser.email + " vs. " + owner.email)
     localUser.email == "root@minder" || localUser.email == owner.email

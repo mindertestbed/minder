@@ -5,7 +5,7 @@
   <br />
 
   <div>
-    <table class="shaded fullw">
+    <table class="table table-bordered table-striped table-hover">
       <tr>
         <th>#</th> <th>Status</th> <th>Date</th> <th>Visibility</th> <th>Run by</th> <th>Details</th> <th>Report</th>
       </tr>
@@ -13,23 +13,21 @@
         @for( testRun <- testRunList) {
           @authentication.decideOnVisibility(testRun.visibility, testRun.runner) {
             <tr class="@if(testRun.success) {goodTestRun} else {badTestRun}">
-              <td style="text-align:center ;" class="tabshrink">
+              <td style="text-align:center ;vertical-align: middle;" class="tabshrink">
               @testRun.number
               </td>
-              <td style="text-align:center ;" class="tabshrink">
+              <td style="text-align:center ;vertical-align: middle;" class="tabshrink">
               @if(testRun.success) {
                 <img src="@routes.Assets.versioned("/images/Check-icon.png")" height="16px" alt='G'/>
               } else {
                 <img src="@routes.Assets.versioned("/images/Delete-icon.png")" height="16px" alt='B'/>
               }
               </td>
-              <td style="text-align:left ;" class="tabshrink">@testRun.date</td>
-              <td style="text-align:center ; font-size:20px ;" class="tabshrink">@visibilityTagFragment(testRun.visibility, testRun.runner)</td>
-              <td style="text-align:left ;" class="tabexpand">@testRun.runner.email</td>
-              <td align="center" valign="middle" class="tabshrink">
-                <a  href="/viewTestRunHistory?testRunId=@testRun.id" ><div class="bevel2 celldiv" style="text-align: center ; padding:5px ;" title="Details">
-                <img src="@routes.Assets.versioned("/images/Details-50.png")" height="24px" alt='G'/>
-                </div></a>
+              <td style="text-align:left ;vertical-align: middle;" class="tabshrink">@testRun.date</td>
+              <td style="text-align:center ; font-size:20px ;vertical-align: middle;" class="tabshrink">@visibilityTagFragment(testRun.visibility, testRun.runner)</td>
+              <td style="text-align:left ;vertical-align: middle;" class="tabexpand">@testRun.runner.email</td>
+              <td align="center" style="vertical-align: middle" class="tabshrink">
+                @createLinkButton("/viewTestRunHistory?testRunId=@testRun.id", "", "glyphicon-option-horizontal", "btn-default")
               </td>
               <td align="center" class="tabshrink">
               @reportMenu(testRun)

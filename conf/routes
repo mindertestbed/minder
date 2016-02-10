@@ -10,6 +10,7 @@ GET         /jobQueue                                   controllers.Application.
 GET         /adapters                                   controllers.Application.adapters()
 GET         /assets/javascript/routes.js                controllers.Application.jsRoutes
 GET         /profile                                    controllers.Application.profile
+GET         /about                                      controllers.Application.about()
 
 GET         /login                                      controllers.Authentication.login
 POST        /login                                      controllers.Authentication.doLogin
@@ -22,7 +23,8 @@ GET         /editUserForm                               controllers.UserControll
 POST        /doCreateUser                               controllers.UserController.doCreateUser
 GET         /doDeleteUser                               controllers.UserController.doDeleteUser(id: Long)
 POST        /doEditUser                                 controllers.UserController.doEditUser()
-
+GET         /showUsers                                  controllers.UserController.listUsers(display: String)
+GET         /showSettings                               controllers.UserController.viewSettings(display:String)
 
 #test group management
 GET         /getCreateGroupEditorView                   controllers.GroupController.getCreateGroupEditorView

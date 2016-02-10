@@ -422,3 +422,38 @@ function ajaxCancelActiveJob(name) {
   dialog.dialog("open");
 
 }
+
+function enqueue(jobName, jobId, visibility){
+
+  var dialogElm = $("#jobEnqueueDialog")
+  var select = $("#jobEnqueueDialog > .visibilitySelect")
+  select.val(visibility)
+
+  var dialog = dialogElm.dialog({
+    autoOpen: false,
+    title: 'Enqueue job ' + jobName + '?',
+    modal: true,
+    width: 550,
+    height: 400,
+    buttons: {
+      "Ok": function () {
+        var theUrl = jsRoutes.controllers.TestQueueController.enqueueJob(jobId, select.val())
+        $.ajax({
+          type: 'GET',
+          url: theUrl.url,
+          success: function (data) {
+            dialog.dialog("close");
+          },
+          error: function (jqXHR, textStatus, errorMessage) {
+            showError(jqXHR.responseText)
+            dialog.dialog("close");
+          }
+        });
+      },
+      Cancel: function () {
+        dialog.dialog("close");
+      }
+    }
+  });
+  dialog.dialog("open");
+}
