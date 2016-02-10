@@ -14,6 +14,9 @@ import rest.models.RestTestAsset;
 import rest.models.RestTestAssetList;
 
 import java.io.*;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -535,7 +538,7 @@ public class RestTestAssetController extends Controller {
 
     }
 
-    private static void handleFileUpload(TestAsset testAsset, byte[] asset) throws IOException, FileNotFoundException {
+    protected static void handleFileUpload(TestAsset testAsset, byte[] asset) throws IOException, FileNotFoundException {
         new File("assets/_" + testAsset.testGroup.id).mkdirs();
         File fl = new File("assets/_" + testAsset.testGroup.id + "/" + testAsset.name);
 
@@ -567,5 +570,17 @@ public class RestTestAssetController extends Controller {
         } catch (IOException e) {
             throw new IOException("Error occurred during the closing of output stream: " + e.getCause());
         }
+    }
+
+    protected static byte[] handleFileDownload(TestAsset testAsset) throws IOException {
+        Path path = Paths.get("assets/_" + testAsset.testGroup.id + "/" + testAsset.name);
+        byte[] asset = null;
+        try {
+            asset = Files.readAllBytes(path);
+        } catch (IOException e) {
+            throw new IOException("Error occurred during the reading bytes from input stream: " + e.getCause());
+        }
+
+        return asset;
     }
 }

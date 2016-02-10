@@ -2,12 +2,13 @@ package rest.controllers;
 
 import com.avaje.ebean.Ebean;
 import com.fasterxml.jackson.databind.JsonNode;
+import com.sun.org.apache.xalan.internal.xsltc.dom.CurrentNodeListIterator;
+import controllers.Authentication;
 import controllers.common.enumeration.Utils;
 import dependencyutils.DependencyClassLoaderCache;
 import editormodels.GroupEditorModel;
 import global.Util;
-import models.TestGroup;
-import models.User;
+import models.*;
 import play.Logger;
 import play.libs.Json;
 import play.mvc.Controller;
@@ -18,7 +19,9 @@ import rest.controllers.common.RestUtils;
 import rest.controllers.restbodyprocessor.IRestContentProcessor;
 import rest.models.*;
 
+import java.io.IOException;
 import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -34,6 +37,7 @@ import java.util.List;
  * @date: 10/11/15.
  */
 public class RestTestGroupController extends Controller {
+    public static SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSXXX");
     /**
      * This method receives JSON or XML request and returns all test groups defined in db.
      *
@@ -170,6 +174,7 @@ public class RestTestGroupController extends Controller {
         response().setContentType(contentProcessor.getContentType());
         return ok(responseValue);
     }
+
 
     /**
      * This method receives JSON or XML request which includes test group information and deletes the test group.

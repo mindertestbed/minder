@@ -13,6 +13,7 @@ import play.data.Form;
 import play.mvc.Controller;
 import play.mvc.Result;
 import play.mvc.Security;
+import rest.controllers.TestGroupImportExportController;
 import security.AllowedRoles;
 import security.Role;
 import views.html.group.childViews.*;
@@ -151,6 +152,16 @@ public class GroupController extends Controller {
       return badRequest("No job with id " + id + ".");
     }
     return ok(mainView.render(tg, display));
+  }
+
+  @AllowedRoles({Role.TEST_DESIGNER, Role.TEST_DEVELOPER})
+  public static Result exportTestGroup() {
+    return TestGroupImportExportController.exportTestGroupData();
+  }
+
+  @AllowedRoles({Role.TEST_DESIGNER, Role.TEST_DEVELOPER})
+  public static Result importTestGroup() {
+    return TestGroupImportExportController.exportTestGroupData();
   }
 
 
