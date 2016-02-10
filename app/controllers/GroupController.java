@@ -1,6 +1,7 @@
 package controllers;
 
 import com.avaje.ebean.Ebean;
+import com.avaje.ebeaninternal.server.lib.util.NotFoundException;
 import com.fasterxml.jackson.databind.JsonNode;
 import controllers.common.enumeration.Utils;
 import dependencyutils.DependencyClassLoaderCache;
@@ -14,10 +15,17 @@ import play.mvc.Controller;
 import play.mvc.Result;
 import play.mvc.Security;
 import rest.controllers.TestGroupImportExportController;
+import rest.controllers.common.RestUtils;
+import rest.controllers.restbodyprocessor.IRestContentProcessor;
+import rest.models.RestTestGroup;
 import security.AllowedRoles;
 import security.Role;
 import views.html.group.childViews.*;
 import views.html.group.*;
+
+import java.io.File;
+import java.io.IOException;
+import java.text.ParseException;
 
 import static play.data.Form.form;
 
@@ -155,13 +163,42 @@ public class GroupController extends Controller {
   }
 
   @AllowedRoles({Role.TEST_DESIGNER, Role.TEST_DEVELOPER})
-  public static Result exportTestGroup() {
-    return TestGroupImportExportController.exportTestGroupData();
+  public static Result exportTestGroup(Long id) {
+    RestTestGroup responseRestTestGroup = new RestTestGroup();
+    try {
+        responseRestTestGroup =  TestGroupImportExportController.exportTestGroupData(id);
+    } catch (NotFoundException e) {
+      return internalServerError(e.getMessage());
+    } catch (IOException e) {
+      return internalServerError(e.getMessage());
+    }
+
+    /*
+    * Preparing response
+    * */
+    IRestContentProcessor contentProcessor = null;
+    try {
+      contentProcessor = RestUtils.createContentProcessor("text/json");
+    } catch (IllegalArgumentException e) {
+      return badRequest(e.getCause().toString());
+    }
+
+    String responseValue = null;
+    try {
+      responseValue = contentProcessor.prepareResponse(RestTestGroup.class.getName(), responseRestTestGroup);
+    } catch (ParseException e) {
+      return internalServerError(e.getMessage());
+    }
+    System.out.println("responseValue:" + responseValue);
+
+    response().setContentType("application/x-download");
+    response().setHeader("Content-disposition", "attachment; filename=" + responseRestTestGroup.getGroupName()+".json");
+    return ok(responseValue);
   }
 
   @AllowedRoles({Role.TEST_DESIGNER, Role.TEST_DEVELOPER})
   public static Result importTestGroup() {
-    return TestGroupImportExportController.exportTestGroupData();
+    return null;
   }
 
 

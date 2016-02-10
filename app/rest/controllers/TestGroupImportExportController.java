@@ -1,6 +1,7 @@
 package rest.controllers;
 
 import com.avaje.ebean.Ebean;
+import com.avaje.ebeaninternal.server.lib.util.NotFoundException;
 import controllers.Secured;
 import controllers.TestCaseController;
 import dependencyutils.DependencyClassLoaderCache;
@@ -60,7 +61,49 @@ public class TestGroupImportExportController extends Controller {
             return unauthorized(Constants.RESULT_UNAUTHORIZED);
         }
 
-        return exportTestGroupData();
+        /*
+        * Handling the request message
+        * */
+        IRestContentProcessor contentProcessor = null;
+        try {
+            contentProcessor = RestUtils.createContentProcessor(request().getHeader(CONTENT_TYPE), request().body());
+        } catch (IllegalArgumentException e) {
+            return badRequest(e.getCause().toString());
+        }
+
+        RestTestGroup restTestGroup = null;
+        try {
+            restTestGroup = (RestTestGroup) contentProcessor.parseRequest(RestTestGroup.class.getName());
+        } catch (ParseException e) {
+            return internalServerError(e.getCause().toString());
+        }
+
+        if (null==restTestGroup.getId())
+            return badRequest("Please provide Test Group ID");
+
+        RestTestGroup responseRestTestGroup = new RestTestGroup();
+        try {
+            responseRestTestGroup =  exportTestGroupData(Long.parseLong(restTestGroup.getId()));
+        } catch (NotFoundException e) {
+            return internalServerError(e.getMessage());
+        } catch (IOException e) {
+            return internalServerError(e.getMessage());
+        }
+
+        /*
+        * Preparing response
+        * */
+        String responseValue = null;
+        try {
+            responseValue = contentProcessor.prepareResponse(RestTestGroup.class.getName(), responseRestTestGroup);
+        } catch (ParseException e) {
+            return internalServerError(e.getMessage());
+        }
+        System.out.println("responseValue:" + responseValue);
+
+        response().setContentType(contentProcessor.getContentType());
+        return ok(responseValue);
+
     }
 
     /**
@@ -290,34 +333,13 @@ public class TestGroupImportExportController extends Controller {
         return ok(responseValue);
     }
 
-    public static Result exportTestGroupData(){
+    public static RestTestGroup exportTestGroupData(Long groupId) throws NotFoundException, IOException{
         RestTestGroup responseRestTestGroup = new RestTestGroup();
 
-        /*
-        * Handling the request message
-        * */
-        IRestContentProcessor contentProcessor = null;
-        try {
-            contentProcessor = RestUtils.createContentProcessor(request().getHeader(CONTENT_TYPE), request().body());
-        } catch (IllegalArgumentException e) {
-            return badRequest(e.getCause().toString());
-        }
-
-        RestTestGroup restTestGroup = null;
-        try {
-            restTestGroup = (RestTestGroup) contentProcessor.parseRequest(RestTestGroup.class.getName());
-        } catch (ParseException e) {
-            return internalServerError(e.getCause().toString());
-        }
-
-        if (null==restTestGroup.getId())
-            return badRequest("Please provide Test Group ID");
-
-
         //getting the  test group
-        TestGroup tg = TestGroup.findById(Long.parseLong(restTestGroup.getId()));
+        TestGroup tg = TestGroup.findById(groupId);
         if (tg == null)
-            return badRequest("Test group with id [" + restTestGroup.getId() + "] not found!");
+            throw new NotFoundException("Test group with id [" + groupId + "] not found!");
 
         //
         responseRestTestGroup.setId(String.valueOf(tg.id));
@@ -388,7 +410,7 @@ public class TestGroupImportExportController extends Controller {
             try {
                 asset = RestTestAssetController.handleFileDownload(ta);
             } catch (IOException e) {
-                return internalServerError(e.getMessage());
+                throw new IOException("Test Asset "+"["+ta.name+"] cannot be downloaded."+e.getMessage());
             }
             rta.setAsset(asset);
 
@@ -409,18 +431,6 @@ public class TestGroupImportExportController extends Controller {
             responseRestTestGroup.getUtilClasses().add(ruc);
         }
 
-        /*
-        * Preparing response
-        * */
-        String responseValue = null;
-        try {
-            responseValue = contentProcessor.prepareResponse(RestTestGroup.class.getName(), responseRestTestGroup);
-        } catch (ParseException e) {
-            return internalServerError(e.getMessage());
-        }
-        System.out.println("responseValue:" + responseValue);
-
-        response().setContentType(contentProcessor.getContentType());
-        return ok(responseValue);
+        return responseRestTestGroup;
     }
 }

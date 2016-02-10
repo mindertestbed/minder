@@ -37,6 +37,8 @@
               onclick='deleteWithDialog("/doDeleteGroup?id=@tg.id", $("#dialog-confirm"), "Delete Group", "group", "@tg.name")'>
                 <span class="glyphicon glyphicon-trash" aria-hidden="true"></span>
               </button>
+              @createLinkButton("/exportTestGroup?id=" + tg.id, "", "glyphicon-download", "btn-default")
+
             </td>
           }
         </tr>

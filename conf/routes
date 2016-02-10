@@ -39,7 +39,7 @@ GET         /renderTestSuites                           controllers.GroupControl
 GET         /renderTestAssets                           controllers.GroupController.renderTestAssets(id: Long)
 GET         /renderUtilClasses                          controllers.GroupController.renderUtilClasses(id: Long)
 GET         /renderDependencies                         controllers.GroupController.renderDependencies(id: Long)
-POST        /exportTestGroup                            controllers.GroupController.exportTestGroup
+GET         /exportTestGroup                            controllers.GroupController.exportTestGroup(id: Long)
 POST        /importTestGroup                            controllers.GroupController.importTestGroup
 
 
