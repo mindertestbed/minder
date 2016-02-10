@@ -115,8 +115,34 @@ object Util {
       "\u2718"
     }
   }
+def setVersionInfo(): Any ={
+
+  val p = getClass.getPackage
+  val name = p.getImplementationTitle
+  val version=p.getImplementationVersion
+}
+
+def getVersionInfo(): String = {
+  val versionNo = {
+    try {
+      val prop = new Properties()
+      prop.load(new FileInputStream("AboutMinder.properties"))
 
 
+      prop.getProperty("VERSION")
+
+
+    }
+    catch {case e:Exception =>
+        e.printStackTrace()
+
+    }
+  }
+  //return versionNo.toString
+  val name :String = getClass.getPackage.getImplementationTitle
+  return name
+
+}
   def canAccess(localUser: User, owner: User): Boolean = {
     println(localUser.email + " vs. " + owner.email)
     localUser.email == "root@minder" || localUser.email == owner.email

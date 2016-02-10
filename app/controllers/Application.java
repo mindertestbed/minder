@@ -56,6 +56,15 @@ public class Application extends Controller {
     }
     return ok(views.html.job.jobQueue.render());
   }
+  @AllowedRoles({Role.TEST_DESIGNER, Role.TEST_OBSERVER,Role.TEST_DESIGNER})
+  public static Result about() {
+    final User localUser = Authentication.getLocalUser();
+
+    if (!session().containsKey("testPageMode")) {
+      session().put("testPageMode", "none");
+    }
+    return ok(views.html.aboutPage.render());
+  }
 
   @AllowedRoles({Role.TEST_DEVELOPER, Role.TEST_DESIGNER, Role.TEST_OBSERVER})
   public static Result profile() {

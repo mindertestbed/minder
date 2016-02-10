@@ -10,6 +10,7 @@ GET         /jobQueue                                   controllers.Application.
 GET         /adapters                                   controllers.Application.adapters()
 GET         /assets/javascript/routes.js                controllers.Application.jsRoutes
 GET         /profile                                    controllers.Application.profile
+GET         /about                                      controllers.Application.about()
 
 GET         /login                                      controllers.Authentication.login
 POST        /login                                      controllers.Authentication.doLogin
