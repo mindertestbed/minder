@@ -25,6 +25,7 @@ public final class Constants {
 
     public static final String RESULT_FIRST_UNAUTHORIZED = "401 Unauthorized";
     public static final String RESULT_UNAUTHORIZED = "401 Unauthorized: Make authentication request first";
+    public static final String RESULT_UNAUTHORIZED_ONLY_ROOT = "401 Unauthorized: Only root role may use this function";
     public static final String RESULT_SUCCESS = "200 Success";
 
 

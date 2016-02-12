@@ -2,14 +2,12 @@ package rest.controllers;
 
 import com.avaje.ebean.Ebean;
 import com.avaje.ebeaninternal.server.lib.util.NotFoundException;
-import controllers.Secured;
 import controllers.TestCaseController;
 import dependencyutils.DependencyClassLoaderCache;
 import models.*;
 import play.Logger;
 import play.mvc.Controller;
 import play.mvc.Result;
-import play.mvc.Security;
 import rest.controllers.common.Constants;
 import rest.controllers.common.RestUtils;
 import rest.controllers.restbodyprocessor.IRestContentProcessor;
@@ -56,9 +54,10 @@ public class TestGroupImportExportController extends Controller {
         */
         String authorizationData = request().getHeader(AUTHORIZATION);
         HashMap<String, String> clientRequest = RestUtils.createHashMapOfClientRequest(authorizationData);
-        User user = User.findByEmail(clientRequest.get("username"));
-        if (null == user) {
-            return unauthorized(Constants.RESULT_UNAUTHORIZED);
+        //User user = User.findByEmail(clientRequest.get("username"));
+        //TODO: RBAC yapınca bunu root rolü olarak değiştir. root@minder
+        if (!clientRequest.get("username").equals("root@minder")) {
+            return unauthorized(Constants.RESULT_UNAUTHORIZED_ONLY_ROOT);
         }
 
         /*
@@ -115,8 +114,13 @@ public class TestGroupImportExportController extends Controller {
      *
      */
     public static Result importTestGroup() {
-        RestTestGroup responseRestTestGroup = new RestTestGroup();
-
+        String authorizationData = request().getHeader(AUTHORIZATION);
+        HashMap<String, String> clientRequest = RestUtils.createHashMapOfClientRequest(authorizationData);
+        //User user = User.findByEmail(clientRequest.get("username"));
+        //TODO: RBAC yapınca bunu root rolü olarak değiştir. root@minder
+        if (!clientRequest.get("username").equals("root@minder")) {
+            return unauthorized(Constants.RESULT_UNAUTHORIZED_ONLY_ROOT);
+        }
         /*
         * Handling the request message
         * */
@@ -137,177 +141,18 @@ public class TestGroupImportExportController extends Controller {
         if (null==restTestGroup.getId())
             return badRequest("Please provide Test Group ID");
 
-        //Creating the new test group
-        TestGroup group = TestGroup.findByName(restTestGroup.getGroupName());
-        if (group != null) {
-            return badRequest("The group with name [" + group.name + "] already exists");
-        }
-
-        final User localUser = User.findByEmail("root@minder");//Authentication.getLocalUser();
-        if (null == localUser) {
-            return badRequest("You must login to Minder.");
-        }
-
-
 
         try {
-            Ebean.beginTransaction();
-
-            //Save Test Group
-            group = new TestGroup();
-            group.owner = localUser;
-            group.name = restTestGroup.getGroupName();
-            group.shortDescription = restTestGroup.getShortDescription();
-            group.description = restTestGroup.getDescription();
-
-            //Save Dependency String
-            String dependencyString = restTestGroup.getDependencyString();
-            if(dependencyString != null){
-                dependencyString = dependencyString.trim();
-
-                if(dependencyString.length() != 0){
-                    try {
-                        DependencyClassLoaderCache.getDependencyClassLoader(dependencyString);
-                    } catch (Exception ex) {
-                        Logger.error(ex.getMessage(), ex);
-                        return badRequest("There was a problem with the dependency string.<br /> \n" +
-                                "Please make sure that the dependencies are in format:<br />\n " +
-                                "groupId:artifactId[:extension[:classifier]]:version]]" + ex.toString());
-                    }
-                }
-            }
-            group.dependencyString = dependencyString;
-
-            try {
-                group.save();
-            } catch (Exception e) {
-                return internalServerError("An error occurred during test group add: " + e.getMessage());
-            }
-
-
-            //Save Test Assertions
-            List<RestTestAssertion> rtaList = restTestGroup.getTestassertions();
-            for(RestTestAssertion rta : rtaList){
-                TestAssertion ta = TestAssertion.findByTaId(rta.getTestAssertionId());
-                if (ta != null) {
-                    return badRequest("The test assertion with ID [" + ta.taId + "] already exists");
-                }
-
-                ta = new TestAssertion();
-                ta.testGroup = group;
-                ta.description = rta.getDescription();
-                ta.normativeSource = rta.getNormativeSource();
-                ta.owner = localUser;
-                ta.predicate = rta.getPredicate();
-                ta.prerequisites = rta.getPrerequisites();
-                ta.shortDescription = rta.getShortDescription();
-                ta.tag = rta.getTag();
-                ta.taId = rta.getTestAssertionId();
-                ta.target = rta.getTarget();
-                ta.variables = rta.getVariables();
-
-                PrescriptionLevel prescriptionLevel = null;
-                try {
-                    prescriptionLevel = PrescriptionLevel.valueOf(rta.getPrescriptionLevel());
-                } catch (IllegalArgumentException e) {
-                    return badRequest("The given prescription level [" + rta.getPrescriptionLevel()
-                            + "] is not defined. Please select one of these: Mandatory, Preffered or Permitted");
-                } catch (NullPointerException e) {
-                    return badRequest("The prescription level cannot be null. Please select one of these: Mandatory, Preffered or Permitted");
-                }
-                ta.prescriptionLevel = prescriptionLevel;
-
-                try {
-                    ta.save();
-                } catch (Exception e) {
-                    return internalServerError("An error occurred during save of test assertion: " + e.getMessage());
-                }
-
-                //Save Test Cases
-                List<RestTestCase> rtcList = rta.getTestcases();
-                for(RestTestCase rtc : rtcList){
-                    TestCase tc = TestCase.findByName(rtc.getName());
-                    if (tc != null) {
-                        return badRequest("The test case with name [" + rtc.getName() + "] already exists");
-                    }
-
-                    tc = new TestCase();
-                    tc.owner = localUser;
-                    tc.testAssertion = ta;
-                    tc.name = rtc.getName();
-
-                    try {
-                        tc.save();
-                    } catch (Exception e) {
-                        return internalServerError("An error occurred during save of test case: " + e.getMessage());
-                    }
-
-                    //Save TDLs
-                    for (RestTdl restTdl : rtc.tdls) {
-                        Tdl tdl = new Tdl();
-                        tdl.creationDate = new Date();
-                        tdl.version = restTdl.getVersion();
-                        tdl.tdl = new String(restTdl.getTdl());
-                        tdl.testCase = tc;
-
-                        try {
-                            tdl.save();
-                            TestCaseController.detectAndSaveParameters(tdl);
-                        } catch (Exception e) {
-                            return internalServerError("An error occurred during save of tdl: " + e.getMessage());
-                        }
-                    }
-                }
-            }
-
-            //Save test assets
-            List<RestTestAsset> restTestAssetList = restTestGroup.getTestassets();
-            for (RestTestAsset rta : restTestAssetList) {
-                TestAsset ta = new TestAsset();
-                ta.name = rta.getName();
-                ta.shortDescription = rta.getShortDescription();
-                ta.description = rta.getDescription();
-                ta.testGroup = group;
-
-                try {
-                    ta.save();
-                } catch (Exception e) {
-                    return internalServerError("An error occurred during save of test asset: " + e.getMessage());
-                }
-
-                if (rta.getAsset() != null && rta.getAsset().length > 0) {
-                    try {
-                        RestTestAssetController.handleFileUpload(ta,rta.getAsset());
-                    } catch (FileNotFoundException e) {
-                        return internalServerError(e.getCause().toString());
-                    } catch (IOException e) {
-                        return internalServerError(e.getCause().toString());
-                    }
-                }
-            }
-
-            //Save Utility Classes
-            List<RestUtilClass> restUtilClassList = restTestGroup.getUtilClasses();
-            for (RestUtilClass ruc : restUtilClassList) {
-                UtilClass uc = new UtilClass();
-                uc.name = ruc.getName();
-                uc.owner = localUser;
-                uc.shortDescription = ruc.getShortDescription();
-                uc.testGroup = group;
-                uc.source = new String(ruc.getSource());
-
-                try {
-                    uc.save();
-                } catch (Exception e) {
-                    return internalServerError("An error occurred during save of util class: " + e.getMessage());
-                }
-            }
-            Ebean.commitTransaction();
-        } finally {
-
-            Ebean.endTransaction();
+            importTestGroupData(restTestGroup,clientRequest.get("username"));
+        } catch (IllegalAccessException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }catch (IllegalArgumentException e) {
+            e.printStackTrace();
+        }catch (NullPointerException e) {
+            e.printStackTrace();
         }
-
 
 
         /*
@@ -432,5 +277,178 @@ public class TestGroupImportExportController extends Controller {
         }
 
         return responseRestTestGroup;
+    }
+
+    public static void importTestGroupData(RestTestGroup restTestGroup, String userName) throws IllegalArgumentException,IllegalAccessException, IOException, NullPointerException,FileNotFoundException{
+
+        //Creating the new test group
+        TestGroup group = TestGroup.findByName(restTestGroup.getGroupName());
+        if (group != null) {
+            throw new IllegalArgumentException("The group with name [" + group.name + "] already exists");
+        }
+
+        final User localUser = User.findByEmail(userName);
+        if (null == localUser) {
+            throw new IllegalAccessException("You must login to Minder with root account.");
+        }
+
+        try {
+            Ebean.beginTransaction();
+
+            //Save Test Group
+            group = new TestGroup();
+            group.owner = localUser;
+            group.name = restTestGroup.getGroupName();
+            group.shortDescription = restTestGroup.getShortDescription();
+            group.description = restTestGroup.getDescription();
+
+            //Save Dependency String
+            String dependencyString = restTestGroup.getDependencyString();
+            if(dependencyString != null){
+                dependencyString = dependencyString.trim();
+
+                if(dependencyString.length() != 0){
+                    try {
+                        DependencyClassLoaderCache.getDependencyClassLoader(dependencyString);
+                    } catch (Exception ex) {
+                        Logger.error(ex.getMessage(), ex);
+                        throw new IOException("There was a problem with the dependency string.<br /> \n" +
+                                "Please make sure that the dependencies are in format:<br />\n " +
+                                "groupId:artifactId[:extension[:classifier]]:version]]" + ex.toString());
+                    }
+                }
+            }
+            group.dependencyString = dependencyString;
+
+            try {
+                group.save();
+            } catch (Exception e) {
+                throw new IOException("An error occurred during test group add: " + e.getMessage());
+            }
+
+
+            //Save Test Assertions
+            List<RestTestAssertion> rtaList = restTestGroup.getTestassertions();
+            for(RestTestAssertion rta : rtaList){
+                TestAssertion ta = TestAssertion.findByTaId(rta.getTestAssertionId());
+                if (ta != null) {
+                    throw new IOException("The test assertion with ID [" + ta.taId + "] already exists");
+                }
+
+                ta = new TestAssertion();
+                ta.testGroup = group;
+                ta.description = rta.getDescription();
+                ta.normativeSource = rta.getNormativeSource();
+                ta.owner = localUser;
+                ta.predicate = rta.getPredicate();
+                ta.prerequisites = rta.getPrerequisites();
+                ta.shortDescription = rta.getShortDescription();
+                ta.tag = rta.getTag();
+                ta.taId = rta.getTestAssertionId();
+                ta.target = rta.getTarget();
+                ta.variables = rta.getVariables();
+
+                PrescriptionLevel prescriptionLevel = null;
+                try {
+                    prescriptionLevel = PrescriptionLevel.valueOf(rta.getPrescriptionLevel());
+                } catch (IllegalArgumentException e) {
+                    throw new IllegalArgumentException("The given prescription level [" + rta.getPrescriptionLevel()
+                            + "] is not defined. Please select one of these: Mandatory, Preffered or Permitted");
+                } catch (NullPointerException e) {
+                    throw new NullPointerException("The prescription level cannot be null. Please select one of these: Mandatory, Preffered or Permitted");
+                }
+                ta.prescriptionLevel = prescriptionLevel;
+
+                try {
+                    ta.save();
+                } catch (Exception e) {
+                    throw new IOException("An error occurred during save of test assertion: " + e.getMessage());
+                }
+
+                //Save Test Cases
+                List<RestTestCase> rtcList = rta.getTestcases();
+                for(RestTestCase rtc : rtcList){
+                    TestCase tc = TestCase.findByName(rtc.getName());
+                    if (tc != null) {
+                        throw new IOException("The test case with name [" + rtc.getName() + "] already exists");
+                    }
+
+                    tc = new TestCase();
+                    tc.owner = localUser;
+                    tc.testAssertion = ta;
+                    tc.name = rtc.getName();
+
+                    try {
+                        tc.save();
+                    } catch (Exception e) {
+                        throw new IOException("An error occurred during save of test case: " + e.getMessage());
+                    }
+
+                    //Save TDLs
+                    for (RestTdl restTdl : rtc.tdls) {
+                        Tdl tdl = new Tdl();
+                        tdl.creationDate = new Date();
+                        tdl.version = restTdl.getVersion();
+                        tdl.tdl = new String(restTdl.getTdl());
+                        tdl.testCase = tc;
+
+                        try {
+                            tdl.save();
+                            TestCaseController.detectAndSaveParameters(tdl);
+                        } catch (Exception e) {
+                            throw new IOException("An error occurred during save of tdl: " + e.getMessage());
+                        }
+                    }
+                }
+            }
+
+            //Save test assets
+            List<RestTestAsset> restTestAssetList = restTestGroup.getTestassets();
+            for (RestTestAsset rta : restTestAssetList) {
+                TestAsset ta = new TestAsset();
+                ta.name = rta.getName();
+                ta.shortDescription = rta.getShortDescription();
+                ta.description = rta.getDescription();
+                ta.testGroup = group;
+
+                try {
+                    ta.save();
+                } catch (Exception e) {
+                    throw new IOException("An error occurred during save of test asset: " + e.getMessage());
+                }
+
+                if (rta.getAsset() != null && rta.getAsset().length > 0) {
+                    try {
+                        RestTestAssetController.handleFileUpload(ta,rta.getAsset());
+                    } catch (FileNotFoundException e) {
+                        throw new FileNotFoundException(e.getCause().toString());
+                    } catch (IOException e) {
+                        throw new IOException(e.getCause().toString());
+                    }
+                }
+            }
+
+            //Save Utility Classes
+            List<RestUtilClass> restUtilClassList = restTestGroup.getUtilClasses();
+            for (RestUtilClass ruc : restUtilClassList) {
+                UtilClass uc = new UtilClass();
+                uc.name = ruc.getName();
+                uc.owner = localUser;
+                uc.shortDescription = ruc.getShortDescription();
+                uc.testGroup = group;
+                uc.source = new String(ruc.getSource());
+
+                try {
+                    uc.save();
+                } catch (Exception e) {
+                    throw new IOException("An error occurred during save of util class: " + e.getMessage());
+                }
+            }
+            Ebean.commitTransaction();
+        } finally {
+
+            Ebean.endTransaction();
+        }
+
     }
 }

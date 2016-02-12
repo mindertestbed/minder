@@ -15,7 +15,17 @@
 
   @subjectHasRole(security.Role.TEST_DESIGNER) {
     @createLinkButton("/getCreateGroupEditorView", Messages("restrictedTestPage.createTestGroup"))
-
+  }
+  @subjectIs(User.findByEmail("root@minder")) {
+    @createButton(Messages("restrictedTestPage.importGroup"),
+      "glyphicon-plus",
+      "btn-primary") {
+      createFormDialog(
+      "/createNewTestGroupImportForm",
+      "/importTestGroup",
+      "Import Test Group",
+      $("#tg").parent(),true)
+    }
     <br />
     <br />
   }
@@ -31,16 +41,18 @@
         <tr>
           <td>@index.getAndIncrement()</td> <td><a href="/getGroupDetailView?id=@tg.id&display=assertions">@tg.name</a></td> <td>@tg.shortDescription</td>
           <td>@tg.owner.name @tg.owner.email</td>
+          <td>
           @subjectIs(tg.owner) {
-            <td>
+
               <button class="btn btn-default"
               onclick='deleteWithDialog("/doDeleteGroup?id=@tg.id", $("#dialog-confirm"), "Delete Group", "group", "@tg.name")'>
                 <span class="glyphicon glyphicon-trash" aria-hidden="true"></span>
               </button>
-              @createLinkButton("/exportTestGroup?id=" + tg.id, "", "glyphicon-download", "btn-default")
-
-            </td>
           }
+          @subjectIs(User.findByEmail("root@minder")) {
+            @createLinkButton("/exportTestGroup?id=" + tg.id, "", "glyphicon-export", "btn-default")
+          }
+          </td>
         </tr>
       }
   }
