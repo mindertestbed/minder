@@ -65,6 +65,10 @@ public class RestTestGroup {
     @XmlElement(required = false)
     public List<RestTestAsset> testassets;
 
+    @XmlElementWrapper(name="utilclasses")
+    @XmlElement(required = false)
+    public List<RestUtilClass> utilClasses;
+
 
     public String getGroupName() {
         return groupName;
@@ -120,5 +124,13 @@ public class RestTestGroup {
 
     public void setTestassets(List<RestTestAsset> testassets) {
         this.testassets = testassets;
+    }
+
+    public List<RestUtilClass> getUtilClasses() {
+        return utilClasses;
+    }
+
+    public void setUtilClasses(List<RestUtilClass> utilClasses) {
+        this.utilClasses = utilClasses;
     }
 }

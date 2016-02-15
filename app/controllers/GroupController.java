@@ -1,22 +1,35 @@
 package controllers;
 
 import com.avaje.ebean.Ebean;
+import com.avaje.ebeaninternal.server.lib.util.NotFoundException;
 import com.fasterxml.jackson.databind.JsonNode;
+import com.google.common.io.Files;
 import controllers.common.enumeration.Utils;
 import dependencyutils.DependencyClassLoaderCache;
 import editormodels.GroupEditorModel;
 import global.Util;
+import models.ModelConstants;
 import models.TestGroup;
 import models.User;
 import play.Logger;
 import play.data.Form;
+import play.data.validation.Constraints;
 import play.mvc.Controller;
+import play.mvc.Http;
 import play.mvc.Result;
 import play.mvc.Security;
+import rest.controllers.TestGroupImportExportController;
+import rest.controllers.common.RestUtils;
+import rest.controllers.restbodyprocessor.IRestContentProcessor;
+import rest.models.RestTestGroup;
 import security.AllowedRoles;
 import security.Role;
 import views.html.group.childViews.*;
 import views.html.group.*;
+
+import java.io.*;
+import java.nio.charset.Charset;
+import java.text.ParseException;
 
 import static play.data.Form.form;
 
@@ -25,6 +38,11 @@ import static play.data.Form.form;
  */
 public class GroupController extends Controller {
   public static final Form<GroupEditorModel> TEST_GROUP_FORM = form(GroupEditorModel.class);
+  public static final Form<GroupImportModel> TEST_GROUP_IMPORT_FORM = form(GroupImportModel.class);
+
+  public static class GroupImportModel {
+    public String useremail;
+  }
 
   @AllowedRoles(Role.TEST_DESIGNER)
   public static Result getCreateGroupEditorView() {
@@ -185,4 +203,147 @@ public class GroupController extends Controller {
     return ok(details.render(TestGroup.findById(id)));
   }
 
+  @Security.Authenticated(Secured.class)
+  public static Result createNewTestGroupImportForm() {
+    return ok(testGroupImportEditor.render(form(GroupImportModel.class)));
+  }
+
+  @Security.Authenticated(Secured.class)
+  public static Result exportTestGroup(Long id) {
+    RestTestGroup responseRestTestGroup = new RestTestGroup();
+    try {
+      responseRestTestGroup =  TestGroupImportExportController.exportTestGroupData(id);
+    } catch (NotFoundException e) {
+      return internalServerError(e.getMessage());
+    } catch (IOException e) {
+      return internalServerError(e.getMessage());
+    }
+
+    /*
+    * Preparing response
+    * */
+    IRestContentProcessor contentProcessor = null;
+    try {
+      contentProcessor = RestUtils.createContentProcessor("text/json");
+    } catch (IllegalArgumentException e) {
+      return badRequest(e.getCause().toString());
+    }
+
+    String responseValue = null;
+    try {
+      responseValue = contentProcessor.prepareResponse(RestTestGroup.class.getName(), responseRestTestGroup);
+    } catch (ParseException e) {
+      return internalServerError(e.getMessage());
+    }
+    System.out.println("responseValue:" + responseValue);
+
+    response().setContentType("application/x-download");
+    response().setHeader("Content-disposition", "attachment; filename=" + responseRestTestGroup.getGroupName()+".json");
+    return ok(responseValue);
+  }
+
+  @Security.Authenticated(Secured.class)
+  public static Result importTestGroup() {
+    final Form<GroupImportModel> filledForm = TEST_GROUP_IMPORT_FORM.bindFromRequest();
+
+    User localUser = Authentication.getLocalUser();
+    if (localUser.email.equals("root@minder")) {
+
+      if (filledForm.hasErrors()) {
+        Util.printFormErrors(filledForm);
+        filledForm.reject("There is error in the form");
+        return badRequest(testGroupImportEditor.render(filledForm));
+      } else {
+        GroupImportModel model = filledForm.get();
+
+        User user = User.findByEmail(model.useremail);
+        if(null == user) {
+          filledForm.reject("You can't use this resource");
+          return badRequest(testGroupImportEditor.render(filledForm));
+        }
+
+        //file upload part
+        try {
+          handleFileUpload(user);
+        } catch (IllegalArgumentException ex) {
+          Logger.error(ex.getMessage(), ex);
+          filledForm.reject(ex.getMessage());
+          return badRequest(testGroupImportEditor.render(filledForm));
+        }catch (IOException ex) {
+          Logger.error(ex.getMessage(), ex);
+          filledForm.reject(ex.getMessage());
+          return badRequest(testGroupImportEditor.render(filledForm));
+        }catch (ParseException ex) {
+          Logger.error(ex.getMessage(), ex);
+          filledForm.reject(ex.getMessage());
+          return badRequest(testGroupImportEditor.render(filledForm));
+        }catch (RuntimeException ex) {
+          Logger.error(ex.getMessage(), ex);
+          filledForm.reject(ex.getMessage());
+          return badRequest(testGroupImportEditor.render(filledForm));
+        }
+
+        return ok(testGroupListView.render());
+      }
+    } else {
+      filledForm.reject("Only root role may import a test group");
+      return badRequest(testGroupImportEditor.render(filledForm));
+    }
+  }
+
+  /**
+   * Reads the file uploaded with the current request (if any)
+   */
+  private static void handleFileUpload(User user) throws IllegalArgumentException,IOException,ParseException, RuntimeException{
+    Http.MultipartFormData body = request().body().asMultipartFormData();
+
+    if (body == null)
+      throw new RuntimeException("The form type is not correct");
+
+    File asset = null;
+
+    if (body.getFiles() != null && body.getFiles().size() > 0)
+      asset = body.getFiles().get(0).getFile();
+
+    if (asset == null) {
+      throw new RuntimeException("No asset file was specified!");
+    } else {
+      /*
+      * Handling import request
+      * */
+      String bodyStr = null;
+      try {
+        bodyStr = Files.toString(asset, Charset.defaultCharset());
+
+      } catch (IOException e) {
+        throw new IOException(e.getCause().toString());
+      }
+
+      IRestContentProcessor contentProcessor = null;
+      try {
+        contentProcessor = RestUtils.createContentProcessor("text/json",bodyStr);
+      } catch (IllegalArgumentException e) {
+        throw new IllegalArgumentException(e.getCause().toString());
+      }
+
+      RestTestGroup restTestGroup = null;
+      try {
+        restTestGroup = (RestTestGroup) contentProcessor.parseRequest(RestTestGroup.class.getName());
+      } catch (ParseException e) {
+        throw new ParseException(e.getCause().toString(),0);
+      }
+
+      try {
+        TestGroupImportExportController.importTestGroupData(restTestGroup,Authentication.getLocalUser().email);
+      } catch (IllegalAccessException e) {
+        e.printStackTrace();
+      } catch (IOException e) {
+        e.printStackTrace();
+      }catch (IllegalArgumentException e) {
+        e.printStackTrace();
+      }catch (NullPointerException e) {
+        e.printStackTrace();
+      }
+    }
+  }
 }

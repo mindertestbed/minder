@@ -39,6 +39,11 @@ GET         /renderTestSuites                           controllers.GroupControl
 GET         /renderTestAssets                           controllers.GroupController.renderTestAssets(id: Long)
 GET         /renderUtilClasses                          controllers.GroupController.renderUtilClasses(id: Long)
 GET         /renderDependencies                         controllers.GroupController.renderDependencies(id: Long)
+GET         /exportTestGroup                            controllers.GroupController.exportTestGroup(id: Long)
+POST        /importTestGroup                            controllers.GroupController.importTestGroup
+GET         /createNewTestGroupImportForm               controllers.GroupController.createNewTestGroupImportForm
+POST        /importTestGroup                            controllers.GroupController.importTestGroup
+
 
 
 #test assertion management
@@ -143,6 +148,8 @@ POST        /rest/addTestGroup                          rest.controllers.RestTes
 POST        /rest/editTestGroup                         rest.controllers.RestTestGroupController.editTestGroup
 POST        /rest/deleteTestGroup                       rest.controllers.RestTestGroupController.deleteTestGroup
 POST        /rest/getTestGroup                          rest.controllers.RestTestGroupController.getTestGroup
+POST        /rest/exportTestGroup                       rest.controllers.TestGroupImportExportController.exportTestGroup
+POST        /rest/importTestGroup                       rest.controllers.TestGroupImportExportController.importTestGroup
 
 #Rest test assertion management
 POST        /rest/listUtilClasses                       rest.controllers.RestUtilClassController.listUtilClasses

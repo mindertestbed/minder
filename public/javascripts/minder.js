@@ -52,7 +52,8 @@ function createFormDialog(sourceUrl, action, titl, target, multiPart, w, h) {
   if (multiPart === undefined || multiPart === null) multiPart = false;
 
   var frm = $("#mainDialog > form");
-  event.stopPropagation();
+  var vnt = $(window.event);
+  vnt.stop();
 
   var dialog = $("#mainDialog").dialog({
     autoOpen: false,

@@ -138,9 +138,8 @@ def getVersionInfo(): String = {
 
     }
   }
-  //return versionNo.toString
-  val name :String = getClass.getPackage.getImplementationTitle
-  return name
+  return versionNo.toString
+  
 
 }
   def canAccess(localUser: User, owner: User): Boolean = {
