@@ -25,13 +25,13 @@
             <td>@{
               tc.owner.email
             }</td>
-            @subjectIs(tc.owner) {
             <td>
+            @subjectIs(tc.owner) {
               @createButton("", "glyphicon-trash", "btn-default"){
                 deleteWithDialog("/doDeleteCase?id=@tc.id", $("#dialog-confirm"), "Delete Test Case", "test case", "@tc.name")
               }
-            </td>
             }
+            </td>
           </tr>
         }
       }

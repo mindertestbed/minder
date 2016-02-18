@@ -57,6 +57,9 @@ Theme: <select id="select">
       editor.setTheme("ace/theme/clouds");
       editor.getSession().setMode("ace/mode/scala");
       editor.setReadOnly(true);
+      editor.setOptions({
+        maxLines: 200
+      });
 
       $("#fontsize").change(function () {
         $("#fontsize option:selected").each(function () {

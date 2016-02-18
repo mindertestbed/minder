@@ -346,4 +346,9 @@ public class GroupController extends Controller {
       }
     }
   }
+  
+  @AllowedRoles({Role.TEST_DESIGNER, Role.TEST_OBSERVER})
+  public static Result renderJobTemplates(long id){
+    return ok(jobTemplatesList.render(TestGroup.findById(id)));
+  }
 }

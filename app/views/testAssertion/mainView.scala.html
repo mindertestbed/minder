@@ -11,47 +11,52 @@
     Array(("Test Groups", controllers.routes.Application.testGroups().path()),
       (ta.testGroup.name, controllers.routes.GroupController.getGroupDetailView(ta.testGroup.id, "assertions").path()),
       (ta.taId, controllers.routes.TestAssertionController.getAssertionDetailView(ta.id, "details").path()))) {
+    <div class="padabit">
+      @dialogs()
 
-    @dialogs()
-
-    <div class="container-fluid">
-      <div class="row">
-        <div class="col-md-@{global.Util.remaining}">
-          <h3>Test Assertion
-            <div id="taId@{
-              ta.id
-            }"
-              @subjectIs(ta.owner) {
-                onclick='showUpdateInputTextDialog(@ta.id, "taId", $(this).next(), "/doEditAssertionField")'
-              }
-            class="hl editable">@ta.taId</div>
-            <input type="hidden" value="@ta.taId"/>
-          </h3>
-          <div class="indent">
-            <script>
-                function showDetails(){
-                  ajaxRouteGet(jsRoutes.controllers.TestAssertionController.renderDetails, @ta.id, $("#assertionSubItems"))
+      <div class="container-fluid">
+        <div class="row">
+          <div class="col-sm-@{
+            global.Util.remaining
+          }">
+            <h3>Test Assertion
+              <div id="taId@{
+                ta.id
+              }"
+                @subjectIs(ta.owner) {
+                  onclick='showUpdateInputTextDialog(@ta.id, "taId", $(this).next(), "/doEditAssertionField")'
                 }
-                function showTestCases(){
-                  ajaxRouteGet(jsRoutes.controllers.TestAssertionController.renderTestCases, @ta.id, $("#assertionSubItems"))
-                }
-            </script>
+              class="hl editable">@ta.taId</div>
+              <input type="hidden" value="@ta.taId"/>
+            </h3>
+            <div class="indent">
+              <script>
+                  function showDetails(){
+                    ajaxRouteGet(jsRoutes.controllers.TestAssertionController.renderDetails, @ta.id, $("#assertionSubItems"))
+                  }
+                  function showTestCases(){
+                    ajaxRouteGet(jsRoutes.controllers.TestAssertionController.renderTestCases, @ta.id, $("#assertionSubItems"))
+                  }
+              </script>
 
-            @ajaxDisplaySelector(display,
-              "cases" ->("Test Cases", "showTestCases"),
-              "details" ->("Details", "showDetails")
-            )
+              @ajaxDisplaySelector(display,
+                "cases" ->("Test Cases", "showTestCases"),
+                "details" ->("Details", "showDetails")
+              )
 
-            <div id="assertionSubItems" style="padding: 4px ;">
+              <div id="assertionSubItems" style="padding: 4px ;">
 
+              </div>
             </div>
           </div>
-        </div>
 
-        <div class="col-md-@{global.Util.feedWidth}">
-          @views.html.job.jobQueueFeed()
-          <hr />
-          @views.html.job.jobHistoryFeed()
+          <div class="col-sm-@{
+            global.Util.feedWidth
+          } hidden-xs">
+            @views.html.job.jobQueueFeed()
+            <hr />
+            @views.html.job.jobHistoryFeed()
+          </div>
         </div>
       </div>
     </div>

@@ -3,47 +3,46 @@
 @import global.Util
 
 @main("About Minder", "about",
-    Array(("About Minder", controllers.routes.Application.about().path()))) {
-    @dialogs()
-    <script>
-            $(function() {
-                $( document ).tooltip();
-            });
-    </script>
+  Array(("About Minder", controllers.routes.Application.about().path()))) {
+  <script>
+      $(function() {
+        $( document ).tooltip();
+      });
+  </script>
 
-    <head>
-        <title>About Minder - Start Testing Your System</title>
-        <style>
-        .business-header {
-        height: 400px;
-        background: url('@routes.Assets.versioned("/images/minder-logo-big.png")') center center no-repeat scroll;
-        -webkit-background-size: cover;
-        -moz-background-size: cover;
-        background-size: cover;
-        -o-background-size: cover;
-        }
+  <head>
+    <title>About Minder - Start Testing Your System</title>
+    <style>
+    .business-header {
+    height: 400px ;
+    background: url(' @routes.Assets.versioned("/images/minder-logo-big.png") ') center center no-repeat scroll;
+    -webkit-background-size : cover ;
+    -moz-background-size : cover ;
+    background-size : cover ;
+    -o-background-size : cover ;
+    }
 
-        .featurette {
-        overflow: hidden;
-        }
+    .featurette {
+    overflow: hidden ;
+    }
 
-        .featurette-image.pull-left {
-        margin-right: 40px;
-        }
+    .featurette-image.pull-left {
+    margin-right: 40px ;
+    }
 
-        .featurette-image.pull-right {
-        margin-left: 40px;
-        }
+    .featurette-image.pull-right {
+    margin-left: 40px ;
+    }
 
-        .img-center {
-        margin: 0 auto;
-        }
+    .img-center {
+    margin: 0 auto ;
+    }
 
-        footer {
-        margin: 50px 0;
-        }
-       </style>
-    </head>
+    footer {
+    margin: 50px 0 ;
+    }
+    </style>
+  </head>
     <!--
     <header class="business-header">
         <div class="container">
@@ -52,87 +51,100 @@
         </div>
     </header>
     -->
-    <body>
-        <div class="container">
+  <body>
+    <div class="container">
 
-                <div class="featurette" id="intro">
-                   <div class="row">
-                       <div class="col-md-8">
-                           <h1 class="page-header" style="color:#337ab7">Minder
-                               <small>The Online Programmable Flow Control Engine</small>
-                           </h1>
-                           <p class="lead">Minder is a generic online programmable flow control engine that provides capability of interconnecting different systems in one node and enabling architects to perform complex communication operations on those interconnected systems.</p>
+      <div class="featurette" id="intro">
+        <div class="row">
+          <div class="col-md-8">
+            <h1 class="page-header" style="color:#337ab7">Minder
+              <small>The Online Programmable Flow Control Engine</small>
+            </h1>
+            <p class="lead">
+              Minder is a generic online programmable flow control engine that provides capability of interconnecting different systems in one node and enabling architects to perform complex communication operations on those interconnected systems.</p>
 
-                       </div>
+          </div>
 
-                       <div class="col-md-4">
-                           <img class="featurette-image img-square img-responsive img-center " width='450px' src='@routes.Assets.versioned("images/minder-2.jpg")' alt="">
-                       </div>
+          <div class="col-md-4">
+            <br />
+            <br />
+            <br />
+            <br />
+            <img class="featurette-image img-square img-responsive img-center " width='450px' src='@routes.Assets.versioned("images/minder-2.jpg")' alt="">
+          </div>
 
-                   </div>
-            </div>
-
-
-            <div class="row">
-                <div class="col-lg-12">
-                    <h1 class="page-header" style="color:#337ab7">Version Info</h1>
-                    <p class="lead">The current version of Minder is @{global.Util.getVersionInfo()}. The minder source code is hosted under the GitHub repository at <a href="https://github.com/mindertestbed">https://github.com/mindertestbed</a>.</p>
-                </div>
-
-            </div>
-
-
-            <div class="featurette" id="team">
-                <!--<img class="featurette-image img-circle img-responsive pull-left" src="http://placehold.it/500x500">-->
-                <h1 class="page-header" style="color:#337ab7">Minder Team
-                </h1>
-                <p class="lead">Minder was developed as an open source project in eSENS to facilitate a sustainable and reusable conformance and interoperability testing. Further details available at <a href="https://joinup.ec.europa.eu/software/minder/description">https://joinup.ec.europa.eu/software/minder/description</a>.</p>
-                <div class="row">
-                    <div class="col-lg-4 col-sm-6 text-center">
-                        <h4>Muhammet Yildiz
-                        </h4>
-
-                        <p>muhammet.yildiz[at]tubitak.gov.tr</p>
-                    </div>
-                    <div class="col-lg-4 col-sm-6 text-center">
-                        <h4>Melis Özgür Çetinkaya Demir
-                        </h4>
-                        <p>melis.cetinkaya[at]tubitak.gov.tr</p>
-                    </div>
-                    <div class="col-lg-4 col-sm-6 text-center">
-                        <h4>Edona Fasllija
-                        </h4>
-                        <p>edona.fasllija[at]tubitak.gov.tr</p>
-                    </div>
-
-                    </div>
-            </div>
-
-            <div class="row">
-                <div class="col-lg-12">
-                    <h2 class="page-header" style="color:#337ab7"></h2>
-                </div>
-            </div>
-            </div>
-    </body>
-
-    <footer>
-        <div class="container">
-            <div class="row">
-        <div class="col-lg-4 col-sm-6 text-center">
-        <img class="img-square img-responsive img-center" height=150px width="150px" src="@routes.Assets.versioned("images/joinup_logo.png")" alt="">
-            </div>
-        <div class="col-lg-4 col-sm-6 text-center">
-            <img class="img-square img-responsive img-center" height=150px width="150px" src="@routes.Assets.versioned("images/e-sens_logo3.jpg")" alt="">
         </div>
-        <div class="col-lg-4 col-sm-6 text-center">
-            <img class="img-square img-responsive img-center" height=150px width="150px" src="@routes.Assets.versioned("images/GitHub_Logo1.png")" alt="">
+      </div>
+
+
+      <div class="row">
+        <div class="col-lg-12">
+          <h1 class="page-header" style="color:#337ab7">Version Info</h1>
+          <p class="lead">The current version of Minder is @{
+            global.Util.getVersionInfo()
+          }. The minder source code is hosted under the GitHub repository at <a href="https://github.com/mindertestbed">
+            https://github.com/mindertestbed</a>.</p>
         </div>
-            </div>
-            </div>
-    </footer>
+
+      </div>
 
 
+      <div class="featurette" id="team">
+          <!--<img class="featurette-image img-circle img-responsive pull-left" src="http://placehold.it/500x500">-->
+        <h1 class="page-header" style="color:#337ab7">Minder Team
+        </h1>
+        <p class="lead">
+          Minder was developed as an open source project in eSENS to facilitate a sustainable and reusable conformance and interoperability testing. Further details available at <a href="https://joinup.ec.europa.eu/software/minder/description">
+          https://joinup.ec.europa.eu/software/minder/description</a>.</p>
+        <div class="row">
+          <div class="col-lg-4 col-sm-6 text-center">
+            <h4>Muhammet Yildiz
+            </h4>
+
+            <p>muhammet.yildiz[at]tubitak.gov.tr</p>
+          </div>
+          <div class="col-lg-4 col-sm-6 text-center">
+            <h4>Melis Özgür Çetinkaya Demir
+            </h4>
+            <p>melis.cetinkaya[at]tubitak.gov.tr</p>
+          </div>
+          <div class="col-lg-4 col-sm-6 text-center">
+            <h4>Edona Fasllija
+            </h4>
+            <p>edona.fasllija[at]tubitak.gov.tr</p>
+          </div>
+
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="col-lg-12">
+          <h2 class="page-header" style="color:#337ab7"></h2>
+        </div>
+      </div>
+    </div>
+  </body>
+
+  <footer>
+    <div align="center">
+      <table style="text-align: center">
+        <tr>
+          <td style="padding-left: 15px ; padding-right: 15px ;">
+            <a href="https://joinup.ec.europa.eu/software/minder/home"><img class="img-square img-responsive img-center" width='100px' src="@routes.Assets.versioned("images/joinup_logo.png")" alt=""></a>
+          </td>
+          <td style="padding-left: 15px ; padding-right: 15px ;">
+            <a href="http://www.esens.eu">
+              <img class="img-square img-responsive img-center" width='100px' src="@routes.Assets.versioned("images/e-sens_logo3.jpg")" alt="">
+            </a>
+          </td>
+          <td style="padding-left: 15px ; padding-right: 15px ;">
+            <a href="https://joinup.ec.europa.eu/software/minder/home"><img class="img-square img-responsive img-center" width='100px' src="@routes.Assets.versioned("images/GitHub_Logo1.png")" alt="">
+            </a>
+          </td>
+        </tr>
+      </table>
+    </div>
+  </footer>
 
 
 }
