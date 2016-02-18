@@ -10,67 +10,68 @@
       (tc.testAssertion.testGroup.name, controllers.routes.GroupController.getGroupDetailView(tc.testAssertion.testGroup.id, "assertions").path()),
       (tc.testAssertion.taId, controllers.routes.TestAssertionController.getAssertionDetailView(tc.testAssertion.id, "cases").path()),
       (tc.name, controllers.routes.TestCaseController.viewTestCase(tc.id, "jobs").path()))) {
-    @dialogs()
+    <div class="padabit">
+      @dialogs()
 
-    <div class="container-fluid">
-      <div class="row">
-        <div class="col-md-@{global.Util.remaining}">
-          <h3>Test Case
-            <div id="name@{
-              tc.id
-            }"
-              @subjectIs(tc.owner) {
-                onclick='showUpdateInputTextDialog(@tc.id, "name", $(this).next(), "/doEditCaseField")'
-              }
+      <div class="container-fluid">
+        <div class="row">
+          <div class="col-sm-@{
+            global.Util.remaining
+          }">
+            <h3>Test Case
+              <div id="name@{
+                tc.id
+              }"
+                @subjectIs(tc.owner) {
+                  onclick='showUpdateInputTextDialog(@tc.id, "name", $(this).next(), "/doEditCaseField")'
+                }
 
-            class="hl editable">
-            @tc.name
+              class="hl editable">
+              @tc.name
 
-            </div>
-            <input type="hidden" value="@tc.name"/>
-          </h3>
-
-
-          <hr />
+              </div>
+              <input type="hidden" value="@tc.name"/>
+            </h3>
 
 
-          <h4>Owner</h4>
-          @{
-            tc.owner.email
-          }
+            <hr />
 
-          <h4>Version</h4>
-          <select id="version" style="width:100px ;">
-          @for(tdl <- Tdl.findByTestCase(tc)) {
-            <option value="@tdl.id"
-              @if(tdl.id == selectedTdl.id) {
-                selected="selected" }>@{
-              tdl.version
-            }</option>
-          }
-          </select>
 
-          <script>
-              $( "#version" ).change(function(data) {
-                var vl=$("#version" ).val()
-                document.location="viewTestCase2?id=@{tc.id}&tdlId="+vl+"&display=@{display}"
-              });
-          </script>
-
-          @if(selectedTdl.parameters != null && selectedTdl.parameters.size() > 0) {
-            <h4>Parametric Wrapper Names</h4>
-            <ul>
-            @for(pm <- selectedTdl.parameters) {
-              <li>
-              @pm.name
-              </li>
+            <h4>Owner</h4>
+            @{
+              tc.owner.email
             }
-            </ul>
-          }
 
-          <hr />
+            <h4>Version</h4>
+            <select id="version" style="width:100px ;">
+            @for(tdl <- Tdl.findByTestCase(tc)) {
+              <option value="@tdl.id"
+                @if(tdl.id == selectedTdl.id) {
+                  selected="selected" }>@{
+                tdl.version
+              }</option>
+            }
+            </select>
 
-          <div class="container-fluid">
+            <script>
+                $( "#version" ).change(function(data) {
+                  var vl=$("#version" ).val()
+                  document.location="viewTestCase2?id=@{tc.id}&tdlId="+vl+"&display=@{display}"
+                });
+            </script>
+
+            @if(selectedTdl.parameters != null && selectedTdl.parameters.size() > 0) {
+              <h4>Parametric Wrapper Names</h4>
+              <ul>
+              @for(pm <- selectedTdl.parameters) {
+                <li>
+                @pm.name
+                </li>
+              }
+              </ul>
+            }
+
+            <hr />
 
             <h4>Jobs</h4>
             @childViews.testCaseJobList(tc, selectedTdl)
@@ -80,20 +81,22 @@
             @childViews.testCaseCodeDisplay(tc, selectedTdl)
 
           </div>
-        </div>
 
-        <div class="col-md-@{global.Util.feedWidth}">
-          @views.html.job.jobQueueFeed()
-          <hr />
+          <div class="col-sm-@{
+            global.Util.feedWidth
+          } hidden-xs">
+            @views.html.job.jobQueueFeed()
+            <hr />
 
-          @views.html.job.jobHistoryFeed()
+            @views.html.job.jobHistoryFeed()
 
+          </div>
         </div>
       </div>
+      <script>
+          $(function(){
+            bindValues($("#name@{tc.id}"))
+          })
+      </script>
     </div>
-    <script>
-        $(function(){
-          bindValues($("#name@{tc.id}"))
-        })
-    </script>
   }

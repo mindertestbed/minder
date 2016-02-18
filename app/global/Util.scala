@@ -17,8 +17,8 @@ import play.mvc.Http
   */
 object Util {
 
-  def feedWidth = 3
-  def remaining = 9
+  def feedWidth = 4
+  def remaining = 8
 
   def choose(value: Any, expected: Any, matchValue: String = "activetab", nonMatchValue: String = "passivetab"): String = {
     if (value == expected)

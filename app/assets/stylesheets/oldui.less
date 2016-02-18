@@ -84,6 +84,8 @@ h4 {
   height: 100%;
 }
 
+@bread: #8d0006;
+
 .breadcrumb {
   margin: 0px;
   border-radius: 0px;
@@ -92,15 +94,20 @@ h4 {
   background: -webkit-linear-gradient(left, rgba(150, 190, 234, 1) 0%, rgba(103, 153, 206, 1) 100%);
   background: linear-gradient(to right, rgba(150, 190, 234, 1) 0%, rgba(103, 153, 206, 1) 100%);
   filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#96beea', endColorstr='#6799ce', GradientType=1);
-
   font-size: smaller;
   padding-top: 3px;
   padding-bottom: 3px;
+  color: @bread;
 }
 
 .breadcrumb > .active {
   font-weight: bold;
-  color: #a7ffae;
+  color: tint(@bread, 30%);
+}
+
+.breadcrumb a {
+  font-weight: bold;
+  color: @bread;
 }
 
 .panel-heading {
@@ -182,4 +189,14 @@ table td.tabexpandNoBorder {
   background: linear-gradient(to right,  rgba(106,167,232,1) 0%,rgba(71,137,204,1) 100%);
   filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#6aa7e8', endColorstr='#4789cc',GradientType=1 );
 
+}
+
+.padabit {
+  padding:10px;
+  padding-top:20px;
+}
+
+[class*="col-"] {
+  padding-right:5px;
+  padding-left:5px;
 }

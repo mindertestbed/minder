@@ -4,57 +4,61 @@
 @import authentication._
 
 
-@main("Test Groups", "testGroups",
-  Array(("Test Groups", controllers.routes.Application.testGroups().path()))) {
-  @dialogs()
-  <script>
-      $(function() {
-        $( document ).tooltip();
-      });
-  </script>
+@main("Test Groups", "testGroups", "") {
+  <div class="padabit">
+    @dialogs()
+    <script>
+        $(function() {
+          $( document ).tooltip();
+        });
+    </script>
 
-  @subjectHasRole(security.Role.TEST_DESIGNER) {
-    @createLinkButton("/getCreateGroupEditorView", Messages("restrictedTestPage.createTestGroup"))
-  }
-  @subjectIs(User.findByEmail("root@minder")) {
-    @createButton(Messages("restrictedTestPage.importGroup"),
-      "glyphicon-plus",
-      "btn-primary") {
-      createFormDialog(
-      "/createNewTestGroupImportForm",
-      "/importTestGroup",
-      "Import Test Group",
-      $("#tg").parent(),true)
+    <h3>Test Groups</h3>
+
+    <br />
+    @subjectHasRole(security.Role.TEST_DESIGNER) {
+      @createLinkButton("/getCreateGroupEditorView", Messages("restrictedTestPage.createTestGroup"))
     }
-    <br />
-    <br />
-  }
-
-  @defining(new AtomicInteger(1)) { index =>
-    <table class="table table-hover table-condensed  table-striped">
-      @createFirstRow {
-        <th>Test Group Name</th>
-        <th>Short Description</th>
-        <th>Author</th>
+    @subjectIs(User.findByEmail("root@minder")) {
+      @createButton(Messages("restrictedTestPage.importGroup"),
+        "glyphicon-import",
+        "btn-primary") {
+        createFormDialog(
+        "/createNewTestGroupImportForm",
+        "/importTestGroup",
+        "Import Test Group",
+        $("#tg").parent(),true)
       }
-      @for(tg <- TestGroup.findAll()) {
-        <tr>
-          <td>@index.getAndIncrement()</td> <td><a href="/getGroupDetailView?id=@tg.id&display=assertions">@tg.name</a></td> <td>@tg.shortDescription</td>
-          <td>@tg.owner.name @tg.owner.email</td>
-          <td>
-          @subjectIs(tg.owner) {
+    }
+      <br />
+      <br />
 
-              <button class="btn btn-default"
-              onclick='deleteWithDialog("/doDeleteGroup?id=@tg.id", $("#dialog-confirm"), "Delete Group", "group", "@tg.name")'>
-                <span class="glyphicon glyphicon-trash" aria-hidden="true"></span>
-              </button>
-          }
-          @subjectIs(User.findByEmail("root@minder")) {
-            @createLinkButton("/exportTestGroup?id=" + tg.id, "", "glyphicon-export", "btn-default")
-          }
-          </td>
-        </tr>
-      }
-  }
-</table>
+    @defining(new AtomicInteger(1)) { index =>
+      <table class="table table-hover table-condensed  table-striped">
+        @createFirstRow {
+          <th>Test Group Name</th>
+          <th>Short Description</th>
+          <th>Author</th>
+        }
+        @for(tg <- TestGroup.findAll()) {
+          <tr>
+            <td>@index.getAndIncrement()</td> <td><a href="/getGroupDetailView?id=@tg.id&display=assertions">@tg.name</a></td> <td>@tg.shortDescription</td>
+            <td>@tg.owner.name @tg.owner.email</td>
+            <td>
+              @subjectIs(tg.owner) {
+
+                <button class="btn btn-default"
+                onclick='deleteWithDialog("/doDeleteGroup?id=@tg.id", $("#dialog-confirm"), "Delete Group", "group", "@tg.name")'>
+                  <span class="glyphicon glyphicon-trash" aria-hidden="true"></span>
+                </button>
+              }
+              @subjectIs(User.findByEmail("root@minder")) {
+                @createLinkButton("/exportTestGroup?id=" + tg.id, "", "glyphicon-export", "btn-default")
+              }
+            </td>
+          </tr>
+        }
+    }
+  </table>
+  </div>
 }

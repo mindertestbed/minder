@@ -1,6 +1,7 @@
 @import authentication._
 
-@main("Job Queue", "jobQueue", "Test Monitor") {
+@main("Test Monitor", "jobQueue", "") {
+  <div class="padabit" style="padding-left: 20px;padding-right: 20px;height:100%;">
   <script>
       $ ( function ( ) {
         var logfeed = $( "#logfeed" )[0];
@@ -35,47 +36,48 @@
 
   </script>
 
-  <table style="width:100% ;" class="visible-xs"><tr><td class="tabexpand">
-    <h3>Test Monitor</h3>
-  </td><td class="tabshrink">
-      <!-- Single button -->
-    <div class="btn-group">
-      <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-        Select View <span class="caret"></span>
-      </button>
-      <ul class="dropdown-menu">
-        <li><a onclick='display("queDiv")'>Job Queue</a></li>
-        <li><a onclick='display("historyDiv")'>History</a></li>
-        <li><a onclick='display("logDiv")'>Log</a></li>
-      </ul>
-    </div>
-  </td></tr></table>
+    <table style="width:100% ;" class="visible-xs"><tr><td class="tabexpand">
+      <h3>Test Monitor</h3>
+    </td><td class="tabshrink">
+        <!-- Single button -->
+      <div class="btn-group">
+        <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+          Select View <span class="caret"></span>
+        </button>
+        <ul class="dropdown-menu">
+          <li><a onclick='display("queDiv")'>Job Queue</a></li>
+          <li><a onclick='display("historyDiv")'>History</a></li>
+          <li><a onclick='display("logDiv")'>Log</a></li>
+        </ul>
+      </div>
+    </td></tr></table>
 
-  <h3 class="hidden-xs">Test Monitor</h3>
+    <h3 class="hidden-xs">Test Monitor</h3>
 
-  <div class="row" style="height:95% ;">
-    <div id="logDiv" class="col-md-@{
-      global.Util.remaining
-    }" style="height:100% ;">
-      <div class="panel panel-info" style="height:97% ; padding: 0px ;">
-        <div class="panel-heading">Log</div>
-        <div class="panel-body zeropad" style="height:100% ;">
+    <div class="row" style="height:95%;">
+      <div id="logDiv" class="col-sm-@{
+        global.Util.remaining
+      }" style="height:100%;">
+        <div class="panel panel-info" style="height:97% ; padding: 0px ;">
+          <div class="panel-heading">Log</div>
+          <div class="panel-body zeropad" style="height:100% ;">
 
-          <textarea readonly="readonly" id="logarea" class="lightMinderBlue"
-          style="resize: none ; font-family:monospace ; height:calc(100% - 2em) ; width:100% ; border:1px solid #ddeee6 ; border-radius:2px ; overflow:scroll">@LogFeeder.currentLogString(Authentication.getLocalUser)</textarea>
+            <textarea readonly="readonly" id="logarea" class="lightMinderBlue"
+            style="resize: none ; font-family:monospace ; height:calc(100% - 2em) ; width:100% ; border:1px solid #ddeee6 ; border-radius:2px ; overflow:scroll">@LogFeeder.currentLogString(Authentication.getLocalUser)</textarea>
 
+          </div>
         </div>
       </div>
-    </div>
-    <div class="col-md-@{
-      global.Util.feedWidth
-    }">
-      <div id="queDiv">
-      @jobQueueFeed()
-      </div>
-      <div id="historyDiv">
-        <hr/>
-        @jobHistoryFeed()
+      <div class="col-sm-@{
+        global.Util.feedWidth
+      }" style="overflow:auto; scroll;height:100%;">
+        <div id="queDiv">
+        @jobQueueFeed()
+        </div>
+        <div id="historyDiv">
+          <hr/>
+          @jobHistoryFeed()
+        </div>
       </div>
     </div>
   </div>
