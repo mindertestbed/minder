@@ -3,7 +3,7 @@
 # ~~~~
 
 # Home page
-GET         /                                           controllers.Application.testGroups()
+GET         /                                           controllers.Application.index()
 GET         /root                                       controllers.Application.root(display: String ?= "users")
 GET         /listTestGroups                             controllers.Application.testGroups()
 GET         /jobQueue                                   controllers.Application.jobQueue()

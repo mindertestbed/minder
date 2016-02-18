@@ -1,0 +1,127 @@
+@main("Minder", "", "") {
+
+  <script>
+      $(function(){
+        var introdiv = $("#introdiv")
+        $(window).resize(function(){
+          introdiv.css("height", parseInt(introdiv.css("width"))*0.5625)
+        });
+        introdiv.css("height", parseInt(introdiv.css("width"))*0.5625)
+      })
+  </script>
+  <div id="introdiv" style="background: url( @routes.Assets.versioned("images/bridge.jpg") ); background-size: 100% auto; background-repeat: no-repeat ;">
+
+    <table style="height: 100%"><tr><td style="vertical-align: text-top">
+
+      <div class="jumbotron" style="background: transparent ;">
+        <img src="@routes.Assets.versioned("/images/minder.png")" height="50px"/> <p class="lead">
+
+        The Testbed!...</p>
+
+      </div>
+    </td></tr>
+      <tr class="hidden-xs"><td style="height: 50px ; padding:15px ;">
+        <a class="btn btn-primary" role="button" href="#features">Read more...</a>
+        <a class="btn btn-success" role="button" href='@routes.Application.testGroups()'>Browse the intentory</a>
+        <a class="btn btn-warning" role="button" href='@routes.Application.adapters()'>Check the adapters</a>
+        <a class="btn btn-info" role="button" href='@routes.Application.jobQueue()'>Monitor the job queue</a>
+      </td></tr></table>
+  </div>
+
+  <div class="featurette" id="features">
+    <h1 class="page-header" style="color:#337ab7 ; text-align: center">Features
+    </h1>
+
+    <table align="center">
+      <tr><td style="padding:20px">
+        <div>
+          <table>
+            <tr>
+              <td style="padding-right: 10px ;"><img src="@routes.Assets.versioned("images/unblocked-padlock.png")"/></td>
+              <td style="width:200px ;"><h3>Open Source</h3>
+                Minder is an open source online control flow management application (testbed) licenced under <a href="https://joinup.ec.europa.eu/community/eupl/og_page/eupl">
+                  EUPL1.1</a></td>
+            </tr>
+          </table>
+        </div>
+
+      </td><td style="padding:20px">
+        <div>
+          <table>
+            <tr>
+              <td style="padding-right: 10px ;"><img src="@routes.Assets.versioned("images/sand-castle.png")"/></td>
+              <td style="width:200px ;"><h3>Stable</h3>
+                The Powerful Play-Scala-Java combination cooked with our teams experience provides a stable architecture that is immune to performance drawbacks.</td>
+            </tr>
+          </table>
+        </div>
+
+      </td></tr>
+      <tr><td style="padding:20px">
+        <div>
+          <table>
+            <tr>
+              <td style="padding-right: 10px ;"><img src="@routes.Assets.versioned("images/puzzle-black-piece-shape.png")"/></td>
+              <td style="width:200px ;"><h3>Modular</h3>
+                We provide a modular development framework that enables arbitrarily complex inter-system communication to be handled easily</td>
+            </tr>
+          </table>
+        </div>
+
+      </td>
+        <td style="padding:20px">
+          <div>
+            <table>
+              <tr>
+                <td style="padding-right: 10px ;"> <img src="@routes.Assets.versioned("images/handshake.png")"/></td>
+                <td style="width:200px ;"><h3>User Friendly</h3>
+                  Minder provides an easy to explore data model that is based on grouping of the inventories</td>
+              </tr>
+            </table>
+          </div>
+        </td></tr>
+      <tr><td style="padding:20px" colspan="2">
+        <div align="center">
+          <table>
+            <tr>
+              <td style="padding-right: 10px ;"><img src="@routes.Assets.versioned("images/wind-mill.png")"/></td>
+              <td style="width:200px ;"><h3>Sustainable</h3>
+                An online scripting capability and open source modular Minder development framework helps create a sustainable architecture</td>
+            </tr>
+          </table>
+        </div>
+      </tr>
+    </table>
+  </div>
+  <br />
+  <br />
+  <br />
+  <br />
+  <footer style="background-color: transparent">
+    <div align="center">
+      <table style="text-align: center">
+        <tr>
+          <td style="padding-left: 15px ; padding-right: 15px ;">
+            <a href="https://joinup.ec.europa.eu/software/minder/home"><img class="img-square img-responsive img-center" width='100px' src="@routes.Assets.versioned("images/joinup_logo.png")" alt=""></a>
+          </td>
+          <td style="padding-left: 15px ; padding-right: 15px ;">
+            <a href="http://www.esens.eu">
+              <img class="img-square img-responsive img-center" width='100px' src="@routes.Assets.versioned("images/e-sens_logo3.jpg")" alt="">
+            </a>
+          </td>
+          <td style="padding-left: 15px ; padding-right: 15px ;">
+            <a href="https://joinup.ec.europa.eu/software/minder/home"><img class="img-square img-responsive img-center" width='100px' src="@routes.Assets.versioned("images/GitHub_Logo1.png")" alt="">
+            </a>
+          </td>
+        </tr>
+      </table>
+    </div>
+  </footer>
+  <div style="font-size:2px ;">Icons made by <a href="http://www.flaticon.com/authors/yannick" title="Yannick">Yannick</a>
+    from <a href="http://www.flaticon.com" title="Flaticon">www.flaticon.com</a>
+    is licensed by <a href="http://creativecommons.org/licenses/by/3.0/" title="Creative Commons BY 3.0" target="_blank">
+      CC 3.0 BY</a>&nbsp; Icons made by <a href="http://www.freepik.com" title="Freepik">Freepik</a>
+    from <a href="http://www.flaticon.com" title="Flaticon">www.flaticon.com</a>
+    is licensed by <a href="http://creativecommons.org/licenses/by/3.0/" title="Creative Commons BY 3.0" target="_blank">
+      CC 3.0 BY</a></div>
+}

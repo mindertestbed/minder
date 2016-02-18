@@ -12,17 +12,54 @@
           console.log("Log " + event.data)
           logarea[0].scrollTop = logarea[0].scrollHeight;
         }
+
+        $(window).resize(function() {
+          if ($(this).width() <= 768) {
+            $("#logDiv").hide();
+          } else{
+            $("#queDiv").show()
+            $("#historyDiv").show()
+            $("#logDiv").show()
+          }
+        });
       });
+
+      function display(id){
+        $("#queDiv").hide()
+        $("#historyDiv").hide()
+        $("#logDiv").hide()
+        $("#"+id).show()
+      }
+
+
+
   </script>
 
-  <h3>Test Monitor</h3>
+  <table style="width:100% ;" class="visible-xs"><tr><td class="tabexpand">
+    <h3>Test Monitor</h3>
+  </td><td class="tabshrink">
+      <!-- Single button -->
+    <div class="btn-group">
+      <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+        Select View <span class="caret"></span>
+      </button>
+      <ul class="dropdown-menu">
+        <li><a onclick='display("queDiv")'>Job Queue</a></li>
+        <li><a onclick='display("historyDiv")'>History</a></li>
+        <li><a onclick='display("logDiv")'>Log</a></li>
+      </ul>
+    </div>
+  </td></tr></table>
+
+  <h3 class="hidden-xs">Test Monitor</h3>
+
   <div class="row" style="height:95% ;">
-    <div class=" col-md-@{
+    <div id="logDiv" class="col-md-@{
       global.Util.remaining
     }" style="height:100% ;">
       <div class="panel panel-info" style="height:97% ; padding: 0px ;">
         <div class="panel-heading">Log</div>
-        <div class="panel-body zeropad" style="height:100%;">
+        <div class="panel-body zeropad" style="height:100% ;">
 
           <textarea readonly="readonly" id="logarea" class="lightMinderBlue"
           style="resize: none ; font-family:monospace ; height:calc(100% - 2em) ; width:100% ; border:1px solid #ddeee6 ; border-radius:2px ; overflow:scroll">@LogFeeder.currentLogString(Authentication.getLocalUser)</textarea>
@@ -33,9 +70,13 @@
     <div class="col-md-@{
       global.Util.feedWidth
     }">
+      <div id="queDiv">
       @jobQueueFeed()
-      <hr/>
-      @jobHistoryFeed()
+      </div>
+      <div id="historyDiv">
+        <hr/>
+        @jobHistoryFeed()
+      </div>
     </div>
   </div>
 }

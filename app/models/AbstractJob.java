@@ -20,7 +20,7 @@ public abstract class AbstractJob extends Model {
   public String name;
 
   @ManyToOne
-  @Column(nullable = false)
+   @Column(nullable = false)
   public Tdl tdl;
 
 

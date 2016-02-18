@@ -29,7 +29,7 @@
     @if(navObject.isInstanceOf[String]) {
       <li class='active'>@navObject</li>
     } else {
-      <li>Test Groups</li>
+      &nbsp;
       @*
       @defining(navObject.asInstanceOf[ModelNavigation]) { navigation =>
         @if(navigation.testGroup == null){
