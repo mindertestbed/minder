@@ -1,58 +1,34 @@
 @(frm: Form[_], editMode: Boolean = true)
 
-  @import helper._
-  @import views.html.util._
+@import helper._
+@import views.html.util._
 
 
-  @implicitFieldConstructor = @{
-    FieldConstructor(myInput.f)
+@implicitFieldConstructor = @{
+  FieldConstructor(myInput.f)
+}
+
+@getOrDummy() = @{
+  val id = frm("id").value
+  if(id == null || id.length == 0) {
+    val tg = TestGroup.findById(frm("groupId").value.toLong)
+    val tc = new UtilClass
+    tc.name = "New Util Class"
+    tc.testGroup = tg
+    tc
+  } else {
+    UtilClass.findById(id.toLong)
   }
+}
 
-
-
-  @getOrDummy() = @{
-    val id = frm("id").value
-    if(id == null || id.length == 0) {
-      val tg = TestGroup.findById(frm("groupId").value.toLong)
-      val tc = new UtilClass
-      tc.name = "New Util Class"
-      tc.testGroup = tg
-      tc
-    } else {
-      UtilClass.findById(id.toLong)
-    }
-  }
-
-  @defining(getOrDummy()) { utilClass =>
-    @main(Messages("minder.navigation.restricted.testdesigner"), "mainNavigation",
-      Array(("Test Groups", controllers.routes.Application.testGroups().path()),
-        (utilClass.testGroup.name, controllers.routes.GroupController.getGroupDetailView(utilClass.testGroup.id, "utils").path()),
-        (utilClass.name, ""))) {
+@defining(getOrDummy()) { utilClass =>
+  @main(Messages("minder.navigation.restricted.testdesigner"), "mainNavigation",
+    Array(("Test Groups", controllers.routes.Application.testGroups().path()),
+      (utilClass.testGroup.name, controllers.routes.GroupController.getGroupDetailView(utilClass.testGroup.id, "utils").path()),
+      (utilClass.name, ""))) {
+    <div class="padabit">
+      <br />
       @dialogs()
-
-      <style>
-      #accordion1 {
-      height: 100% ;
-      overflow:scroll ;
-      }
-
-      .myscroll {
-      overflow:scroll ;
-      width:100% ;
-
-      background: rgb(200,230,255) ;
-      }
-      #editor {
-      position: relative;
-      top: 10px;
-      right: 0;
-      bottom: 0;
-      left: 0px;
-      height:350px;
-      }
-
-
-      </style>
       <script type="text/javascript" src="@routes.Assets.versioned("javascripts/ace/ace.js")"></script>
       <script>
 
@@ -60,6 +36,9 @@
             editor = ace.edit("editor");
             editor.setTheme("ace/theme/clouds");
             editor.getSession().setMode("ace/mode/scala");
+            editor.setOptions({
+              maxLines: 50
+            });
 
             // store it
             $("#editor").data('AceInstance', editor);
@@ -90,114 +69,131 @@
       } else {
         routes.UtilClassController.doEditUtilClass()
       }) { act =>
-        @helper.form(action = act, 'class -> "fullh") {
-          <div id="contentPane" style="position:absolute ; top:0px ; left:3px ; bottom: 3px ; right: 3px ;">
-            <div class="bevel2" style="position:absolute ; width:100% ; height:50px ; margin:0 ; padding:10px ;">
-              <table style="width: 100% ;">
-                <tr>
-                  <td class="tabshrink">
-                    <b>Util Class: </b>
-                    @if(!editMode) {
-                      <input type="text" name="name" value='@frm("name").value' style="border: 1px solid lightgrey ; background: white ; width:150px ;"/>
-                    } else {
-                      @frm("name").value
-                      <input type="hidden" name="name" id="name" value='@frm("name").value'/>
-                    }</td>
-                  <td class="tabshrink">
-                      &nbsp;
-                    <b>Short Description:</b>
-                    <input type="text" name="shortDescription" value='@frm("shortDescription").value' style="border: 1px solid lightgrey ; background: white ; width:200px ;"/>
-                  </td>
-                  <td align="right">
-                    <table><tr><td>
-
-                      <b>Theme12</b>: <select id="select">
-                      <option>chrome</option>
-                      <option>eclipse</option>
-                      <option>monokai</option>
-                      <option>sqlserver</option>
-                      <option selected>clouds</option>
-                      <option>textmate</option>
-                      <option>xcode</option>
-                    </select>
-                        &nbsp;&nbsp;&nbsp;&nbsp;
-                    <td align="right">
-                      <button type="submit">Save</button>&nbsp;
-                      <button type="reset">Reset</button>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                      <button type="button" onclick="history.back ( )">Cancel</button>
-                    </td></tr></table>
-
-                  </td>
+        <form id="editorform" method="post" action="@act">
+          <table style="width: 100% ;">
+            <tr>
+              <td class="tabshrink">
+                <b>Util Class: </b>
+                @if(!editMode) {
+                  <input type="text" name="name" value='@frm("name").value' style="border: 1px solid lightgrey ; background: white ; width:150px ;"/>
+                } else {
+                  @frm("name").value
+                  <input type="hidden" name="name" id="name" value='@frm("name").value'/>
+                }</td>
+              <td class="tabshrink">
+                  &nbsp;
+                <b>Short Description:</b>
+                <input type="text" name="shortDescription" value='@frm("shortDescription").value' style="border: 1px solid lightgrey ; background: white ; width:200px ;"/>
+              </td>
+              <td align="right" class="tabexpand">
+                <table class="hidden-xs hidden-sm"><tr><td>
+                  <b>Theme</b>: <select id="select">
+                  <option>chrome</option>
+                  <option>eclipse</option>
+                  <option>monokai</option>
+                  <option>sqlserver</option>
+                  <option selected>clouds</option>
+                  <option>textmate</option>
+                  <option>xcode</option>
+                </select>
+                <td align="right">
+                  <button type="submit" class="btn btn-primary btn-sm glyphicon glyphicon-floppy-disk" action="save">
+                    Save</button>&nbsp;
+                  <a type="cancel" onclick="history.back ( )" class="btn btn-danger btn-sm glyphicon glyphicon-floppy-disk">
+                    Cancel</a>
+                </td></tr></table>
+                <table class="visible-xs visible-sm"><tr><td style="vertical-align: middle">
+                    <!-- Split button -->
+                  <div class="btn-group">
+                    <button type="button" class="btn btn-primary dropdown-toggle  btn-sm glyphicon glyphicon-menu-hamburger" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                      <span class="caret"></span>
+                    </button>
+                    <ul class="dropdown-menu">
+                      <li><a onclick='$("#editorform").submit();' class="glyphicon glyphicon-floppy-disk">Save</a></li>
+                      <li role="separator" class="divider"></li>
+                      <li><b>Theme</b>: <br /><select id="select2" style="width:95% ; height:25px ;">
+                        <option>chrome</option>
+                        <option>eclipse</option>
+                        <option>monokai</option>
+                        <option>sqlserver</option>
+                        <option selected>clouds</option>
+                        <option>textmate</option>
+                        <option>xcode</option>
+                      </select></li>
+                      <li role="separator" class="divider"></li>
+                      <li><a onclick="history.back ( )" class="glyphicon glyphicon-remove">Cancel</a></li>
+                    </ul>
+                  </div>
+                </td>
                 </tr>
-              </table>
-            </div>
-            <div style="position:absolute ; top:50px ; left:0 ; right:0 ; bottom: 0 ; margin:0 ; padding:5px ; overflow:auto ;">
-              @if(frm.hasErrors) {
-                <p id="error" class="alert alert-danger" style='font-family:"Monaco", "Courier New", "monospace"'></p>
-                <xmp id="source" style="display: none">
-                  @if(frm.hasGlobalErrors) {
-                    @frm.globalError
-                  }
-                  @if(frm.hasErrors) {
-                    @for( error <- frm.errors) {
-                      @for( err <- error._2) {
-                        @error._1: @Messages(err.message)
-                      }
-                    }
-                  }
-                </xmp>
+                </table>
+              </td>
+            </tr>
+          </table>
 
-                <script>
-                    function trimAll(arr){
-                      var arr2 = new Array()
-                      for(a in arr){
-                        arr[a] =arr[a].trim()
-                        if (arr[a].length > 0) arr2.push(arr[a])
-                      }
-                      return arr2;
-                    }
-                    $(function(){
-                      var newd  = $("#source" ).text()
-                      newd = trimAll(newd.split(/\n/g)).join("<br/>");
-                      newd = newd.replace(/ /g, '&nbsp;')
-                      $("#error")[0 ].innerHTML = newd.trim();
-                    });
-                </script>
+          @if(frm.hasErrors) {
+            <p id="error" class="alert alert-danger" style='font-family:"Monaco", "Courier New", "monospace"'></p>
+            <xmp id="source" style="display: none">
+              @if(frm.hasGlobalErrors) {
+                @frm.globalError
               }
-
-              <div id="editor-container">
-                <pre id="editor">@utilClass.source</pre>
-              </div>
-              @defining(if(frm("tdl").value == null) {
-                ""
-              } else {
-                frm("tdl").value
-              }) { str =>
-                @defining(str.toString.split("\\\n").length) { len =>
-                  <script>
-                      $(function(){
-                        var editor = $("#tdl").data('CodeMirrorInstance');
-
-                        var nls = "";
-                        for(i = @len; i < 20; i++){
-                          nls += "\n"
-                        }
-
-                        editor.replaceRange(nls, CodeMirror.Pos(editor.lastLine()))
-                      });
-                  </script>
+              @if(frm.hasErrors) {
+                @for(error <- frm.errors) {
+                  @for(err <- error._2) {
+                    @error._1: @Messages(err.message)
+                  }
                 }
               }
+            </xmp>
 
-            </div>
+            <script>
+                function trimAll(arr){
+                  var arr2 = new Array()
+                  for(a in arr){
+                    arr[a] =arr[a].trim()
+                    if (arr[a].length > 0) arr2.push(arr[a])
+                  }
+                  return arr2;
+                }
+                $(function(){
+                  var newd  = $("#source" ).text()
+                  newd = trimAll(newd.split(/\n/g)).join("<br/>");
+                  newd = newd.replace(/ /g, '&nbsp;')
+                  $("#error")[0 ].innerHTML = newd.trim();
+                });
+            </script>
+          }
 
+          <div id="editor-container" style="padding-top: 5px;">
+            <pre id="editor">@utilClass.source</pre>
           </div>
+          @defining(if(frm("tdl").value == null) {
+            ""
+          } else {
+            frm("tdl").value
+          }) { str =>
+            @defining(str.toString.split("\\\n").length) { len =>
+              <script>
+                  $(function(){
+                    var editor = $("#tdl").data('CodeMirrorInstance');
+
+                    var nls = "";
+                    for(i = @len; i < 20; i++){
+                      nls += "\n"
+                    }
+
+                    editor.replaceRange(nls, CodeMirror.Pos(editor.lastLine()))
+                  });
+              </script>
+            }
+          }
 
           <input type="hidden" name="id" id="id" value='@frm("id").value'/>
           <input type="hidden" name="groupId" id="groupId" value='@frm("groupId").value'/>
           <input type="hidden" name="tdl" id="tdl" value = @frm("tdl").value/>
 
-        } <!-- helper.form -->
-      } <!-- defininf -->
-    } <!-- main -->
-  } <!-- defining -->
+        </form>
+      } <!-- defining -->
+    </div>
+  } <!-- main -->
+} <!-- defining -->

@@ -7,24 +7,23 @@
       (utilClass.testGroup.name, controllers.routes.GroupController.getGroupDetailView(utilClass.testGroup.id, "utils").path()),
       (utilClass.name, ""))) {
     @dialogs()
-  <head>
-    <style>      #editor {
-    position: relative;
-    top: 10px;
-    right: 0;
-    bottom: 0;
-    left: 0px;
-    height:350px;
-    }
+    <head>
+      <style>      #editor {
+      position: relative ;
+      top: 10px ;
+      right: 0 ;
+      bottom: 0 ;
+      left: 0px ;
+      height:350px ;
+      }
 
 
-    </style>
-  </head>
+      </style>
+    </head>
     <h3>Util Class
       <div id="name@{
         utilClass.id
       }"
-
         @subjectIs(utilClass.owner) {
           onclick='showUpdateInputTextDialog(@utilClass.id, "name", $(this).next(), "/doEditUtilClassField")'
         }
@@ -32,62 +31,59 @@
       <input type="hidden" value="@utilClass.name"/>
     </h3>
 
-    <div class="indent">
-      <h4>Short Description</h4>
-      <div id="shortDescription@{
-        utilClass.id
-      }"
+    <h4>Short Description</h4>
+    <div id="shortDescription@{
+      utilClass.id
+    }"
 
-        @subjectIs(utilClass.owner) {
-          onclick='showUpdateInputTextDialog(@utilClass.id, "shortDescription", $(this).next(), "/doEditUtilClassField")'
-        }
-      class="editable"></div>
+      @subjectIs(utilClass.owner) {
+        onclick='showUpdateInputTextDialog(@utilClass.id, "shortDescription", $(this).next(), "/doEditUtilClassField")'
+      }
+    class="editable"></div>
 
-      <input type="hidden" value="@utilClass.shortDescription"/>
+    <input type="hidden" value="@utilClass.shortDescription"/>
+    <br />
 
-      <table class="section fullw" style="border-top:1px solid gray ; margin-top:0 ;">
-        <tr>
-          <td>
-            <br />
-            <div>
-              @subjectIs(utilClass.owner) {
-                <input type="button" onclick='window.location="/getEditUtilClassEditorView?id=@{utilClass.id}"' value="         Edit         "/> &nbsp;&nbsp;&nbsp;&nbsp;
-                }
-            Theme: <select id="select">
-              <option>chrome</option>
-              <option>eclipse</option>
-              <option>monokai</option>
-              <option>sqlserver</option>
-              <option selected>clouds</option>
-              <option>textmate</option>
-              <option>xcode</option>
-            </select>
-            </div>
-            <div id="editor-container">
-              <pre id="editor">@utilClass.source</pre>
-            </div>
-            <script type="text/javascript" src="@routes.Assets.versioned("javascripts/ace/ace.js")"></script>
-            <script>
+    <h4>Code</h4>
 
-
-                    var editor = ace.edit("editor");
-                    editor.setTheme("ace/theme/clouds");
-                    editor.getSession().setMode("ace/mode/scala");
-                    editor.setReadOnly(true);
-
-
-                    $("#select").change(function () {
-                      $("#select option:selected").each(function () {
-                        var theme = "ace/theme/".concat($(this).text()) ;
-                        editor.setTheme(theme);
-
-                      });
-                    });
-            </script>
-          </td>
-        </tr>
-      </table>
+    <div>
+      @subjectIs(utilClass.owner) {
+        <button class="btn btn-primary btn-sm" onclick='window.location="/getEditUtilClassEditorView?id=@{utilClass.id}"' >&nbsp;&nbsp;&nbsp;Edit&nbsp;&nbsp;&nbsp;</button>
+      }
+      Theme: <select id="select">
+      <option>chrome</option>
+      <option>eclipse</option>
+      <option>monokai</option>
+      <option>sqlserver</option>
+      <option selected>clouds</option>
+      <option>textmate</option>
+      <option>xcode</option>
+    </select>
     </div>
+    <div id="editor-container">
+      <pre id="editor">@utilClass.source</pre>
+    </div>
+    <script type="text/javascript" src="@routes.Assets.versioned("javascripts/ace/ace.js")"></script>
+    <script>
+
+
+        var editor = ace.edit("editor");
+        editor.setTheme("ace/theme/clouds");
+        editor.getSession().setMode("ace/mode/scala");
+        editor.setReadOnly(true);
+        editor.setOptions({
+          maxLines: 50
+        });
+
+
+        $("#select").change(function () {
+          $("#select option:selected").each(function () {
+            var theme = "ace/theme/".concat($(this).text()) ;
+            editor.setTheme(theme);
+          });
+        });
+    </script>
+
     <br />
 
     <script>

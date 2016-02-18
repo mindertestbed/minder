@@ -14,31 +14,10 @@ import javax.persistence.*;
  * Created by edonafasllija on 11/02/16.
  */
 @Entity
-
-@Table(name = "JobTemplate")
-public class JobTemplate extends Model {
-
-  @Id
-  public Long id;
-
-  @Column(nullable = false)
-  public String name;
-
+@DiscriminatorValue("3")
+public class JobTemplate extends AbstractJob {
   @ManyToOne
-  @Column(nullable = false)
   public TestGroup testGroup;
-
-  @ManyToOne
-  @Column(nullable = false)
-  public User owner;
-
-  public Visibility visibility;
-
-  public String mtdlParameters;
-
-
-  @OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
-  public List<MappedWrapper> mappedWrappers;
 
   private static final Finder<Long, JobTemplate> find = new Finder<>(
       JobTemplate.class);

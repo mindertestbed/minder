@@ -62,6 +62,9 @@
               editor = ace.edit("editor");
               editor.setTheme("ace/theme/clouds");
               editor.getSession().setMode("ace/mode/scala");
+              editor.setOptions({
+                maxLines: 50
+              });
 
               // store it
               $("#editor").data('AceInstance', editor);
@@ -131,22 +134,19 @@
                     <option>textmate</option>
                     <option>xcode</option>
                   </select>
-                    <button onclick='$ ( "#funcdiv" ).show( );' class="btn btn-primary btn-sm glyphicon glyphicon-transfer">
-                      Insert Converter</button>
+                    <a onclick='$ ( "#funcdiv" ).show( );' class="btn btn-primary btn-sm glyphicon glyphicon-transfer">
+                      Insert Converter</a>
                       &nbsp;
-                    <button onclick='$("#wrappersDiv").show();' class="btn btn-primary btn-sm glyphicon glyphicon-paperclip">
-                      Insert Reference</button>
+                    <a onclick='$("#wrappersDiv").show();' class="btn btn-primary btn-sm glyphicon glyphicon-paperclip">
+                      Insert Reference</a>
                       &nbsp;
                   <td align="right">
                     <button type="submit" class="btn btn-primary btn-sm glyphicon glyphicon-floppy-disk" action="save">
                       Save</button>&nbsp;
-                    <button onclick="history.back ( )" class="btn btn-danger btn-sm glyphicon glyphicon-floppy-disk">
-                      Cancel</button>
+                    <a type="cancel" onclick="history.back ( )" class="btn btn-danger btn-sm glyphicon glyphicon-floppy-disk">
+                      Cancel</a>
                   </td></tr></table>
-
                   <table class="visible-xs visible-sm"><tr><td style="vertical-align: middle">
-
-
                       <!-- Split button -->
                     <div class="btn-group">
                       <button type="button" class="btn btn-primary dropdown-toggle  btn-sm glyphicon glyphicon-menu-hamburger" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">

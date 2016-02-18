@@ -4,12 +4,12 @@
       $(function(){
         var introdiv = $("#introdiv")
         $(window).resize(function(){
-          introdiv.css("height", parseInt(introdiv.css("width"))*0.5625)
+          introdiv.css("height", parseInt(introdiv.css("width"))*0.48);//0.5625)
         });
-        introdiv.css("height", parseInt(introdiv.css("width"))*0.5625)
+        introdiv.css("height", parseInt(introdiv.css("width"))*0.48);//0.5625)
       })
   </script>
-  <div id="introdiv" style="background: url( @routes.Assets.versioned("images/bridge.jpg") ); background-size: 100% auto; background-repeat: no-repeat ;">
+  <div id="introdiv" style="background: url( @routes.Assets.versioned("images/bridge2.jpg") ); background-size: 100% auto; background-repeat: no-repeat ;">
 
     <table style="height: 100%"><tr><td style="vertical-align: text-top">
 
@@ -24,10 +24,10 @@
       </div>
     </td></tr>
       <tr class="hidden-xs"><td style="height: 50px ; padding:15px ;">
-        <a class="btn btn-primary" role="button" href="#features">Read more...</a>
-        <a class="btn btn-success" role="button" href='@routes.Application.testGroups()'>Browse the intentory</a>
+        <a class="btn btn-info" role="button" href="#features">Read more...</a>
+        <a class="btn btn-success" role="button" href='@routes.Application.testGroups()'>Browse the inventory</a>
         <a class="btn btn-warning" role="button" href='@routes.Application.adapters()'>Check the adapters</a>
-        <a class="btn btn-info" role="button" href='@routes.Application.jobQueue()'>Monitor the job queue</a>
+        <a class="btn btn-primary" role="button" href='@routes.Application.jobQueue()'>Monitor the job queue</a>
       </td></tr></table>
   </div>
 

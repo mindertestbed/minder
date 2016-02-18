@@ -22,7 +22,6 @@ public abstract class AbstractJob extends Model {
   @ManyToOne
   public Tdl tdl;
 
-
   @ManyToOne
   @Column(nullable = false)
   public User owner;
