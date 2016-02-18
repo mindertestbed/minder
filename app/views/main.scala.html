@@ -13,7 +13,7 @@
   </head>
 
   <body>
-    <nav class="navbar navbar-default navbar-fixed-top navbar-inverse" role="navigation">
+    <nav class="navbar navbar-default navbar-fixed-top navbar-inverse navbarim" role="navigation">
       <div class="container-fluid">
           <!-- Brand and toggle get grouped for better mobile display -->
         <div class="navbar-header">
@@ -24,14 +24,14 @@
             <span class="icon-bar"></span>
           </button>
           <span class="navbar-brand">
-            <img src="@routes.Assets.versioned("/images/minder.png")" height="34px"/>
+            <a href="@routes.Application.index()"><img src="@routes.Assets.versioned("/images/mindersmall.png")" height="34px"/></a>
           </span>
         </div>
 
           <!-- Collect the nav links, forms, and other content for toggling -->
         <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
           <ul class="nav navbar-nav">
-            <li class="@("active".when(nav == "testGroups"))"><a href="@routes.Application.testGroups()">Test Groups</a>
+            <li class="@("active".when(nav == "testGroups"))"><a href="@routes.Application.testGroups()">Inventory</a>
             </li>
             <li class="@("active".when(nav == "adapters"))"><a href="@routes.Application.adapters()">Adapters</a></li>
             <li class="@("active".when(nav == "jobQueue"))"><a href="@routes.Application.jobQueue()">Test Monitor</a></li>
@@ -75,27 +75,27 @@
       </div>
     </nav>
 
-    <div style="position: absolute ; top:85px ; left:0px ; right:0px ; bottom:5px ; overflow:auto ; padding: 10px ;">
+    @if(flash.contains(Authentication.FLASH_ERROR_KEY)) {
+      <div class="alert alert-danger" role="alert">
+        <button type="button" class="close" data-dismiss="alert"><span aria-hidden="true">&times;</span><span class="sr-only">
+          Close</span></button>
+        @flash().get(Authentication.FLASH_ERROR_KEY)
+      </div>
+    }
+    @if(flash.contains(Authentication.FLASH_MESSAGE_KEY)) {
+      <div class="alert alert-success" role="alert">
+        <button type="button" class="close" data-dismiss="alert"><span aria-hidden="true">&times;</span><span class="sr-only">
+          Close</span></button>
+        @flash().get(Authentication.FLASH_MESSAGE_KEY)
+      </div>
+    }
 
-      @if(flash.contains(Authentication.FLASH_ERROR_KEY)) {
-        <div class="alert alert-danger" role="alert">
-          <button type="button" class="close" data-dismiss="alert"><span aria-hidden="true">&times;</span><span class="sr-only">
-            Close</span></button>
-          @flash().get(Authentication.FLASH_ERROR_KEY)
-        </div>
-      }
-      @if(flash.contains(Authentication.FLASH_MESSAGE_KEY)) {
-        <div class="alert alert-success" role="alert">
-          <button type="button" class="close" data-dismiss="alert"><span aria-hidden="true">&times;</span><span class="sr-only">
-            Close</span></button>
-          @flash().get(Authentication.FLASH_MESSAGE_KEY)
-        </div>
-      }
-      @content
-    </div> <!-- /container -->
+    <div class="container" style="padding-top:70px ;padding-left:0;padding-right: 0;margin:0;width:100%;height:100%;">
+    @content
+    </div>
     <footer style="position:fixed ; top:calc(100% - 10px) ; left:0 ; width:100% ; height:5px ;">
       <table style="width:97% ;"><tr><td style="text-align:right ; font-size:8px ;">&copy;
-        eSENS 2015, icons: <a href="http://glyphicons.com">http://glyphicons.com</a></td>
+        eSENS 2015-2020, icons: <a href="http://glyphicons.com">http://glyphicons.com</a></td>
       </tr>
       </table>
     </footer>

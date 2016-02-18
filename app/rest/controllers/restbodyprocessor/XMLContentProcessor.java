@@ -24,6 +24,10 @@ public class XMLContentProcessor implements IRestContentProcessor {
 
     public XMLContentProcessor() {}
 
+    public XMLContentProcessor(String body) {
+        this.body = body;
+    }
+
     public XMLContentProcessor(Http.RequestBody body) {
         String[] parts = body.toString().split("Some\\(");
         if(parts.length >0){

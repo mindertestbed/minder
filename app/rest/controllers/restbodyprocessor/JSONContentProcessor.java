@@ -22,6 +22,10 @@ public class JSONContentProcessor implements IRestContentProcessor {
 
     public JSONContentProcessor() {}
 
+    public JSONContentProcessor(String body) {
+        this.body = body;
+    }
+
     public JSONContentProcessor(Http.RequestBody body) {
         String[] parts = body.toString().split("Some\\(");
         if(parts.length >0){

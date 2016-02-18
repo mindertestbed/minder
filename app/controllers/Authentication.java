@@ -63,7 +63,7 @@ public class Authentication extends Controller {
 
     session().clear();
     session().put("email", lgn.email);
-    return redirect(routes.Application.testGroups());
+    return redirect(routes.Application.index());
   }
 
   public static Result doLogout() {

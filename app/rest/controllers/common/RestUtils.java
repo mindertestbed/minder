@@ -299,5 +299,13 @@ public class RestUtils {
     throw new IllegalArgumentException("Content type is not defined. The defined types are text/xml and text/json. The received type is " + contentType);
   }
 
+  public static IRestContentProcessor createContentProcessor(String contentType, String body) throws IllegalArgumentException {
+    if (contentType == null || contentType.length() == 0 || contentType.contains("text/json") || contentType.contains("application/json"))
+      return new JSONContentProcessor(body);
+    if (contentType.contains("text/xml") || contentType.contains("application/xml"))
+      return new XMLContentProcessor(body);
+    throw new IllegalArgumentException("Content type is not defined. The defined types are text/xml and text/json. The received type is " + contentType);
+  }
+
 
 }

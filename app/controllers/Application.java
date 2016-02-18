@@ -14,6 +14,16 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 
 public class Application extends Controller {
+
+  @AllowedRoles({Role.TEST_DESIGNER, Role.TEST_OBSERVER, Role.TEST_DEVELOPER})
+  public static Result index() {
+    final User localUser = Authentication.getLocalUser();
+    if (!session().containsKey("testPageMode")) {
+      session().put("testPageMode", "none");
+    }
+    return ok(views.html.index.render());
+  }
+
   public static Result root(String display) {
     final User localUser = Authentication.getLocalUser();
     if (localUser == null)
@@ -56,7 +66,8 @@ public class Application extends Controller {
     }
     return ok(views.html.job.jobQueue.render());
   }
-  @AllowedRoles({Role.TEST_DESIGNER, Role.TEST_OBSERVER,Role.TEST_DESIGNER})
+
+  @AllowedRoles({Role.TEST_DESIGNER, Role.TEST_OBSERVER, Role.TEST_DESIGNER})
   public static Result about() {
     final User localUser = Authentication.getLocalUser();
 

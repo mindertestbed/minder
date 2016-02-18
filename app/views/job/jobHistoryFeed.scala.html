@@ -75,8 +75,8 @@
       </nav>
     </div>
 
-    <table class="table table-hover table-condensed table-striped" style="border:none ;">
-      <tbody id="updatableTbody">
+    <table class="table table-hover table-condensed table-striped">
+      <tbody id="updatableTbody" >
       @defining(TestRun.getRecentRuns(40)) { testRunList =>
         @for(testRun <- testRunList) {
           @authentication.decideOnVisibility(testRun.visibility, testRun.runner) {
@@ -89,11 +89,12 @@
               }
               </td>
               <td style="text-align:center ;" class="tabshrink">#@testRun.number</td>
-              <td class="tabexpandNoBorder">@if(testRun.job != null) {
-                @visibilityTagFragment(testRun.visibility, testRun.runner)
-                <a href="@controllers.routes.JobController.displayJob(testRun.job.id, true)">@testRun.job.name</a>
+              <td>
+                <div style="width: 14vw;overflow: hidden;text-overflow: ellipsis;white-space: nowrap">@if(testRun.job != null) {
+                  @visibilityTagFragment(testRun.visibility, testRun.runner)
+                  <a href="@controllers.routes.JobController.displayJob(testRun.job.id, true)">@testRun.job.name</a>
 
-              }</td>
+                }</div></td>
               <td align="center" valign="middle" class="tabshrink">
                 <a href="/viewReport?testRunId=@testRun.id&type=pdf" title="View Report" class="celldiv" style="height:16px ; width:16px ;">
                   <img src="@routes.Assets.versioned("/images/pdf-2-64.png")" height="12px"/>
