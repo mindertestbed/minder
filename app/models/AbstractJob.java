@@ -20,7 +20,6 @@ public abstract class AbstractJob extends Model {
   public String name;
 
   @ManyToOne
-   @Column(nullable = false)
   public Tdl tdl;
 
 
@@ -30,6 +29,7 @@ public abstract class AbstractJob extends Model {
 
   public Visibility visibility;
 
+  @Column(nullable = false, length = ModelConstants.DESCRIPTION_LENGTH, columnDefinition = "TEXT")
   public String mtdlParameters;
 
 
