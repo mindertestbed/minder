@@ -1,0 +1,79 @@
+@(frm: Form[_], localUser: models.User = null)
+
+@import views.html.util._
+@import authentication._
+@import views.html.helper._
+@import helper._
+
+@implicitFieldConstructor = @{
+  FieldConstructor(twitterBootstrapBasic.f)
+}
+<script>
+        $(function(){
+          $( "#rc1@{frm("id").value}" ).tabs();
+        });
+</script>
+
+<h2>New Job Template</h2>
+@if(frm.hasGlobalErrors) {
+  <p class="alert alert-danger">
+  @frm.globalError.message
+  </p>
+}
+@inputText(
+  frm("name"),
+  '_label -> "Job Template Name"
+)
+
+@textarea(frm("mtdlParameters"), 'rows -> 5, '_label -> "Parameters", '_style -> "height:auto;")
+
+<label for="visibility">Visibility: </label>
+<select id="visibility" name="visibility" >
+@for(vis <- Visibility.values()) {
+  @if(vis == frm("visibility").value) {
+    <option selected="selected" value="@vis">@vis</option>
+  } else {
+    <option value="@vis">@vis</option>
+  }
+}
+</select><br />
+<br />
+<table>
+  <tr>
+    <td>
+      <label for="wrapperMappings">Wrapper Parameter Mappings: </label>
+  <td>
+  </tr>
+  <tr>
+    <td>
+      <button id ="btn" type="button" class="btn btn-default" >
+        <span class="glyphicon glyphicon-plus" aria-hidden="true" ></span>
+        <script type="text/javascript">
+                $(function(){
+                  $('#btn').on('click',function() {
+                    //alert('Hello!');
+                    var wmtable = document.getElementById("WrapperMappingsTable");
+                    var rowCount = wmtable.rows.length;
+                    var row = wmtable.insertRow(rowCount);
+                    var cell = row.insertCell(0);
+                    cell.innerHTML = cell.innerHTML +'<tr><td>Variable: <input type="text" name="variable"></td></tr>' +
+                            '<tr><td>Wrapper: <input type="text" name="wrapper"></td></tr>';
+                  })
+                })
+        </script>
+      </button>
+
+    </td>
+  </tr>
+  <tr>
+    <table id="WrapperMappingsTable">
+    </table>
+  </tr>
+</table>
+
+
+<br />
+<br />
+<br />
+
+<input type="hidden" name="id" id="id" value='@frm("id").value' />

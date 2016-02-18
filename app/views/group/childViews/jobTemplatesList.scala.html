@@ -1,0 +1,71 @@
+@(testGroup: TestGroup)
+
+    @import java.util.concurrent.atomic.AtomicInteger
+    @import views.html.util._
+    @import authentication._
+
+    <script>
+    $(function() {
+        $( document ).tooltip();
+    });
+</script>
+
+    @subjectIs(testGroup.owner) {
+        @createButton(Messages("Create Job Template"),
+            "glyphicon-plus",
+            "btn-primary") {
+            createFormDialog(
+            "/createJobTemplateForm",
+            "/doCreateJobTemplate?groupId=@{testGroup.id}",
+            "Create Job Template",
+            $("#jobTemplates@{testGroup.id}").parent(),true)
+        }
+        <br />
+        <br />
+    }
+    <div id="jobTemplates@testGroup.id">
+    @if(JobTemplate.findByGroup(testGroup).size() > 0) {
+        <table class="table table-hover table-condensed  table-striped " style="width: 50% ;">
+            @createFirstRow {
+                <th >Name</th>
+
+            }
+
+            @defining(new AtomicInteger(1)) { index =>
+                @defining(JobTemplate.findByGroup(testGroup)) { jobTemplates =>
+                    @for(jobtempl <- jobTemplates) {
+                        <tr>
+                            <td class="tabshrink" >@index.getAndIncrement</td>
+                            <td class="tabshrink">
+                                    &nbsp; @jobtempl.name
+                            </td>
+
+
+                            <td class="tabshrink" align="center" width="100px">
+                                <table><tr>
+                                    @subjectIs(testGroup.owner) {
+                                        <td>@createButton("", "glyphicon-pencil", "btn-default") {
+                                            createFormDialog(
+                                            "/editAssetForm?id=@{jobtempl.id}",
+                                            "/doEditAsset",
+                                            "Edit Asset",
+                                            $("#testGroupAsset1").parent(),true)
+                                        }</td>
+
+                                        <td>@createButton("", "glyphicon-trash", "btn-default") {
+                                            deleteWithDialog("/doDeleteAsset?id=@jobtempl.id", $("#dialog-confirm"),
+                                            "Delete Asset", "asset", "@jobtempl.name", $("#testGroupAsset@{
+                                            testGroup.id
+                                        }").parent())
+                                        }</td>
+                                    }
+                                </tr>
+                                </table>
+
+                            </td>
+                        </tr>
+                    }
+                </table>
+        }}
+    }
+    </div>
