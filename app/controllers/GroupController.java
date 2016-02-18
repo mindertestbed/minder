@@ -185,4 +185,7 @@ public class GroupController extends Controller {
     return ok(details.render(TestGroup.findById(id)));
   }
 
+  @AllowedRoles({Role.TEST_DESIGNER, Role.TEST_OBSERVER})
+  public static Result renderJobTemplates(long id){return ok(jobTemplatesList.render(TestGroup.findById(id)));}
+
 }

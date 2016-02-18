@@ -39,6 +39,7 @@ GET         /renderTestSuites                           controllers.GroupControl
 GET         /renderTestAssets                           controllers.GroupController.renderTestAssets(id: Long)
 GET         /renderUtilClasses                          controllers.GroupController.renderUtilClasses(id: Long)
 GET         /renderDependencies                         controllers.GroupController.renderDependencies(id: Long)
+GET         /renderJobTemplates                         controllers.GroupController.renderJobTemplates(id: Long)
 
 
 #test assertion management
@@ -71,6 +72,9 @@ GET         /changeTestRunVisibility                    controllers.JobControlle
 GET         /changeJobVisibility                        controllers.JobController.changeJobVisibility(id: Long, visibility : String)
 POST        /doEditJobField                             controllers.JobController.doEditJobField()
 
+#Job Template
+POST        /doCreateJobTemplate                        controllers.JobTemplateController.doCreateJobTemplate(groupId: Long)
+GET         /createJobTemplateForm                      controllers.JobTemplateController.createJobTemplateForm()
 
 #test asset management
 POST        /doCreateTestAsset                          controllers.TestAssetController.doCreateTestAsset(groupId: Long)

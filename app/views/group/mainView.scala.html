@@ -69,6 +69,9 @@
       function showDependencies(){
         ajaxRouteGet(jsRoutes.controllers.GroupController.renderDependencies, @tg.id, $("#groupSubItems"))
       }
+      function showJobTemplates(){
+          ajaxRouteGet(jsRoutes.controllers.GroupController.renderJobTemplates,@tg.id,$("#groupSubItems"))
+      }
   </script>
 
   @ajaxDisplaySelector(display,
@@ -77,7 +80,9 @@
     // "suites" -> ("Test Suites", "showSuites"),
     "assets" ->("Test Assets", "showAssets"),
     "utils" ->("Utility Classes", "showUtils"),
-    "deps" ->("Dependencies", "showDependencies"))
+    "deps" ->("Dependencies", "showDependencies"),
+    "jobTemplates"->("Job Templates","showJobTemplates"))
+
 
   <br />
   <div id="groupSubItems">

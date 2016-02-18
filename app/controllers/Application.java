@@ -94,7 +94,8 @@ public class Application extends Controller {
             routes.javascript.JobController.changeJobVisibility(),
             routes.javascript.TestQueueController.enqueueJob(),
             routes.javascript.UserController.listUsers(),
-            routes.javascript.UserController.viewSettings()
+            routes.javascript.UserController.viewSettings(),
+                routes.javascript.GroupController.renderJobTemplates()
         ))
         .as("text/javascript");
   }
