@@ -119,30 +119,35 @@ public class XMLValidationController extends Controller {
         }
 
         Schema schema;
+        String report;
         try {
             switch (validationRequest.getSchemaSubType()) {
                 case SUB_TYPE_JAR:
                     schema = schemaVerifier.getSchema(validationRequest.getPathToSchema(), validationRequest.getSchema(), ArchiveType.JAR);
-                    minderResponse.setDescription(schemaVerifier.verify(schema, validationRequest.getDocument()));
-                    minderResponse.setResult(schemaVerifier.getPositiveResult());
+                    report = schemaVerifier.verify(schema, validationRequest.getDocument());
+                    minderResponse.setDescription(report);
+                    minderResponse.setResult(schemaVerifier.getResult(report));
                     return minderResponse;
 
                 case SUB_TYPE_PLAIN:
                     schema = schemaVerifier.getSchema(validationRequest.getSchema());
-                    minderResponse.setDescription(schemaVerifier.verify(schema, validationRequest.getDocument()));
-                    minderResponse.setResult(schemaVerifier.getPositiveResult());
+                    report = schemaVerifier.verify(schema, validationRequest.getDocument());
+                    minderResponse.setDescription(report);
+                    minderResponse.setResult(schemaVerifier.getResult(report));
                     return minderResponse;
 
                 case SUB_TYPE_ZIP:
                     schema = schemaVerifier.getSchema(validationRequest.getPathToSchema(), validationRequest.getSchema(), ArchiveType.ZIP);
-                    minderResponse.setDescription(schemaVerifier.verify(schema, validationRequest.getDocument()));
-                    minderResponse.setResult(schemaVerifier.getPositiveResult());
+                    report = schemaVerifier.verify(schema, validationRequest.getDocument());
+                    minderResponse.setDescription(report);
+                    minderResponse.setResult(schemaVerifier.getResult(report));
                     return minderResponse;
 
                 case SUB_TYPE_URL:
-                	String schemaUrl = new String(validationRequest.getSchema());
-                    minderResponse.setDescription(schemaVerifier.verify(schemaUrl, validationRequest.getDocument()));
-                    minderResponse.setResult(schemaVerifier.getPositiveResult());
+                	  String schemaUrl = new String(validationRequest.getSchema());
+                    report = schemaVerifier.verify(schemaUrl, validationRequest.getDocument());
+                    minderResponse.setDescription(report);
+                    minderResponse.setResult(schemaVerifier.getResult(report));
                     return minderResponse;
 
                 default:

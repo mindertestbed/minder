@@ -30,7 +30,9 @@ runAsRivet(() => {
   mustSucceed("Verify Simple Books", () => {
     val xsd = getAsset("books.xsd")
     val xml = getAsset("sample-book.xml")
-    verifyXsd(xsd(), xml())
+    var report = verifyXsd(xsd(), xml())
+    INFO(report)
+    getResultForXSD(report)
   })
 })
 
@@ -40,15 +42,20 @@ runAsRivet(() => {
     val xsd = getAsset("library.zip")
     val xml = getAsset("sample-library.xml")
     val schema = schemaFromByteArray("library/mainscheme/library.xsd", xsd(), ArchiveType.ZIP);
-    verifyXsd(schema, xml())
+    var report = verifyXsd(schema, xml())
+    INFO(report)
+    getResultForXSD(report)
   })
+
   //test an invalid zip
   mustFail("Fail an invalid xsd schema from a ZIP file", () => {
     val xsd = getAsset("library.jar")
     val xml = getAsset("sample-library-invalid.xml")
     //refer to the schema within the archive
     val schema = schemaFromByteArray("library/mainscheme/library.xsd", xsd(), ArchiveType.ZIP);
-    verifyXsd(schema, xml())
+    var report = verifyXsd(schema, xml())
+    INFO(report)
+    getResultForXSD(report)
   })
 })
 
@@ -58,7 +65,9 @@ runAsRivet(() => {
     val xsd = getAsset("library.jar")
     val xml = getAsset("sample-library.xml")
     val minderXsd = schemaFromByteArray("library/mainscheme/library.xsd", xsd(), ArchiveType.JAR);
-    verifyXsd(minderXsd, xml())
+    var report = verifyXsd(minderXsd, xml())
+    INFO(report)
+    getResultForXSD(report)
   })
   //test an invalid zip
   mustFail("Fail an invalid xsd schema from a JAR file", () => {
@@ -66,7 +75,9 @@ runAsRivet(() => {
     val xml = getAsset("sample-library-invalid.xml")
     //refer to the schema within the archive
     val schema = schemaFromByteArray("library/mainscheme/library.xsd", xsd(), ArchiveType.JAR);
-    verifyXsd(schema, xml())
+    var report = verifyXsd(schema, xml())
+    INFO(report)
+    getResultForXSD(report)
   })
 })
 
@@ -80,7 +91,9 @@ runAsRivet(() => {
     val url = resources("library.zip")
     val xml = getAsset("sample-library.xml")
     val schema = schemaFromURL("library/mainscheme/library.xsd", url, ArchiveType.ZIP);
-    verifyXsd(schema, xml())
+    var report = verifyXsd(schema, xml())
+    INFO(report)
+    getResultForXSD(report)
   })
 
   //test an invalid zip
@@ -88,7 +101,9 @@ runAsRivet(() => {
     val url = resources("library.zip")
     val xml = getAsset("sample-library-invalid.xml")
     val schema = schemaFromURL("library/mainscheme/library.xsd", url, ArchiveType.ZIP);
-    verifyXsd(schema, xml())
+    var report = verifyXsd(schema, xml())
+    INFO(report)
+    getResultForXSD(report)
   })
 })
 
@@ -98,7 +113,9 @@ runAsRivet(() => {
     val url = resources("library.jar")
     val xml = getAsset("sample-library.xml")
     val schema = schemaFromURL("library/mainscheme/library.xsd", url, ArchiveType.JAR);
-    verifyXsd(schema, xml())
+    var report = verifyXsd(schema, xml())
+    INFO(report)
+    getResultForXSD(report)
   })
 
   //test an invalid zip
@@ -106,7 +123,9 @@ runAsRivet(() => {
     val url = resources("library.jar")
     val xml = getAsset("sample-library-invalid.xml")
     val schema = schemaFromURL("library/mainscheme/library.xsd", url, ArchiveType.JAR);
-    verifyXsd(schema, xml())
+    var report = verifyXsd(schema, xml())
+    INFO(report)
+    getResultForXSD(report)
   })
 })
 
@@ -116,14 +135,18 @@ runAsRivet(() => {
   mustSucceed("Verify an XSD on a URL with valid XML and includes ", () => {
     val url = resources("library/mainscheme/library.xsd")
     val xml = getAsset("sample-library.xml")
-    verifyXsd(url, xml())
+    var report = verifyXsd(url, xml())
+    INFO(report)
+    getResultForXSD(report)
   })
 
   //test an invalid zip
   mustFail("Fail a an XSD on a URL with an invalid XML and includes ", () => {
     val url = resources("library/mainscheme/library.xsd")
     val xml = getAsset("sample-library-invalid.xml")
-    verifyXsd(url, xml())
+    var report = verifyXsd(url, xml())
+    INFO(report)
+    getResultForXSD(report)
   })
 })
 
@@ -138,14 +161,18 @@ runAsRivet(() => {
     val schematron = getAsset("schematron.zip")
     val xml = getAsset("simple-input.xml")
     val schema = schemaFromByteArray("schematron/deep/deeper/includer1.sch", schematron(), ArchiveType.ZIP);
-    verifySchematron(schema, xml())
+    var report = verifySchematron(schema, xml(), null)
+    INFO(report)
+    getResultForSchematron(report)
   })
   //test an invalid zip
   mustFail("Fail schematron in ZIP File, invalid XML", () => {
     val schematron = getAsset("schematron.zip")
     val xml = getAsset("simple-input-invalid.xml")
     val schema = schemaFromByteArray("schematron/deep/deeper/includer1.sch", schematron(), ArchiveType.ZIP);
-    verifySchematron(schema, xml())
+    var report = verifySchematron(schema, xml(), null)
+    INFO(report)
+    getResultForSchematron(report)
   })
 })
 
@@ -155,14 +182,18 @@ runAsRivet(() => {
     val schematron = getAsset("schematron.jar")
     val xml = getAsset("simple-input.xml")
     val schema = schemaFromByteArray("schematron/deep/deeper/includer1.sch", schematron(), ArchiveType.JAR);
-    verifySchematron(schema, xml())
+    var report = verifySchematron(schema, xml(), null)
+    INFO(report)
+    getResultForSchematron(report)
   })
   //test an invalid zip
   mustFail("Fail schematron in JAR File, invalid XML", () => {
     val schematron = getAsset("schematron.jar")
     val xml = getAsset("simple-input-invalid.xml")
     val schema = schemaFromByteArray("schematron/deep/deeper/includer1.sch", schematron(), ArchiveType.JAR);
-    verifySchematron(schema, xml())
+    var report = verifySchematron(schema, xml(), null)
+    INFO(report)
+    getResultForSchematron(report)
   })
 })
 
@@ -172,7 +203,9 @@ runAsRivet(() => {
     val url = resources("schematron.zip")
     val xml = getAsset("simple-input.xml")
     val schema = schemaFromURL("schematron/deep/deeper/includer1.sch", url, ArchiveType.ZIP);
-    verifySchematron(schema, xml())
+    var report = verifySchematron(schema, xml(), null)
+    INFO(report)
+    getResultForSchematron(report)
   })
 
   //test an invalid zip
@@ -180,7 +213,9 @@ runAsRivet(() => {
     val url = resources("schematron.zip")
     val xml = getAsset("simple-input-invalid.xml")
     val schema = schemaFromURL("schematron/deep/deeper/includer1.sch", url, ArchiveType.ZIP);
-    verifySchematron(schema, xml())
+    var report = verifySchematron(schema, xml(), null)
+    INFO(report)
+    getResultForSchematron(report)
   })
 })
 
@@ -190,7 +225,9 @@ runAsRivet(() => {
     val url = resources("schematron.jar")
     val xml = getAsset("simple-input.xml")
     val schema = schemaFromURL("schematron/deep/deeper/includer1.sch", url, ArchiveType.JAR);
-    verifySchematron(schema, xml())
+    var report = verifySchematron(schema, xml(), null)
+    INFO(report)
+    getResultForSchematron(report)
   })
 
   //test an invalid zip
@@ -198,7 +235,9 @@ runAsRivet(() => {
     val url = resources("schematron.jar")
     val xml = getAsset("simple-input-invalid.xml")
     val schema = schemaFromURL("schematron/deep/deeper/includer1.sch", url, ArchiveType.JAR);
-    verifySchematron(schema, xml())
+    var report = verifySchematron(schema, xml(), null)
+    INFO(report)
+    getResultForSchematron(report)
   })
 })
 
@@ -208,16 +247,18 @@ runAsRivet(() => {
   mustSucceed("Verify a schematron on a URL with valid XML and includes ", () => {
     val url = resources("schematron/deep/deeper/includer1.sch")
     val xml = getAsset("simple-input.xml")
-    verifySchematron(url, xml(), null)
-    verifySchematron(url, xml())
+    var report = verifySchematron(url, xml(), null)
+    INFO(report)
+    getResultForSchematron(report)
   })
 
   //test an invalid zip
   mustFail("Fail a schematron JAR on a URL with an invalid XML and includes ", () => {
     val url = resources("schematron/deep/deeper/includer1.sch")
     val xml = getAsset("simple-input-invalid.xml")
-    verifySchematron(url, xml(), null)
-    verifySchematron(url, xml())
+    var report = verifySchematron(url, xml(), null)
+    INFO(report)
+    getResultForSchematron(report)
   })
 })
 
@@ -248,4 +289,16 @@ def mustSucceed(message: String, f: () => Unit) {
       THROWLATER("Assertion  Failed:" + message, ex)
     }
   }
+}
+
+def getResultForXSD(report: String) {
+    if ((report contains "<error>") || (report contains "<fatalerror>")) {
+      throw new Exception("XML has errors");
+    }
+}
+
+def getResultForSchematron(report: String) {
+    if (report contains "<svrl:failed-assert") {
+      throw new Exception("XML has errors");
+    }
 }

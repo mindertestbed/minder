@@ -20,6 +20,6 @@ public interface ISchemaVerifier {
 
     public Schema getSchema(byte[] schema) throws RuntimeException;
 
-    public String getPositiveResult();
+    public String getResult(String report);
 
 }

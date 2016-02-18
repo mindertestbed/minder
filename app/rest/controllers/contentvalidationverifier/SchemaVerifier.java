@@ -29,5 +29,5 @@ public abstract class SchemaVerifier implements ISchemaVerifier{
 
     abstract public String verify(String url, byte[] xml) throws RuntimeException, MalformedURLException;
 
-    abstract public String getPositiveResult();
+    abstract public String getResult(String report);
 }

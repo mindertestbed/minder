@@ -3,8 +3,10 @@ package builtin;
 import minderengine.Slot;
 import org.beybunproject.xmlContentVerifier.ArchiveType;
 import org.beybunproject.xmlContentVerifier.Schema;
+import org.xml.sax.SAXException;
 
 import java.io.ByteArrayInputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
 import java.net.URL;
@@ -31,59 +33,96 @@ public class XmlContentVerifier extends BuiltInWrapper {
    * @return the result of the verification process
    */
   @Slot
-  public void verifyXsd(Schema xsd, byte[] xml) {
-    org.beybunproject.xmlContentVerifier.XmlContentVerifier.verifyXsd(xsd, xml);
+  public String verifyXsd(Schema xsd, byte[] xml) {
+    try {
+      return org.beybunproject.xmlContentVerifier.XmlContentVerifier.verifyXsd(xsd, xml);
+    } catch (IOException e) {
+      throw new RuntimeException(e);
+    } catch (SAXException e) {
+      throw new RuntimeException(e);
+    }
   }
 
   @Slot
-  public void verifyXsd(Schema xsd, InputStream xml) {
-    org.beybunproject.xmlContentVerifier.XmlContentVerifier.verifyXsd(xsd, xml);
+  public String verifyXsd(Schema xsd, InputStream xml) {
+    try {
+      return org.beybunproject.xmlContentVerifier.XmlContentVerifier.verifyXsd(xsd, xml);
+    } catch (IOException e) {
+      throw new RuntimeException(e);
+    } catch (SAXException e) {
+      throw new RuntimeException(e);
+    }
   }
 
   @Slot
-  public void verifyXsd(byte[] xsd, byte[] xml) {
-    org.beybunproject.xmlContentVerifier.XmlContentVerifier.verifyXsd(xsd, xml);
+  public String verifyXsd(byte[] xsd, byte[] xml) {
+    try {
+      return org.beybunproject.xmlContentVerifier.XmlContentVerifier.verifyXsd(xsd, xml);
+    } catch (IOException e) {
+      throw new RuntimeException(e);
+    } catch (SAXException e) {
+      throw new RuntimeException(e);
+    }
   }
 
   @Slot
-  public void verifyXsd(byte[] xsd, InputStream xml) {
-    org.beybunproject.xmlContentVerifier.XmlContentVerifier.verifyXsd(new ByteArrayInputStream(xsd), xml);
+  public String verifyXsd(byte[] xsd, InputStream xml) {
+    try {
+      return org.beybunproject.xmlContentVerifier.XmlContentVerifier.verifyXsd(new ByteArrayInputStream(xsd), xml);
+    } catch (IOException e) {
+      throw new RuntimeException(e);
+    } catch (SAXException e) {
+      throw new RuntimeException(e);
+    }
   }
 
   @Slot
-  public void verifyXsd(URL xsd, InputStream xml) {
-    org.beybunproject.xmlContentVerifier.XmlContentVerifier.verifyXsd(xsd.toExternalForm(), xml);
+  public String verifyXsd(URL xsd, InputStream xml) {
+    try {
+      return org.beybunproject.xmlContentVerifier.XmlContentVerifier.verifyXsd(xsd.toExternalForm(), xml);
+    } catch (IOException e) {
+      throw new RuntimeException(e);
+    } catch (SAXException e) {
+      throw new RuntimeException(e);
+    }
   }
 
   @Slot
-  public void verifyXsd(URL xsd, URL xml) {
-    org.beybunproject.xmlContentVerifier.XmlContentVerifier.verifyXsd(xsd, xml);
+  public String verifyXsd(URL xsd, URL xml) {
+    try {
+      return org.beybunproject.xmlContentVerifier.XmlContentVerifier.verifyXsd(xsd, xml);
+    } catch (IOException e) {
+      throw new RuntimeException(e);
+    } catch (SAXException e) {
+      throw new RuntimeException(e);
+    }
+  }
+
+
+  @Slot
+  public String verifySchematron(byte[] sch, byte[] xml, Properties params) {
+    return org.beybunproject.xmlContentVerifier.XmlContentVerifier.verifySchematron(sch, xml, params);
+  }
+
+
+  @Slot
+  public String verifySchematron(URL url, byte[] xml, Properties params) {
+    return org.beybunproject.xmlContentVerifier.XmlContentVerifier.verifySchematron(url, xml, params);
   }
 
   @Slot
-  public void verifySchematron(byte[] sch, byte[] xml, Properties params) {
-    org.beybunproject.xmlContentVerifier.XmlContentVerifier.verifySchematron(sch, xml, params);
-  }
-
-
-  @Slot
-  public void verifySchematron(URL url, byte[] xml, Properties params) {
-    org.beybunproject.xmlContentVerifier.XmlContentVerifier.verifySchematron(url, xml, params);
+  public String verifySchematron(URL url, InputStream xml, Properties params) {
+    return org.beybunproject.xmlContentVerifier.XmlContentVerifier.verifySchematron(url, xml, params);
   }
 
   @Slot
-  public void verifySchematron(URL url, InputStream xml, Properties params) {
-    org.beybunproject.xmlContentVerifier.XmlContentVerifier.verifySchematron(url, xml, params);
+  public String verifySchematron(Schema schema, InputStream xml, Properties params) {
+    return org.beybunproject.xmlContentVerifier.XmlContentVerifier.verifySchematron(schema, xml, params);
   }
 
   @Slot
-  public void verifySchematron(Schema schema, InputStream xml, Properties params) {
-    org.beybunproject.xmlContentVerifier.XmlContentVerifier.verifySchematron(schema, xml, params);
-  }
-
-  @Slot
-  public void verifySchematron(Schema schema, byte[] xml, Properties params) {
-    org.beybunproject.xmlContentVerifier.XmlContentVerifier.verifySchematron(schema, new ByteArrayInputStream(xml), params);
+  public String verifySchematron(Schema schema, byte[] xml, Properties params) {
+    return org.beybunproject.xmlContentVerifier.XmlContentVerifier.verifySchematron(schema, new ByteArrayInputStream(xml), params);
   }
 
   /**
@@ -94,8 +133,8 @@ public class XmlContentVerifier extends BuiltInWrapper {
    * @param params
    */
   @Slot
-  public void verifySchematron(InputStream schematron, InputStream xml, Properties params) {
-    org.beybunproject.xmlContentVerifier.XmlContentVerifier.verifySchematron(schematron, xml, params);
+  public String verifySchematron(InputStream schematron, InputStream xml, Properties params) {
+    return org.beybunproject.xmlContentVerifier.XmlContentVerifier.verifySchematron(schematron, xml, params);
   }
 }
 
