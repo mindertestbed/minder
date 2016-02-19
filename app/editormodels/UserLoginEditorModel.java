@@ -15,4 +15,6 @@ public class UserLoginEditorModel {
   @Constraints.Required
   @Constraints.MinLength(5)
   public String password;
+
+  public String path;
 }

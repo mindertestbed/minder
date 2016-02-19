@@ -12,6 +12,7 @@ import play.mvc.Results;
 import play.mvc.Security;
 import views.html.authentication.login;
 import views.html.authentication.*;
+import views.html.index;
 
 import static play.data.Form.form;
 
@@ -27,6 +28,7 @@ public class Authentication extends Controller {
     User user = User.findByEmail(email);
     return user;
   }
+
   public static User getLocalUser(Session session) {
     String email = session.get("email");
     if (email == null)
@@ -36,7 +38,7 @@ public class Authentication extends Controller {
   }
 
   public static Result login() {
-    return ok(login.render(form(UserLoginEditorModel.class)));
+    return ok(index.render());
   }
 
   public static Result doLogin() {
@@ -44,26 +46,26 @@ public class Authentication extends Controller {
 
     if (filledForm.hasErrors()) {
       Logger.debug("Login Form Has Errors");
-      // User did not fill everything properly
-      return badRequest(login.render(filledForm));
+      return unauthorized("Plese provide a valid username and password");
     }
 
     UserLoginEditorModel lgn = filledForm.get();
 
     final User byEmail = User.findByEmail(lgn.email);
     if (byEmail == null) {
-      filledForm.reject("No User with email [" + lgn.email + "]");
-      return badRequest(login.render(filledForm));
+      return unauthorized("Plese provide a valid username and password");
     }
 
-    if(!Util.compareArray(Util.sha256(lgn.password.getBytes()), byEmail.password)){
-      filledForm.reject("Wrong Password");
-      return badRequest(login.render(filledForm));
+    if (!Util.compareArray(Util.sha256(lgn.password.getBytes()), byEmail.password)) {
+      return unauthorized("Plese provide a valid username and password");
     }
 
     session().clear();
     session().put("email", lgn.email);
-    return redirect(routes.Application.index());
+    if (lgn.path != null) {
+      return redirect(lgn.path);
+    }
+    return ok("");
   }
 
   public static Result doLogout() {
@@ -72,12 +74,12 @@ public class Authentication extends Controller {
   }
 
   @Security.Authenticated(Secured.class)
-  public static Result changePassword(){
+  public static Result changePassword() {
     return Results.badRequest("Not supported");
   }
 
   @Security.Authenticated(Secured.class)
-  public static Result doChangePassword(){
+  public static Result doChangePassword() {
     return Results.badRequest("Not supported");
   }
 }

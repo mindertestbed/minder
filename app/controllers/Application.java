@@ -67,7 +67,6 @@ public class Application extends Controller {
     return ok(views.html.job.jobQueue.render());
   }
 
-  @AllowedRoles({Role.TEST_DESIGNER, Role.TEST_OBSERVER, Role.TEST_DESIGNER})
   public static Result about() {
     final User localUser = Authentication.getLocalUser();
 
@@ -87,6 +86,7 @@ public class Application extends Controller {
     return ok(
         Routes.javascriptRouter("jsRoutes",
             routes.javascript.Authentication.login(),
+            routes.javascript.Authentication.doLogin(),
             routes.javascript.TestSuiteController.listAvailableTdlsForSuite(),
             routes.javascript.TestSuiteController.getTestSuiteDetailView(),
             routes.javascript.TestSuiteController.renderJoblistView(),

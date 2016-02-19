@@ -64,7 +64,50 @@
             }
             </ul>
           } {
-            <a href="@routes.Authentication.login()" class=" navbar-right btn btn-default navbar-btn @("disabled".when(nav == "login"))">@Messages("authenticate.login")</a>
+            <table style="height: 50px ;" align="right"><tr><td style="vertical-align: middle ; padding-right: 20px ;">
+              <form id="loginform" class="nav navbar-nav navbar-right" style="vertical-align: middle" method="post" action="@routes.Authentication.doLogin()">
+                <style>
+                .simpleinput {
+                background-color: rgba(103, 153, 206, 1);
+                border:1px solid rgb(118, 168, 222) ;
+                border-radius: 10px ;
+                width:100px ;
+                padding-left: 10px ;
+                padding-right: 10px ;
+                font-size:small ;
+                color:white ;
+                }
+                </style>
+                <div id="popoverdiv">
+                  <span class="fa-user" style="color:lightgrey">&nbsp;</span><input type="email" name="email" class="simpleinput"/>
+                  <span class="fa-key" style="color:lightgrey">&nbsp;</span><input type="password" name="password" class="simpleinput"/>
+                  <button type="button" class="btn btn-success btn-xs fa-signin" style="color:lightgrey" onclick="tryLogin()"></button>
+                </div>
+                <script>
+
+var errText = '';
+                    function tryLogin(){
+                      jsRoutes.controllers.Authentication.doLogin().ajax({
+                        data : $("#loginform").serialize(),
+                        success : function(data) {
+                          location.reload()
+                        },
+                        error : function(err) {
+                          errText = err.responseText
+                          console.log(errText)
+                          var popo = $('#popoverdiv').popover({animation:true, content: function() {
+                            return errText;
+                          }, placement:'left',
+                          template: '<div class="popover" role="tooltip" style="color: #e87673"><div class="arrow"></div><h3 ' +
+                          'class="popover-title"></h3><div class="popover-content"></div></div>'});
+                          $('#popoverdiv').popover('show')
+                        }})
+                    }
+                </script>
+              </form>
+            </td></tr></table>
+
+
           }
 
         </div> <!-- /.navbar-collapse -->
@@ -90,7 +133,7 @@
       </div>
     }
 
-    <div class="container" style="padding-top:70px ;padding-left:0;padding-right: 0;margin:0;width:100%;height:100%;">
+    <div class="container" style="padding-top:70px ; padding-left:0 ; padding-right: 0 ; margin:0 ; width:100% ; height:100% ;">
     @content
     </div>
     <footer style="position:fixed ; top:calc(100% - 10px) ; left:0 ; width:100% ; height:5px ;">
