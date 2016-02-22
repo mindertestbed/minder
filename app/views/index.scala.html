@@ -1,41 +1,47 @@
+
+@import authentication._
+
+@loginOrActual(call: Call) = {
+  @subjectPresentOr {href='@call'} {href='#' onclick='showLoginOverlay("@call")'}
+}
+
 @main("Minder", "index", "") {
   <script>
       $(function(){
         var introdiv = $("#introdiv")
         $(window).resize(function(){
-          introdiv.css("height", parseInt(introdiv.css("width"))*0.48);//0.5625)
+          introdiv.css("height", parseInt(introdiv.css("width"))*1370/2928)//0.48);//0.5625)
         });
-        introdiv.css("height", parseInt(introdiv.css("width"))*0.48);//0.5625)
+        introdiv.css("height", parseInt(introdiv.css("width"))* 1370/2928)//1439/2736);//0.5625)
       })
   </script>
-  <div id="introdiv" style="background: url( @routes.Assets.versioned("images/bridge2.jpg") ); background-size: 100% auto; background-repeat: no-repeat ;">
+  <div id="introdiv" style="background: url( @routes.Assets.versioned("images/bogaz5.jpg") ); background-size: 100% auto; background-repeat: no-repeat ;">
 
-    <table style="height: 100%"><tr><td style="vertical-align: text-top">
-
-      <div class="jumbotron" style="background: transparent ;">
-        <img src="@routes.Assets.versioned("/images/minder.png")" height="50px"/>
-        <br/>
-        <br/>
-        <p class="lead">
-
-            &nbsp;&nbsp;The Testbed!...</p>
+    <table style="height: 100% ;"><tr><td style="vertical-align: text-top ;">
+      <div class="jumbotron" style="background: transparent ; padding-top: 5px ;">
+        <h1><img src="@routes.Assets.versioned("/images/minder.png")" height="100px"/>
+          <br/>
+          <small>
+              &nbsp;&nbsp;The Testbed!...</small></h1>
 
       </div>
     </td></tr>
+
+
       <tr class="hidden-xs"><td style="height: 50px ; padding:15px ;">
         <a class="btn btn-info" role="button" href="#features">Read more...</a>
-        <a class="btn btn-success" role="button" href='@routes.Application.testGroups()'>Browse the inventory</a>
-        <a class="btn btn-warning" role="button" href='@routes.Application.adapters()'>Check the adapters</a>
-        <a class="btn btn-primary" role="button" href='@routes.Application.jobQueue()'>Monitor the job queue</a>
+        <a class="btn btn-success" role="button" @loginOrActual(routes.Application.testGroups())>Browse the inventory</a>
+        <a class="btn btn-warning" role="button" @loginOrActual(routes.Application.adapters())>Check the adapters</a>
+        <a class="btn btn-primary" role="button" @loginOrActual(routes.Application.jobQueue())>Monitor the job queue</a>
       </td></tr></table>
   </div>
 
   <div class="featurette" id="features">
-    <h1 class="page-header" style="color:#337ab7 ; text-align: center">Features
+    <h1 class="page-header" style="color:#337ab7 ; text-align: center; margin:5px;margin-top:10px;">Features
     </h1>
 
     <table align="center">
-      <tr><td style="padding:20px">
+      <tr><td style="padding:20px;padding-top:10px;">
         <div>
           <table>
             <tr>
@@ -47,7 +53,7 @@
           </table>
         </div>
 
-      </td><td style="padding:20px">
+      </td><td style="padding:20px;padding-top:10px;">
         <div>
           <table>
             <tr>
@@ -83,18 +89,18 @@
           </div>
         </td>
 
-        </tr>
+      </tr>
       <tr>
         <td style="padding:20px">
-        <div align="center">
-          <table>
-            <tr>
-              <td style="padding-right: 10px ;"><img src="@routes.Assets.versioned("images/wind-mill.png")"/></td>
-              <td style="width:200px ;"><h3>Sustainable</h3>
-                An online scripting capability and open source modular Minder development framework helps create a sustainable architecture</td>
-            </tr>
-          </table>
-        </div>
+          <div align="center">
+            <table>
+              <tr>
+                <td style="padding-right: 10px ;"><img src="@routes.Assets.versioned("images/wind-mill.png")"/></td>
+                <td style="width:200px ;"><h3>Sustainable</h3>
+                  An online scripting capability and open source modular Minder development framework helps create a sustainable architecture</td>
+              </tr>
+            </table>
+          </div>
         </td>
         <td style="padding:20px">
           <div>
