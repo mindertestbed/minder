@@ -12,6 +12,8 @@ import play.mvc.Controller;
 import play.mvc.Http;
 import play.mvc.Result;
 import play.mvc.Security;
+import security.AllowedRoles;
+import security.Role;
 import views.html.group.testAssetEditor;
 import views.html.group.childViews.testAssetList;
 
@@ -40,7 +42,7 @@ public class TestAssetController extends Controller {
     public String description;
   }
 
-  @Security.Authenticated(Secured.class)
+  @AllowedRoles({Role.TEST_DESIGNER})
   public static Result doCreateTestAsset(Long testGroupId) {
     final Form<TestAssetModel> filledForm = TEST_ASSET_FORM.bindFromRequest();
 
@@ -89,12 +91,13 @@ public class TestAssetController extends Controller {
     }
   }
 
-  @Security.Authenticated(Secured.class)
+
+  @AllowedRoles({Role.TEST_DESIGNER})
   public static Result createNewAssetForm() {
     return ok(testAssetEditor.render(TEST_ASSET_FORM, null));
   }
 
-  @Security.Authenticated(Secured.class)
+  @AllowedRoles({Role.TEST_DESIGNER})
   public static Result editAssetForm(Long id) {
     User localUser = Authentication.getLocalUser();
 
@@ -122,7 +125,8 @@ public class TestAssetController extends Controller {
     }
   }
 
-  @Security.Authenticated(Secured.class)
+
+  @AllowedRoles({Role.TEST_DESIGNER})
   public static Result doEditAsset() {
     final Form<TestAssetModel> filledForm = TEST_ASSET_FORM.bindFromRequest();
 
@@ -154,7 +158,7 @@ public class TestAssetController extends Controller {
     }
   }
 
-  @Security.Authenticated(Secured.class)
+  @AllowedRoles({Role.TEST_DESIGNER})
   public static Result doDeleteAsset(Long id) {
     TestAsset ta = TestAsset.findById(id);
     if (ta == null) {
@@ -174,7 +178,7 @@ public class TestAssetController extends Controller {
     }
   }
 
-  @Security.Authenticated(Secured.class)
+  @AllowedRoles({Role.TEST_DESIGNER, Role.TEST_OBSERVER, Role.TEST_DEVELOPER})
   public static Result downloadAsset(Long id) {
     TestAsset ta = TestAsset.findById(id);
     if (ta == null) {

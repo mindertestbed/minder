@@ -10,11 +10,12 @@ import play.data.Form;
 import play.mvc.Controller;
 import play.mvc.Result;
 import play.mvc.Security;
+import security.RestrictTOUser;
 import security.Role;
 import views.html.rootViews.userEditor;
 import views.html.rootViews.userListView;
 import views.html.rootViews.settingsView;
-import javax.xml.bind.DatatypeConverter;
+
 import java.util.ArrayList;
 
 import static play.data.Form.form;
@@ -26,21 +27,13 @@ public class UserController extends Controller {
   public static final Form<UserEditorModel> USER_EDIT_FORM = form(UserEditorModel.class);
   public static final Form<UserCreatorModel> USER_CREATE_FORM = form(UserCreatorModel.class);
 
-  @Security.Authenticated(Secured.class)
+  @RestrictTOUser("root@minder")
   public static Result getUserEditorView() {
-    User localUser = Authentication.getLocalUser();
-    if (localUser == null || !localUser.email.equals("root@minder")) {
-      return badRequest("You don't have the permission for this service");
-    }
-
     return ok(userEditor.render(USER_CREATE_FORM, true));
   }
 
+  @RestrictTOUser("root@minder")
   public static Result doCreateUser() {
-    User localUser = Authentication.getLocalUser();
-    if (localUser == null || !localUser.email.equals("root@minder")) {
-      return badRequest("You don't have the permission for this service");
-    }
     final Form<UserCreatorModel> filledForm = USER_CREATE_FORM
         .bindFromRequest();
 
@@ -92,13 +85,8 @@ public class UserController extends Controller {
     return true;
   }
 
-  @Security.Authenticated(Secured.class)
+  @RestrictTOUser("root@minder")
   public static Result editUserForm(Long id) {
-    User localUser = Authentication.getLocalUser();
-    if (localUser == null || !localUser.email.equals("root@minder")) {
-      return badRequest("You don't have the permission for this service");
-    }
-
     User user = User.findById(id);
     if (user == null) {
       return badRequest("User with id [" + id + "] not found!");
@@ -118,13 +106,8 @@ public class UserController extends Controller {
     }
   }
 
-  @Security.Authenticated(Secured.class)
+  @RestrictTOUser("root@minder")
   public static Result doEditUser() {
-    User localUser = Authentication.getLocalUser();
-    if (localUser == null || !localUser.email.equals("root@minder")) {
-      return badRequest("You don't have the permission for this service");
-    }
-
     final Form<UserEditorModel> filledForm = USER_EDIT_FORM
         .bindFromRequest();
 
@@ -174,13 +157,8 @@ public class UserController extends Controller {
     }
   }
 
-  @Security.Authenticated(Secured.class)
+  @RestrictTOUser("root@minder")
   public static Result doDeleteUser(Long id) {
-    User localUser = Authentication.getLocalUser();
-    if (localUser == null || !localUser.email.equals("root@minder")) {
-      return badRequest("You don't have the permission for this service");
-    }
-
     User user = User.findById(id);
     if (user == null) {
       return badRequest("User with id [" + id + "] not found!");
@@ -192,6 +170,7 @@ public class UserController extends Controller {
       try {
         Ebean.beginTransaction();
 
+        User localUser = Authentication.getLocalUser();
         TestGroup.updateUser(user, localUser);
         TestAssertion.updateUser(user, localUser);
         //TestCase.updateUser(user, localUser);
@@ -209,29 +188,15 @@ public class UserController extends Controller {
       return redirect(routes.Application.root("users"));
     }
   }
-  @Security.Authenticated(Secured.class)
+
+  @RestrictTOUser("root@minder")
   public static Result listUsers(String string) {
-    final User localUser = Authentication.getLocalUser();
-    if (localUser == null)
-      return badRequest("You cannot access this resoruce.");
-
-    if (localUser.email.equals("root@minder")) {
-      return ok(userListView.render());
-    } else {
-      return badRequest("You cannot access this resoruce.");
-    }
+    return ok(userListView.render());
   }
-  @Security.Authenticated(Secured.class)
-  public static Result viewSettings(String string) {
-    final User localUser = Authentication.getLocalUser();
-    if (localUser == null)
-      return badRequest("You cannot access this resoruce.");
 
-    if (localUser.email.equals("root@minder")) {
-      return ok(settingsView.render());
-    } else {
-      return badRequest("You cannot access this resoruce.");
-    }
+  @RestrictTOUser("root@minder")
+  public static Result viewSettings(String string) {
+    return ok(settingsView.render());
   }
 
 }

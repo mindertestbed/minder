@@ -8,12 +8,10 @@ import controllers.common.enumeration.Utils;
 import dependencyutils.DependencyClassLoaderCache;
 import editormodels.GroupEditorModel;
 import global.Util;
-import models.ModelConstants;
 import models.TestGroup;
 import models.User;
 import play.Logger;
 import play.data.Form;
-import play.data.validation.Constraints;
 import play.mvc.Controller;
 import play.mvc.Http;
 import play.mvc.Result;
@@ -24,12 +22,13 @@ import rest.controllers.restbodyprocessor.IRestContentProcessor;
 import rest.models.RestTestGroup;
 import security.AllowedRoles;
 import security.Role;
-import views.html.group.childViews.*;
-import views.html.group.*;
 
-import java.io.*;
+import java.io.File;
+import java.io.IOException;
 import java.nio.charset.Charset;
 import java.text.ParseException;
+import views.html.group.childViews.*;
+import views.html.group.*;
 
 import static play.data.Form.form;
 
@@ -203,12 +202,12 @@ public class GroupController extends Controller {
     return ok(details.render(TestGroup.findById(id)));
   }
 
-  @Security.Authenticated(Secured.class)
+  @AllowedRoles({Role.TEST_DESIGNER})
   public static Result createNewTestGroupImportForm() {
     return ok(testGroupImportEditor.render(form(GroupImportModel.class)));
   }
 
-  @Security.Authenticated(Secured.class)
+  @AllowedRoles({Role.TEST_DESIGNER, Role.TEST_OBSERVER})
   public static Result exportTestGroup(Long id) {
     RestTestGroup responseRestTestGroup = new RestTestGroup();
     try {
@@ -242,7 +241,7 @@ public class GroupController extends Controller {
     return ok(responseValue);
   }
 
-  @Security.Authenticated(Secured.class)
+  @AllowedRoles({Role.TEST_DESIGNER, Role.TEST_OBSERVER})
   public static Result importTestGroup() {
     final Form<GroupImportModel> filledForm = TEST_GROUP_IMPORT_FORM.bindFromRequest();
 

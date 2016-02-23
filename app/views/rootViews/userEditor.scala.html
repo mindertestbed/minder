@@ -1,121 +1,120 @@
 @(frm: Form[_], createMode: Boolean = true)
-@import views.html.util._
-@import helper._
-@import authentication._
+  @import views.html.util._
+  @import helper._
+  @import authentication._
 
-@implicitFieldConstructor = @{
-  FieldConstructor(twitterBootstrapBasic.f)
-}
-
-@main("User Editor", "root") {
-
-  <style>
-
-
-  .navbar-inverse .navbar-nav > .active > a, .navbar-inverse .navbar-nav > .active > a:focus, .navbar-inverse .navbar-nav > .active > a:hover {
-  color: #fff;
-  background-color: red;
+  @implicitFieldConstructor = @{
+    FieldConstructor(twitterBootstrapBasic.f)
   }
 
+  @main("User Editor", "root") {
 
-  .navbar-inverse {
-  background-color: darkred;
-  }
-  </style>
-
-
-  <h3 class="explanation"><img src="@routes.Assets.versioned("images/skull.png")" height="50px"/></h3>
-  <p>
-    Welcome ROOT!. Be Careful!!!
-  </p>
-
-  @dialogs()
-
-  @if(createMode) {
-    <h3>Create New User</h3>
-    @helper.form(action = routes.UserController.doCreateUser()) {
-      @if(frm.hasGlobalErrors) {
-        <p class="alert alert-danger">
-        @frm.globalError.message
-        </p>
+    <div class="padabit">
+      <style>
+      .navbar-inverse.navbar-nav >.active > a,.navbar-inverse.navbar-nav >.active > a : focus,.navbar-inverse.navbar-nav >.active > a : hover {
+      color: #fff ;
+      background-color: red ;
       }
-      @inputText(
-        frm("name"),
-        '_label -> "Name"
-      )
+      .navbar-inverse {
+      background-color: darkred ;
+      }
+      </style>
 
-      @_emailPartial(frm)
 
-      @_passwordPartial(frm)
+      <h3 class="explanation"><img src="@routes.Assets.versioned("images/skull.png")" height="50px"/></h3>
+      <p>
+        Welcome ROOT!. Be Careful!!!
+      </p>
 
-      <br />
-      <strong>@Messages("minder.user.role")</strong>
-      <table>
-        <tr>
-          <td><i>
-            Test Designer &nbsp;&nbsp;&nbsp;&nbsp;</i></td><td><input type="checkbox" name="ists" value='@frm("ists").value' @if(frm("ists").value != null) {
-          checked="checked"}/></td>
-        </tr>
-        <tr>
-          <td><i>
-            Test Developer</i> </td><td><input type="checkbox" name="@frm("istd").name" value='@frm("istd").value' @if(frm("istd").value != null) {
-          checked="checked"} /></td>
-        </tr>
-        <tr>
-          <td><i>
-            Test Observer</i></td><td><input type="checkbox" name="@frm("isto").name" value='@frm("isto").value' @if(frm("isto").value != null) {
-          checked="checked"} /></td>
-        </tr>
-      </table>
+      @dialogs()
 
-      <button type="submit" class="btn btn-default">Create</button>
-    }
-  } else {
-    <h3>Edit User</h3>
-    @helper.form(action = routes.UserController.doEditUser()) {
-      @if(frm.hasGlobalErrors) {
-        <p class="alert alert-danger">
-        @frm.globalError.message
-        </p>
+      @if(createMode) {
+        <h3>Create New User</h3>
+        @helper.form(action = routes.UserController.doCreateUser()) {
+          @if(frm.hasGlobalErrors) {
+            <p class="alert alert-danger">
+            @frm.globalError.message
+            </p>
+          }
+          @inputText(
+            frm("name"),
+            '_label -> "Name"
+          )
+
+          @_emailPartial(frm)
+
+          @_passwordPartial(frm)
+
+          <br />
+          <strong>@Messages("minder.user.role")</strong>
+          <table>
+            <tr>
+              <td><i>
+                Test Designer &nbsp;&nbsp;&nbsp;&nbsp;</i></td><td><input type="checkbox" name="ists" value='@frm("ists").value' @if(frm("ists").value != null) {
+              checked="checked"}/></td>
+            </tr>
+            <tr>
+              <td><i>
+                Test Developer</i> </td><td><input type="checkbox" name="@frm("istd").name" value='@frm("istd").value' @if(frm("istd").value != null) {
+              checked="checked"} /></td>
+            </tr>
+            <tr>
+              <td><i>
+                Test Observer</i></td><td><input type="checkbox" name="@frm("isto").name" value='@frm("isto").value' @if(frm("isto").value != null) {
+              checked="checked"} /></td>
+            </tr>
+          </table>
+
+          <button type="submit" class="btn btn-default">Create</button>
+        }
+      } else {
+        <h3>Edit User</h3>
+        @helper.form(action = routes.UserController.doEditUser()) {
+          @if(frm.hasGlobalErrors) {
+            <p class="alert alert-danger">
+            @frm.globalError.message
+            </p>
+          }
+
+          @inputText(
+            frm("name"),
+            '_label -> "Name"
+          )
+
+          <b style="color:red">Leave Passwords Blank If you don't wanna change them.</b> <br />
+          @_passwordPartial(frm)
+
+          <label>Is Active &nbsp;&nbsp;&nbsp;&nbsp;</label>
+          <input type="checkbox" name="@frm("active").name" value='@frm("active").value' @if(frm("active").value != null) {
+            checked="checked"
+        }
+          />
+          <input type="hidden" name="id" id="id" value='@frm("id").value'/>
+          <input type="hidden" name="email" id="email" value='@frm("email").value'/>
+
+          <br />
+          <strong>@Messages("minder.signup.role")</strong>
+          <table>
+            <tr>
+              <td><i>
+                Test Designer &nbsp;&nbsp;&nbsp;&nbsp;</i></td><td><input type="checkbox" name="ists" value='@frm("ists").value' @if(frm("ists").value != null) {
+              checked="checked"}/></td>
+            </tr>
+            <tr>
+              <td><i>
+                Test Developer</i> </td><td><input type="checkbox" name="@frm("istd").name" value='@frm("istd").value' @if(frm("istd").value != null) {
+              checked="checked"} /></td>
+            </tr>
+            <tr>
+              <td><i>
+                Test Observer</i></td><td><input type="checkbox" name="@frm("isto").name" value='@frm("isto").value' @if(frm("isto").value != null) {
+              checked="checked"} /></td>
+            </tr>
+          </table>
+
+          <button type="submit" class="btn btn-default">Update</button>
+        }
       }
 
-      @inputText(
-        frm("name"),
-        '_label -> "Name"
-      )
-
-      <b style="color:red">Leave Passwords Blank If you don't wanna change them.</b> <br />
-      @_passwordPartial(frm)
-
-      <label>Is Active &nbsp;&nbsp;&nbsp;&nbsp;</label>
-      <input type="checkbox" name="@frm("active").name" value='@frm("active").value' @if(frm("active").value != null) {
-        checked="checked"
-    }
-      />
-      <input type="hidden" name="id" id="id" value='@frm("id").value'/>
-      <input type="hidden" name="email" id="email" value='@frm("email").value'/>
-
-      <br />
-      <strong>@Messages("minder.signup.role")</strong>
-      <table>
-        <tr>
-          <td><i>
-            Test Designer &nbsp;&nbsp;&nbsp;&nbsp;</i></td><td><input type="checkbox" name="ists" value='@frm("ists").value' @if(frm("ists").value != null) {
-          checked="checked"}/></td>
-        </tr>
-        <tr>
-          <td><i>
-            Test Developer</i> </td><td><input type="checkbox" name="@frm("istd").name" value='@frm("istd").value' @if(frm("istd").value != null) {
-          checked="checked"} /></td>
-        </tr>
-        <tr>
-          <td><i>
-            Test Observer</i></td><td><input type="checkbox" name="@frm("isto").name" value='@frm("isto").value' @if(frm("isto").value != null) {
-          checked="checked"} /></td>
-        </tr>
-      </table>
-
-      <button type="submit" class="btn btn-default">Update</button>
-    }
+    </div>
   }
-}

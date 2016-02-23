@@ -6,47 +6,43 @@
 
   @main("Danger Zone", "root", "Danger Zone!!!!") {
 
-    <style>
+    <div class="padabit">
+      <style>
+      .navbar-inverse.navbar-nav >.active > a,.navbar-inverse.navbar-nav >.active > a : focus,.navbar-inverse.navbar-nav >.active > a : hover {
+      color: #fff ;
+      background-color: red ;
+      }
+      .navbar-inverse {
+      background-color: darkred ;
+      }
+      </style>
 
 
-    .navbar-inverse .navbar-nav > .active > a, .navbar-inverse .navbar-nav > .active > a:focus, .navbar-inverse .navbar-nav > .active > a:hover {
-    color: #fff;
-    background-color: red;
-    }
+      <h3 class="explanation"><img src="@routes.Assets.versioned("images/skull.png")" height="50px"/></h3>
+      <p>
+        Welcome ROOT!. Be Careful!!
+      </p>
 
-
-    .navbar-inverse {
-    background-color: darkred;
-    }
-    </style>
-
-
-    <h3 class="explanation"><img src="@routes.Assets.versioned("images/skull.png")" height="50px"/></h3>
-    <p>
-      Welcome ROOT!. Be Careful!!
-    </p>
-
-    @dialogs()
-    <div class="indent">
+      @dialogs()
+      <div class="indent">
         <script>
-                function showUsers(){
-                    var obj = jsRoutes.controllers.UserController.listUsers;
-                    ajaxRouteGet(obj,"users",$("#rootSubItems"))
-                }
-                function showSettings(){
-                    ajaxRouteGet(jsRoutes.controllers.UserController.viewSettings,"settings",$("#rootSubItems"))
-                }
+            function showUsers(){
+              var obj = jsRoutes.controllers.UserController.listUsers;
+              ajaxRouteGet(obj,"users",$("#rootSubItems"))
+            }
+            function showSettings(){
+              ajaxRouteGet(jsRoutes.controllers.UserController.viewSettings,"settings",$("#rootSubItems"))
+            }
         </script>
 
         @ajaxDisplaySelector(display,
-            "users" ->("Users", "showUsers"),
-            "settings" ->("Settings", "showSettings")
+          "users" ->("Users", "showUsers"),
+          "settings" ->("Settings", "showSettings")
         )
 
-        <div id="rootSubItems" style="padding: 4px;">
+        <div id="rootSubItems" style="padding: 4px ;">
 
         </div>
+      </div>
     </div>
-
-
   }

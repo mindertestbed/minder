@@ -9,6 +9,8 @@ import play.data.Form;
 import play.mvc.Controller;
 import play.mvc.Result;
 import play.mvc.Security;
+import security.AllowedRoles;
+import security.Role;
 import views.html.adapters.wrapperEditor;
 import views.html.adapters.wrapperLister;
 
@@ -20,7 +22,7 @@ import static play.data.Form.form;
 public class WrapperController extends Controller {
   public static final Form<WrapperEditorModel> WRAPPER_FORM = form(WrapperEditorModel.class);
 
-  @Security.Authenticated(Secured.class)
+  @AllowedRoles({Role.TEST_DEVELOPER})
   public static Result doCreateWrapper() {
     final Form<WrapperEditorModel> filledForm = WRAPPER_FORM.bindFromRequest();
     final User localUser = Authentication.getLocalUser();
@@ -49,12 +51,12 @@ public class WrapperController extends Controller {
     }
   }
 
-  @Security.Authenticated(Secured.class)
+  @AllowedRoles({Role.TEST_DEVELOPER})
   public static Result createNewAdapterForm() {
     return ok(wrapperEditor.render(WRAPPER_FORM, false));
   }
 
-  @Security.Authenticated(Secured.class)
+  @AllowedRoles({Role.TEST_DEVELOPER})
   public static Result doDeleteWrapper(Long id) {
     System.out.println("Adapter id:" + id);
     Wrapper wr = Wrapper.findById(id);
@@ -75,7 +77,7 @@ public class WrapperController extends Controller {
     return ok(wrapperLister.render());
   }
 
-  @Security.Authenticated(Secured.class)
+  @AllowedRoles({Role.TEST_DEVELOPER})
   public static Result editWrapperForm(Long id) {
     Wrapper wr = Wrapper.find.byId(id);
     if (wr == null) {
@@ -92,7 +94,7 @@ public class WrapperController extends Controller {
     }
   }
 
-  @Security.Authenticated(Secured.class)
+  @AllowedRoles({Role.TEST_DEVELOPER})
   public static Result doEditWrapper() {
     final Form<WrapperEditorModel> filledForm = WRAPPER_FORM.bindFromRequest();
 

@@ -13,6 +13,8 @@ import play.data.Form;
 import play.mvc.Controller;
 import play.mvc.Result;
 import play.mvc.Security;
+import security.AllowedRoles;
+import security.Role;
 import views.html.utilClass.*;
 
 import static play.data.Form.form;
@@ -24,7 +26,7 @@ import static play.data.Form.form;
 public class UtilClassController extends Controller {
   public static final Form<UtilClassEditorModel> UTIL_CLASS_FORM = form(UtilClassEditorModel.class);
 
-  @Security.Authenticated(Secured.class)
+  @AllowedRoles({Role.TEST_DESIGNER})
   public static Result getCreateUtilClassEditorView(Long groupId) {
     TestGroup testGroup = TestGroup.findById(groupId);
     if (testGroup == null) {
@@ -41,7 +43,7 @@ public class UtilClassController extends Controller {
     }
   }
 
-  @Security.Authenticated(Secured.class)
+  @AllowedRoles({Role.TEST_DESIGNER})
   public static Result doCreateUtilClass() {
     final Form<UtilClassEditorModel> filledForm = UTIL_CLASS_FORM
         .bindFromRequest();
@@ -97,7 +99,7 @@ public class UtilClassController extends Controller {
     }
   }
 
-  @Security.Authenticated(Secured.class)
+  @AllowedRoles({Role.TEST_DESIGNER})
   public static Result getEditCaseEditorView(Long id) {
     UtilClass utilClass = UtilClass.findById(id);
     if (utilClass == null) {
@@ -116,7 +118,7 @@ public class UtilClassController extends Controller {
     }
   }
 
-  @Security.Authenticated(Secured.class)
+  @AllowedRoles({Role.TEST_DESIGNER})
   public static Result doEditUtilClass() {
     final Form<UtilClassEditorModel> filledForm = UTIL_CLASS_FORM
         .bindFromRequest();
@@ -166,7 +168,7 @@ public class UtilClassController extends Controller {
     }
   }
 
-  @Security.Authenticated(Secured.class)
+  @AllowedRoles({Role.TEST_DESIGNER})
   public static Result doDeleteUtilClass(Long id) {
     UtilClass uc = UtilClass.findById(id);
     if (uc == null) {
@@ -184,7 +186,7 @@ public class UtilClassController extends Controller {
     return redirect(routes.GroupController.getGroupDetailView(uc.testGroup.id, "utils"));
   }
 
-  @Security.Authenticated(Secured.class)
+  @AllowedRoles({Role.TEST_DESIGNER})
   public static Result viewUtilClass(long id) {
     UtilClass uc = UtilClass.findById(id);
     if (uc == null) {
@@ -194,7 +196,7 @@ public class UtilClassController extends Controller {
 
   }
 
-  @Security.Authenticated(Secured.class)
+  @AllowedRoles({Role.TEST_DESIGNER})
   public static Result doEditUtilClassField() {
     JsonNode jsonNode = request().body().asJson();
 

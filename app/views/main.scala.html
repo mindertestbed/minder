@@ -8,7 +8,7 @@
 
 <html lang="@lang().code()">
   <head>
-    <title>@targetURL</title>
+    <title>@title</title>
     @main_header()
   </head>
 
@@ -106,9 +106,9 @@
                 <a href="#" class="dropdown-toggle" data-toggle="dropdown">
                   <i class="glyphicon glyphicon-user"></i>@user.name <span class="caret"></span></a>
                 <ul class="dropdown-menu" role="menu">
-                  <li class="@("active".when(nav == "profile"))"><a href="@routes.Application.profile()">@Messages("authenticate.profile")</a></li>
+                  @* <li class="@("active".when(nav == "profile"))"><a href="@routes.Application.profile()">@Messages("authenticate.profile")</a></li>
                   <li class="divider"></li>
-                  <li><a href="@routes.Authentication.doLogout()"><i class="icon-off"></i> @Messages("authenticate.logout")</a></li>
+                  *@ <li><a href="@routes.Authentication.doLogout()"><i class="icon-off"></i> @Messages("authenticate.logout")</a></li>
                 </ul>
               </li>
             }

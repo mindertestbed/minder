@@ -7,6 +7,8 @@ import play.data.Form;
 import play.mvc.Controller;
 import play.mvc.Result;
 import play.mvc.Security;
+import security.AllowedRoles;
+import security.Role;
 
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -22,8 +24,8 @@ public class SettingsController extends Controller {
   public static class SettingsModel{
     public long timeout;
   }
-  
-  @Security.Authenticated(Secured.class)
+
+  @AllowedRoles({Role.TEST_DESIGNER})
   public static Result updateSettings() {
     Form<SettingsModel> form = form(SettingsModel.class).bindFromRequest();
     SettingsModel model = form.get();

@@ -10,6 +10,8 @@ import play.mvc.Http.Session;
 import play.mvc.Result;
 import play.mvc.Results;
 import play.mvc.Security;
+import security.AllowedRoles;
+import security.Role;
 import views.html.authentication.login;
 import views.html.authentication.*;
 import views.html.index;
@@ -81,12 +83,12 @@ public class Authentication extends Controller {
     return redirect(routes.Authentication.login());
   }
 
-  @Security.Authenticated(Secured.class)
+  @AllowedRoles({Role.TEST_DESIGNER, Role.TEST_DEVELOPER, Role.TEST_OBSERVER})
   public static Result changePassword() {
     return Results.badRequest("Not supported");
   }
 
-  @Security.Authenticated(Secured.class)
+  @AllowedRoles({Role.TEST_DESIGNER, Role.TEST_DEVELOPER, Role.TEST_OBSERVER})
   public static Result doChangePassword() {
     return Results.badRequest("Not supported");
   }

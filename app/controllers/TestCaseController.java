@@ -16,6 +16,8 @@ import play.data.Form;
 import play.mvc.Controller;
 import play.mvc.Result;
 import play.mvc.Security;
+import security.AllowedRoles;
+import security.Role;
 import views.html.testCase.mainView;
 import views.html.testCase.childViews.*;
 
@@ -30,7 +32,7 @@ import static play.data.Form.form;
 public class TestCaseController extends Controller {
   public static final Form<TestCaseEditorModel> TEST_CASE_FORM = form(TestCaseEditorModel.class);
 
-  @Security.Authenticated(Secured.class)
+  @AllowedRoles({Role.TEST_DESIGNER})
   public static Result getCreateCaseEditorView(Long assertionId) {
     TestAssertion ta = TestAssertion.findById(assertionId);
     if (ta == null) {
@@ -63,7 +65,8 @@ public class TestCaseController extends Controller {
     }
   }
 
-  @Security.Authenticated(Secured.class)
+
+  @AllowedRoles({Role.TEST_DESIGNER})
   public static Result doCreateCase() {
     final Form<TestCaseEditorModel> filledForm = TEST_CASE_FORM
         .bindFromRequest();
@@ -124,7 +127,7 @@ public class TestCaseController extends Controller {
     }
   }
 
-  @Security.Authenticated(Secured.class)
+  @AllowedRoles({Role.TEST_DESIGNER, Role.TEST_OBSERVER})
   public static Result getEditCaseEditorView(Long tdlId) {
     Tdl tdl = Tdl.findById(tdlId);
     if (tdl == null) {
@@ -146,7 +149,7 @@ public class TestCaseController extends Controller {
     }
   }
 
-  @Security.Authenticated(Secured.class)
+  @AllowedRoles({Role.TEST_DESIGNER})
   public static Result doEditCase() {
     final Form<TestCaseEditorModel> filledForm = TEST_CASE_FORM
         .bindFromRequest();
@@ -205,7 +208,8 @@ public class TestCaseController extends Controller {
     }
   }
 
-  @Security.Authenticated(Secured.class)
+
+  @AllowedRoles({Role.TEST_DESIGNER})
   public static void detectAndSaveParameters(Tdl newTdl) {
     Logger.debug("Detect parameters for the newTdl");
     LinkedHashMap<String, Set<WrapperFunction>> descriptionMap = TestEngine.describeTdl(newTdl);
@@ -268,7 +272,8 @@ public class TestCaseController extends Controller {
     Logger.debug("Detect parameters done");
   }
 
-  @Security.Authenticated(Secured.class)
+
+  @AllowedRoles({Role.TEST_DESIGNER})
   public static Result doDeleteCase(Long id) {
     TestCase tc = TestCase.findById(id);
     if (tc == null) {
@@ -290,7 +295,8 @@ public class TestCaseController extends Controller {
     return redirect(routes.TestAssertionController.getAssertionDetailView(tc.testAssertion.id, "testCases"));
   }
 
-  @Security.Authenticated(Secured.class)
+
+  @AllowedRoles({Role.TEST_DESIGNER, Role.TEST_OBSERVER, Role.TEST_DEVELOPER})
   public static Result viewTestCase(long id, String display) {
     TestCase tc = TestCase.findById(id);
     if (tc == null) {
@@ -299,7 +305,7 @@ public class TestCaseController extends Controller {
     return ok(mainView.render(tc, Tdl.getLatestTdl(tc), Authentication.getLocalUser(), display));
   }
 
-  @Security.Authenticated(Secured.class)
+  @AllowedRoles({Role.TEST_DESIGNER, Role.TEST_OBSERVER, Role.TEST_DEVELOPER})
   public static Result viewTestCase2(long id, long tdlId, String display) {
     TestCase tc = TestCase.findById(id);
     Tdl tdl = Tdl.findById(tdlId);
@@ -312,7 +318,7 @@ public class TestCaseController extends Controller {
     return ok(mainView.render(tc, tdl, Authentication.getLocalUser(), display));
   }
 
-  @Security.Authenticated(Secured.class)
+  @AllowedRoles({Role.TEST_DESIGNER})
   public static Result doEditCaseField() {
     JsonNode jsonNode = request().body().asJson();
 
