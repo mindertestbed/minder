@@ -1,14 +1,14 @@
 @import authentication._
 @import util._
 
-@(title: String, nav: String = "", navObject: Object = null)(content: Html)
+@(title: String, nav: String = "", navObject: Object = null, targetURL:String = null)(content: Html)
 
 
 <!DOCTYPE html>
 
 <html lang="@lang().code()">
   <head>
-    <title>@title</title>
+    <title>@targetURL</title>
     @main_header()
   </head>
 
@@ -52,6 +52,12 @@
             $("#loginAlert").show()
           }})
       }
+
+    @if(targetURL != null) {
+    $(function(){
+    showLoginOverlay('@targetURL')
+    })
+  }
   </script>
   <body>
     <nav class="navbar navbar-default navbar-fixed-top navbar-inverse navbarim" role="navigation">
@@ -177,10 +183,12 @@
             <form id="loginform2" method="post" action="@routes.Authentication.doLogin()">
               <table>
                 <tr>
-                  <td><span class="fa-user" style="color:darkgray">Username: </span></td><td style="padding: 5px;"><input type="email" name="email"/></td>
+                  <td><span class="fa-user" style="color:darkgray">
+                    Username: </span></td><td style="padding: 5px ;"><input type="email" name="email"/></td>
                 </tr>
                 <tr>
-                  <td><span class="fa-key" style="color:darkgray">Password: </span></td><td style="padding: 5px;"><input type="password" name="password"/></td>
+                  <td><span class="fa-key" style="color:darkgray">
+                    Password: </span></td><td style="padding: 5px ;"><input type="password" name="password"/></td>
                 </tr>
               </table>
 

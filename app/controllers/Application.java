@@ -21,7 +21,7 @@ public class Application extends Controller {
     if (!session().containsKey("testPageMode")) {
       session().put("testPageMode", "none");
     }
-    return ok(views.html.index.render());
+    return ok(views.html.index.render(null));
   }
 
   public static Result root(String display) {

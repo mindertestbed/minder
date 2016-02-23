@@ -1,3 +1,4 @@
+@(targetURL:String = null)
 
 @import authentication._
 
@@ -5,7 +6,7 @@
   @subjectPresentOr {href='@call'} {href='#' onclick='showLoginOverlay("@call")'}
 }
 
-@main("Minder", "index", "") {
+@main("Minder", "index", "", targetURL) {
   <script>
       $(function(){
         var introdiv = $("#introdiv")

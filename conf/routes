@@ -13,6 +13,7 @@ GET         /profile                                    controllers.Application.
 GET         /about                                      controllers.Application.about()
 
 GET         /login                                      controllers.Authentication.login
+GET         /loginToTargetURL                           controllers.Authentication.loginToTargetURL(targetURL: String)
 POST        /login                                      controllers.Authentication.doLogin
 GET         /logout                                     controllers.Authentication.doLogout
 GET         /changePassword                             controllers.Authentication.changePassword()

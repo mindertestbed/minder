@@ -29,6 +29,10 @@ public class Authentication extends Controller {
     return user;
   }
 
+  public static String getRequestURI() {
+    return request().uri();
+  }
+
   public static User getLocalUser(Session session) {
     String email = session.get("email");
     if (email == null)
@@ -38,7 +42,11 @@ public class Authentication extends Controller {
   }
 
   public static Result login() {
-    return ok(index.render());
+    return ok(index.render(null));
+  }
+
+  public static Result loginToTargetURL(String nextTarget) {
+    return ok(index.render(nextTarget));
   }
 
   public static Result doLogin() {

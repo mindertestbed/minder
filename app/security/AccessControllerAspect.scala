@@ -12,10 +12,10 @@ class AccessControllerAspect {
     val myClass: Class[_] = pjp.getStaticPart().getSignature().getDeclaringType();
 
     try {
-      Thread.sleep(500)
       val user = Authentication.getLocalUser
       if (user == null) {
-        play.mvc.Results.redirect(routes.Authentication.login);
+        println(Authentication.getRequestURI)
+        play.mvc.Results.redirect(routes.Authentication.loginToTargetURL(Authentication.getRequestURI));
       } else {
         val signature = pjp.getSignature.asInstanceOf[MethodSignature]
         val allowedRoles = signature.getMethod.getAnnotation(classOf[AllowedRoles]).value()

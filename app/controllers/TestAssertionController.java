@@ -194,6 +194,7 @@ public class TestAssertionController extends Controller {
     return redirect(controllers.routes.GroupController.getGroupDetailView(ta.testGroup.id, "assertions"));
   }
 
+  @AllowedRoles(Role.TEST_DESIGNER)
   public static Result getAssertionDetailView(Long id, String display) {
     TestAssertion ta = TestAssertion.findById(id);
     if (ta == null) {
