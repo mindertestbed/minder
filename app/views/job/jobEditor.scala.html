@@ -1,15 +1,16 @@
 @(frm: Form[_])
 
-  @import views.html.helper._
-  @import views.html.util._
+@import views.html.helper._
+@import views.html.util._
 
-  @implicitFieldConstructor = @{
-    FieldConstructor(twitterBootstrapBasic.f)
-  }
+@implicitFieldConstructor = @{
+  FieldConstructor(twitterBootstrapBasic.f)
+}
 
 
-  @main(Messages("minder.navigation.restricted.testdesigner"), "mainNavigation") {
+@main(Messages("minder.navigation.restricted.testdesigner"), "mainNavigation") {
 
+  <div class="padabit">
     @dialogs()
 
     <script>
@@ -20,62 +21,69 @@
 
 
     <h2>New Job</h2>
-    @helper.form(action = routes.JobController.doCreateJob(), 'class -> "fullh") {
+
+    <form action='@routes.JobController.doCreateJob()' method="post">
       @if(frm.hasGlobalErrors) {
         <p class="alert alert-danger">
         @frm.globalError.message
         </p>
       }
-
-      <div class="fullh" id="rc1@frm("id").value">
-        @inputText(
-          frm("name"),
-          '_label -> "Job name"
-        )
-
-        @textarea(frm("mtdlParameters"), 'rows -> 5, '_label -> "Parameters", '_style -> "height:auto;")
-
-        <table cellpadding="5" cellspacing="10px">
-          @repeat(frm("wrapperMappingList"), min = 0) { field =>
-            @defining(field.value.get) { str =>
-              @defining(MappedWrapperModel.parse(str)) { entry =>
-                <tr><td>
-                  <label for="@field.name" class="control-label">@entry.wrapperParam.name</label>:
-                </td><td><select id="@entry.wrapperParam.id" name="@field.name" style="width:200px ;">
-                @for( wrapperVersion <- JobController.listFittingWrappers(entry)) {
-                  <option value="@entry.toJsonWith(wrapperVersion)"
-                    @if(entry.wrapperVersion == wrapperVersion) {
-                      selected="selected" }>@{
-                    wrapperVersion.wrapper.name + " (" + wrapperVersion.version + ")"
-                  }</option>
+      <div class="container">
+        <div class="row">
+          <div class="col-md-6">
+            <table class="topCells paddedTable noWrap formInput">
+              <tr><td>Job Name:</td><td><input type="text" name="name" value="@frm("name").value()" />
+                @formChecker(frm("name"))
+              </td>
+              </tr>
+              <tr><td>
+                Parameters:</td><td><textarea name="mtdlParameters" rows="5">@frm("mtdlParameters").value()</textarea></td></tr>
+            </table>
+          </div>
+          <div class="col-md-6">
+            <table class="topCells paddedTable noWrap formInput">
+                @repeat(frm("wrapperMappingList"), min = 0) { field =>
+                  @defining(field.value.get) { str =>
+                    @defining(MappedWrapperModel.parse(str)) { entry =>
+                      <tr><td>
+                        <label for="@field.name" class="control-label">@entry.wrapperParam.name</label>:
+                      </td><td><select id="@entry.wrapperParam.id" name="@field.name" style="width:200px ;">
+                      @for(wrapperVersion <- JobController.listFittingWrappers(entry)) {
+                        <option value="@entry.toJsonWith(wrapperVersion)"
+                          @if(entry.wrapperVersion == wrapperVersion) {
+                            selected="selected" }>@{
+                          wrapperVersion.wrapper.name + " (" + wrapperVersion.version + ")"
+                        }</option>
+                      }
+                      </select><br /></td></tr>
+                    }
+                  }
+                }
+              <tr><td>Visibility:</td><td>
+                <select id="visibility" name="visibility" >
+                @for(vis <- Visibility.values()) {
+                  @if(vis == frm("visibility").value) {
+                    <option selected="selected" value="@vis">@vis</option>
+                  } else {
+                    <option value="@vis">@vis</option>
+                  }
                 }
                 </select><br /></td></tr>
-              }
-            }
-          }
-          <tr><td>
-            <label for="visibility">Visibility: </label></td><td>
-            <select id="visibility" name="visibility" >
-              @for(vis <- Visibility.values()) {
-                @if(vis == frm("visibility").value) {
-                  <option selected="selected" value="@vis">@vis</option>
-                } else {
-                  <option value="@vis">@vis</option>
-                }
-              }
-            </select><br /></td></tr>
-        </table>
-        <br />
-        <button type="submit">Create</button> &nbsp;
-        <button type="reset">Reset</button> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-        <button type="button" onclick="history.back ( )">Cancel</button>
+            </table>
+          </div>
+        </div>
+      </div>
+      <hr />
+      <div align="center">
+        <button type="submit" class="btn btn-success btn-sm">Create</button> &nbsp;
+        <button type="reset" class="btn btn-primary btn-sm">Reset</button> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        <button type="button" onclick="history.back ( )" class="btn btn-warning btn-sm">Cancel</button>
 
         <input type="hidden" name="id" id="id" value='@frm("id").value'/>
         <input type="hidden" name="tdlID" id="tdlID" value='@frm("tdlID").value'/>
         <input type="hidden" name="obsolete" id="obsolete" value='@frm("obsolete").value'/>
         <input type="hidden" name="tdl" id="tdl" value='@frm("tdl").value'/>
-
       </div>
-      </div>
-    }
-  }
+    </form>
+  </div>
+}

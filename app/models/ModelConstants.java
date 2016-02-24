@@ -12,6 +12,6 @@ public interface ModelConstants {
   public final int MAX_TDL_LENGTH = 20*K;
   public final int REPORT_LENGTH = 40*K;
 
-  public final int ERROR_MESSAGE_LENGTH = 250;
+  public final int ERROR_MESSAGE_LENGTH = 20*K;
   public final int DEFAULT = 255;
 }

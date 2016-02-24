@@ -366,9 +366,8 @@ public class JobController extends Controller {
       values.put("email", tr.history.email);
       values.put("result", tr.success);
       values.put("date", tr.date);
-      values.put("errorMessage", tr.errorMessage);
+      values.put("errorMessage", new String(tr.errorMessage, "utf-8"));
 
-      Logger.debug("Error message " + tr.errorMessage);
       Job rc = Job.findById(tr.job.id);
       TestCase tc = TestCase.findById(rc.tdl.testCase.id);
       TestAssertion ta = TestAssertion.findById(tc.testAssertion.id);

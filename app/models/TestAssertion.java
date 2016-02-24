@@ -33,7 +33,7 @@ public class TestAssertion extends Model {
     @Column(nullable = false, length = ModelConstants.DESCRIPTION_LENGTH, columnDefinition = "TEXT")
     public String predicate;
 
-    @Column(length = ModelConstants.K)
+    @Column(length = ModelConstants.DESCRIPTION_LENGTH)
     public String variables;
 
     @Column(length = ModelConstants.K)

@@ -43,7 +43,7 @@ public class TestRun extends Model {
   public int number;
 
   @Column(length = ModelConstants.ERROR_MESSAGE_LENGTH, columnDefinition = "TEXT")
-  public String errorMessage;
+  public byte[] errorMessage;
 
   public Visibility visibility;
 

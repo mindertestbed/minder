@@ -110,14 +110,7 @@ public class GroupController extends Controller {
 
       String field = jsonNode.findPath("field").asText();
 
-      String fieldName = null;
-      try {
-        fieldName = TestGroup.class.getField("dependencyString").getName();
-      } catch (NoSuchFieldException e) {
-        return internalServerError(e.getCause().toString());
-      }
-
-      if (field.equals(fieldName)) {
+      if (field.equals("dependencyString")) {
         String dependencyString = jsonNode.findPath("newValue").asText();
         if (dependencyString != null)
           dependencyString = dependencyString.trim();
@@ -134,6 +127,8 @@ public class GroupController extends Controller {
                 "groupId:artifactId[:extension[:classifier]]:version]]");
           }
         }
+      } else{
+        Ebean.commitTransaction();
       }
     } finally {
       Ebean.endTransaction();

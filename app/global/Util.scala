@@ -7,16 +7,19 @@ import java.util.zip.{GZIPInputStream, GZIPOutputStream}
 
 import models.{PrescriptionLevel, User, Visibility}
 import play.Logger
+import play.api.i18n.Messages
 import play.data.Form
 import play.data.validation.{Constraints, ValidationError}
 import play.mvc.Http
-
+import play.twirl.api.Html
+import scala.collection.JavaConversions._
+import play.api.Play.current
+import play.api.i18n.Messages.Implicits._
 
 /**
   * Created by yerlibilgin on 02/05/15.
   */
 object Util {
-
   def feedWidth = 4
   def remaining = 8
 

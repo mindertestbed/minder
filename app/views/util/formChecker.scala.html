@@ -1,0 +1,27 @@
+@(field: Form.Field, targetId: String = null)
+
+  <a role="button" style="tab-stops:none; text-decoration: none;outline: none;vertical-align: top;" onclick='$(this).popover("show")'
+  data-toggle="popover" data-trigger="focus"
+  data-content="@{Html(field.constraints().map(a => "" + Messages(a._1, a._2) + "").mkString(", "))}">
+    <span class="fa-question-sign" style="font-size: xx-small ; color:green;vertical-align: top;"> </span></a>
+
+@if(field.hasErrors) {
+  <script>
+
+      var divTemplate = '<div class="popover" role="tooltip" style="color: #e87673"><div class="arrow"></div><h3 ' +
+          'class="popover-title"></h3><div class="popover-content"></div></div>'
+
+      $(function(){
+        @if(targetId==null){
+        var selector = $('input[name="@{field.name}"], textarea[name="@{field.name}"]')
+        } else {
+        var selector = $('#@targetId')
+        }
+        var popo = selector.popover({animation:true, content: function() {
+          return @{Html(field.errors().map(a => "'" + Messages(a.message(), a.arguments()) + "'").mkString("+"))}
+        }, placement:'right',
+          template: divTemplate});
+        popo.popover('show')
+      })
+  </script>
+}

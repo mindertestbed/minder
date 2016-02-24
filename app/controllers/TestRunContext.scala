@@ -149,7 +149,7 @@ class TestRunContext(val testRun: TestRun) extends Runnable with TestProcessWatc
     testRun.history.save();
     testRun.success = (status == TestStatus.GOOD)
     testRun.report = rg.generateReport();
-    testRun.errorMessage = error;
+    testRun.errorMessage = error.getBytes("utf-8");
     if (sutNames != null) {
       val sb = new StringBuilder()
       var i: Int = 1

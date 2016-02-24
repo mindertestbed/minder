@@ -1,9 +1,10 @@
 @minderGreen: #aed2b4;
 @minderBlue: #74A0D1;
 
-body{
+body {
   font-family: 'Open Sans', sans-serif;
 }
+
 a {
   text-decoration: none;
 }
@@ -33,7 +34,8 @@ a {
 .navbar-inverse {
   border-bottom: none;
 }
-h1{
+
+h1 {
   font-family: 'Alegreya Sans SC', sans-serif;
 }
 
@@ -183,19 +185,55 @@ table td.tabexpandNoBorder {
 }
 
 .navbarim {
-  background: rgb(106,167,232);
-  background: -moz-linear-gradient(left,  rgba(106,167,232,1) 0%, rgba(71,137,204,1) 100%);
-  background: -webkit-linear-gradient(left,  rgba(106,167,232,1) 0%,rgba(71,137,204,1) 100%);
-  background: linear-gradient(to right,  rgba(106,167,232,1) 0%,rgba(71,137,204,1) 100%);
-  filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#6aa7e8', endColorstr='#4789cc',GradientType=1 );
+  background: rgb(106, 167, 232);
+  background: -moz-linear-gradient(left, rgba(106, 167, 232, 1) 0%, rgba(71, 137, 204, 1) 100%);
+  background: -webkit-linear-gradient(left, rgba(106, 167, 232, 1) 0%, rgba(71, 137, 204, 1) 100%);
+  background: linear-gradient(to right, rgba(106, 167, 232, 1) 0%, rgba(71, 137, 204, 1) 100%);
+  filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#6aa7e8', endColorstr='#4789cc', GradientType=1);
 
 }
 
 .padabit {
-  padding:10px;
-  padding-top:20px;
+  padding: 10px;
+  padding-top: 20px;
 }
 
-textarea:focus, input:focus{
+textarea:focus, input:focus {
   outline: none;
+}
+
+table.topCells th, table.topCells td {
+  vertical-align: top;
+}
+
+table.paddedTable th, table.paddedTable td {
+  padding: 10px;
+}
+
+table.noWrap th, table.noWrap td {
+  white-space: nowrap;
+}
+
+table.formInput th, table.formInput td {
+  min-width: 145px;
+}
+
+table.formInput input[type='text'] {
+  background-color: rgba(121, 171, 228, 0.3);
+  border: 1px solid rgb(118, 168, 222);
+  border-radius: 4px;
+  padding: 3px 10px 3px 10px;
+  font-size: small;
+  color: black;
+  min-width: 300px;
+}
+
+textarea {
+  background-color: rgba(121, 171, 228, 0.3);
+  border: 1px solid rgb(118, 168, 222);
+  border-radius: 4px;
+  padding: 3px 10px 3px 10px;
+  font-size: small;
+  color: black;
+  min-width: 300px;
 }

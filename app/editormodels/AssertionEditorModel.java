@@ -44,5 +44,6 @@ public class AssertionEditorModel {
   @Constraints.MaxLength(ModelConstants.DESCRIPTION_LENGTH)
   public String description;
 
+  @Constraints.Required
   public String prescriptionLevel;
 }

@@ -13,8 +13,7 @@ import play.mvc.Result;
 import security.AllowedRoles;
 import security.Role;
 import views.html.testSuite.*;
-import views.html.testSuite.tdlList.existingTdls;
-import views.html.testSuite.tdlList.suitableTdls;
+import views.html.testSuite.childViews.*;
 
 import java.util.ArrayList;
 import java.util.List;
