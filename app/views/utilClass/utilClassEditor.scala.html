@@ -132,61 +132,20 @@
           </table>
 
           @if(frm.hasErrors) {
-            <p id="error" class="alert alert-danger" style='font-family:"Monaco", "Courier New", "monospace"'></p>
-            <xmp id="source" style="display: none">
-              @if(frm.hasGlobalErrors) {
-                @frm.globalError
-              }
-              @if(frm.hasErrors) {
-                @for(error <- frm.errors) {
-                  @for(err <- error._2) {
-                    @error._1: @Messages(err.message)
-                  }
+            <p id="error" class="alert alert-danger" style='font-family:"Monaco", "Courier New", "monospace"'>
+            @if(frm.hasErrors) {
+              @for(error <- frm.errors) {
+                @for(err <- error._2) {
+                  @Html(global.Util.fixLineNumbers(Messages(err.message), 9).replaceAll("\n", "<br/>"))
                 }
               }
-            </xmp>
-
-            <script>
-                function trimAll(arr){
-                  var arr2 = new Array()
-                  for(a in arr){
-                    arr[a] =arr[a].trim()
-                    if (arr[a].length > 0) arr2.push(arr[a])
-                  }
-                  return arr2;
-                }
-                $(function(){
-                  var newd  = $("#source" ).text()
-                  newd = trimAll(newd.split(/\n/g)).join("<br/>");
-                  newd = newd.replace(/ /g, '&nbsp;')
-                  $("#error")[0 ].innerHTML = newd.trim();
-                });
-            </script>
+            }
+            </p>
           }
 
           <div id="editor-container" style="padding-top: 5px;">
-            <pre id="editor">@utilClass.source</pre>
+            <pre id="editor">@frm("tdl").value</pre>
           </div>
-          @defining(if(frm("tdl").value == null) {
-            ""
-          } else {
-            frm("tdl").value
-          }) { str =>
-            @defining(str.toString.split("\\\n").length) { len =>
-              <script>
-                  $(function(){
-                    var editor = $("#tdl").data('CodeMirrorInstance');
-
-                    var nls = "";
-                    for(i = @len; i < 20; i++){
-                      nls += "\n"
-                    }
-
-                    editor.replaceRange(nls, CodeMirror.Pos(editor.lastLine()))
-                  });
-              </script>
-            }
-          }
 
           <input type="hidden" name="id" id="id" value='@frm("id").value'/>
           <input type="hidden" name="groupId" id="groupId" value='@frm("groupId").value'/>

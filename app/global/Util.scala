@@ -2,7 +2,9 @@ package global
 
 import java.io._
 import java.lang.reflect.Field
+import java.util
 import java.util._
+import java.util.regex.Pattern
 import java.util.zip.{GZIPInputStream, GZIPOutputStream}
 
 import models.{PrescriptionLevel, User, Visibility}
@@ -20,7 +22,32 @@ import play.api.i18n.Messages.Implicits._
   * Created by yerlibilgin on 02/05/15.
   */
 object Util {
+  def fixLineNumbers(value: String, firstLineNumber: Int) = {
+    //currently hard code, in the future get it from TDL Compiler
+    //its a -9
+
+    val sb = new StringBuilder(value)
+
+    val matcher = Pattern.compile(".*\\.scala\\:\\d+\\:").matcher(value);
+
+    val list = new util.ArrayList[(Int, Int)]()
+    while (matcher.find()) {
+      val substr = value.substring(matcher.start(), matcher.end() - 1)
+      val loIndex = substr.lastIndexOf(':') + 1
+      list.add((matcher.start() + loIndex, matcher.end() - 1))
+    }
+
+    list.foldRight(null){
+      (z, i) => {sb.replace(z._1, z._2, ((value.substring(z._1, z._2).toInt) - firstLineNumber)+""); null}
+    }
+    //{
+    //  sb.replace(tpl._1, tpl._2, ((value.substring(tpl._1, tpl._2).toInt) - 9)+"")
+   // }
+    sb.toString();
+  }
+
   def feedWidth = 4
+
   def remaining = 8
 
   def choose(value: Any, expected: Any, matchValue: String = "activetab", nonMatchValue: String = "passivetab"): String = {
@@ -118,33 +145,36 @@ object Util {
       "\u2718"
     }
   }
-def setVersionInfo(): Any ={
 
-  val p = getClass.getPackage
-  val name = p.getImplementationTitle
-  val version=p.getImplementationVersion
-}
+  def setVersionInfo(): Any = {
 
-def getVersionInfo(): String = {
-  val versionNo = {
-    try {
-      val prop = new Properties()
-      prop.load(new FileInputStream("AboutMinder.properties"))
-
-
-      prop.getProperty("VERSION")
-
-
-    }
-    catch {case e:Exception =>
-        e.printStackTrace()
-
-    }
+    val p = getClass.getPackage
+    val name = p.getImplementationTitle
+    val version = p.getImplementationVersion
   }
-  return versionNo.toString
+
+  def getVersionInfo(): String = {
+    val versionNo = {
+      try {
+        val prop = new Properties()
+        prop.load(new FileInputStream("AboutMinder.properties"))
 
 
-}
+        prop.getProperty("VERSION")
+
+
+      }
+      catch {
+        case e: Exception =>
+          e.printStackTrace()
+
+      }
+    }
+    return versionNo.toString
+
+
+  }
+
   def canAccess(localUser: User, owner: User): Boolean = {
     println(localUser.email + " vs. " + owner.email)
     localUser.email == "root@minder" || localUser.email == owner.email
