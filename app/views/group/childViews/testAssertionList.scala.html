@@ -33,11 +33,9 @@
           <td>@ta.owner.email</td>
           @subjectIs(ta.owner) {
             <td>
-              <div title="Delete" class="bevel2 celldiv" style="height:30px ; width:30px ; cursor:hand ;"
-              onclick='deleteWithDialog("/doDeleteAssertion?id=@ta.id", $("#dialog-confirm"), "Delete Test Assertion", "test assertion", "@ta.taId")'>
-                <img src="@routes.Assets.versioned("/images/trash2-64.png")" height="16px" alt='@ta.id'/>
-              </div>
-
+                <button type="button" class="glyphicon glyphicon-trash btn btn-default  btn-xs"
+                onclick='deleteWithDialog("/doDeleteAssertion?id=@ta.id", $("#dialog-confirm"), "Delete Test Assertion", "test assertion", "@ta.taId")' title="Delete">
+                </button>
             </td>
           }
         </tr>

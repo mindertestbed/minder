@@ -6,17 +6,20 @@ import editormodels.TestSuiteEditorModel;
 import global.Util;
 import models.*;
 import play.Logger;
-import play.api.libs.json.Json;
 import play.data.Form;
+import play.libs.Json;
 import play.mvc.Controller;
 import play.mvc.Result;
 import security.AllowedRoles;
 import security.Role;
-import views.html.testSuite.*;
+import views.html.testSuite.childViews.editor;
+import views.html.testSuite.mainView;
 import views.html.testSuite.childViews.*;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import static play.data.Form.form;
 
@@ -53,7 +56,6 @@ public class TestSuiteController extends Controller {
       return badRequest(editor.render(filledForm));
     } else {
       TestSuiteEditorModel model = filledForm.get();
-
       TestGroup tg = TestGroup.findById(model.groupId);
 
       if (tg == null) {
@@ -66,9 +68,14 @@ public class TestSuiteController extends Controller {
       ts.description = model.description;
       ts.shortDescription = model.shortDescription;
       ts.testGroup = tg;
+      ts.visibility = model.visibility;
       ts.mtdlParameters = model.mtdlParameters;
+      ts.preemptionPolicy = model.preemptionPolicy;
       ts.owner = Authentication.getLocalUser();
       ts.save();
+
+      System.out.println(model.tdlArray);
+      System.out.println(model.selectedCandidateMap);
       Logger.debug("TestSuite with id " + ts.id + " was created");
       return redirect(routes.GroupController.getGroupDetailView(tg.id, "suites"));
     }
@@ -92,6 +99,8 @@ public class TestSuiteController extends Controller {
     tsModel.shortDescription = ts.shortDescription;
     tsModel.groupId = ts.testGroup.id;
     tsModel.mtdlParameters = ts.mtdlParameters;
+    tsModel.visibility = ts.visibility;
+    tsModel.preemptionPolicy = ts.preemptionPolicy;
 
     Form<TestSuiteEditorModel> bind = TEST_SUITE_FORM
         .fill(tsModel);
@@ -162,7 +171,7 @@ public class TestSuiteController extends Controller {
   public static Result doEditTestSuiteField() {
     JsonNode jsonNode = request().body().asJson();
 
-    return Utils.doEditField(TestSuiteEditorModel.class, TestSuite.class, jsonNode,Authentication.getLocalUser());
+    return Utils.doEditField(TestSuiteEditorModel.class, TestSuite.class, jsonNode, Authentication.getLocalUser());
   }
 
   @AllowedRoles(Role.TEST_DESIGNER)
@@ -211,6 +220,41 @@ public class TestSuiteController extends Controller {
 
   @AllowedRoles(Role.TEST_DESIGNER)
   public static Result renderTdlList(long id) {
-    return ok(existingTdls.render(TestSuite.findById(id)));
+    return ok(views.html.testSuite.childViews.existingTdls.render(TestSuite.findById(id)));
+  }
+
+  @AllowedRoles(Role.TEST_DESIGNER)
+  public static Result getNamesAndAdaptersForTdls() {
+    System.out.println(request().body().asJson());
+    JsonNode json = request().body().asJson();
+    System.out.println(json);
+    System.out.println(json.isArray());
+
+    List<Tdl> tdls = new ArrayList<>();
+    if(json.isArray()){
+      json.forEach(value -> {
+        tdls.add(Tdl.findById(value.asLong()));
+      });
+    } else {
+      long tdlId = json.asLong();
+      Tdl tdl = Tdl.findById(tdlId);
+      tdls.add(tdl);
+    }
+
+    Map<String, Set<WrapperVersion>> wrapperParamListHashMap = Util.listCandidateAdapters(tdls);
+
+    return ok(Json.toJson(wrapperParamListHashMap));
+  }
+
+  public static List<TestAssertion> listAllAssertionsWithTDLS(TestGroup group) {
+    List<TestAssertion> list = TestAssertion.findByGroup(group);
+
+    for(TestAssertion ta : list){
+      ta.testCases = TestCase.listByTestAssertion(ta);
+      for(TestCase tc : ta.testCases){
+        tc.tdls = Tdl.findByTestCase(tc);
+      }
+    }
+    return list;
   }
 }

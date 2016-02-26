@@ -1,6 +1,7 @@
 package models;
 
 import com.avaje.ebean.Model;
+import editormodels.PreemptionPolicy;
 
 import javax.persistence.*;
 import java.util.List;
@@ -38,6 +39,9 @@ public class TestSuite extends Model {
   @Column(nullable = false)
   public TestGroup testGroup;
 
+  public Visibility visibility;
+
+  public PreemptionPolicy preemptionPolicy;
 
   @OneToMany
   public List<SuiteJob> jobs;

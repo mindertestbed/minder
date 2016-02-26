@@ -152,14 +152,7 @@ public class JobController extends Controller {
       }
       job.mtdlParameters = model.mtdlParameters;
       job.save();
-      /*SuiteJob sj = new SuiteJob();
-      sj.name = "Ali";
-      sj.tdl = tdl;
-      sj.owner = job.owner;
-      sj.mappedWrappers = mappedWrappers;
-      sj.mtdlParameters = model.mtdlParameters;
-      sj.testSuite = TestSuite.findById(1L);
-      sj.save();*/
+
       Ebean.commitTransaction();
     } catch (Exception ex) {
       ex.printStackTrace();
@@ -198,34 +191,6 @@ public class JobController extends Controller {
     return redirect(routes.TestCaseController.viewTestCase(rc.tdl.testCase.id, "jobs"));
   }
 
-  @AllowedRoles(Role.TEST_DESIGNER)
-  public static Result getEditJobEditorView(Long id) {
-    Job job = Job.findById(id);
-    if (job == null) {
-      // it does not exist. error
-      return badRequest("Job with id " + id + " does not exist.");
-    }
-
-    if (!Util.canAccess(Authentication.getLocalUser(), job.owner))
-      return badRequest("You don't have permission to modify this resource");
-
-
-    JobEditorModel jobEditorModel = new JobEditorModel();
-    jobEditorModel.id = job.id;
-    jobEditorModel.name = job.name;
-    jobEditorModel.visibility = job.visibility;
-    jobEditorModel.wrapperMappingList = new ArrayList<>();
-    jobEditorModel.mtdlParameters = job.mtdlParameters;
-
-    for (MappedWrapper mappedWrapper : job.mappedWrappers) {
-      jobEditorModel.wrapperMappingList.add(new MappedWrapperModel(mappedWrapper, mappedWrapper.parameter, mappedWrapper.wrapperVersion));
-    }
-
-    Form<?> fill = JOB_FORM.fill(jobEditorModel);
-
-    return ok(views.html.job.jobEditor.render(fill));
-  }
-
   @AllowedRoles({Role.TEST_DESIGNER, Role.TEST_DEVELOPER, Role.TEST_OBSERVER})
   public static Result displayJob(Long id, boolean showHistory) {
     Job rc = Job.findById(id);
@@ -240,78 +205,6 @@ public class JobController extends Controller {
       return ok(views.html.job.jobDetailView.render(rc, showHistory, localUser));
     else
       return unauthorized("You can't see this resource");
-  }
-
-  /**
-   * List the actual registered wrappers that provide the same
-   * signal and slots with the parametric wrappers provided in the model
-   *
-   * @param mappedWrapperModel
-   * @return
-   */
-  @AllowedRoles(Role.TEST_DESIGNER)
-  public static List<WrapperVersion> listFittingWrappers(MappedWrapperModel mappedWrapperModel) {
-    // get signatures supported by this wp.
-    List<ParamSignature> psList = ParamSignature.getByWrapperParam(mappedWrapperModel.wrapperParam);
-
-    // create the return list.
-    List<WrapperVersion> listOptions = new ArrayList<>();
-    // List<SignalSlot> TdlCompiler.getSignatures(testCase.tdl,
-    // mappedWrapperModel.name);
-    // we have to list the wrappers that cover all these signatures (might
-    // be more but we don't care)
-    // not an optiomal solution for a huuuuge database. But there won't be
-    // more than 100 wrappers :-)
-    List<Wrapper> all = Wrapper.getAll();
-
-    Logger.debug("List Fitting Wrappers");
-    Logger.info("List Fitting Wrappers");
-
-    out:
-    for (Wrapper wrapper : all) {
-      // check if all the signatures are covered by the signals or slots
-      // of this wrapper.
-      List<WrapperVersion> wrapperVersions = WrapperVersion.getAllByWrapper(wrapper);
-      for (WrapperVersion wrapperVersion : wrapperVersions) {
-        Logger.debug("Check " + wrapper.name + "|" + wrapperVersion.version);
-        for (ParamSignature ps : psList) {
-          boolean included = false;
-
-
-          Logger.debug("\tLook for " + ps.signature);
-          for (TSignal signal : wrapperVersion.signals) {
-            if (ps.signature.equals(signal.signature.replaceAll("\\s",
-                ""))) {
-              included = true;
-              Logger.debug("\t\t" + signal.signature + " HIT");
-              break;
-            }
-          }
-
-          if (!included) {
-            for (TSlot slot : wrapperVersion.slots) {
-              if (ps.signature.equals(slot.signature.replaceAll(
-                  "\\s", ""))) {
-                included = true;
-                Logger.debug("\t\t" + slot.signature + " HIT");
-                break;
-              }
-            }
-          }
-
-          if (!included)
-            continue out;
-        }
-
-        // if we are here, then this wrapper contains all.
-        // so add it to the list.
-        Logger.debug(wrapper.name + "|" + wrapperVersion.version + " FITS");
-        listOptions.add(wrapperVersion);
-      }
-    }
-
-
-    return listOptions;
   }
 
   @AllowedRoles({Role.TEST_DESIGNER, Role.TEST_DEVELOPER, Role.TEST_OBSERVER})

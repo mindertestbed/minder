@@ -126,11 +126,11 @@
           <div class="row">
             <div class="col-md-12">
               @decideOnVisibility(job.visibility, job.owner, security.Role.TEST_DESIGNER) {
-                <button id="enqueue" type="button" class="btn btn-success" onclick='enqueue("@{job.name}", @{job.id}, "@{job.visibility}")' title="Enqueue">
+                <button id="enqueue" type="button" class="btn btn-success btn-sm" onclick='enqueue("@{job.name}", @{job.id}, "@{job.visibility}")' title="Enqueue">
                   <span class="glyphicon glyphicon-play"></span>
                 </button>
               }
-              <button type="button" class="btn btn-primary" onclick='window.location="@controllers.routes.Application.jobQueue()"' title="Test Monitor">
+              <button type="button" class="btn btn-primary btn-sm" onclick='window.location="@controllers.routes.Application.jobQueue()"' title="Test Monitor">
                 <span class="glyphicon glyphicon-tasks"></span>
               </button>
             </div>

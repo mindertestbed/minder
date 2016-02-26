@@ -1,51 +1,49 @@
 @(tc: TestCase, selectedTdl: Tdl)
-  @import java.util.concurrent.atomic.AtomicInteger
-  @import views.html.util._
-  @import global.Util._
-  @import authentication._
+@import java.util.concurrent.atomic.AtomicInteger
+@import views.html.util._
+@import global.Util._
+@import authentication._
 
 
   <!-- Display the list of Jobs assigned to this test case-->
-  @subjectHasRole(security.Role.TEST_DESIGNER) {
-    @createLinkButton("/getCreateJobEditorView?tdlID=" + selectedTdl.id, Messages("restrictedTestPage.createJob"))
-    <br />
-    <br />
-  }
+@subjectHasRole(security.Role.TEST_DESIGNER) {
+  @createLinkButton("/getCreateJobEditorView?tdlID=" + selectedTdl.id, Messages("restrictedTestPage.createJob"))
+  <br />
+  <br />
+}
 
-  @views.html.job.jobEnqueueDialog()
+@views.html.job.jobEnqueueDialog()
 
-  @defining(Job.findByTdl(selectedTdl)) { jobs =>
-    @if(jobs.size() > 0) {
-      @defining(new AtomicInteger(1)) { index =>
-        <table class="table table-hover table-condensed table-striped">
-          @createFirstRow {
-            <th>Job Name</th>
-            <th>Short Description</th>
-            <th>Author</th>
+@defining(Job.findByTdl(selectedTdl)) { jobs =>
+  @if(jobs.size() > 0) {
+    @defining(new AtomicInteger(1)) { index =>
+      <table class="table table-hover table-condensed table-striped">
+        @createFirstRow {
+          <th>Job Name</th>
+          <th>Short Description</th>
+          <th>Author</th>
+        }
+        @for(job <- jobs) {
+          @decideOnVisibility(job.visibility, job.owner) {
+            <tr>
+              <td>@index.getAndIncrement()</td> <td><a href="/viewJob?id=@job.id&showHistory=true">@job.name</a></td> <td>
+              SHORT Description</td>
+              <td>@job.owner.email</td>
+              <td align="center">
+                @decideOnVisibility(job.visibility, job.owner, security.Role.TEST_DESIGNER) {
+                  <button type="button" class="glyphicon glyphicon-play btn btn-success  btn-sm" onclick='enqueue("@{job.name}", @{job.id}, "@{job.visibility}")' title="Enqueue">
+                  </button>
+                }
+
+                @subjectIs(job.owner) {
+                  <button type="button" class="glyphicon glyphicon-trash btn btn-danger  btn-sm" onclick='deleteWithDialog("/doDeleteJob?id=@job.id", $("#dialog-confirm"), "Delete Job", "job", "@job.name")' title="Delete">
+                  </button>
+                }
+              </td>
+            </tr>
           }
-          @for(job <- jobs) {
-            @decideOnVisibility(job.visibility, job.owner) {
-              <tr>
-                <td>@index.getAndIncrement()</td> <td><a href="/viewJob?id=@job.id&showHistory=true">@job.name</a></td> <td>
-                SHORT Description</td>
-                <td>@job.owner.email</td>
-                <td align="center">
-                  @decideOnVisibility(job.visibility, job.owner, security.Role.TEST_DESIGNER) {
-                    <button id="enqueue" type="button" class="btn btn-success" onclick='enqueue("@{job.name}", @{job.id}, "@{job.visibility}")' title="Enqueue">
-                      <span class="glyphicon glyphicon-play"></span>
-                    </button>
-                  }
-
-                  @subjectIs(job.owner) {
-                    @createButton("", "glyphicon-trash", "btn-default") {
-                      deleteWithDialog("/doDeleteJob?id=@job.id", $("#dialog-confirm"), "Delete Job", "job", "@job.name")
-                    }
-                  }
-                </td>
-              </tr>
-            }
-          }
-        </table>
-      }
+        }
+      </table>
     }
   }
+}

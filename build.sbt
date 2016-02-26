@@ -6,6 +6,8 @@ version := "1.6-B0001"
 
 lazy val minder = (project in file(".")).enablePlugins(PlayJava, PlayEbean)
 
+offline := true
+
 products in Compile <<= products in Aspectj
 
 resolvers += "Eid public repository" at "http://193.140.74.199:8081/nexus/content/groups/public/"

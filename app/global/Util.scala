@@ -7,7 +7,8 @@ import java.util._
 import java.util.regex.Pattern
 import java.util.zip.{GZIPInputStream, GZIPOutputStream}
 
-import models.{PrescriptionLevel, User, Visibility}
+import controllers.MappedWrapperModel
+import models._
 import play.Logger
 import play.api.i18n.Messages
 import play.data.Form
@@ -37,12 +38,15 @@ object Util {
       list.add((matcher.start() + loIndex, matcher.end() - 1))
     }
 
-    list.foldRight(null){
-      (z, i) => {sb.replace(z._1, z._2, ((value.substring(z._1, z._2).toInt) - firstLineNumber)+""); null}
+    list.foldRight(null) {
+      (z, i) => {
+        sb.replace(z._1, z._2, ((value.substring(z._1, z._2).toInt) - firstLineNumber) + "");
+        null
+      }
     }
     //{
     //  sb.replace(tpl._1, tpl._2, ((value.substring(tpl._1, tpl._2).toInt) - 9)+"")
-   // }
+    // }
     sb.toString();
   }
 
@@ -297,5 +301,107 @@ object Util {
         }
       }
     }
+  }
+
+  /**
+    * List the actual registered wrappers that provide the same
+    * signal and slots with the parametric wrappers provided in the model
+    *
+    * @param mappedWrapperModel
+    * @return
+    */
+  def listCandidateAdapters(mappedWrapperModel: MappedWrapperModel): util.Set[WrapperVersion] = {
+    val param: WrapperParam = mappedWrapperModel.wrapperParam
+
+    val psList: util.List[ParamSignature] = ParamSignature.getByWrapperParam(param)
+    val candidateAdapters: util.Set[WrapperVersion] = listCandidatesForSignatures(psList)
+    return candidateAdapters
+  }
+
+  /**
+    * List the actual registered wrappers that provide the same
+    * signal and slots with the tdl provided
+    *
+    * @param tdls
+    * @return
+    */
+  def listCandidateAdapters(tdls: util.List[Tdl]): util.LinkedHashMap[String, util.Set[WrapperVersion]] = {
+    val params: List[WrapperParam] = tdls.map(tdl => tdl.parameters).flatten.toList.sortWith((t1, t2) => {
+      t1.name < t2.name
+    })
+
+    val map = new util.LinkedHashMap[String, util.Set[WrapperVersion]]()
+
+    params.foreach { param =>
+      val psList: util.List[ParamSignature] = ParamSignature.getByWrapperParam(param)
+      val candidateAdapters: util.Set[WrapperVersion] = listCandidatesForSignatures(psList)
+      if (map.containsKey(param.name)) {
+        //oops we have the same param for different tdls.
+        //in the future we may think of something more nasty, but now lets just merge the two lists
+        val existingSet = map(param.name)
+
+
+      } else {
+        map.put(param.name, candidateAdapters);
+      }
+    }
+
+    map
+  }
+
+
+  def listCandidatesForSignatures(psList: util.List[ParamSignature]): util.Set[WrapperVersion] = {
+    val candidateAdapters: util.Set[WrapperVersion] = new util.HashSet[WrapperVersion]
+
+    /**
+      * Foreach param signature, query the wrapper versions that provide either a signal
+      * or a slot that matches the signature. And increase their score by 1
+      */
+
+    val scoreMap = new util.HashMap[WrapperVersion, Int]()
+    psList.foreach { paramSignature =>
+      val signals = TSignal.findBySignature(paramSignature.signature)
+      signals.foreach { signal =>
+        val wv: WrapperVersion = signal.wrapperVersion
+        if (scoreMap.containsKey(wv)) {
+          scoreMap.put(wv, scoreMap(wv) + 1)
+        } else {
+          scoreMap.put(wv, 1)
+        }
+      }
+      val slots = TSlot.findBySignature(paramSignature.signature)
+      slots.foreach { slot =>
+        val wv: WrapperVersion = slot.wrapperVersion
+        if (scoreMap.containsKey(wv)) {
+          scoreMap.put(wv, scoreMap(wv) + 1)
+        } else {
+          scoreMap.put(wv, 1)
+        }
+      }
+    }
+
+    val temporaryList = new util.ArrayList[WrapperVersion]()
+    val size: Int = psList.size()
+    //now put the versions with the score == |psList| to the candidate list
+    scoreMap.foreach { k =>
+      if (k._2 == size) {
+        val wv = WrapperVersion.findById(k._1.id)
+        wv.wrapper = Wrapper.findById(wv.wrapper.id)
+        wv.signals = null
+        wv.slots = null
+        wv.wrapper.user = null;
+        wv.wrapper.wrapperVersions = null
+        //wv.version="mami"
+        temporaryList.add(wv)
+      }
+    }
+
+
+    temporaryList.sort(new Comparator[WrapperVersion] {
+      override def compare(o1: WrapperVersion, o2: WrapperVersion): Int = o1.wrapper.name.compareTo(o2.wrapper.name)
+    })
+
+    temporaryList.foreach(f => candidateAdapters.add(f))
+    candidateAdapters
   }
 }

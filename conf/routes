@@ -70,7 +70,6 @@ POST        /doEditCaseField                            controllers.TestCaseCont
 
 GET         /getCreateJobEditorView                     controllers.JobController.getCreateJobEditorView(tdlID: Long)
 POST        /doCreateJob                                controllers.JobController.doCreateJob()
-GET         /getEditJobEditorView                       controllers.JobController.getEditJobEditorView(id: Long)
 GET         /viewJob                                    controllers.JobController.displayJob(id: Long, showHistory: Boolean)
 GET         /doDeleteJob                                controllers.JobController.doDeleteJob(id: Long)
 GET         /viewTestRunHistory                         controllers.JobController.viewTestRunHistory(testRunId: Long)
@@ -128,6 +127,8 @@ GET         /renderJoblistView                          controllers.TestSuiteCon
 GET         /renderTestRunListView                      controllers.TestSuiteController.renderTestRunListView(id: Long)
 GET         /renderDetailView                           controllers.TestSuiteController.renderDetailView(id: Long)
 GET         /renderTdlList                              controllers.TestSuiteController.renderTdlList(id: Long)
+
+POST        /getNamesAndAdaptersForTdls                  controllers.TestSuiteController.getNamesAndAdaptersForTdls()
 
 GET         /getCreateUtilClassEditorView               controllers.UtilClassController.getCreateUtilClassEditorView(groupId: Long)
 POST        /doCreateUtilClass                          controllers.UtilClassController.doCreateUtilClass

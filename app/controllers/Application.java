@@ -99,6 +99,7 @@ public class Application extends Controller {
             routes.javascript.GroupController.renderTestAssets(),
             routes.javascript.GroupController.renderUtilClasses(),
             routes.javascript.GroupController.renderDependencies(),
+            routes.javascript.GroupController.renderJobTemplates(),
             routes.javascript.TestAssertionController.renderDetails(),
             routes.javascript.TestAssertionController.renderTestCases(),
             routes.javascript.JobController.changeTestRunVisibility(),
@@ -106,7 +107,7 @@ public class Application extends Controller {
             routes.javascript.TestQueueController.enqueueJob(),
             routes.javascript.UserController.listUsers(),
             routes.javascript.UserController.viewSettings(),
-                routes.javascript.GroupController.renderJobTemplates()
+            routes.javascript.TestSuiteController.getNamesAndAdaptersForTdls()
         ))
         .as("text/javascript");
   }
