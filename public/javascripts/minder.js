@@ -215,12 +215,8 @@ function simpleAjaxGet(dialogId, url, title, message) {
  * Added function for play ajax navigation
  */
 function ajaxRouteGet(playAjaxObject, params, successTarget, failTarget) {
-  if (!isArray(params))
-    params = [params];
-
   if (typeof successTarget === 'undefined' || successTarget === null) {
-    showError("The success function cannot be empty")
-    return;
+    successTarget = $('.ajaxContent')
   }
 
   var successFunctionDelegate = successTarget;
@@ -248,20 +244,32 @@ function ajaxRouteGet(playAjaxObject, params, successTarget, failTarget) {
     }
   }
 
-  playAjaxObject.apply(null, params).ajax()
-    .done(
-      function (data) {
-        successFunctionDelegate(data)
-      })
-    .fail(
-      function (data) {
-        if (typeof failTarget === 'undefined' || failTarget === null) {
-          showError(data.responseText)
-        } else {
-          failTarget(data.responseText);
-        }
+
+  var ajaxObject = {
+    success: function (data) {
+      successFunctionDelegate(data)
+    },
+    error: function (data) {
+      if (typeof failTarget === 'undefined' || failTarget === null) {
+        showError(data.responseText)
+      } else {
+        failTarget.html(data.responseText);
       }
-    )
+    }
+  }
+
+  //check if we are a form
+  if(typeof  playAjaxObject.serialize === 'function'){
+    //this is a form
+    ajaxObject.data = playAjaxObject.serialize()
+    ajaxObject.type = playAjaxObject.attr('method')
+    ajaxObject.url =playAjaxObject.attr('action')
+  } else if (!isArray(params)) {
+    params = [params];
+    ajaxObject.url = playAjaxObject.apply(null, params).url
+  }
+
+  $.ajax(ajaxObject)
 }
 
 

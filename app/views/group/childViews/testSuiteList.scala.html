@@ -17,7 +17,7 @@
       @defining(new AtomicInteger(1)) { index =>
         @for( suite <- TestSuite.findByGroup(tg)) {
           <tr>
-            <td>@index.getAndIncrement()</td> <td><a href="@routes.TestSuiteController.getTestSuiteDetailView(suite.id, "jobs")">@suite.name</a></td> <td>@suite.shortDescription</td>
+            <td>@index.getAndIncrement()</td> <td><a href="@routes.TestSuiteController.getTestSuiteDetailView(suite.id, "details")">@suite.name</a></td> <td>@suite.shortDescription</td>
             <td>@suite.owner.email</td>
             @subjectIs(suite.owner) {
               <td style="border:1px solid white ; background-color:white ;">

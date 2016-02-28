@@ -87,12 +87,6 @@ public class Application extends Controller {
         Routes.javascriptRouter("jsRoutes",
             routes.javascript.Authentication.login(),
             routes.javascript.Authentication.doLogin(),
-            routes.javascript.TestSuiteController.listAvailableTdlsForSuite(),
-            routes.javascript.TestSuiteController.getTestSuiteDetailView(),
-            routes.javascript.TestSuiteController.renderJoblistView(),
-            routes.javascript.TestSuiteController.renderTestRunListView(),
-            routes.javascript.TestSuiteController.renderDetailView(),
-            routes.javascript.TestSuiteController.renderTdlList(),
             routes.javascript.GroupController.renderDetails(),
             routes.javascript.GroupController.renderTestAssertionList(),
             routes.javascript.GroupController.renderTestSuites(),
@@ -107,7 +101,9 @@ public class Application extends Controller {
             routes.javascript.TestQueueController.enqueueJob(),
             routes.javascript.UserController.listUsers(),
             routes.javascript.UserController.viewSettings(),
-            routes.javascript.TestSuiteController.getNamesAndAdaptersForTdls()
+            routes.javascript.TestSuiteController.renderDetailView(),
+            routes.javascript.TestSuiteController.getNamesAndAdaptersForTdls(),
+            routes.javascript.TestSuiteController.renderTestRunListView()
         ))
         .as("text/javascript");
   }

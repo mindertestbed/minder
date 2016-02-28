@@ -94,4 +94,10 @@ public class TestRun extends Model {
   public static void updateUser(User user, User localUser) {
 
   }
+
+  public static int countRunsForJob(SuiteJob suiteJob) {
+    com.avaje.ebean.SqlQuery qu = Ebean.createSqlQuery("Select count(id) from TestRun where job_id=" + suiteJob.id);
+    Object count = qu.findUnique().get("count");
+    return Integer.parseInt(count.toString());
+  }
 }

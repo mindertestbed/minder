@@ -1,5 +1,8 @@
 @import java.util.concurrent.atomic.AtomicInteger
-@(group: TestGroup)
+@import views.html.authentication.subjectIsnt
+@import views.html.authentication.subjectIs
+
+@(group: TestGroup, owner: User)
 
 @import scala.collection.JavaConversions._
 
@@ -19,16 +22,23 @@ color: black;
 font-size: small;
 }
 </style>
-<table width="100%">
-  <tr>
-    <td>
-      <label>Select</label>:
-      <button class="btn btn-xs btn-success" style="margin-bottom: 5px ;" type="button" onclick='$(".tdlVersionInput").prop("checked", true);updateNameList()'><span class="fa fa-list-ul">&nbsp;</span>All</button>
-      <button class="btn btn-xs btn-primary" style="margin-bottom: 5px ;" type="button" onclick='$(".tdlVersionInput").prop("checked", false);$(".tdlLatest").prop("checked", true);updateNameList()'><span class="fa fa-clock-o">&nbsp;</span>Latest</button>
-      <button class="btn btn-xs btn-warning" style="margin-bottom: 5px ;" type="button" onclick='$(".tdlVersionInput").prop("checked", false);updateNameList()'><span class="fa fa-square-o">&nbsp;</span>None</button></td>
-    <td align="right"><button class="btn btn-xs btn-danger" style="margin-bottom: 5px ;" type="button" onclick='reconstructList()' title="Reconstruct the candidate adapter list"><span class="fa fa-angle-double-right">&nbsp;</span>List</button></td>
-  </tr>
-</table>
+
+@subjectIs(owner) {
+  <table width="100%">
+    <tr>
+      <td>
+        <label>Select</label>:
+        <button class="btn btn-xs btn-success" style="margin-bottom: 5px ;" type="button" onclick='$(".tdlVersionInput").prop("checked", true);updateNameList()'><span class="fa fa-list-ul">&nbsp;</span>
+          All</button>
+        <button class="btn btn-xs btn-primary" style="margin-bottom: 5px ;" type="button" onclick='$(".tdlVersionInput").prop("checked", false);$(".tdlLatest").prop("checked", true);updateNameList()'><span class="fa fa-clock-o">&nbsp;</span>
+          Latest</button>
+        <button class="btn btn-xs btn-warning" style="margin-bottom: 5px ;" type="button" onclick='$(".tdlVersionInput").prop("checked", false);updateNameList()'><span class="fa fa-square-o">&nbsp;</span>
+          None</button></td>
+      <td align="right"><button class="btn btn-xs btn-danger" style="margin-bottom: 5px ;" type="button" onclick='reconstructList()' title="Reconstruct the candidate adapter list"><span class="fa fa-angle-double-right">&nbsp;</span>
+        List</button></td>
+    </tr>
+  </table>
+}
 
 @defining(TestSuiteController.listAllAssertionsWithTDLS(group)) { testAssertionList =>
   <table class="table table-condensed table-hover noWrap">
@@ -45,7 +55,7 @@ font-size: small;
           <td>@testCase.name</td> <td>
             @defining(Tdl.getLatestTdl(testCase)) { latest =>
               @for(tdl <- testCase.tdls) {
-                <span class="label label-info label-aligned"><input id='checkBox_@{tdl.id}' type="checkbox" class="tdlVersionInput @if(tdl == latest){tdlLatest}" onchange='updateNameList($(this))' value="@tdl.id"/> @tdl.version</span> &nbsp;
+                <span class="label label-info label-aligned"><input @subjectIsnt(owner){disabled="true"} id='checkBox_@{tdl.id}' type="checkbox" class="tdlVersionInput @if(tdl == latest){tdlLatest}" onchange='updateNameList($(this))' value="@tdl.id"/> @tdl.version</span> &nbsp;
               }
             }
           </td>

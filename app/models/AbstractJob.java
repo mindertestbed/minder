@@ -1,5 +1,6 @@
 package models;
 
+import com.avaje.ebean.Ebean;
 import com.avaje.ebean.Model;
 
 import javax.persistence.*;
@@ -28,7 +29,7 @@ public abstract class AbstractJob extends Model {
 
   public Visibility visibility;
 
-  @Column(nullable = false, length = ModelConstants.DESCRIPTION_LENGTH, columnDefinition = "TEXT")
+  @Column(length = ModelConstants.DESCRIPTION_LENGTH, columnDefinition = "TEXT")
   public String mtdlParameters;
 
 
@@ -37,4 +38,9 @@ public abstract class AbstractJob extends Model {
 
   @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
   public List<TestRun> testRuns;
+
+  public static void deleteById(Long id) {
+    com.avaje.ebean.SqlUpdate qu = Ebean.createSqlUpdate("delete from abstract_job where id=" + id);
+    qu.execute();
+  }
 }

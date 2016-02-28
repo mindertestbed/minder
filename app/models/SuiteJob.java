@@ -12,6 +12,12 @@ import java.util.List;
 @Entity
 @DiscriminatorValue("1")
 public class SuiteJob extends AbstractJob {
+
+  /**
+   * if it has been run at least one but thrown away with an edit, then it is obsolete
+   */
+  public boolean isObsolete;
+
   @ManyToOne
   public TestSuite testSuite;
 

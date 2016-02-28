@@ -21,8 +21,7 @@ public class MappedWrapper extends Model {
   @ManyToOne
   public WrapperVersion wrapperVersion;
 
-  @ManyToOne
-  @Column(nullable = false)
+  @ManyToOne()
   public AbstractJob job;
 
   public static final Finder<Long, MappedWrapper> find = new Finder<>(MappedWrapper.class);

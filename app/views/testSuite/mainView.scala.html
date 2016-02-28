@@ -1,44 +1,43 @@
 @(ts: TestSuite, display: String = "details")
-  @import java.util.concurrent.atomic.AtomicInteger
-  @import global.Util._;
-  @import views.html.util._
+@import java.util.concurrent.atomic.AtomicInteger
+@import global.Util._;
+@import views.html.util._
 
-  @main(Messages("minder.navigation.restricted.testdesigner"), "testGroups", "Test Groups") {
+@main(Messages("minder.navigation.restricted.testdesigner"), "testGroups",
+  Array(("Test Groups", controllers.routes.Application.testGroups().path()),
+    (ts.testGroup.name, controllers.routes.GroupController.getGroupDetailView(ts.testGroup.id, "suites").path()),
+    (ts.name, controllers.routes.TestSuiteController.getTestSuiteDetailView(ts.id, "details")))) {
 
-    @dialogs()
+  @dialogs()
 
-    <div class="padabit">
-      <script>
-          $(function(){
-            bindValues($("#name@{ts.id}"))
-          });
+  <div class="padabit">
+    <script>
+        $(function(){
+          bindValues($("#name@{ts.id}"))
+        });
 
-          function showDetails() {
-            ajaxRouteGet(jsRoutes.controllers.TestSuiteController.renderDetailView, @ts.id, $("#habura"))
-          }
+        function showDetails() {
+          ajaxRouteGet(jsRoutes.controllers.TestSuiteController.renderDetailView, @ts.id)
+        }
 
-          function showJobs() {
-            ajaxRouteGet(jsRoutes.controllers.TestSuiteController.renderJoblistView, @ts.id, $("#habura"))
-          }
+        function showRuns(){
+          ajaxRouteGet(jsRoutes.controllers.TestSuiteController.renderTestRunListView, @ts.id)
+        }
+    </script>
 
-          function showRuns(){
-            ajaxRouteGet(jsRoutes.controllers.TestSuiteController.renderTestRunListView, @ts.id, $("#habura"))
-          }
-      </script>
+    <h2>@Messages("testSuite.TestSuite")
+      <div id="name@{
+        ts.id
+      }" onclick='showUpdateInputTextDialog(@ts.id, "name", $(this).next(), "/doEditTestSuiteField")' class="hl editable"></div>
+      <input type="hidden" value="@ts.name"/>
+    </h2>
 
-      <h2>@Messages("testSuite.TestSuite")
-        <div id="name@{
-          ts.id
-        }" onclick='showUpdateInputTextDialog(@ts.id, "name", $(this).next(), "/doEditTestSuiteField")' class="hl editable"></div>
-        <input type="hidden" value="@ts.name"/>
-      </h2>
+    <div class="indent">
 
-      <div class="indent">
+      @ajaxDisplaySelector(display, "details" ->("Details", "showDetails"), "runs" ->("Test Runs", "showRuns"))
 
-        @ajaxDisplaySelector(display, "details" ->("Details", "showDetails"), "jobs" ->("Jobs", "showJobs"), "runs" ->("Test Runs", "showRuns"))
+      <div class="ajaxContent"></div>
 
-        <div id="habura"></div>
-
-      </div>
     </div>
-  }
+  </div>
+}

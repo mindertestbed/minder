@@ -121,14 +121,12 @@ POST        /doEditTestSuiteField                       controllers.TestSuiteCon
 GET         /getTestSuiteDetailView                     controllers.TestSuiteController.getTestSuiteDetailView(id: Long, display: String)
 GET         /createTestSuite                            controllers.TestSuiteController.getCreateTestSuiteView(groupId: Long)
 POST        /createTestSuite                            controllers.TestSuiteController.doCreateTestSuite
+POST        /doEditTestSuite                            controllers.TestSuiteController.doEditTestSuite
 GET         /doDeleteTestSuite                          controllers.TestSuiteController.doDeleteTestSuite(id: Long)
-GET         /listAvailableTdlsForSuite                  controllers.TestSuiteController.listAvailableTdlsForSuite(testSuiteId: Long)
-GET         /renderJoblistView                          controllers.TestSuiteController.renderJoblistView(id: Long)
-GET         /renderTestRunListView                      controllers.TestSuiteController.renderTestRunListView(id: Long)
 GET         /renderDetailView                           controllers.TestSuiteController.renderDetailView(id: Long)
-GET         /renderTdlList                              controllers.TestSuiteController.renderTdlList(id: Long)
+GET         /renderTestRunListView                      controllers.TestSuiteController.renderTestRunListView(id: Long)
 
-POST        /getNamesAndAdaptersForTdls                  controllers.TestSuiteController.getNamesAndAdaptersForTdls()
+POST        /getNamesAndAdaptersForTdls                 controllers.TestSuiteController.getNamesAndAdaptersForTdls()
 
 GET         /getCreateUtilClassEditorView               controllers.UtilClassController.getCreateUtilClassEditorView(groupId: Long)
 POST        /doCreateUtilClass                          controllers.UtilClassController.doCreateUtilClass
