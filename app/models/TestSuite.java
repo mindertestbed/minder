@@ -42,8 +42,11 @@ public class TestSuite extends Model {
 
   public PreemptionPolicy preemptionPolicy;
 
-  @OneToMany
+  @OneToMany(cascade = CascadeType.ALL, mappedBy = "testSuite")
   public List<SuiteJob> jobs;
+
+  @OneToMany(cascade = CascadeType.ALL, mappedBy = "testSuite")
+  public List<SuiteRun> run;
 
   private static final Finder<Long, TestSuite> find = new Finder<>(TestSuite.class);
 

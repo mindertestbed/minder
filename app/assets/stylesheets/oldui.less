@@ -227,7 +227,9 @@ table.noWrap th, table.noWrap td {
 }
 
 table.formInput th, table.formInput td {
-  min-width: 145px;
+  min-width: 130px;
+  white-space: nowrap;
+  overflow: hidden;
 }
 
 table.formInput input[type='text'] {
@@ -237,7 +239,7 @@ table.formInput input[type='text'] {
   color: black;
   padding: 3px 10px 3px 10px;
   font-size: small;
-  min-width: 300px;
+  min-width: 250px;
 }
 
 textarea {
@@ -247,9 +249,13 @@ textarea {
   padding: 3px 10px 3px 10px;
   font-size: small;
   color: black;
-  min-width: 300px;
+  min-width: 250px;
 }
 
 .label{
   display: inline-block;
+}
+
+tr.highlight{
+  background-color: rgba(209, 234, 255, 0.96) !important;
 }

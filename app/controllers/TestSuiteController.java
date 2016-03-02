@@ -148,11 +148,6 @@ public class TestSuiteController extends Controller {
     }
   }
 
-  @AllowedRoles(Role.TEST_DESIGNER)
-  public static Result renderTestRunListView(Long testSuiteId) {
-    return ok("atas");
-  }
-
   public static Form<TestSuiteEditorModel> fillEditorModelForm(TestSuite ts) {
     TestSuiteEditorModel tsModel = new TestSuiteEditorModel();
     tsModel.id = ts.id;
@@ -205,11 +200,15 @@ public class TestSuiteController extends Controller {
       return badRequest("You don't have permission to modify this resource");
 
     try {
+      Ebean.beginTransaction();
       ta.delete();
+      Ebean.commitTransaction();
     } catch (Exception ex) {
       ex.printStackTrace();
       Logger.error(ex.getMessage(), ex);
       return badRequest(ex.getMessage());
+    } finally{
+      Ebean.endTransaction();
     }
     return redirect(routes.GroupController.getGroupDetailView(ta.testGroup.id, "suites"));
   }
@@ -234,8 +233,8 @@ public class TestSuiteController extends Controller {
       sj.name = testSuite.name + "-" + tdl.testCase.name;
       sj.visibility = testSuite.visibility;
       sj.tdl = tdl;
-      sj.save();
       sj.owner = testSuite.owner;
+      sj.save();
       tdl.parameters.forEach(param -> {
         MappedWrapper mw = new MappedWrapper();
         mw.job = sj;
@@ -261,11 +260,6 @@ public class TestSuiteController extends Controller {
     JsonNode jsonNode = request().body().asJson();
 
     return Utils.doEditField(TestSuiteEditorModel.class, TestSuite.class, jsonNode, Authentication.getLocalUser());
-  }
-
-  @AllowedRoles(Role.TEST_DESIGNER)
-  public static Result renderDetailView(long id) {
-    return ok(views.html.testSuite.childViews.details.render(TestSuite.findById(id)));
   }
 
   @AllowedRoles(Role.TEST_DESIGNER)
@@ -302,4 +296,22 @@ public class TestSuiteController extends Controller {
     }
     return list;
   }
+
+
+  @AllowedRoles(Role.TEST_DESIGNER)
+  public static Result renderStatus(Long testSuiteId) {
+    return ok(testSuiteStatus.apply(TestSuite.findById(testSuiteId)));
+  }
+
+  @AllowedRoles(Role.TEST_DESIGNER)
+  public static Result renderEditor(Long testSuiteId) {
+    return ok(editor.apply(TestSuite.findById(testSuiteId)));
+  }
+
+
+  @AllowedRoles(Role.TEST_DESIGNER)
+  public static Result renderDetails(long id) {
+    return ok(details.render(TestSuite.findById(id)));
+  }
+
 }

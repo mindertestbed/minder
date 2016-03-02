@@ -100,7 +100,6 @@
       }
 
       $(function(){
-        debugger;
         resetTDLS()
       })
 
@@ -158,7 +157,8 @@
   @frm.globalError.message
   </p>
 }
-  <div class="container"><div class="row"><div class="col-md-6">
+
+  <div class="row"><div class="col-md-6">
     <table class="topCells paddedTable noWrap formInput">
       <tr><td>
         Test Suite Name:</td><td><input @subjectIsnt(owner) {
@@ -213,7 +213,7 @@
       }
       </td></tr>
     </table>
-  </div></div></div>
+  </div></div>
 
   <input type="hidden" name="id" id="id" value='@frm("id").value' />
   <input type="hidden" name="groupId" id="groupId" value='@frm("groupId").value' />
@@ -225,18 +225,16 @@
   }' />
   <hr />
 
-  <div class="container">
-  @defining(TestGroup.findById(frm("groupId").value.toLong)) { group =>
-    <div class="row">
-      <div class="col-md-6">
-        @candidateTDLList(group, owner)
-      </div>
-      <div class="col-md-6">
-      @nameAdapterSelector()
-      </div>
+@defining(TestGroup.findById(frm("groupId").value.toLong)) { group =>
+  <div class="row">
+    <div class="col-md-6">
+      @candidateTDLList(group, owner)
     </div>
-  }
+    <div class="col-md-6">
+    @nameAdapterSelector()
+    </div>
   </div>
+}
   <hr />
 @subjectIs(owner) {
   <div align="center">

@@ -26,9 +26,7 @@ class TestRunContext(val testRun: TestRun) extends Runnable with TestProcessWatc
   val mappedWrappers = MappedWrapper.findByJob(testRun.job)
   var sutNames: java.util.Set[String] = null;
   var error = ""
-  var job: AbstractJob = Job.findById(testRun.job.id)
-  if (job == null) job = SuiteJob.findById(testRun.job.id)
-  if (job == null) job = GitbJob.findById(testRun.job.id)
+  var job: AbstractJob = AbstractJob.findById(testRun.job.id)
   val user = testRun.runner;
   val tdl = Tdl.findById(job.tdl.id);
   val testCase = TestCase.findById(tdl.testCase.id)

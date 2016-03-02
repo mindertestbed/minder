@@ -10,34 +10,49 @@
 
   @dialogs()
 
-  <div class="padabit">
+  <div class="padabit container-fluid">
     <script>
         $(function(){
           bindValues($("#name@{ts.id}"))
         });
 
         function showDetails() {
-          ajaxRouteGet(jsRoutes.controllers.TestSuiteController.renderDetailView, @ts.id)
+          ajaxRouteGet(jsRoutes.controllers.TestSuiteController.renderDetails, @ts.id)
+        }
+        function showEdit() {
+          ajaxRouteGet(jsRoutes.controllers.TestSuiteController.renderEditor, @ts.id)
         }
 
-        function showRuns(){
-          ajaxRouteGet(jsRoutes.controllers.TestSuiteController.renderTestRunListView, @ts.id)
+        function showStatus(){
+          ajaxRouteGet(jsRoutes.controllers.TestSuiteController.renderStatus, @ts.id)
         }
     </script>
 
-    <h2>@Messages("testSuite.TestSuite")
-      <div id="name@{
-        ts.id
-      }" onclick='showUpdateInputTextDialog(@ts.id, "name", $(this).next(), "/doEditTestSuiteField")' class="hl editable"></div>
-      <input type="hidden" value="@ts.name"/>
-    </h2>
+    <div class="row">
+      <div class="col-sm-@{
+        global.Util.remaining
+      }">
 
-    <div class="indent">
+        <h2>@Messages("testSuite.TestSuite")
+          <div id="name@{
+            ts.id
+          }" onclick='showUpdateInputTextDialog(@ts.id, "name", $(this).next(), "/doEditTestSuiteField")' class="hl editable"></div>
+          <input type="hidden" value="@ts.name"/>
+        </h2>
 
-      @ajaxDisplaySelector(display, "details" ->("Details", "showDetails"), "runs" ->("Test Runs", "showRuns"))
+        <div class="indent">
+          @ajaxDisplaySelector(display, "status" ->("Status", "showStatus"), "details" ->("Details", "showDetails"), "edit" ->("Edit", "showEdit"))
+          <div class="ajaxContent container-fluid"></div>
 
-      <div class="ajaxContent"></div>
-
+        </div>
+      </div>
+      <div class="col-sm-@{
+        global.Util.feedWidth
+      } hidden-xs">
+        @views.html.job.jobQueueFeed()
+        <hr />
+        @views.html.job.jobHistoryFeed()
+      </div>
     </div>
   </div>
 }

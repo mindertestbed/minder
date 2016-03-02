@@ -18,8 +18,11 @@ public class TestRun extends Model {
   public Long id;
 
   @ManyToOne
-  @Column(nullable = false)
+  @Column(name="job_id")
   public AbstractJob job;
+
+  @ManyToOne
+  public SuiteRun suiteRun;
 
   public Date date;
 
@@ -69,6 +72,11 @@ public class TestRun extends Model {
 
   public static List<TestRun> findByJob(AbstractJob rc) {
     return find.where().eq("job", rc).orderBy("date desc").findList();
+  }
+
+
+  public static List<TestRun> findBySuiteRun(SuiteRun suiteRun) {
+    return find.where().eq("suiteRun", suiteRun).orderBy("date desc").findList();
   }
 
 

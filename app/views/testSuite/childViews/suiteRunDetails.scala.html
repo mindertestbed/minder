@@ -1,0 +1,40 @@
+@(suiteRun: SuiteRun)
+
+
+<table class="table table-striped">
+  <tr><th>&nbsp;</th><th>Date</th><th>TDL</th><th>Test Case</th><th>Test Assertion</th></tr>
+  @for(testRun <- TestRun.findBySuiteRun(suiteRun)) {
+    <tr class="@if(testRun.success) {goodTestRun} else {badTestRun}">
+      <td class="tabshrink"><input type="checkbox" id="testRun@{
+        testRun.id
+      }"/>
+      </td>
+      <td style="text-align:center ; vertical-align: middle ;" class="tabshrink">
+      @if(testRun.success) {
+        <img src="@routes.Assets.versioned("/images/Check-icon.png")" height="16px" alt='G'/>
+      } else {
+        <img src="@routes.Assets.versioned("/images/Delete-icon.png")" height="16px" alt='B'/>
+      }
+      </td>
+      <td>@testRun.date</td>
+      <td>
+        <a href="@controllers.routes.TestCaseController.viewTestCase2(testRun.job.tdl.testCase.id, testRun.job.tdl.id, "jobs")">
+        @{
+          testRun.job.tdl.version
+        }</a>
+      </td> <td>
+      <a href="@controllers.routes.TestCaseController.viewTestCase(testRun.job.tdl.testCase.id, "jobs")">
+      @{
+        testRun.job.tdl.testCase.name
+      }</a>
+    </td> <td>
+      <a href="@controllers.routes.TestAssertionController.getAssertionDetailView(testRun.job.tdl.testCase.testAssertion.id, "cases")">
+      @{
+        testRun.job.tdl.testCase.testAssertion.taId
+      }
+      </a>
+    </td>
+    </tr>
+  }
+</table>
+

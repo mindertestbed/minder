@@ -80,10 +80,10 @@ function createFormDialog(sourceUrl, action, titl, target, multiPart, w, h) {
             },
           }
 
-          if(multiPart) {
+          if (multiPart) {
             ajaxObject.data = new FormData(frm[0]);
-            ajaxObject.contentType=false;
-            ajaxObject.processData=false;
+            ajaxObject.contentType = false;
+            ajaxObject.processData = false;
           } else {
             ajaxObject.data = frm.serialize();
           }
@@ -104,7 +104,7 @@ function createFormDialog(sourceUrl, action, titl, target, multiPart, w, h) {
   });
 
   frm[0].setAttribute('action', action);
-  if(multiPart)
+  if (multiPart)
     frm[0].setAttribute('enctype', 'multipart/form-data');
 
   spin(frm[0])
@@ -162,22 +162,6 @@ function deleteWithDialog(action, dialog, title, category, item, target) {
   dialog.find("span.itemtype").html(category);
   dialog.find("span.itemname").html(item);
   deleteDialog.dialog("open");
-}
-
-function showError(data) {
-  var dialog = $("#errorDialog").dialog({
-    resizable: false,
-    height: "600",
-    width: "800",
-    autoOpen: true,
-    modal: true,
-    buttons: {
-      'Ok': function () {
-        $(this).dialog("close");
-      }
-    }
-  });
-  dialog.html(data);
 }
 
 function simpleAjaxGet(dialogId, url, title, message) {
@@ -245,31 +229,34 @@ function ajaxRouteGet(playAjaxObject, params, successTarget, failTarget) {
   }
 
 
-  var ajaxObject = {
-    success: function (data) {
-      successFunctionDelegate(data)
-    },
-    error: function (data) {
-      if (typeof failTarget === 'undefined' || failTarget === null) {
-        showError(data.responseText)
+  var ajaxObject = {}
+
+  //check if we are a form
+  if (typeof  playAjaxObject.serialize === 'function') {
+    //this is a form
+    ajaxObject.data = playAjaxObject.serialize()
+    ajaxObject.type = playAjaxObject.attr('method')
+    ajaxObject.url = playAjaxObject.attr('action')
+  } else {
+    if (!isArray(params)) {
+      params = [params];
+    }
+    ajaxObject.url = playAjaxObject.apply(null, params).url
+  }
+
+  $.ajax(ajaxObject).done(function (data) {
+    successFunctionDelegate(data)
+  }).fail(function (data) {
+    if (typeof failTarget === 'undefined' || failTarget === null) {
+      showError(data.responseText)
+    } else {
+      if (isFunction(failTarget)) {
+        failTarget(data.responseText)
       } else {
         failTarget.html(data.responseText);
       }
     }
-  }
-
-  //check if we are a form
-  if(typeof  playAjaxObject.serialize === 'function'){
-    //this is a form
-    ajaxObject.data = playAjaxObject.serialize()
-    ajaxObject.type = playAjaxObject.attr('method')
-    ajaxObject.url =playAjaxObject.attr('action')
-  } else if (!isArray(params)) {
-    params = [params];
-    ajaxObject.url = playAjaxObject.apply(null, params).url
-  }
-
-  $.ajax(ajaxObject)
+  })
 }
 
 
@@ -432,7 +419,7 @@ function ajaxCancelActiveJob(name) {
 
 }
 
-function enqueue(jobName, jobId, visibility){
+function enqueue(jobName, jobId, visibility) {
 
   var dialogElm = $("#jobEnqueueDialog")
   var select = $("#jobEnqueueDialog > .visibilitySelect")

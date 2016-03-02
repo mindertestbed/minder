@@ -1,4 +1,29 @@
-@(ts: TestSuite)
+@(testSuite: TestSuite)
+<script>
 
-@testSuiteForm(TestSuiteController.fillEditorModelForm(ts))
+    $(function(){
+      bindValues($("#shortDescription@{testSuite.id}"))
+      bindValues($("#mtdlParameters@{testSuite.id}"))
+      bindValues($("#description@{testSuite.id}"))
+    })
+
+</script>
+
+<h3>Short Description</h3>
+<div id="shortDescription@{
+  testSuite.id
+}" onclick='showUpdateInputTextDialog(@testSuite.id, "shortDescription", $(this).next(), "/doEditTestSuiteField")' class="editable"></div>
+<input type="hidden" value="@testSuite.shortDescription"/>
+
+<h3>Owner</h3>
+<p>
+@testSuite.owner.email
+</p>
+
+
+<h3>Mtdl Parameters</h3>
+<div id="mtdlParameters@{
+  testSuite.id
+}" onclick='showUpdateTextAreaDialog(@testSuite.id, "mtdlParameters", $(this).next(), "/doEditTestSuiteField")' class="editable"></div>
+<input type="hidden" value="@testSuite.mtdlParameters"/>
 

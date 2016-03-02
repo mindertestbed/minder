@@ -8,9 +8,11 @@ GET         /root                                       controllers.Application.
 GET         /listTestGroups                             controllers.Application.testGroups()
 GET         /jobQueue                                   controllers.Application.jobQueue()
 GET         /adapters                                   controllers.Application.adapters()
-GET         /assets/javascript/routes.js                controllers.Application.jsRoutes
 GET         /profile                                    controllers.Application.profile
 GET         /about                                      controllers.Application.about()
+
+#JSRoutes
+GET         /assets/javascript/routes.js                controllers.JSRoutes.jsRoutes
 
 GET         /login                                      controllers.Authentication.login
 GET         /loginToTargetURL                           controllers.Authentication.loginToTargetURL(targetURL: String)
@@ -54,8 +56,8 @@ POST        /doCreateAssertion                          controllers.TestAssertio
 GET         /doDeleteAssertion                          controllers.TestAssertionController.doDeleteAssertion(id: Long)
 GET         /getAssertionDetailView                     controllers.TestAssertionController.getAssertionDetailView(id: Long, display : String ?= "cases")
 POST        /doEditAssertionField                       controllers.TestAssertionController.doEditAssertionField()
-POST        /renderDetails                              controllers.TestAssertionController.renderDetails(id: Long)
-POST        /renderTestCases                            controllers.TestAssertionController.renderTestCases(id: Long)
+GET         /renderAssertionDetails                     controllers.TestAssertionController.renderDetails(id: Long)
+GET         /renderTestCases                            controllers.TestAssertionController.renderTestCases(id: Long)
 
 #test case management
 GET         /getCreateCaseEditorView                    controllers.TestCaseController.getCreateCaseEditorView(assertionId: Long)
@@ -115,6 +117,7 @@ GET         /logFeed                                    controllers.LogFeeder.lo
 GET         /cancelJob                                  controllers.TestQueueController.cancelJob(index: Int)
 GET         /cancelActiveJob                            controllers.TestQueueController.cancelActiveJob
 GET         /enqueueJob                                 controllers.TestQueueController.enqueueJob(id: Long, visibility: String)
+GET         /enqueueTestSuite                           controllers.TestQueueController.enqueueTestSuite(id: Long, visibility: String)
 
 
 POST        /doEditTestSuiteField                       controllers.TestSuiteController.doEditTestSuiteField
@@ -123,10 +126,13 @@ GET         /createTestSuite                            controllers.TestSuiteCon
 POST        /createTestSuite                            controllers.TestSuiteController.doCreateTestSuite
 POST        /doEditTestSuite                            controllers.TestSuiteController.doEditTestSuite
 GET         /doDeleteTestSuite                          controllers.TestSuiteController.doDeleteTestSuite(id: Long)
-GET         /renderDetailView                           controllers.TestSuiteController.renderDetailView(id: Long)
-GET         /renderTestRunListView                      controllers.TestSuiteController.renderTestRunListView(id: Long)
-
+GET         /renderSuiteDetailView                      controllers.TestSuiteController.renderDetails(id: Long)
+GET         /renderTestStatus                           controllers.TestSuiteController.renderStatus(id: Long)
+GET         /renderTestSuiteEditor                      controllers.TestSuiteController.renderEditor(id: Long)
 POST        /getNamesAndAdaptersForTdls                 controllers.TestSuiteController.getNamesAndAdaptersForTdls()
+
+
+GET         /getSuiteRunDetailView                      controllers.SuiteRunController.getSuiteRunDetailView(id: Long)
 
 GET         /getCreateUtilClassEditorView               controllers.UtilClassController.getCreateUtilClassEditorView(groupId: Long)
 POST        /doCreateUtilClass                          controllers.UtilClassController.doCreateUtilClass

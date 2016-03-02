@@ -1,0 +1,132 @@
+@(testSuite: TestSuite)
+
+<script>
+
+    var previousHighlighedRow = null
+    function grabSuiteRunDetails(suiteRunId, targetRow){
+      spin($('#testRunListDiv')[0])
+      ajaxRouteGet(jsRoutes.controllers.SuiteRunController.getSuiteRunDetailView, suiteRunId,
+          function (data){
+            stopSpin($('#testRunListDiv')[0])
+            $('#testRunListDiv').html(data)
+          })
+
+      if(previousHighlighedRow != null){
+        previousHighlighedRow.removeClass('highlight')
+      }
+      $(targetRow).addClass('highlight')
+      previousHighlighedRow = $(targetRow)
+    }
+
+    function reportAll(){
+
+    }
+
+    function runSelectedTests(){
+
+    }
+
+    function runAllTests(){
+      showInputDialog("Please select visibility", ['PUBLIC', 'PROTECTED', 'PRIVATE'], '@testSuite.visibility.name()',
+          function(result){
+            console.log("Run all tdls with visibility " + result)
+            ajaxRouteGet(jsRoutes.controllers.TestQueueController.enqueueTestSuite, [@testSuite.id, result],
+                function(){
+                  showInfoDialog('Success', 'A new suite run was added to the queue')
+                },
+                showError
+            )
+          })}
+
+    function runSelectedTests(){
+
+    }
+
+</script>
+<div class="row">
+  <div class="col-md-12">
+    <h3>Tdls</h3>
+    <table width="100%" style="padding-bottom: 3px ;">
+      <tr>
+        <td align="right">
+          <button class="btn btn-xs btn-success" style="margin-bottom: 5px ;" type="button" onclick='runAllTests();'><span class="fa fa-rocket">&nbsp;</span><span class="fa fa-rocket">&nbsp;</span>
+            Run All Tdls</button>
+          <button class="btn btn-xs btn-primary" style="margin-bottom: 5px ;" type="button" onclick='runSelectedTests()'><span class="fa fa-rocket">&nbsp;</span><span class="fa fa-check-square-o">&nbsp;</span>
+            Run Selected Tdls</button></td>
+      </tr>
+    </table>
+    <table class="table table-striped">
+      <tr><th>&nbsp;</th><th>TDL</th><th>Test Case</th><th>Test Assertion</th></tr>
+      @for(job <- testSuite.jobs) {
+        <tr>
+          <td class="tabshrink"><input type="checkbox" id="checkBox@{
+            job.id
+          }"/>
+          </td> <td>
+          <a href="@controllers.routes.TestCaseController.viewTestCase2(job.tdl.testCase.id, job.tdl.id, "jobs")">
+          @{
+            job.tdl.version
+          }</a>
+        </td> <td>
+          <a href="@controllers.routes.TestCaseController.viewTestCase(job.tdl.testCase.id, "jobs")">
+          @{
+            job.tdl.testCase.name
+          }</a>
+        </td> <td>
+          <a href="@controllers.routes.TestAssertionController.getAssertionDetailView(job.tdl.testCase.testAssertion.id, "cases")">
+          @{
+            job.tdl.testCase.testAssertion.taId
+          }
+          </a>
+        </td>
+        </tr>
+      }
+    </table>
+  </div>
+</div>
+<hr />
+<div class="row">
+  <div class="col-md-12">
+    <table width="100%" style="padding-bottom: 3px ;">
+      <tr>
+        <td align="right">
+          <button class="btn btn-xs btn-info" style="margin-bottom: 5px ;" type="button" onclick='reportAll();'><span class="fa fa-print">&nbsp;</span><span class="fa fa-print">&nbsp;</span>
+            Report All Runs</button>
+          <button class="btn btn-xs btn-warning" style="margin-bottom: 5px ;" type="button" onclick='reportSelectedRuns()'><span class="fa fa-print">&nbsp;</span><span class="fa fa-check-square-o">&nbsp;</span>
+            Report Selected Runs</button></td>
+      </tr>
+    </table>
+
+    <div class="row">
+      <div class="col-md-3">
+      @defining(new java.util.concurrent.atomic.AtomicInteger(0)) { indexCounter =>
+        @defining(SuiteRun.findBySuite(testSuite)) { suiteRuns =>
+          <table class="table table-striped table-hover noWrap">
+            <tr><th>#</th><th>Date</th></tr>
+            @for(suiteRun <- suiteRuns) {
+              <tr onclick="grabSuiteRunDetails(@suiteRun.id, this)" id="tr_@suiteRun.id" style="cursor: pointer">
+                <td style="text-align:center ; vertical-align: middle ;" class="tabshrink">
+                  <a role="button" onclick='grabSuiteRunDetails(@suiteRun.id, "#tr_@suiteRun.id")' style="text-decoration: none;">
+                  @suiteRun.number
+                  </a>
+                </td>
+                <td><a role="button" onclick='grabSuiteRunDetails(@suiteRun.id, "#tr_@suiteRun.id")' style="text-decoration: none;">
+                @suiteRun.date
+                </a>
+                </td>
+              </tr>
+              @if(indexCounter.getAndIncrement == 0) {
+                <script>grabSuiteRunDetails(@suiteRun.id, "#tr_@suiteRun.id")</script>
+              }
+            }
+          </table>
+        }
+      }
+      </div>
+      <div class="col-md-9" id="testRunListDiv">
+
+      </div>
+    </div>
+
+  </div>
+</div>

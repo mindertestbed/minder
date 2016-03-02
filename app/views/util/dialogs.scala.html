@@ -8,9 +8,6 @@
   </form>
 </div>
 
-<div id="errorDialog" title="Error" style="display:none">
-</div>
-
 <div id="updateInputTextDialog" title="Update Field" style="display:none">
   <input type="text" style="width:100% ;" value=""/>
 </div>
@@ -27,8 +24,42 @@
   <!-- the above ones are the good old jquery dialogs -->
   <!-- below ones are bootstrap -->
 
-<div class="modal fade bs-example-modal-sm" id='myAlertDialog' tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel">
-  <div class="modal-dialog modal-sm">
+<div class="modal fade" id='myAlertDialog' tabindex="-1" role="dialog">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title" id="gridSystemModalLabel"></h4>
+      </div>
+      <div class="modal-body alert alert-success">
+
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal fade" id='myErrorDialog' tabindex="-1" role="dialog">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title" id="gridSystemModalLabel"></h4>
+      </div>
+      <div class="modal-body alert alert-danger" style="overflow: scroll;">
+
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal fade" id='myQuestionDialog' tabindex="-1" role="dialog">
+  <div class="modal-dialog modal-lg">
     <div class="modal-content">
       <div class="modal-header">
         <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
@@ -38,7 +69,8 @@
 
       </div>
       <div class="modal-footer">
-        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+        <button type="button" class="btn btn-success" data-dismiss="modal">Ok</button>
+        <button type="button" class="btn btn-warning" data-dismiss="modal">Cancel</button>
       </div>
     </div>
   </div>
@@ -57,4 +89,63 @@ function showInfoDialog(title, body, onClose){
   }
   dialog.modal({keyboard:true})
 }
+
+
+function showInputDialog(title, data, initial, accept, reject){
+
+  $('#myQuestionDialog .modal-title').html(title)
+
+  if(isArray(data)){
+    var str = '<select class="mySelect">'
+    for(var idx in data){
+      var value = data[idx]
+      if(value===initial){
+        str += '<option selected="selected">'+value+'</option>'
+      } else {
+        str += '<option>'+value+'</option>'
+      }
+    }
+
+    str += '</select>'
+    $('#myQuestionDialog .modal-body').html(str)
+  } else {
+    $('#myQuestionDialog .modal-body').html(data)
+  }
+
+  $('#myQuestionDialog .btn-success').on('click', function(){
+    dialog.accepted=true;
+  })
+
+  $('#myQuestionDialog .btn-warning').on('click', function(){
+    dialog.accepted=false;
+  })
+
+  var dialog = $('#myQuestionDialog');
+  dialog.accepted = false
+  dialog.on('hidden.bs.modal', function (e) {
+    if(dialog.accepted){
+      if(accept !== undefined)
+        accept($('#myQuestionDialog .mySelect').val())
+    } else{
+      if(reject !== undefined)
+        reject()
+    }
+
+    $('#myQuestionDialog .btn-success').off()
+    $('#myQuestionDialog .btn-warning').off()
+    dialog.off()
+  })
+
+  dialog.modal({keyboard:true})
+}
+
+
+function showError(data) {
+  $('#myErrorDialog .modal-title').html('Error')
+  $('#myErrorDialog .modal-body').html(data)
+
+  var dialog = $('#myErrorDialog');
+  dialog.modal({keyboard:true})
+}
+
 </script>
