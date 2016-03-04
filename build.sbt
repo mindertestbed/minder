@@ -18,13 +18,11 @@ scalaVersion := "2.11.7"
 
 libraryDependencies ++= Seq(
   javaJdbc,
-  specs2 % Test,
   evolutions,
   "xalan" % "serializer" % "2.7.2",
   "com.typesafe.play" % "play-java-ws_2.11" % "2.4.2",
   "com.typesafe.play" % "play-cache_2.11" % "2.4.2",
   "com.typesafe.play" % "play-java_2.11" % "2.4.2",
-  "com.typesafe.play" % "twirl-api_2.11" % "1.1.1",
   "org.scala-lang" % "scala-library" % "2.11.7",
   "org.scala-lang" % "scala-reflect" % "2.11.7",
   "org.scala-lang" % "scala-actors" % "2.11.7",
@@ -38,11 +36,17 @@ libraryDependencies ++= Seq(
   "org.webjars" % "bootstrap" % "3.3.6",
   "org.codehaus.groovy" % "groovy" % "2.3.9",
   "gov.tubitak.minder" % "minder-gitb-bridge-common" % "0.0.1",
-  "org.xhtmlrenderer" % "flying-saucer-pdf" % "9.0.7",
   "com.itextpdf" % "itextpdf" % "5.5.8",
   "com.itextpdf.tool" % "xmlworker" % "5.5.8",
+  specs2 % Test,
   "junit" % "junit" % "4.12" % Test
-)
+).map(_.excludeAll(
+  ExclusionRule(organization = "bouncycastle"),
+  ExclusionRule(organization = "org.bouncycastle"),
+  ExclusionRule(organization = "org.jboss.logging"),
+  ExclusionRule(organization = "org.apache.cxf"),
+  ExclusionRule(organization = "com.h2database", name="h2-1.4.187.jar"),
+  ExclusionRule(organization = "commons-logging")))
 
 resolvers ++= Seq(
   "Apache" at "http://repo1.maven.org/maven2/",

@@ -21,6 +21,7 @@ import static play.data.Form.form;
 public class SuiteRunController extends Controller {
   public static final Form<TestSuiteEditorModel> TEST_SUITE_FORM = form(TestSuiteEditorModel.class);
 
+  static ThreadLocal<String> threadLocal = new ThreadLocal<>();
   /*
    */
   @AllowedRoles({Role.TEST_DESIGNER, Role.TEST_DEVELOPER, Role.TEST_OBSERVER})
@@ -65,6 +66,4 @@ public class SuiteRunController extends Controller {
       }
     }
   }
-
-
 }

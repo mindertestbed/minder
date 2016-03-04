@@ -16,10 +16,7 @@ import security.Role;
 import views.html.testSuite.childViews.editor;
 import views.html.testSuite.mainView;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 import views.html.testSuite.childViews.*;
 import views.html.testSuite.*;
@@ -31,6 +28,12 @@ import static play.data.Form.form;
  */
 public class TestSuiteController extends Controller {
   public static final Form<TestSuiteEditorModel> TEST_SUITE_FORM = form(TestSuiteEditorModel.class);
+  private static Comparator<? super JsonNode> nodeComparator = new Comparator<JsonNode>() {
+    @Override
+    public int compare(JsonNode o1, JsonNode o2) {
+      return (int) (o1.asLong() - o2.asLong());
+    }
+  };
 
   /*
    * Test Asertion CRUD
@@ -45,7 +48,7 @@ public class TestSuiteController extends Controller {
       testSuiteEditorModel.groupId = groupId;
       Form<TestSuiteEditorModel> bind = TEST_SUITE_FORM
           .fill(testSuiteEditorModel);
-      return ok(creator.render(bind));
+      return ok(views.html.testSuite.childViews.creator.render(bind));
     }
   }
 
@@ -223,7 +226,15 @@ public class TestSuiteController extends Controller {
       AbstractJob.deleteById(suiteJob.id);
     });
 
+    ArrayList<JsonNode> nodes = new ArrayList<>();
+
     tdlArray.forEach(node -> {
+      nodes.add(node);
+    });
+
+    Collections.sort(nodes, nodeComparator);
+
+    nodes.forEach(node -> {
       Tdl tdl = Tdl.findById(node.asLong());
       Job sj = new Job();
       sj.testSuite = testSuite;
