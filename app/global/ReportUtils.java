@@ -10,8 +10,7 @@ import play.Logger;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.FileInputStream;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 
 /**
@@ -120,6 +119,13 @@ public class ReportUtils {
   }
 
 
+  static final Comparator<TestRun> comparator = new Comparator<TestRun>() {
+    @Override
+    public int compare(TestRun o1, TestRun o2) {
+      return o1.job.tdl.testCase.testAssertion.taId.compareToIgnoreCase(o2.job.tdl.testCase.testAssertion.taId);
+    }
+  };
+
   public static byte[] toPdf(List<TestRun> testRuns, String subTitle) throws Exception {
 
     /**
@@ -128,6 +134,9 @@ public class ReportUtils {
 
     StringBuilder builder = new StringBuilder();
     StringBuilder tocBuilder = new StringBuilder();
+
+
+    Collections.sort(testRuns, comparator);
 
     String testGroup = "";
     for (TestRun testRun : testRuns) {

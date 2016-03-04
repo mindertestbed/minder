@@ -109,7 +109,7 @@ function showInputDialog(title, data, initial, accept, reject){
     str += '</select>'
     $('#myQuestionDialog .modal-body').html(str)
   } else {
-    $('#myQuestionDialog .modal-body').html(data + '<input type="text" />')
+    $('#myQuestionDialog .modal-body').html(data + ':&nbsp;<input type="text" />')
   }
 
   $('#myQuestionDialog .btn-success').on('click', function(){
