@@ -2,6 +2,7 @@
 @import java.util.concurrent.atomic.AtomicInteger
 @import global.Util._;
 @import views.html.util._
+@import views.html.authentication._
 
 @main(Messages("minder.navigation.restricted.testdesigner"), "testGroups",
   Array(("Test Groups", controllers.routes.Application.testGroups().path()),
@@ -13,7 +14,7 @@
   <div class="padabit container-fluid">
     <script>
         $(function(){
-          bindValues($("#name@{ts.id}"))
+          bindValues($("#name@ts.id"))
         });
 
         function showDetails() {
@@ -33,15 +34,25 @@
         global.Util.remaining
       }">
 
-        <h2>@Messages("testSuite.TestSuite")
-          <div id="name@{
-            ts.id
-          }" onclick='showUpdateInputTextDialog(@ts.id, "name", $(this).next(), "/doEditTestSuiteField")' class="hl editable"></div>
+        <h3>@Messages("testSuite.TestSuite")
+          <div id="name@ts.id"
+
+            @subjectIs(ts.owner) {
+              onclick='showUpdateInputTextDialog(@ts.id, "name", $(this).next(), "/doEditTestSuiteField")'
+            }
+              class="hl editable">
+
+          </div>
           <input type="hidden" value="@ts.name"/>
-        </h2>
+        </h3>
 
         <div class="indent">
-          @ajaxDisplaySelector(display, "status" ->("Status", "showStatus"), "details" ->("Details", "showDetails"), "edit" ->("Edit", "showEdit"))
+          @subjectIsOr(ts.owner) {
+            @ajaxDisplaySelector(display, "status" ->("Status", "showStatus"), "details" ->("Details", "showDetails"), "edit" ->("Edit", "showEdit"))
+          }{
+          @ajaxDisplaySelector(display, "status" ->("Status", "showStatus"), "details" ->("Details", "showDetails"))
+        }
+
           <div class="ajaxContent container-fluid"></div>
 
         </div>

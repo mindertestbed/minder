@@ -6,7 +6,7 @@ import java.util.concurrent.LinkedBlockingQueue
 
 import com.avaje.ebean.Ebean
 import com.gitb.core.v1.StepStatus
-import controllers.LogFeeder.LogRecord
+import controllers.TestLogFeeder.LogRecord
 import controllers.common.enumeration.OperationType
 import minderengine.{MinderSignalRegistry, SessionMap}
 import models._
@@ -41,32 +41,32 @@ object TestQueueController extends Controller {
   val testThread = new Thread() {
     override def run(): Unit = {
       while (goon) {
-        LogFeeder.clear()
+        TestLogFeeder.clear()
         var run1: TestRun = null;
         try {
-          LogFeeder.log("--> Test Thread waiting on job queue");
+          TestLogFeeder.log("--> Test Thread waiting on job queue");
           activeRunContext = TestQueueController.jobQueue.take();
           activeRunContext.updateNumber()
           TestRunFeeder.jobQueueUpdate()
           run1 = activeRunContext.testRun
           SessionMap.registerObject(run1.runner.email, "signalRegistry", new MinderSignalRegistry());
 
-          LogFeeder.log("--> Job with id [" + run1.job.id + "] arrived. Start");
+          TestLogFeeder.log("--> Job with id [" + run1.job.id + "] arrived. Start");
           Thread.sleep(1000);
-          LogFeeder.log("--> Run Job #[" + run1.number + "]")
+          TestLogFeeder.log("--> Run Job #[" + run1.number + "]")
           activeRunContext.run()
         } catch {
           case inter: InterruptedException => {
             //someone interrupted me.
             //check the exit flag and go back.
             activeRunContext.failed("Job Cancelled", inter)
-            LogFeeder.log(LogRecord(run1, "<-- Job Interrupted"))
+            TestLogFeeder.log(LogRecord(run1, "<-- Job Interrupted"))
           }
           case t: Throwable => {
-            LogFeeder.log(LogRecord(run1, "<-- Error [" + t.getMessage + "]"))
+            TestLogFeeder.log(LogRecord(run1, "<-- Error [" + t.getMessage + "]"))
           }
         } finally {
-          LogFeeder.log(">>> Test Run  #[" + run1.number + "] finished.")
+          TestLogFeeder.log(">>> Test Run  #[" + run1.number + "] finished.")
           activeRunContext = null
           TestRunFeeder.jobQueueUpdate()
           Thread.sleep(1000)
@@ -282,11 +282,13 @@ object TestQueueController extends Controller {
     *
     * @return
     */
-  def enqueueTestSuite(id: Long, visibility: String) = Action {
+  def enqueueTestSuite(id: Long, visibility: String, jobIdList: String) = Action {
     implicit request => {
       if (jobQueue.size >= 30) {
         BadRequest("The job queue is full.")
       } else {
+
+
         try {
           Ebean.beginTransaction()
           val testSuite = TestSuite.findById(id);
@@ -305,9 +307,23 @@ object TestQueueController extends Controller {
             val java_session = java_ctx.session()
             val user = Authentication.getLocalUser(java_session)
             jobQueue.synchronized {
-              SuiteJob.getAllByTestSuite(testSuite).foreach(sj => {
-                jobQueue.offer(createTestRunContext(sj, user, Visibility.valueOf(visibility), suiteRun))
-              })
+
+              //if the job id list is empty, then enqueue all jobs
+              if (jobIdList == null || jobIdList.isEmpty) {
+
+                Job.getAllByTestSuite(testSuite).foreach(job => {
+                  jobQueue.offer(createTestRunContext(job, user, Visibility.valueOf(visibility), suiteRun))
+                })
+
+              } else {
+
+                //split the job id list with respect to comma and enqueue all
+                jobIdList.split(",").foreach(jobId => {
+                  jobQueue.offer(createTestRunContext(Job.findById(jobId.toLong), user,
+                    Visibility.valueOf(visibility), suiteRun))
+                })
+
+              }
             }
             TestRunFeeder.jobQueueUpdate()
             Ebean.commitTransaction()

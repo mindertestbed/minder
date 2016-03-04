@@ -13,13 +13,16 @@ import play.mvc.Controller;
 import play.mvc.Result;
 import security.AllowedRoles;
 import security.Role;
+import views.html.testSuite.childViews.editor;
 import views.html.testSuite.mainView;
-import views.html.testSuite.childViews.*;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
+import views.html.testSuite.childViews.*;
+import views.html.testSuite.*;
 
 import static play.data.Form.form;
 
@@ -164,7 +167,7 @@ public class TestSuiteController extends Controller {
     //a sample candidate map
     //    {"$as4-adapter":4,"$corner1":5,"$corner4":5,"$generator":10,"$initiator":11}
 
-    List<SuiteJob> jobs = SuiteJob.getAllByTestSuite(ts);
+    List<Job> jobs = Job.getAllByTestSuite(ts);
     StringBuilder tdlArrayBuilder = new StringBuilder("[");
     StringBuilder candidateMapBuilder = new StringBuilder("{");
     jobs.forEach(job -> {
@@ -207,7 +210,7 @@ public class TestSuiteController extends Controller {
       ex.printStackTrace();
       Logger.error(ex.getMessage(), ex);
       return badRequest(ex.getMessage());
-    } finally{
+    } finally {
       Ebean.endTransaction();
     }
     return redirect(routes.GroupController.getGroupDetailView(ta.testGroup.id, "suites"));
@@ -215,19 +218,14 @@ public class TestSuiteController extends Controller {
 
   private static void updateSuiteJobs(JsonNode tdlArray, JsonNode selectedCandidateMap, TestSuite testSuite) {
     //find and remove all suite jobs for this test suite.
-    SuiteJob.getAllByTestSuite(testSuite).forEach(suiteJob -> {
-      if (TestRun.countRunsForJob(suiteJob) > 0) {
-        suiteJob.isObsolete = true;
-        suiteJob.save();
-      } else {
-        MappedWrapper.deleteByJob(suiteJob);
-        AbstractJob.deleteById(suiteJob.id);
-      }
+    Job.getAllByTestSuite(testSuite).forEach(suiteJob -> {
+      MappedWrapper.deleteByJob(suiteJob);
+      AbstractJob.deleteById(suiteJob.id);
     });
 
     tdlArray.forEach(node -> {
       Tdl tdl = Tdl.findById(node.asLong());
-      SuiteJob sj = new SuiteJob();
+      Job sj = new Job();
       sj.testSuite = testSuite;
       sj.mtdlParameters = testSuite.mtdlParameters;
       sj.name = testSuite.name + "-" + tdl.testCase.name;
@@ -246,6 +244,7 @@ public class TestSuiteController extends Controller {
     });
   }
 
+  @AllowedRoles({Role.TEST_DESIGNER, Role.TEST_DEVELOPER, Role.TEST_OBSERVER})
   public static Result getTestSuiteDetailView(Long id, String display) {
     TestSuite testSuite = TestSuite.findById(id);
     if (testSuite == null) {
@@ -298,18 +297,25 @@ public class TestSuiteController extends Controller {
   }
 
 
-  @AllowedRoles(Role.TEST_DESIGNER)
+  @AllowedRoles({Role.TEST_DESIGNER, Role.TEST_DEVELOPER, Role.TEST_OBSERVER})
   public static Result renderStatus(Long testSuiteId) {
     return ok(testSuiteStatus.apply(TestSuite.findById(testSuiteId)));
   }
 
   @AllowedRoles(Role.TEST_DESIGNER)
   public static Result renderEditor(Long testSuiteId) {
-    return ok(editor.apply(TestSuite.findById(testSuiteId)));
+
+    TestSuite testSuite = TestSuite.findById(testSuiteId);
+
+    if (!Util.canAccess(Authentication.getLocalUser(), testSuite.owner)) {
+      return badRequest("You don't have permission to modify this resource");
+    }
+
+    return ok(editor.apply(testSuite));
   }
 
 
-  @AllowedRoles(Role.TEST_DESIGNER)
+  @AllowedRoles({Role.TEST_DESIGNER, Role.TEST_DEVELOPER, Role.TEST_OBSERVER})
   public static Result renderDetails(long id) {
     return ok(details.render(TestSuite.findById(id)));
   }

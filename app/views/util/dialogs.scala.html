@@ -109,7 +109,7 @@ function showInputDialog(title, data, initial, accept, reject){
     str += '</select>'
     $('#myQuestionDialog .modal-body').html(str)
   } else {
-    $('#myQuestionDialog .modal-body').html(data)
+    $('#myQuestionDialog .modal-body').html(data + '<input type="text" />')
   }
 
   $('#myQuestionDialog .btn-success').on('click', function(){
@@ -124,8 +124,13 @@ function showInputDialog(title, data, initial, accept, reject){
   dialog.accepted = false
   dialog.on('hidden.bs.modal', function (e) {
     if(dialog.accepted){
-      if(accept !== undefined)
-        accept($('#myQuestionDialog .mySelect').val())
+      if(accept !== undefined){
+        if(isArray(data)){
+          accept($('#myQuestionDialog .mySelect').val())
+        } else {
+          accept($('#myQuestionDialog .modal-body input').val())
+        }
+      }
     } else{
       if(reject !== undefined)
         reject()

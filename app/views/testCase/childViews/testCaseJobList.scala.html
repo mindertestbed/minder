@@ -24,23 +24,25 @@
           <th>Author</th>
         }
         @for(job <- jobs) {
-          @decideOnVisibility(job.visibility, job.owner) {
-            <tr>
-              <td>@index.getAndIncrement()</td> <td><a href="/viewJob?id=@job.id&showHistory=true">@job.name</a></td> <td>
-              SHORT Description</td>
-              <td>@job.owner.email</td>
-              <td align="center">
-                @decideOnVisibility(job.visibility, job.owner, security.Role.TEST_DESIGNER) {
-                  <button type="button" class="glyphicon glyphicon-play btn btn-success  btn-sm" onclick='enqueue("@{job.name}", @{job.id}, "@{job.visibility}")' title="Enqueue">
-                  </button>
-                }
+          @if(job.testSuite == null) {
+            @decideOnVisibility(job.visibility, job.owner) {
+              <tr>
+                <td>@index.getAndIncrement()</td> <td><a href="/viewJob?id=@job.id&showHistory=true">@job.name</a></td> <td>
+                SHORT Description</td>
+                <td>@job.owner.email</td>
+                <td align="center">
+                  @decideOnVisibility(job.visibility, job.owner, security.Role.TEST_DESIGNER) {
+                    <button type="button" class="glyphicon glyphicon-play btn btn-success  btn-sm" onclick='enqueue("@{job.name}", @{job.id}, "@{job.visibility}")' title="Enqueue">
+                    </button>
+                  }
 
-                @subjectIs(job.owner) {
-                  <button type="button" class="glyphicon glyphicon-trash btn btn-danger  btn-sm" onclick='deleteWithDialog("/doDeleteJob?id=@job.id", $("#dialog-confirm"), "Delete Job", "job", "@job.name")' title="Delete">
-                  </button>
-                }
-              </td>
-            </tr>
+                  @subjectIs(job.owner) {
+                    <button type="button" class="glyphicon glyphicon-trash btn btn-danger  btn-sm" onclick='deleteWithDialog("/doDeleteJob?id=@job.id", $("#dialog-confirm"), "Delete Job", "job", "@job.name")' title="Delete">
+                    </button>
+                  }
+                </td>
+              </tr>
+            }
           }
         }
       </table>

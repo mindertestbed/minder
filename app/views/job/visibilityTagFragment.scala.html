@@ -2,13 +2,13 @@
 <span
   @visibility match {
     case Visibility.PUBLIC => {
-      class="fa-globe"
+      class="fa fa-globe"
     }
     case Visibility.PRIVATE => {
-      class="fa-lock"
+      class="fa fa-lock"
     }
     case Visibility.PROTECTED => {
-      class="fa-group"
+      class="fa fa-group"
     }
   }
 
@@ -23,7 +23,7 @@
       #7cd8ff
     }
   }"
-  >&nbsp; </span> &nbsp;
+  ></span>
 
 @if(renderName) {
   @visibility
@@ -31,6 +31,6 @@
 
 @authentication.subjectIs(owner) {
   @if(renderEditLink) {
-    <a href="#" style="text-decoration: none" onclick='changeTestRunVisibility()' class="fa-edit"></a>
+    &nbsp;<a href="#" style="text-decoration: none" onclick='changeTestRunVisibility()' class="fa fa-edit"></a>
   }
 }

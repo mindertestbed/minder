@@ -1,4 +1,9 @@
 @(testSuite: TestSuite)
+
+
+  @import views.html.authentication._
+
+
 <script>
 
     $(function(){
@@ -10,9 +15,17 @@
 </script>
 
 <h3>Short Description</h3>
-<div id="shortDescription@{
-  testSuite.id
-}" onclick='showUpdateInputTextDialog(@testSuite.id, "shortDescription", $(this).next(), "/doEditTestSuiteField")' class="editable"></div>
+
+
+<div id="shortDescription@testSuite.id"
+
+
+
+@subjectIs(testSuite.owner) {
+  onclick='showUpdateInputTextDialog(@testSuite.id, "shortDescription", $(this).next(), "/doEditTestSuiteField")'
+}
+
+  class="editable"></div>
 <input type="hidden" value="@testSuite.shortDescription"/>
 
 <h3>Owner</h3>
@@ -22,8 +35,12 @@
 
 
 <h3>Mtdl Parameters</h3>
-<div id="mtdlParameters@{
-  testSuite.id
-}" onclick='showUpdateTextAreaDialog(@testSuite.id, "mtdlParameters", $(this).next(), "/doEditTestSuiteField")' class="editable"></div>
+<div id="mtdlParameters@testSuite.id"
+
+@subjectIs(testSuite.owner) {
+  onclick='showUpdateTextAreaDialog(@testSuite.id, "mtdlParameters", $(this).next(), "/doEditTestSuiteField")'
+}
+
+  class="editable"></div>
 <input type="hidden" value="@testSuite.mtdlParameters"/>
 

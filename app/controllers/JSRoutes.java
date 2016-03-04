@@ -26,6 +26,7 @@ public class JSRoutes extends Controller {
             routes.javascript.UserController.listUsers(),
             routes.javascript.UserController.viewSettings(),
             routes.javascript.SuiteRunController.getSuiteRunDetailView(),
+            routes.javascript.SuiteRunController.generateReport(),
             routes.javascript.TestSuiteController.getNamesAndAdaptersForTdls(),
             routes.javascript.TestSuiteController.renderStatus(),
             routes.javascript.TestSuiteController.renderDetails(),

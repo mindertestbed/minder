@@ -21,20 +21,19 @@
             cls = 'badTestRun'
           }
           var visibilityColor = 'red'
-          var visibilityClass = "fa-lock"
+          var visibilityClass = "fa fa-lock"
           if (json.visibility == "PUBLIC"){
-            visibilityClass = 'fa-globe'
+            visibilityClass = 'fa fa-globe'
             visibilityColor = '#1fc36d'
           }
           else if (json.visibility == "PROTECTED"){
-            visibilityClass = 'fa-group'
+            visibilityClass = 'fa fa-group'
             visibilityColor = '#7cd8ff'
           }
 
           var newRow  = rowTemplate.replace('$image', img).replace("$trclass", cls).
           replace('$testRunNumber', json.no).
           replace('$testRunId', json.id).
-          replace('$jobName', json.name).
           replace('$jobName', json.name).
           replace('$jobId', json.jobId).
           replace('$visibilityColor', visibilityColor).

@@ -2,6 +2,7 @@ package global
 
 import java.io._
 import java.lang.reflect.Field
+import java.text.SimpleDateFormat
 import java.util
 import java.util._
 import java.util.regex.Pattern
@@ -403,5 +404,11 @@ object Util {
 
     temporaryList.foreach(f => candidateAdapters.add(f))
     candidateAdapters
+  }
+
+
+  val formatter = new SimpleDateFormat("yyyy.MM.dd HH:mm:ss")
+  def formatDate(date: Date): String ={
+    return formatter.format(date)
   }
 }

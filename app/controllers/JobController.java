@@ -3,25 +3,23 @@ package controllers;
 import com.avaje.ebean.Ebean;
 import com.fasterxml.jackson.databind.JsonNode;
 import controllers.common.enumeration.Utils;
-import editormodels.AssertionEditorModel;
 import editormodels.JobEditorModel;
+import global.ReportUtils;
 import global.Util;
 import models.*;
-import net.sf.jasperreports.engine.*;
-import net.sf.jasperreports.engine.export.JRPdfExporter;
-import net.sf.jasperreports.engine.export.JRPdfExporterParameter;
 import play.Logger;
 import play.data.Form;
 import play.mvc.Controller;
 import play.mvc.Result;
-import play.mvc.Security;
 import security.AllowedRoles;
 import security.Role;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
+
 import views.html.job.*;
-
-import java.io.ByteArrayOutputStream;
-import java.util.*;
-
 import static play.data.Form.form;
 
 /**
@@ -234,11 +232,11 @@ public class JobController extends Controller {
     if (Util.canAccess(localUser, tr.runner, tr.visibility)) {
       response().setContentType("application/x-download");
       String fileName = tr.job.name + "." + tr.number + ".report";
-      byte[] data = tr.report;
+      byte[] data = {};
       if ("pdf".equals(type)) {
         //
         fileName += ".pdf";
-        data = toPdf(data, tr);
+        data = ReportUtils.toPdf(tr);
       } else {
         fileName += ".xml";
       }
@@ -246,73 +244,6 @@ public class JobController extends Controller {
       return ok(data);
     } else {
       return unauthorized("You don't have permission to modify this resource");
-    }
-  }
-
-
-  @SuppressWarnings({"DEPRECATION"})
-  private static byte[] toPdf(byte[] data, TestRun tr) {
-    try {
-      JasperReport report = JasperCompileManager.compileReport(WrapperController.class.getResourceAsStream("/taReport.jrxml"));
-      Map<String, Object> values = new HashMap<String, Object>();
-      values.put("user", tr.history.email);
-      values.put("email", tr.history.email);
-      values.put("result", tr.success);
-      values.put("date", tr.date);
-      values.put("errorMessage", new String(tr.errorMessage, "utf-8"));
-
-      Job rc = Job.findById(tr.job.id);
-      TestCase tc = TestCase.findById(rc.tdl.testCase.id);
-      TestAssertion ta = TestAssertion.findById(tc.testAssertion.id);
-      TestGroup tg = TestGroup.findById(ta.testGroup.id);
-
-      values.put("testGroup", tg.name);
-      values.put("testCase", tc.name);
-      values.put("job", rc.name);
-
-      values.put("taId", ta.taId);
-      values.put("taNormativeSource", ta.normativeSource);
-      values.put("taDescription", ta.shortDescription);
-      values.put("taTarget", ta.target);
-      values.put("taPredicate", ta.predicate);
-      values.put("taPrerequisite", ta.prerequisites);
-      values.put("taPrescription", ta.prescriptionLevel.toString());
-      values.put("taVariable", ta.variables);
-      values.put("taTag", ta.tag);
-
-      JRDataSource source = new JREmptyDataSource();
-      JasperPrint print1 = JasperFillManager.fillReport(report, values, source);
-      List<JasperPrint> jasperPrintList = new ArrayList<JasperPrint>();
-      jasperPrintList.add(print1);
-
-      if (tr.sutNames != null && tr.sutNames.length() > 0) {
-        JasperReport wrapperReport = JasperCompileManager.compileReport(WrapperController.class.getResourceAsStream("/sutNamesReport.jrxml"));
-        values = new HashMap<String, Object>();
-        values.put("sutNames", tr.sutNames);
-        source = new JREmptyDataSource();
-        JasperPrint print2 = JasperFillManager.fillReport(wrapperReport, values, source);
-        jasperPrintList.add(print2);
-      }
-
-      JasperReport logReport = JasperCompileManager.compileReport(WrapperController.class.getResourceAsStream("/logReport.jrxml"));
-      values = new HashMap<String, Object>();
-      values.put("log", tr.history.extractSystemOutputLog());
-      source = new JREmptyDataSource();
-      JasperPrint print3 = JasperFillManager.fillReport(logReport, values, source);
-      jasperPrintList.add(print3);
-
-      ByteArrayOutputStream baos = new ByteArrayOutputStream();
-      JRPdfExporter exporter = new JRPdfExporter();
-      //Add the list as a Parameter
-      exporter.setParameter(JRExporterParameter.JASPER_PRINT_LIST, jasperPrintList);
-      //this will make a bookmark in the exported PDF for each of the reports
-      exporter.setParameter(JRPdfExporterParameter.IS_CREATING_BATCH_MODE_BOOKMARKS, Boolean.TRUE);
-      exporter.setParameter(JRExporterParameter.OUTPUT_STREAM, baos);
-      exporter.exportReport();
-      return baos.toByteArray();
-    } catch (Exception ex) {
-      ex.printStackTrace();
-      return "Invalid".getBytes();
     }
   }
 

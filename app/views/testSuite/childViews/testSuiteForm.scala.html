@@ -7,122 +7,35 @@
 @defining(if(editMode) {
   TestSuite.findById(frm("id").value().toLong).owner
 } else {
-  TestGroup.findById(frm("groupId").value.toLong).owner
+  Authentication.getLocalUser
 }) { owner =>
 
-  <script>
-      var tdlArray = []
-      var candidateMap = {}
-      var selectedCandidateMap = {}
+  @subjectHasRole(security.Role.TEST_DESIGNER) {
+    <script>
+        var tdlArray = []
+        var candidateMap = {}
+        var selectedCandidateMap = {}
 
-      function updateNameList(target){
-        if(target === undefined){
-          tdlArray.splice(0,tdlArray.length)
-          $("input:checkbox:checked").each(function(){
-            tdlArray.push(parseInt($(this).val()))
-          });
-        } else {
-          var val = parseInt(parseInt(target.val()))
-          if(target.prop('checked')){
-            tdlArray.push(val)
+        function updateNameList(target){
+          if(target === undefined){
+            tdlArray.splice(0,tdlArray.length)
+            $("input:checkbox:checked").each(function(){
+              tdlArray.push(parseInt($(this).val()))
+            });
           } else {
-            tdlArray.splice(tdlArray.indexOf(val), 1)
-          }
-
-        }
-        console.log(tdlArray)
-      }
-
-      function reconstructList(){
-        selectedCandidateMap = {}
-        var r = jsRoutes.controllers.TestSuiteController.getNamesAndAdaptersForTdls()
-        $.ajax({
-          url: r.url,
-          type: 'POST',
-          dataType: "json",
-          contentType: "application/json; charset=utf-8",
-          data: JSON.stringify(tdlArray),
-          success: reconstructListAsync,
-          error: function(data){
-            showError(data.responseText)
-          }
-        })
-      }
-
-      function  reconstructListAsync(data){
-        if(data === undefined || data === null || typeof(data[0])==='string')
-          return
-
-        candidateMap = data
-
-        $('#selectorTableBody').empty()
-        $('#selectorTableBody').append('<th>Name</th><th>Mapped Adapter</th>')
-
-        for(key in candidateMap){
-          var options = ""
-          var current = candidateMap[key]
-          for(key2 in current){
-            wrapperVersion = current[key2]
-            if(selectedCandidateMap[key] === wrapperVersion.id){
-              options += '<option value="' + wrapperVersion.id + '" selected="selected">' + wrapperVersion.wrapper.name  + '|' + wrapperVersion.version + '</option>'
+            var val = parseInt(parseInt(target.val()))
+            if(target.prop('checked')){
+              tdlArray.push(val)
             } else {
-              options += '<option value="' + wrapperVersion.id + '">' + wrapperVersion.wrapper.name + '|' + wrapperVersion.version + '</option>'
+              tdlArray.splice(tdlArray.indexOf(val), 1)
             }
+
           }
-          if(selectedCandidateMap[key] ===undefined){
-            selectedCandidateMap[key]=current[0].id
-          }
-
-          $('#selectorTableBody').append('<tr><td>' + key + '</td><td><select ' +
-              @subjectIsnt(owner){'disabled="true"' + } 'onchange="updateCandidate($(this))" title="' + key + '">' + options + '</select></td></tr>');
-        }
-      }
-
-      function updateCandidate(select){
-        selectedCandidateMap[select.prop('title')] = parseInt(select.val())
-      }
-
-      function submitFrom(){
-        var target = $('.ajaxContent')
-        spin(target[0])
-        $('#selectedCandidateMap').val(JSON.stringify(selectedCandidateMap))
-        $('#tdlArray').val(JSON.stringify(tdlArray))
-        ajaxRouteGet($('#testSuiteForm'), null, function(){
-          showInfoDialog('Success', 'The test suite was saved successfully!',
-              function(){
-                stopSpin(target[0])
-                @if(!editMode){
-                debugger;
-                window.location.href='@controllers.routes.GroupController.getGroupDetailView(frm("groupId").value.toLong, "suites")'
-                }
-              })
-        }, target)
-      }
-
-      $(function(){
-        resetTDLS()
-      })
-
-      function resetForm(){
-        $('#testSuiteForm')[0].reset();
-
-        resetTDLS()
-      }
-
-      function resetTDLS(){
-        var tmp = $('#selectedCandidateMap').val()
-        if(tmp !== undefined && tmp.length !== 0){
-          selectedCandidateMap = JSON.parse($('#selectedCandidateMap').val())
-        } else {
-          return;
+          console.log(tdlArray)
         }
 
-        tmp = $('#tdlArray').val()
-        if(tmp.length !== 0){
-          tdlArray = JSON.parse($('#tdlArray').val())
-          for(idx in tdlArray){
-            $('#checkBox_' + tdlArray[idx]).prop('checked', true)
-          }
+        function reconstructList(){
+          selectedCandidateMap = {}
           var r = jsRoutes.controllers.TestSuiteController.getNamesAndAdaptersForTdls()
           $.ajax({
             url: r.url,
@@ -136,117 +49,206 @@
             }
           })
         }
-      }
 
-  </script>
+        function  reconstructListAsync(data){
+          if(data === undefined || data === null || typeof(data[0])==='string')
+            return
 
+          candidateMap = data
 
+          $('#selectorTableBody').empty()
+          $('#selectorTableBody').append('<th>Name</th><th>Mapped Adapter</th>')
 
-@{
-  Html("<h2>Create New Test Suite</h2>".when(!editMode))
-}
+          for(key in candidateMap){
+            var options = ""
+            var current = candidateMap[key]
+            for(key2 in current){
+              wrapperVersion = current[key2]
+              if(selectedCandidateMap[key] === wrapperVersion.id){
+                options += '<option value="' + wrapperVersion.id + '" selected="selected">' + wrapperVersion.wrapper.name  + '|' + wrapperVersion.version + '</option>'
+              } else {
+                options += '<option value="' + wrapperVersion.id + '">' + wrapperVersion.wrapper.name + '|' + wrapperVersion.version + '</option>'
+              }
+            }
+            if(selectedCandidateMap[key] ===undefined){
+              selectedCandidateMap[key]=current[0].id
+            }
 
-@subjectIs(owner) {
-  <form action="@if(editMode) {@routes.TestSuiteController.doEditTestSuite()} else {
-    @routes.TestSuiteController.doCreateTestSuite()
-  }" method="post" id="testSuiteForm">
-  }
-
-@if(frm.hasGlobalErrors) {
-  <p class="alert alert-danger">
-  @frm.globalError.message
-  </p>
-}
-
-  <div class="row"><div class="col-md-6">
-    <table class="topCells paddedTable noWrap formInput">
-      <tr><td>
-        Test Suite Name:</td><td><input @subjectIsnt(owner) {
-        readonly='true'
-      } type="text" name="name" value="@frm("name").value()" />
-        @subjectIs(owner) {
-          @formChecker(frm("name"))
-        }
-      </td>
-      </tr>
-      <tr><td>
-        Short Description:</td><td><input @subjectIsnt(owner) {
-        readonly='true'
-      } type="text" name="shortDescription" value="@frm("shortDescription").value()" />
-        @subjectIs(owner) {
-          @formChecker(frm("shortDescription"))
-        }
-      </td></tr>
-      <tr><td>Visibility:</td><td>
-      @subjectIsOr(owner) {
-        <select id="visibility" name="visibility" >
-        @for(vis <- Visibility.values()) {
-          @if(vis == frm("visibility").value) {
-            <option selected="selected" value="@vis">@vis</option>
-          } else {
-            <option value="@vis">@vis</option>
+            $('#selectorTableBody').append('<tr><td>' + key + '</td><td><select ' +
+                @subjectIsnt(owner){'disabled="true"' + } 'onchange="updateCandidate($(this))" title="' + key + '">' + options + '</select></td></tr>');
           }
         }
-        </select>
-      } {
-        <span class="label label-info label-aligned">@frm("visibility").value</span>
-      }
-      </td></tr>
 
-    </table>
-  </div><div class="col-md-6">
-    <table class="topCells paddedTable noWrap formInput">
-      <tr><td>
-        Parameters:</td><td><textarea @subjectIsnt(owner) {
-        readonly='true'
-      } name="mtdlParameters" rows="4">@frm("mtdlParameters").value()</textarea></td></tr>
-      <tr><td>
-        Preemption Policy:</td><td>
-      @subjectIsOr(owner) {
-        <input type='radio' name="preemptionPolicy" value='FAIR' @{
-          "checked".when(frm("preemptionPolicy").value != "GREEDY")
-        }/>&nbsp;Fair&nbsp;&nbsp;&nbsp;<input type='radio' name="preemptionPolicy" value='GREEDY' @{
-          "checked".when(frm("preemptionPolicy").value == "GREEDY")
-        }/>&nbsp;Greedy
-      } {
-        <span class="label label-info label-aligned">@frm("preemptionPolicy").value</span>
-      }
-      </td></tr>
-    </table>
-  </div></div>
+        function updateCandidate(select){
+          selectedCandidateMap[select.prop('title')] = parseInt(select.val())
+        }
 
-  <input type="hidden" name="id" id="id" value='@frm("id").value' />
-  <input type="hidden" name="groupId" id="groupId" value='@frm("groupId").value' />
-  <input type="hidden" id="selectedCandidateMap" name="selectedCandidateMap" id="selectedCandidateMap" value='@{
-    frm("selectedCandidateMap").value
-  }' />
-  <input type="hidden" id="tdlArray" name="tdlArray" id="tdlArray" value='@{
-    frm("tdlArray").value
-  }' />
-  <hr />
+        function submitFrom(){
+          var target = $('.ajaxContent')
+          spin(target[0])
+          $('#selectedCandidateMap').val(JSON.stringify(selectedCandidateMap))
+          $('#tdlArray').val(JSON.stringify(tdlArray))
+          ajaxRouteGet($('#testSuiteForm'), null, function(){
+            showInfoDialog('Success', 'The test suite was saved successfully!',
+                function(){
+                  stopSpin(target[0])
+                  @if(!editMode){
+                  debugger;
+                  window.location.href='@controllers.routes.GroupController.getGroupDetailView(frm("groupId").value.toLong, "suites")'
+                  }
+                })
+          }, target)
+        }
 
-@defining(TestGroup.findById(frm("groupId").value.toLong)) { group =>
-  <div class="row">
-    <div class="col-md-6">
-      @candidateTDLList(group, owner)
-    </div>
-    <div class="col-md-6">
-    @nameAdapterSelector()
-    </div>
-  </div>
-}
-  <hr />
-@subjectIs(owner) {
-  <div align="center">
-    <button type="button" class="btn btn-success btn-sm" onclick="submitFrom()">Save</button> &nbsp;
-    <button type="button" class="btn btn-primary btn-sm" onclick="resetForm()">
-      Reset</button> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-    @if(!editMode) {
-      <button type="button" onclick="history.back ( )" class="btn btn-warning btn-sm">Cancel</button>
+        $(function(){
+          resetTDLS()
+        })
+
+        function resetForm(){
+          $('#testSuiteForm')[0].reset();
+
+          resetTDLS()
+        }
+
+        function resetTDLS(){
+          var tmp = $('#selectedCandidateMap').val()
+          if(tmp !== undefined && tmp.length !== 0){
+            selectedCandidateMap = JSON.parse($('#selectedCandidateMap').val())
+          } else {
+            return;
+          }
+
+          tmp = $('#tdlArray').val()
+          if(tmp.length !== 0){
+            tdlArray = JSON.parse($('#tdlArray').val())
+            for(idx in tdlArray){
+              $('#checkBox_' + tdlArray[idx]).prop('checked', true)
+            }
+            var r = jsRoutes.controllers.TestSuiteController.getNamesAndAdaptersForTdls()
+            $.ajax({
+              url: r.url,
+              type: 'POST',
+              dataType: "json",
+              contentType: "application/json; charset=utf-8",
+              data: JSON.stringify(tdlArray),
+              success: reconstructListAsync,
+              error: function(data){
+                showError(data.responseText)
+              }
+            })
+          }
+        }
+
+    </script>
+
+
+
+    @{
+      Html("<h2>Create New Test Suite</h2>".when(!editMode))
     }
-  </div>
-}
-@subjectIs(owner) {
-</form>
-}
+
+    @subjectIs(owner) {
+      <form action="@if(editMode) {@routes.TestSuiteController.doEditTestSuite()} else {
+        @routes.TestSuiteController.doCreateTestSuite()
+      }" method="post" id="testSuiteForm">
+      }
+
+    @if(frm.hasGlobalErrors) {
+      <p class="alert alert-danger">
+      @frm.globalError.message
+      </p>
+    }
+
+    <div class="row"><div class="col-md-6">
+      <table class="topCells paddedTable noWrap formInput">
+        <tr><td>
+          Test Suite Name:</td><td><input @subjectIsnt(owner) {
+          readonly='true'
+        } type="text" name="name" value="@frm("name").value()" />
+          @subjectIs(owner) {
+            @formChecker(frm("name"))
+          }
+        </td>
+        </tr>
+        <tr><td>
+          Short Description:</td><td><input @subjectIsnt(owner) {
+          readonly='true'
+        } type="text" name="shortDescription" value="@frm("shortDescription").value()" />
+          @subjectIs(owner) {
+            @formChecker(frm("shortDescription"))
+          }
+        </td></tr>
+        <tr><td>Visibility:</td><td>
+        @subjectIsOr(owner) {
+          <select id="visibility" name="visibility" >
+          @for(vis <- Visibility.values()) {
+            @if(vis == frm("visibility").value) {
+              <option selected="selected" value="@vis">@vis</option>
+            } else {
+              <option value="@vis">@vis</option>
+            }
+          }
+          </select>
+        } {
+          <span class="label label-info label-aligned">@frm("visibility").value</span>
+        }
+        </td></tr>
+
+      </table>
+    </div><div class="col-md-6">
+      <table class="topCells paddedTable noWrap formInput">
+        <tr><td>
+          Parameters:</td><td><textarea @subjectIsnt(owner) {
+          readonly='true'
+        } name="mtdlParameters" rows="4">@frm("mtdlParameters").value()</textarea></td></tr>
+        <tr><td>
+          Preemption Policy:</td><td>
+        @subjectIsOr(owner) {
+          <input type='radio' name="preemptionPolicy" value='FAIR' @{
+            "checked".when(frm("preemptionPolicy").value != "GREEDY")
+          }/>&nbsp;Fair&nbsp;&nbsp;&nbsp;<input type='radio' name="preemptionPolicy" value='GREEDY' @{
+            "checked".when(frm("preemptionPolicy").value == "GREEDY")
+          }/>&nbsp;Greedy
+        } {
+          <span class="label label-info label-aligned">@frm("preemptionPolicy").value</span>
+        }
+        </td></tr>
+      </table>
+    </div></div>
+
+    <input type="hidden" name="id" id="id" value='@frm("id").value' />
+    <input type="hidden" name="groupId" id="groupId" value='@frm("groupId").value' />
+    <input type="hidden" id="selectedCandidateMap" name="selectedCandidateMap" id="selectedCandidateMap" value='@{
+      frm("selectedCandidateMap").value
+    }' />
+    <input type="hidden" id="tdlArray" name="tdlArray" id="tdlArray" value='@{
+      frm("tdlArray").value
+    }' />
+    <hr />
+
+    @defining(TestGroup.findById(frm("groupId").value.toLong)) { group =>
+      <div class="row">
+        <div class="col-md-6">
+          @candidateTDLList(group, owner)
+        </div>
+        <div class="col-md-6">
+        @nameAdapterSelector()
+        </div>
+      </div>
+    }
+    <hr />
+    @subjectIs(owner) {
+      <div align="center">
+        <button type="button" class="btn btn-success btn-sm" onclick="submitFrom()">Save</button> &nbsp;
+        <button type="button" class="btn btn-primary btn-sm" onclick="resetForm()">
+          Reset</button> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        @if(!editMode) {
+          <button type="button" onclick="history.back ( )" class="btn btn-warning btn-sm">Cancel</button>
+        }
+      </div>
+    }
+    @subjectIs(owner) {
+    </form>
+    }
+  }
 }

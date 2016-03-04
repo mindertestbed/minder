@@ -2,7 +2,7 @@ organization := "gov.tubitak.minder"
 
 name := """minder"""
 
-version := "1.6-B0001"
+version := "1.6-RC1"
 
 lazy val minder = (project in file(".")).enablePlugins(PlayJava, PlayEbean)
 
@@ -36,10 +36,11 @@ libraryDependencies ++= Seq(
   "gov.tubitak.minder" %% "minder-tdl" % "0.5",
   "org.webjars" % "webjars-play_2.11" % "2.4.0-1",
   "org.webjars" % "bootstrap" % "3.3.6",
-  "net.sf.jasperreports" % "jasperreports" % "6.0.0",
-  "net.sourceforge.barbecue" % "barbecue" % "1.5-beta1",
   "org.codehaus.groovy" % "groovy" % "2.3.9",
   "gov.tubitak.minder" % "minder-gitb-bridge-common" % "0.0.1",
+  "org.xhtmlrenderer" % "flying-saucer-pdf" % "9.0.7",
+  "com.itextpdf" % "itextpdf" % "5.5.8",
+  "com.itextpdf.tool" % "xmlworker" % "5.5.8",
   "junit" % "junit" % "4.12" % Test
 )
 
@@ -47,13 +48,12 @@ resolvers ++= Seq(
   "Apache" at "http://repo1.maven.org/maven2/",
   "jBCrypt Repository" at "http://repo1.maven.org/maven2/org/",
   "scalaz-bintray" at "http://dl.bintray.com/scalaz/releases",
-  "play-easymail (release)" at "http://joscha.github.io/play-easymail/repo/releases/",
   "Objectify Play Repository" at "http://schaloner.github.io/releases/",
   "play-authenticate (release)" at "http://joscha.github.io/play-authenticate/repo/releases/",
   "jasper" at "http://jaspersoft.artifactoryonline.com/jaspersoft/third-party-ce-artifacts/"
 )
 
-includeFilter in (Assets, LessKeys.less) := "ui2.less" | "oldui.less"
+includeFilter in(Assets, LessKeys.less) := "ui2.less" | "oldui.less"
 
 import com.typesafe.sbt.SbtAspectj.AspectjKeys.{binaries, inputs}
 import com.typesafe.sbt.SbtAspectj.{Aspectj, aspectjSettings, compiledClasses}

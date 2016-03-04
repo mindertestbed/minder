@@ -28,9 +28,18 @@ create index ix_TestRun_suiteRun_24 on TestRun (suite_run_id);
 
 alter table abstract_job
   drop constraint fk_abstract_job_testSuite_3,
-  add constraint fk_abstract_job_testSuite_3 foreign key (test_suite_id) references TestSuite (id) on delete cascade;
+  add constraint fk_abstract_job_testSuite_3 foreign key (test_suite_id) references TestSuite (id) ON DELETE CASCADE ON UPDATE CASCADE ;
+
+alter table testrun
+  drop constraint fk_testrun_job_20,
+  add constraint fk_testrun_job_20 foreign key (job_id) references abstract_job (id) ON DELETE CASCADE ON UPDATE CASCADE ;
 
 # --- !Downs
+
+alter table testrun
+drop constraint fk_testrun_job_20,
+add constraint fk_testrun_job_20 foreign key (job_id) references abstract_job (id);
+
 
 alter table abstract_job
   drop constraint fk_abstract_job_testSuite_3,

@@ -11,7 +11,7 @@ import play.api.libs.iteratee.{Concurrent, Enumeratee}
 import play.api.mvc._
 import scala.collection.JavaConversions._
 
-object LogFeeder extends Controller {
+object TestLogFeeder extends Controller {
   val (logOut, logChannel) = Concurrent.broadcast[LogRecord];
 
   val currentLog = Collections.synchronizedList(new util.ArrayList[LogRecord]())

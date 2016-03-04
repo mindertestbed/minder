@@ -204,6 +204,7 @@ function ajaxRouteGet(playAjaxObject, params, successTarget, failTarget) {
   }
 
   var successFunctionDelegate = successTarget;
+  var spinner = null
   //if the user provided a JQuery object, then use its html function
   if (!isFunction(successTarget)) {
     //is it a dialog
@@ -211,15 +212,17 @@ function ajaxRouteGet(playAjaxObject, params, successTarget, failTarget) {
       //yes
       successTarget.repaint("")
       spin(successTarget.contentPane[0])
+      spinner = successTarget.contentPane[0].spinner
       successFunctionDelegate = function (data) {
-        successTarget.contentPane[0].spinner.stop()
+        spinner.stop()
         successTarget.repaint(data)
       }
     } else if (typeof successTarget.html === 'function') {
       //no its not a dialog, but it has a html() function
       spin(successTarget[0])
+      spinner = successTarget[0].spinner
       successFunctionDelegate = function (data) {
-        successTarget[0].spinner.stop()
+        spinner.stop()
         successTarget.html(data)
       }
     } else {
@@ -247,6 +250,9 @@ function ajaxRouteGet(playAjaxObject, params, successTarget, failTarget) {
   $.ajax(ajaxObject).done(function (data) {
     successFunctionDelegate(data)
   }).fail(function (data) {
+    if (spinner != null)
+      spinner.stop()
+
     if (typeof failTarget === 'undefined' || failTarget === null) {
       showError(data.responseText)
     } else {

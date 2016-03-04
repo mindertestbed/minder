@@ -43,7 +43,7 @@ public class TestSuite extends Model {
   public PreemptionPolicy preemptionPolicy;
 
   @OneToMany(cascade = CascadeType.ALL, mappedBy = "testSuite")
-  public List<SuiteJob> jobs;
+  public List<Job> jobs;
 
   @OneToMany(cascade = CascadeType.ALL, mappedBy = "testSuite")
   public List<SuiteRun> run;

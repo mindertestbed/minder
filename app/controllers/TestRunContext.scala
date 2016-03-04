@@ -3,8 +3,7 @@ package controllers
 import java.util
 
 import builtin.ReportGenerator
-import controllers.LogFeeder
-import controllers.LogFeeder.LogRecord
+import controllers.TestLogFeeder.LogRecord
 import controllers.common.enumeration.TestStatus
 import minderengine._
 import models.Wrapper
@@ -89,6 +88,7 @@ class TestRunContext(val testRun: TestRun) extends Runnable with TestProcessWatc
 
   /**
     * This callback comes from the engine so that we can create our status data structure and later update it.
+ *
     * @param slotDefs
     */
   def describe(slotDefs: util.List[Rivet]): Unit = {
@@ -131,14 +131,14 @@ class TestRunContext(val testRun: TestRun) extends Runnable with TestProcessWatc
 
   override def addLog(log: String): Unit = {
     logStringBuilder.append(log)
-    LogFeeder.log(LogRecord(testRun, log))
+    TestLogFeeder.log(LogRecord(testRun, log))
   }
 
 
   override def addReportLog(log: String): Unit = {
     reportLogBuilder.append(log)
     logStringBuilder.append(log)
-    LogFeeder.log(LogRecord(testRun, log))
+    TestLogFeeder.log(LogRecord(testRun, log))
   }
 
   def updateRun(): Unit = {

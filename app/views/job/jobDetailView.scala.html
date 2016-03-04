@@ -3,14 +3,15 @@
 @import security.Role
 
 @(job: Job, showHistory: Boolean = true, localUser: models.User = null)
-  @main(Messages("minder.navigation.restricted.testdesigner"), "testGroups",
-    Array(("Test Groups", controllers.routes.Application.testGroups().path()),
-      (job.tdl.testCase.testAssertion.testGroup.name, controllers.routes.GroupController.getGroupDetailView(job.tdl.testCase.testAssertion.testGroup.id, "assertions").path()),
-      (job.tdl.testCase.testAssertion.taId, controllers.routes.TestAssertionController.getAssertionDetailView(job.tdl.testCase.testAssertion.id, "cases").path()),
-      (job.tdl.testCase.name, controllers.routes.TestCaseController.viewTestCase(job.tdl.testCase.id, "jobs").path()),
-      (job.name, controllers.routes.JobController.displayJob(job.id, true).path())
-    )) {
+@main(Messages("minder.navigation.restricted.testdesigner"), "testGroups",
+  Array(("Test Groups", controllers.routes.Application.testGroups().path()),
+    (job.tdl.testCase.testAssertion.testGroup.name, controllers.routes.GroupController.getGroupDetailView(job.tdl.testCase.testAssertion.testGroup.id, "assertions").path()),
+    (job.tdl.testCase.testAssertion.taId, controllers.routes.TestAssertionController.getAssertionDetailView(job.tdl.testCase.testAssertion.id, "cases").path()),
+    (job.tdl.testCase.name, controllers.routes.TestCaseController.viewTestCase(job.tdl.testCase.id, "jobs").path()),
+    (job.name, controllers.routes.JobController.displayJob(job.id, true).path())
+  )) {
 
+  <div class="padabit">
     @dialogs()
     @jobEnqueueDialog()
 
@@ -31,7 +32,10 @@
     </script>
 
 
-    <h3>Job
+    <h3>
+
+    @if(job.testSuite == null) {
+      Job
       <span id="name@{
         job.id
       }"
@@ -40,12 +44,17 @@
         }
       class="hl editable"></span>
       <input type="hidden" value="@job.name"/>
-
+    } else {
+      Suite Job
+      <span style="color:black">@job.name</span>
+    }
     </h3>
 
     <div class="container-fluid">
       <div class="row">
-        <div class="col-md-@{global.Util.remaining}">
+        <div class="col-md-@{
+          global.Util.remaining
+        }">
           <div class="row">
             <div class="col-md-12">
               <table class="table table-condensed table-striped table-hover">
@@ -62,6 +71,22 @@
                     </a>
                   </td>
                 </tr>
+
+
+
+                @if(job.testSuite != null) {
+                  <tr>
+                    <th>Test Suite</th><td>
+                    <a href='@controllers.routes.TestSuiteController.getTestSuiteDetailView(job.testSuite.id, "status")'>
+                    @{
+                      job.testSuite.name
+                    }</a>
+                  </td>
+                  </tr>
+                }
+
+
+
                 <tr>
                   <th>Test Assertion:</th>
                   <td>
@@ -83,16 +108,23 @@
                     </a>
                   </td>
                 </tr>
+
                 <tr><th>Parameters:</th>
                   <td>
+                  @if(job.testSuite == null) {
                     <span id="params@{
                       job.id
                     }"
+
                       @subjectIs(job.owner) {
                         onclick='showUpdateTextAreaDialog(@job.id, "mtdlParameters", $(this).next(), "@controllers.routes.JobController.doEditJobField()")'
                       }
-                    class="hl editable"></span>
+                    class="hl editable"
+                    ></span>
                     <input type="hidden" value="@job.mtdlParameters"/>
+                  } else {
+                    @job.mtdlParameters
+                  }
                   </td>
                 </tr>
 
@@ -125,24 +157,35 @@
           </div>
           <div class="row">
             <div class="col-md-12">
-              @decideOnVisibility(job.visibility, job.owner, security.Role.TEST_DESIGNER) {
-                <button id="enqueue" type="button" class="btn btn-success btn-sm" onclick='enqueue("@{job.name}", @{job.id}, "@{job.visibility}")' title="Enqueue">
-                  <span class="glyphicon glyphicon-play"></span>
+              @if(job.testSuite == null) {
+                @decideOnVisibility(job.visibility, job.owner, security.Role.TEST_DESIGNER) {
+                  <button id="enqueue" type="button" class="btn btn-success btn-sm" onclick='enqueue("@{job.name}", @{job.id}, "@{job.visibility}")' title="Enqueue">
+                    <span class="glyphicon glyphicon-play"></span> Enqueue
+                  </button>
+                }
+
+                <button type="button" class="btn btn-primary btn-sm" onclick='window.location="@controllers.routes.Application.jobQueue()"' title="Test Monitor">
+                  <span class="glyphicon glyphicon-tasks"></span> Test Monitor
                 </button>
+              } else{
+                <mark>Please navigate to the test suite <a href='@controllers.routes.TestSuiteController.getTestSuiteDetailView(job.testSuite.id, "status")'>
+                @{
+                  job.testSuite.name
+                }</a> to run this job</mark>
               }
-              <button type="button" class="btn btn-primary btn-sm" onclick='window.location="@controllers.routes.Application.jobQueue()"' title="Test Monitor">
-                <span class="glyphicon glyphicon-tasks"></span>
-              </button>
+
             </div>
           </div>
 
           <div class="row">
             <div class="col-md-12">
-              @testRunLister(job.id)
+            @testRunLister(job.id)
             </div>
           </div>
         </div>
-        <div class="col-md-@{global.Util.feedWidth}">
+        <div class="col-md-@{
+          global.Util.feedWidth
+        }">
           @*Right side of the page, up *@
           @jobQueueFeed()
           @*Right side of the page, down *@
@@ -161,4 +204,5 @@
           bindValues($("#params@{job.id}"))
         })
     </script>
-  }
+  </div>
+}
