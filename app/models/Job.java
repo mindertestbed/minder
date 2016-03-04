@@ -42,6 +42,10 @@ public class Job extends AbstractJob {
     return find.where().eq("tdl", tdl).eq("name", name).findUnique();
   }
 
+  public static List<Job> findByTestSuite(TestSuite testSuite) {
+    return find.where().eq("testSuite", testSuite).setOrderBy("name").findList();
+  }
+
   public static Job findByName(String name) {
     return find.where().eq("name", name).findUnique();
   }

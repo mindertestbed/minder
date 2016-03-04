@@ -129,7 +129,7 @@
     </table>
     <table class="table table-striped">
       <tr><th>&nbsp;</th><th>Test Assertion</th><th>Test Case</th><th>MTDL Script Version</th></tr>
-      @for(job <- testSuite.jobs) {
+      @for(job <- Job.findByTestSuite(testSuite)) {
         <tr>
 
           <td class="tabshrink"><input type="checkbox" id="checkBox@{

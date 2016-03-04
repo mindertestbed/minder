@@ -9,7 +9,8 @@ import java.util.List;
  * Created by yerlibilgin on 22/12/14.
  */
 @Entity
-@Table(name = "TestCase")
+@Table(name = "TestCase",
+    uniqueConstraints = {@UniqueConstraint(columnNames = {"testAssertion", "name"})})
 public class TestCase extends Model {
   @Id
   public long id;
@@ -18,7 +19,7 @@ public class TestCase extends Model {
   @Column(nullable = false)
   public TestAssertion testAssertion;
 
-  @Column(unique = true, nullable = false)
+  @Column(nullable = false)
   public String name;
 
   @ManyToOne

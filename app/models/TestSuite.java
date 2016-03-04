@@ -16,7 +16,7 @@ public class TestSuite extends Model {
   @Id
   public long id;
 
-  @Column(unique = true, nullable = false)
+  @Column(nullable = false)
   public String name;
 
   @Column(nullable = false, length = ModelConstants.SHORT_DESC_LENGTH, columnDefinition = "TEXT")
