@@ -10,7 +10,7 @@ import java.util.List;
  */
 @Entity
 @Table(name = "TestCase",
-    uniqueConstraints = {@UniqueConstraint(columnNames = {"testAssertion", "name"})})
+    uniqueConstraints = {@UniqueConstraint(columnNames = {"test_assertion_id", "name"})})
 public class TestCase extends Model {
   @Id
   public long id;
@@ -28,7 +28,7 @@ public class TestCase extends Model {
 
   private static final Finder<Long, TestCase> find = new Finder<>(TestCase.class);
 
-  @OneToMany
+  @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
   public List<Tdl> tdls;
 
   public static TestCase findById(Long id) {

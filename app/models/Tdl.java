@@ -31,13 +31,13 @@ public class Tdl extends Model {
     @Column(nullable = false)
     public String version;
 
-    @OneToMany
+    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     public List<AbstractJob> jobs;
 
     public Date creationDate;
 
 
-    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     public List<WrapperParam> parameters;
 
     private static final Finder<Long, Tdl> find = new Finder<>(Tdl.class);

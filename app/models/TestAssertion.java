@@ -10,7 +10,7 @@ import java.util.List;
  */
 @Entity
 @Table(name = "TestAssertion",
-    uniqueConstraints = {@UniqueConstraint(columnNames = {"testGroup", "taId"})})
+    uniqueConstraints = {@UniqueConstraint(columnNames = {"test_group_id", "ta_id"})})
 public class TestAssertion extends Model {
   @Id
   public Long id;

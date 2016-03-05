@@ -12,7 +12,9 @@ import java.util.List;
  * Created by yerlibilgin on 18/05/15.
  */
 @Entity
-@Table(name = "UtilClass")
+@Table(name = "UtilClass", uniqueConstraints = {
+    @UniqueConstraint(columnNames = {"test_group_id", "name"})
+})
 public class UtilClass extends Model {
     @Id
     public long id;

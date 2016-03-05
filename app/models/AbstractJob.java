@@ -45,7 +45,7 @@ public abstract class AbstractJob extends Model {
   public String mtdlParameters;
 
 
-  @OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL, mappedBy = "job")
+  @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, mappedBy = "job")
   public List<MappedWrapper> mappedWrappers;
 
   @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, mappedBy = "job")

@@ -11,13 +11,24 @@ import java.util.List;
  * @date: 14/09/15.
  */
 @Entity
-@Table(name = "TestSuite")
+@Table(name = "TestSuite", uniqueConstraints = {
+    @UniqueConstraint(columnNames = {"test_group_id", "name"})
+})
 public class TestSuite extends Model {
   @Id
   public long id;
 
+
+
+  @ManyToOne
+  @Column(nullable = false)
+  public TestGroup testGroup;
+
+
+
   @Column(nullable = false)
   public String name;
+
 
   @Column(nullable = false, length = ModelConstants.SHORT_DESC_LENGTH, columnDefinition = "TEXT")
   public String shortDescription;
@@ -34,9 +45,6 @@ public class TestSuite extends Model {
   @Column(nullable = false)
   public User owner;
 
-  @ManyToOne
-  @Column(nullable = false)
-  public TestGroup testGroup;
 
   public Visibility visibility;
 

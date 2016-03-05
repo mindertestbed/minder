@@ -19,31 +19,14 @@ create table SuiteRun (
 
 ALTER TABLE testrun ADD COLUMN suite_run_id bigint;
 
-ALTER TABLE SuiteRun add constraint fk_SuiteRun_testSuite_12 foreign key (test_suite_id) references TestSuite (id) ON DELETE CASCADE ON UPDATE CASCADE ;
+ALTER TABLE SuiteRun add constraint fk_SuiteRun_testSuite_12 foreign key (test_suite_id) references TestSuite (id);
 create index ix_SuiteRun_testSuite_12 on SuiteRun (test_suite_id);
 ALTER TABLE SuiteRun add constraint fk_SuiteRun_runner_13 foreign key (runner_id) references Users (id);
 create index ix_SuiteRun_runner_13 on SuiteRun (runner_id);
-ALTER TABLE TestRun add constraint fk_TestRun_suiteRun_24 foreign key (suite_run_id) references SuiteRun (id) ON DELETE CASCADE ON UPDATE CASCADE ;
+ALTER TABLE TestRun add constraint fk_TestRun_suiteRun_24 foreign key (suite_run_id) references SuiteRun (id);
 create index ix_TestRun_suiteRun_24 on TestRun (suite_run_id);
 
-alter table abstract_job
-  drop constraint fk_abstract_job_testSuite_3,
-  add constraint fk_abstract_job_testSuite_3 foreign key (test_suite_id) references TestSuite (id) ON DELETE CASCADE ON UPDATE CASCADE ;
-
-alter table testrun
-  drop constraint fk_testrun_job_20,
-  add constraint fk_testrun_job_20 foreign key (job_id) references abstract_job (id) ON DELETE CASCADE ON UPDATE CASCADE ;
-
 # --- !Downs
-
-alter table testrun
-drop constraint fk_testrun_job_20,
-add constraint fk_testrun_job_20 foreign key (job_id) references abstract_job (id);
-
-
-alter table abstract_job
-  drop constraint fk_abstract_job_testSuite_3,
-  add constraint fk_abstract_job_testSuite_3 foreign key (test_suite_id) references TestSuite (id);
 
 ALTER TABLE testrun DROP COLUMN suite_run_id;
 DROP  TABLE if exists SuiteRun cascade;
