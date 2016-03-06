@@ -88,7 +88,7 @@ public class ReportUtils {
         .replace("${taID}", testAssertion.taId)
         .replace("${testGroup}", testAssertion.testGroup.name)
         .replace("${testCase}", tr.job.tdl.testCase.name)
-        .replace("${user}", tr.runner.email)
+        .replace("${user}", tr.runner.name)
         .replace("${date}", Util.formatDate(tr.date))
         .replace("${systemsTested}", getNonNullString(tr.sutNames))
         .replace("${resultCharacter}", tr.success ? checkString : crossString)

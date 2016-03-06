@@ -12,9 +12,18 @@
 
   @subjectHasRole(security.Role.TEST_DESIGNER) {
     <script>
+
+      var popoverOpen=false
+        document.onclick = function(){
+          console.log('click')
+          if(popoverOpen){
+            $('#reconstructButton').popover('destroy')
+          }
+        }
+
         var tdlArray = []
         var candidateMap = {}
-        var selectedCandidateMap = {}
+        var selectedCandidateMap = null
 
         function updateNameList(target){
           if(target === undefined){
@@ -84,6 +93,25 @@
         }
 
         function submitFrom(){
+
+          if (tdlArray === undefined || tdlArray.length == 0){
+            showError('You are creating a test suite with no test cases selected. <br/>Please select at least one tdl')
+            return
+          }
+
+          if(selectedCandidateMap === null){
+            $('#reconstructButton').popover({
+              template:'<div class="popover" role="tooltip"><div class="arrow"></div>' +
+              '<h3 class="popover-title alert alert-danger" style="white-space: ' +
+              'nowrap"></h3><div class="popover-content alert alert-danger" style="border-radius: 0px;min-width:300px;"></div></div>',
+              placement: 'top'
+            })
+            $('#reconstructButton').popover('show')
+            popoverOpen=true
+            window.event.stopPropagation()
+            return
+          }
+
           var target = $('.ajaxContent')
           spin(target[0])
           $('#selectedCandidateMap').val(JSON.stringify(selectedCandidateMap))

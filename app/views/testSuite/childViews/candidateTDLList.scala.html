@@ -34,8 +34,10 @@ font-size: small;
           Latest</button>
         <button class="btn btn-xs btn-warning" style="margin-bottom: 5px ;" type="button" onclick='$(".tdlVersionInput").prop("checked", false);updateNameList()'><span class="fa fa-square-o">&nbsp;</span>
           None</button></td>
-      <td align="right"><button class="btn btn-xs btn-danger" style="margin-bottom: 5px ;" type="button" onclick='reconstructList()' title="Reconstruct the candidate adapter list"><span class="fa fa-angle-double-right">&nbsp;</span>
-        List</button></td>
+      <td align="right">
+
+        <a tabindex="0" class="btn btn-xs btn-danger fa fa-angle-double-right" role="button" id="reconstructButton"  data-toggle="popover" onclick='reconstructList()' data-trigger="focus" title="Warning" data-content='Please click this button to select possible adapter candidates.'>List</a>
+      </td>
     </tr>
   </table>
 }

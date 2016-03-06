@@ -52,7 +52,8 @@ public abstract class AbstractJob extends Model {
   public List<TestRun> testRuns;
 
   public static void deleteById(Long id) {
-    com.avaje.ebean.SqlUpdate qu = Ebean.createSqlUpdate("delete from abstract_job where id=" + id);
-    qu.execute();
+    AbstractJob aj = findById(id);
+    if (aj != null)
+      aj.delete();
   }
 }

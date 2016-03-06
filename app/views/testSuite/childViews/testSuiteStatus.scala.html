@@ -129,41 +129,42 @@
     </table>
     <table class="table table-striped">
       <tr><th>&nbsp;</th><th>Test Assertion</th><th>Test Case</th><th>MTDL Script Version</th></tr>
-      @for(job <- Job.findByTestSuite(testSuite)) {
-        <tr>
-
-          <td class="tabshrink"><input type="checkbox" id="checkBox@{
-            job.id
-          }" onchange='updateSelectedJobList(this, @job.id)'/>
-          </td>
-
-
-          <td>
-            <a href="@controllers.routes.TestAssertionController.getAssertionDetailView(job.tdl.testCase.testAssertion.id, "cases")">
-            @{
-              job.tdl.testCase.testAssertion.taId
-            }
-            </a>
-          </td>
+      @defining(new java.util.concurrent.atomic.AtomicInteger(1)) { index =>
+        @for(job <- Job.findByTestSuite(testSuite)) {
+          <tr>
+            <td class="tabshrink">@index.getAndIncrement(). &nbsp; <input type="checkbox" id="checkBox@{
+              job.id
+            }" onchange='updateSelectedJobList(this, @job.id)'/>
+            </td>
 
 
-          <td>
-            <a href="@controllers.routes.TestCaseController.viewTestCase(job.tdl.testCase.id, "jobs")">
-            @{
-              job.tdl.testCase.name
-            }</a>
-          </td>
+            <td>
+              <a href="@controllers.routes.TestAssertionController.getAssertionDetailView(job.tdl.testCase.testAssertion.id, "cases")">
+              @{
+                job.tdl.testCase.testAssertion.taId
+              }
+              </a>
+            </td>
+
+
+            <td>
+              <a href="@controllers.routes.TestCaseController.viewTestCase(job.tdl.testCase.id, "jobs")">
+              @{
+                job.tdl.testCase.name
+              }</a>
+            </td>
 
 
 
-          <td>
-            <a href="@controllers.routes.TestCaseController.viewTestCase2(job.tdl.testCase.id, job.tdl.id, "jobs")">
-            @{
-              job.tdl.version
-            }</a>
-          </td>
+            <td>
+              <a href="@controllers.routes.TestCaseController.viewTestCase2(job.tdl.testCase.id, job.tdl.id, "jobs")">
+              @{
+                job.tdl.version
+              }</a>
+            </td>
 
-        </tr>
+          </tr>
+        }
       }
     </table>
   </div>
