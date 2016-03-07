@@ -48,7 +48,7 @@
                       <tr><td>
                         <label for="@field.name" class="control-label">@entry.wrapperParam.name</label>:
                       </td><td><select id="@entry.wrapperParam.id" name="@field.name" style="width:200px ;">
-                      @for(wrapperVersion <- JobController.listFittingWrappers(entry)) {
+                      @for(wrapperVersion <- global.Util.listCandidateAdapters(entry)) {
                         <option value="@entry.toJsonWith(wrapperVersion)"
                           @if(entry.wrapperVersion == wrapperVersion) {
                             selected="selected" }>@{

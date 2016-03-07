@@ -1,24 +1,156 @@
-<div id="dialog-confirm" title=""  style="display:none">
-  <p><span class="ui-icon ui-icon-alert" style="float:left; margin:0 7px 20px 0;"></span>
+<div id="dialog-confirm" title="" style="display:none">
+  <p><span class="ui-icon ui-icon-alert" style="float:left ; margin:0 7px 20px 0 ;"></span>
     The <span class="itemtype"></span> <b><span class="itemname"></span></b> will be deleted. Are you sure?</p>
 </div>
 
 <div id="mainDialog" title="" style="display:none" class="absofull">
-  <form method="post" id="mainForm" style="height:100%;">
+  <form method="post" id="mainForm" style="height:100% ;">
   </form>
 </div>
 
-<div id="errorDialog" title="Error" style="display:none">
-</div>
-
 <div id="updateInputTextDialog" title="Update Field" style="display:none">
-  <input type="text" style="width:100%;" value=""/>
+  <input type="text" style="width:100% ;" value=""/>
 </div>
 
 <div id="updateTextAreaDialog" title="Update Field" style="display:none">
-  <textarea style="width:100%;height:100%;overflow:scroll;"></textarea>
+  <textarea style="width:100% ; height:100% ; overflow:scroll ;"></textarea>
 </div>
 
 <div id="updateOptionDialog" title="Update Field" style="display:none">
-  <select style="width:100%;height:100%;overflow:scroll;"></select>
+  <select style="width:100% ; height:100% ; overflow:scroll ;"></select>
 </div>
+
+
+  <!-- the above ones are the good old jquery dialogs -->
+  <!-- below ones are bootstrap -->
+
+<div class="modal fade" id='myAlertDialog' tabindex="-1" role="dialog">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title" id="gridSystemModalLabel"></h4>
+      </div>
+      <div class="modal-body alert alert-success">
+
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal fade" id='myErrorDialog' tabindex="-1" role="dialog">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title" id="gridSystemModalLabel"></h4>
+      </div>
+      <div class="modal-body alert alert-danger" style="overflow: scroll;">
+
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal fade" id='myQuestionDialog' tabindex="-1" role="dialog">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title" id="gridSystemModalLabel"></h4>
+      </div>
+      <div class="modal-body">
+
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-success" data-dismiss="modal">Ok</button>
+        <button type="button" class="btn btn-warning" data-dismiss="modal">Cancel</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+
+function showInfoDialog(title, body, onClose){
+  $('#myAlertDialog .modal-title').html(title)
+  $('#myAlertDialog .modal-body').html(body)
+
+  var dialog = $('#myAlertDialog');if (onClose !== undefined && onClose !== null){
+    dialog.on('hidden.bs.modal', function (e) {
+      onClose()
+    })
+  }
+  dialog.modal({keyboard:true})
+}
+
+
+function showInputDialog(title, data, initial, accept, reject){
+
+  $('#myQuestionDialog .modal-title').html(title)
+
+  if(isArray(data)){
+    var str = '<select class="mySelect">'
+    for(var idx in data){
+      var value = data[idx]
+      if(value===initial){
+        str += '<option selected="selected">'+value+'</option>'
+      } else {
+        str += '<option>'+value+'</option>'
+      }
+    }
+
+    str += '</select>'
+    $('#myQuestionDialog .modal-body').html(str)
+  } else {
+    $('#myQuestionDialog .modal-body').html(data + ':&nbsp;<input type="text" />')
+  }
+
+  $('#myQuestionDialog .btn-success').on('click', function(){
+    dialog.accepted=true;
+  })
+
+  $('#myQuestionDialog .btn-warning').on('click', function(){
+    dialog.accepted=false;
+  })
+
+  var dialog = $('#myQuestionDialog');
+  dialog.accepted = false
+  dialog.on('hidden.bs.modal', function (e) {
+    if(dialog.accepted){
+      if(accept !== undefined){
+        if(isArray(data)){
+          accept($('#myQuestionDialog .mySelect').val())
+        } else {
+          accept($('#myQuestionDialog .modal-body input').val())
+        }
+      }
+    } else{
+      if(reject !== undefined)
+        reject()
+    }
+
+    $('#myQuestionDialog .btn-success').off()
+    $('#myQuestionDialog .btn-warning').off()
+    dialog.off()
+  })
+
+  dialog.modal({keyboard:true})
+}
+
+
+function showError(data) {
+  $('#myErrorDialog .modal-title').html('Error')
+  $('#myErrorDialog .modal-body').html(data)
+
+  var dialog = $('#myErrorDialog');
+  dialog.modal({keyboard:true})
+}
+
+</script>

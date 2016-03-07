@@ -10,81 +10,114 @@
     ("Test Run Details", "")
   )
 ) {
-  @dialogs()
+  <div class="padabit" style="height: 100% ;">
+    @dialogs()
 
-  <div style="position:absolute ; top:0 ; left:0 ; bottom:5px ; right:0 ; padding:5px ;">
-    <div style="position:absolute ; top:2px ; left:0 ; bottom:5px ; width:300px ;">
-      <h4>Test Run Details</h4>
-      <table class="table table-hover table-striped">
-        @if(testRun.job != null) {
-          <tr>
-            <th>Test Group</th><td>
-            <a href="/getGroupDetailView?id=@{
-              testRun.job.tdl.testCase.testAssertion.testGroup.id
-            }&display=assertions">
-            @{
-              testRun.job.tdl.testCase.testAssertion.testGroup.name
-            }
-            </a>
-          </td>
-          </tr>
-          <tr>
-            <th>Test Assertion</th><td>
-            <a href="/getAssertionDetailView?id=@{
-              testRun.job.tdl.testCase.testAssertion.id
-            }">
-            @{
-              testRun.job.tdl.testCase.testAssertion.taId
-            }
-            </a>
+    <div class="container-fluid" style="height: 100% ;">
 
-          </td>
-          </tr>
-          <tr>
-            <th>Test Case</th><td>
-            <a href="/viewTestCase?id=@{
-              testRun.job.tdl.testCase.id
-            }&display=jobs">
-            @{
-              testRun.job.tdl.testCase.name
-            }
-            </a>
-          </td>
-          </tr>
-          <tr>
-            <th>Job</th><td>
-            <a href="/viewJob?id=@{
-              testRun.job.id
-            }&showHistory=true">
-            @{
-              testRun.job.name
-            }</a>
-          </td>
-          </tr>
-        }
-        <tr>
-          <th>User</th><td>@testRun.runner.email</td>
-        </tr>
-        <tr>
-          <th>
-            Visibility</th><td id="visibilityTd">@visibilityTagFragment(testRun.visibility, testRun.runner, true, true)</td>
-        </tr>
-        <tr>
-          <th>Date</th><td>@testRun.date</td>
-        </tr>
-        <tr>
-          <th>Report</th><td style="text-align: center">@reportMenu(testRun, false)</td>
-        </tr>
-      </table>
-    </div>
-    <div style="position:absolute ; top:2px ; left:300px ; bottom:4px ; right:0 ; padding: 5px ;">
-      <h4>Log</h4>
-      <textarea readonly="readonly" id="logpre"
-      style="background-color:#faffe1 ; resize: none; font-family:monospace; height:calc(100% - 1em) ; width:100%; border:1px solid #ddeee6 ; border-radius:2px ; overflow:scroll">@testRun.history.extractSystemOutputLog()</textarea>
+      <div class="row" style="height: 100% ;">
+        <div class="col-md-3">
+          <h4>Test Run Details</h4>
+          <table class="table table-hover table-striped">
 
+
+            <tr>
+              <th>Test Group</th><td>
+              <a href="/getGroupDetailView?id=@{
+                testRun.job.tdl.testCase.testAssertion.testGroup.id
+              }&display=assertions">
+              @{
+                testRun.job.tdl.testCase.testAssertion.testGroup.name
+              }
+              </a>
+            </td>
+            </tr>
+
+
+            @defining(Job.findById(testRun.job.id)) { job =>
+              @if(job != null && job.testSuite != null) {
+                <tr>
+                  <th>Test Suite</th><td>
+                  <a href='@controllers.routes.TestSuiteController.getTestSuiteDetailView(job.testSuite.id, "status")'>
+                  @{
+                    job.testSuite.name
+                  }</a>
+                </td>
+                </tr>
+              }
+            }
+
+
+            <tr>
+              <th>Test Assertion</th><td>
+              <a href="/getAssertionDetailView?id=@{
+                testRun.job.tdl.testCase.testAssertion.id
+              }">
+              @{
+                testRun.job.tdl.testCase.testAssertion.taId
+              }
+              </a>
+
+            </td>
+            </tr>
+
+
+            <tr>
+              <th>Test Case</th><td>
+              <a href="/viewTestCase?id=@{
+                testRun.job.tdl.testCase.id
+              }&display=jobs">
+              @{
+                testRun.job.tdl.testCase.name
+              }
+              </a>
+            </td>
+            </tr>
+
+
+            <tr>
+              <th>Job</th> <td>
+              <a href="/viewJob?id=@{
+                testRun.job.id
+              }&showHistory=true">
+              @{
+                testRun.job.name
+              } </a>
+            </td>
+            </tr>
+
+
+            <tr>
+              <th>User</th><td>@testRun.runner.email</td>
+            </tr>
+
+
+            <tr>
+              <th>
+                Visibility</th><td id="visibilityTd">@visibilityTagFragment(testRun.visibility, testRun.runner, true, true)</td>
+            </tr>
+
+
+            <tr>
+              <th>Date</th><td> @global.Util.formatDate(testRun.date)</td>
+            </tr>
+
+
+            <tr>
+              <th>Report</th><td style="text-align: center">@reportMenu(testRun, false)</td>
+            </tr>
+
+
+          </table>
+        </div>
+        <div class="col-md-9" style="height: 100% ;">
+          <h4>Log</h4>
+          <textarea readonly="readonly" id="logpre"
+          style="background-color:#faffe1 ; resize: none ; font-family:monospace ; height:calc(100% - 5em) ; width:100% ; border:1px solid #ddeee6 ; border-radius:2px ; overflow:scroll">@testRun.history.extractSystemOutputLog()</textarea>
+        </div>
+      </div>
     </div>
   </div>
-
   @authentication.subjectIs(testRun.runner) {
     @visibilityEditorFragment("jsRoutes.controllers.JobController.changeTestRunVisibility", testRun.id, testRun.visibility, "visibilityTd")
   }

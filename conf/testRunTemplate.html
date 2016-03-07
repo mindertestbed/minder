@@ -1,0 +1,80 @@
+<h2><a name="${taID}" class="h2">Test Report - ${taID}</a></h2>
+
+<h3>Overview</h3>
+<table style="width:100%;">
+    <tr>
+        <th>Test Group:</th>
+        <td><span class="value">${testGroup}</span></td>
+    </tr>
+    <tr>
+        <th>Test Assertion:</th>
+        <td><span class="value">${taID}</span></td>
+    </tr>
+    <tr>
+        <th>Test Case:</th>
+        <td><span class="value">${testCase}</span></td>
+    </tr>
+    <tr>
+        <th>User:</th>
+        <td><span class="value">${user}</span></td>
+    </tr>
+    <tr>
+        <th>Date:</th>
+        <td><span class="value">${date}</span></td>
+    </tr>
+    <tr>
+        <th>System(s) Tested:</th>
+        <td><span class="value">${systemsTested}</span></td>
+    </tr>
+    <tr style="background-color: ${resultColor}">
+        <th>Result:</th>
+        <td>${result} ${resultCharacter}</td>
+    </tr>
+</table>
+
+<br/>
+<br/>
+<br/>
+<h3>Test Assertion Details</h3>
+<table>
+    <tr>
+        <th>TAID:</th>
+        <td><span class="value">${taID}</span></td>
+    </tr>
+    <tr>
+        <th>Target:</th>
+        <td><span class="value">${target}</span></td>
+    </tr>
+    <tr>
+        <th>Normative Source:</th>
+        <td><span class="value">${normativeSource}</span></td>
+    </tr>
+    <tr>
+        <th>Prescription Level:</th>
+        <td><span class="value">${prescriptionLevel}</span></td>
+    </tr>
+    <tr>
+        <th>Prerequisite:</th>
+        <td><span class="value">${prerequisite}</span></td>
+    </tr>
+    <tr>
+        <th>Predicate:</th>
+        <td><span class="value">${predicate}</span></td>
+    </tr>
+    <tr>
+        <th>Variables:</th>
+        <td><span class="value">${variables}</span></td>
+    </tr>
+    <tr>
+        <th>Tag:</th>
+        <td><span class="value">${tag}</span></td>
+    </tr>
+</table>
+<br class="pageBreak"/>
+
+<h3>Log</h3>
+<div style="padding:5px;border:1px solid darkblue; background-color:rgb(240,240,240); font-size:8px;font-weight: bold; font-family: Monaco, 'DejaVu Sans Mono', Consolas, 'Lucida Console', 'Courier New', monospace">
+    ${log}
+</div>
+
+<br class="pageBreak"/>

@@ -1,0 +1,129 @@
+@(suiteRun: SuiteRun)
+
+
+<script>
+
+
+
+    var selectedTestRuns = []
+
+
+    /**
+     * Report all the test runs in this suiteRun
+     */
+    function reportAll(){
+
+      selectedTestRuns = []
+
+      report()
+    }
+
+
+
+
+
+
+    /**
+     * Generate report fromt the selected test runs
+     */
+    function reportSelectedRuns(){
+      if (selectedTestRuns.length == 0){
+        showError('Please select at least one test run')
+        return
+      }
+
+      report()
+    }
+
+
+    /**
+     * Generate report from the selectedTestRuns
+     */
+    function report(){
+
+      showInputDialog('Please Enter A Subtitle', "Subtitle", null, function(data){
+        console.log(data)
+        window.location = jsRoutes.controllers.SuiteRunController.generateReport(@suiteRun.id, selectedTestRuns.join(','), data).url
+      })
+    }
+
+
+
+
+    function updateSelectedTestRunList(theInput, testRunId){
+      if($(theInput).prop('checked') == true){
+        console.log('checked    ' + testRunId)
+
+        selectedTestRuns.push(testRunId)
+      } else {
+        console.log('unchecked  ' + testRunId)
+
+        selectedTestRuns.splice(selectedTestRuns.indexOf(testRunId), 1)
+      }
+
+      console.log(selectedTestRuns)
+    }
+
+
+
+
+
+</script>
+
+<table width="100%">
+  <tr>
+
+    <td class="tabshrink">
+      <h4>Batch Job Details</h4>
+    </td>
+
+    <td align="right">
+      <button class="btn btn-xs btn-info" style="margin-bottom: 5px ;" type="button" onclick='reportAll();'><span class="fa fa-print">&nbsp;</span> <span class="fa fa-print">&nbsp;</span>
+        Report All Runs</button>
+      <button class="btn btn-xs btn-warning" style="margin-bottom: 5px ;" type="button" onclick='reportSelectedRuns()'><span class="fa fa-print">&nbsp;</span> <span class="fa fa-check-square-o">&nbsp;</span>
+        Report Selected Runs</button>
+    </td>
+
+  </tr>
+
+</table>
+
+<table class="table table-striped table-condensed table-hover table-responsive">
+  <tr><th>&nbsp;</th> <th>Result</th> <th>Date</th> <th>MTDL Script V.</th> <th>Test Case</th> <th>Test Assertion</th></tr>
+  @defining(new java.util.concurrent.atomic.AtomicInteger(1)) { index =>
+    @for(testRun <- TestRun.findBySuiteRun(suiteRun)) {
+      <tr class="@if(testRun.success) {goodTestRun} else {badTestRun}">
+        <td class="tabshrink">@index.getAndIncrement(). &nbsp;<input type="checkbox" id="testRun@{
+          testRun.id
+        }" onchange='updateSelectedTestRunList(this, @testRun.id)'/>
+        </td>
+        <td style="text-align:center ; vertical-align: middle ;" class="tabshrink">
+        @if(testRun.success) {
+          <img src="@routes.Assets.versioned("/images/Check-icon.png")" height="16px" alt='G'/>
+        } else {
+          <img src="@routes.Assets.versioned("/images/Delete-icon.png")" height="16px" alt='B'/>
+        }
+        </td>
+        <td><a href='@routes.JobController.viewTestRunHistory(testRun.id)'>@global.Util.formatDate(testRun.date)</a></td>
+        <td>
+          <a href="@controllers.routes.TestCaseController.viewTestCase2(testRun.job.tdl.testCase.id, testRun.job.tdl.id, "jobs")">
+          @{
+            testRun.job.tdl.version
+          }</a>
+        </td> <td>
+        <a href="@controllers.routes.TestCaseController.viewTestCase(testRun.job.tdl.testCase.id, "jobs")">
+        @{
+          testRun.job.tdl.testCase.name
+        }</a>
+      </td> <td>
+        <a href="@controllers.routes.TestAssertionController.getAssertionDetailView(testRun.job.tdl.testCase.testAssertion.id, "cases")">
+        @{
+          testRun.job.tdl.testCase.testAssertion.taId
+        }
+        </a>
+      </td>
+      </tr>
+    }
+  }
+</table>
+

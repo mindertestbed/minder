@@ -23,7 +23,7 @@
                 <img src="@routes.Assets.versioned("/images/Delete-icon.png")" height="16px" alt='B'/>
               }
               </td>
-              <td style="text-align:left ;vertical-align: middle;" class="tabshrink">@testRun.date</td>
+              <td style="text-align:left ;vertical-align: middle;" class="tabshrink">@global.Util.formatDate(testRun.date)</td>
               <td style="text-align:center ; font-size:20px ;vertical-align: middle;" class="tabshrink">@visibilityTagFragment(testRun.visibility, testRun.runner)</td>
               <td style="text-align:left ;vertical-align: middle;" class="tabexpand">@testRun.runner.email</td>
               <td align="center" style="vertical-align: middle" class="tabshrink">

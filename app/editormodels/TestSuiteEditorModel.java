@@ -1,9 +1,7 @@
 package editormodels;
 
-import controllers.MappedWrapperModel;
 import models.ModelConstants;
-import models.SuiteJob;
-import models.Tdl;
+import models.Visibility;
 import play.data.validation.Constraints;
 
 import java.util.List;
@@ -25,9 +23,15 @@ public class TestSuiteEditorModel {
   @Constraints.MaxLength(ModelConstants.DESCRIPTION_LENGTH)
   public String description;
 
-  public List<JobEditorModel> jobList;
-
   public Long groupId;
 
   public String mtdlParameters;
+
+  public String selectedCandidateMap;
+
+  public String tdlArray;
+
+  public Visibility visibility;
+
+  public PreemptionPolicy preemptionPolicy;
 }

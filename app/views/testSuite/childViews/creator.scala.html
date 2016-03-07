@@ -1,0 +1,18 @@
+
+@import views.html.util.dialogs
+@(frm: Form[_])
+
+@defining(TestGroup.findById(frm("groupId").value.toLong)) { testGroup =>
+  @main(Messages("minder.navigation.restricted.testdesigner"), "mainNavigation",
+
+    Array(("Test Groups", controllers.routes.Application.testGroups().path()),
+      (testGroup.name, controllers.routes.GroupController.getGroupDetailView(testGroup.id, "suites").path()),
+      ("New Test Suite", ""))
+  ) {
+    @dialogs()
+
+    <div class="padabit ajaxContent container">
+      @testSuiteForm(frm, false);
+    </div>
+  }
+}

@@ -1,28 +1,46 @@
-@(ts: TestSuite)
+@(testSuite: TestSuite)
+
+
+  @import views.html.authentication._
+
 
 <script>
-  $(function(){
-    bindValues($("#shortDescription@{ts.id}"))
-    bindValues($("#mtdlParameters@{ts.id}"))
-    bindValues($("#description@{ts.id}"))
-  })
+
+    $(function(){
+      bindValues($("#shortDescription@{testSuite.id}"))
+      bindValues($("#mtdlParameters@{testSuite.id}"))
+      bindValues($("#description@{testSuite.id}"))
+    })
+
 </script>
 
 <h3>Short Description</h3>
-<div id="shortDescription@{ts.id}" onclick='showUpdateInputTextDialog(@ts.id, "shortDescription", $(this).next(), "/doEditTestSuiteField")' class="editable"></div>
-<input type="hidden" value="@ts.shortDescription"/>
 
-<h3>Author</h3>
+
+<div id="shortDescription@testSuite.id"
+
+
+
+@subjectIs(testSuite.owner) {
+  onclick='showUpdateInputTextDialog(@testSuite.id, "shortDescription", $(this).next(), "/doEditTestSuiteField")'
+}
+
+  class="editable"></div>
+<input type="hidden" value="@testSuite.shortDescription"/>
+
+<h3>Owner</h3>
 <p>
-@ts.owner.email
+@testSuite.owner.email
 </p>
 
 
-<h3>MTDL Parameters</h3>
-<div id="mtdlParameters@{ts.id}" onclick='showUpdateTextAreaDialog(@ts.id, "mtdlParameters", $(this).next(), "/doEditTestSuiteField")' class="editable"></div>
-<input type="hidden" value="@ts.mtdlParameters"/>
+<h3>Mtdl Parameters</h3>
+<div id="mtdlParameters@testSuite.id"
 
+@subjectIs(testSuite.owner) {
+  onclick='showUpdateTextAreaDialog(@testSuite.id, "mtdlParameters", $(this).next(), "/doEditTestSuiteField")'
+}
 
-<h3>Detailed Description</h3>
-<div id="description@{ts.id}" onclick='showUpdateTextAreaDialog(@ts.id, "description", $(this ).next(), "/doEditTestSuiteField")' class="editable"></div>
-<input type="hidden" value="@ts.description"/>
+  class="editable"></div>
+<input type="hidden" value="@testSuite.mtdlParameters"/>
+

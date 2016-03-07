@@ -80,10 +80,10 @@ function createFormDialog(sourceUrl, action, titl, target, multiPart, w, h) {
             },
           }
 
-          if(multiPart) {
+          if (multiPart) {
             ajaxObject.data = new FormData(frm[0]);
-            ajaxObject.contentType=false;
-            ajaxObject.processData=false;
+            ajaxObject.contentType = false;
+            ajaxObject.processData = false;
           } else {
             ajaxObject.data = frm.serialize();
           }
@@ -104,7 +104,7 @@ function createFormDialog(sourceUrl, action, titl, target, multiPart, w, h) {
   });
 
   frm[0].setAttribute('action', action);
-  if(multiPart)
+  if (multiPart)
     frm[0].setAttribute('enctype', 'multipart/form-data');
 
   spin(frm[0])
@@ -164,22 +164,6 @@ function deleteWithDialog(action, dialog, title, category, item, target) {
   deleteDialog.dialog("open");
 }
 
-function showError(data) {
-  var dialog = $("#errorDialog").dialog({
-    resizable: false,
-    height: "600",
-    width: "800",
-    autoOpen: true,
-    modal: true,
-    buttons: {
-      'Ok': function () {
-        $(this).dialog("close");
-      }
-    }
-  });
-  dialog.html(data);
-}
-
 function simpleAjaxGet(dialogId, url, title, message) {
   var dlgSel = $("#" + dialogId)
   dlgSel.html(message)
@@ -215,15 +199,12 @@ function simpleAjaxGet(dialogId, url, title, message) {
  * Added function for play ajax navigation
  */
 function ajaxRouteGet(playAjaxObject, params, successTarget, failTarget) {
-  if (!isArray(params))
-    params = [params];
-
   if (typeof successTarget === 'undefined' || successTarget === null) {
-    showError("The success function cannot be empty")
-    return;
+    successTarget = $('.ajaxContent')
   }
 
   var successFunctionDelegate = successTarget;
+  var spinner = null
   //if the user provided a JQuery object, then use its html function
   if (!isFunction(successTarget)) {
     //is it a dialog
@@ -231,15 +212,17 @@ function ajaxRouteGet(playAjaxObject, params, successTarget, failTarget) {
       //yes
       successTarget.repaint("")
       spin(successTarget.contentPane[0])
+      spinner = successTarget.contentPane[0].spinner
       successFunctionDelegate = function (data) {
-        successTarget.contentPane[0].spinner.stop()
+        spinner.stop()
         successTarget.repaint(data)
       }
     } else if (typeof successTarget.html === 'function') {
       //no its not a dialog, but it has a html() function
       spin(successTarget[0])
+      spinner = successTarget[0].spinner
       successFunctionDelegate = function (data) {
-        successTarget[0].spinner.stop()
+        spinner.stop()
         successTarget.html(data)
       }
     } else {
@@ -248,20 +231,38 @@ function ajaxRouteGet(playAjaxObject, params, successTarget, failTarget) {
     }
   }
 
-  playAjaxObject.apply(null, params).ajax()
-    .done(
-      function (data) {
-        successFunctionDelegate(data)
-      })
-    .fail(
-      function (data) {
-        if (typeof failTarget === 'undefined' || failTarget === null) {
-          showError(data.responseText)
-        } else {
-          failTarget(data.responseText);
-        }
+
+  var ajaxObject = {}
+
+  //check if we are a form
+  if (typeof  playAjaxObject.serialize === 'function') {
+    //this is a form
+    ajaxObject.data = playAjaxObject.serialize()
+    ajaxObject.type = playAjaxObject.attr('method')
+    ajaxObject.url = playAjaxObject.attr('action')
+  } else {
+    if (!isArray(params)) {
+      params = [params];
+    }
+    ajaxObject.url = playAjaxObject.apply(null, params).url
+  }
+
+  $.ajax(ajaxObject).done(function (data) {
+    successFunctionDelegate(data)
+  }).fail(function (data) {
+    if (spinner != null)
+      spinner.stop()
+
+    if (typeof failTarget === 'undefined' || failTarget === null) {
+      showError(data.responseText)
+    } else {
+      if (isFunction(failTarget)) {
+        failTarget(data.responseText)
+      } else {
+        failTarget.html(data.responseText);
       }
-    )
+    }
+  })
 }
 
 
@@ -424,7 +425,7 @@ function ajaxCancelActiveJob(name) {
 
 }
 
-function enqueue(jobName, jobId, visibility){
+function enqueue(jobName, jobId, visibility) {
 
   var dialogElm = $("#jobEnqueueDialog")
   var select = $("#jobEnqueueDialog > .visibilitySelect")

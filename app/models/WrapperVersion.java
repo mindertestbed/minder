@@ -35,6 +35,9 @@ public class WrapperVersion extends Model {
   @OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
   public List<GitbEndpoint> gitbEndpoints;
 
+  @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+  public List<MappedWrapper> mappedWrappers;
+
 
   public static final Finder<Long, WrapperVersion> find = new Finder<>(WrapperVersion.class);
 
@@ -67,6 +70,7 @@ public class WrapperVersion extends Model {
   public static WrapperVersion findWrapperAndVersion(Wrapper wrapper, String version) {
     return find.where().eq("wrapper", wrapper).eq("version", version).findUnique();
   }
+
   public static WrapperVersion findWrapperNameAndVersion(String wrapperName, String version) {
     return find.where().eq("wrapper.name", wrapperName).eq("version", version).findUnique();
   }

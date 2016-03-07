@@ -1,5 +1,6 @@
 package global;
 
+import com.avaje.ebean.Ebean;
 import com.avaje.ebean.Model;
 import controllers.TestCaseController;
 import minderengine.BuiltInWrapperRegistry;
