@@ -1,7 +1,7 @@
 package controllers;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import controllers.common.enumeration.Utils;
+import controllers.common.Utils;
 import editormodels.AssertionEditorModel;
 import global.Util;
 import models.PrescriptionLevel;

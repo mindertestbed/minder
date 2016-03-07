@@ -2,7 +2,7 @@ package controllers;
 
 import com.avaje.ebean.Ebean;
 import com.fasterxml.jackson.databind.JsonNode;
-import controllers.common.enumeration.Utils;
+import controllers.common.Utils;
 import editormodels.TestSuiteEditorModel;
 import global.Util;
 import models.*;

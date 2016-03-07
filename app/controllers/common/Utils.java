@@ -1,4 +1,4 @@
-package controllers.common.enumeration;
+package controllers.common;
 
 import com.avaje.ebean.Ebean;
 import com.avaje.ebean.Query;
@@ -16,6 +16,10 @@ import security.Role;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.lang.reflect.Field;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.TimeZone;
 
 /**
  * Created by melis on 11/11/15.
@@ -78,6 +82,14 @@ public class Utils extends Controller {
       e.printStackTrace();
       return badRequest(sw.toString());
     }
+  }
+
+  // Gets the current timestamp in ISO 8601 Format : 2016-03-03T08:21:45+00:00
+  public static String getCurrentTimeStamp(){
+    TimeZone tz = TimeZone.getTimeZone("UTC");
+    DateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mmZ");
+    df.setTimeZone(tz);
+    return df.format(new Date());
   }
 
 }

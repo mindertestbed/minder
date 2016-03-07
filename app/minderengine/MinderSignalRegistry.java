@@ -12,7 +12,10 @@ import java.util.concurrent.TimeUnit;
  * Created by yerlibilgin on 02/12/14.
  */
 public class MinderSignalRegistry {
-  private HashMap<AdapterIdentifier, HashMap<String, PriorityBlockingQueue<SignalData>>> wrapperMap = new HashMap<AdapterIdentifier, HashMap<String, PriorityBlockingQueue<SignalData>>>();
+  /*
+  * HashMap<AdapterIdentifier,HashMap<TestSession, HasMap<signatureofSignal, signalqueue>>>>
+  * */
+  private HashMap<TestSession, HashMap<AdapterIdentifier, HashMap<String, PriorityBlockingQueue<SignalData>>>> wrapperMap = new HashMap<TestSession, HashMap<AdapterIdentifier,HashMap<String, PriorityBlockingQueue<SignalData>>>>();
 
   /**
    * A signal was emitted on the wrapper side. We should put it into the queue until it gets taken by a rivet.
@@ -21,29 +24,29 @@ public class MinderSignalRegistry {
    * @param signature
    * @param signalData
    */
-  public void enqueueSignal(AdapterIdentifier adapterIdentifier, String signature, SignalData signalData) {
-    PriorityBlockingQueue<SignalData> queue = initMap(adapterIdentifier, signature);
-    queue.offer(signalData);
+  public void enqueueSignal(TestSession testSession,AdapterIdentifier adapterIdentifier,String signature, SignalData signalData) {
+    PriorityBlockingQueue<SignalData> signalQueue = findRelatedQueue(testSession,adapterIdentifier,signature);
+    signalQueue.offer(signalData);
   }
 
   /**
    * If the signal is not yet emitted, we still have to settle down
    * and wait on a queue. That is why, we have to call init-map method here too
    *
-   * @param label
+   * @param adapterIdentifier
    * @param signature
    * @param timeout   maximum timeout to wait for the deque operation. 0 means get the default (XoolaProperty.NETWORK_RESPONSE_TIMEOUT)
    *                  from app.conf.
    * @return
    */
-  public SignalData dequeueSignal(AdapterIdentifier label, String signature, long timeout) {
-    PriorityBlockingQueue<SignalData> queue = initMap(label, signature);
+  public SignalData dequeueSignal(TestSession testSession,AdapterIdentifier adapterIdentifier, String signature, long timeout) {
+    PriorityBlockingQueue<SignalData> signalQueue = findRelatedQueue(testSession,adapterIdentifier, signature);
 
     if (timeout == 0)
       timeout = Long.parseLong(XoolaServer.properties.getProperty(XoolaProperty.NETWORK_RESPONSE_TIMEOUT));
 
     try {
-      SignalData result = queue.poll(timeout, TimeUnit.MILLISECONDS);
+      SignalData result = signalQueue.poll(timeout, TimeUnit.MILLISECONDS);
       if (result == null) {
         throw new RuntimeException("Signal Timeout Expired (" + timeout + ")");
       }
@@ -54,13 +57,24 @@ public class MinderSignalRegistry {
     }
   }
 
-  private PriorityBlockingQueue<SignalData> initMap(AdapterIdentifier adapterIdentifier, String signature) {
-    HashMap<String, PriorityBlockingQueue<SignalData>> signalMap = null;
-    if (!wrapperMap.containsKey(adapterIdentifier)) {
-      signalMap = new HashMap<String, PriorityBlockingQueue<SignalData>>();
-      wrapperMap.put(adapterIdentifier, signalMap);
+  /*
+  * Adding an incoming signal into the related queue.
+  * */
+  private PriorityBlockingQueue<SignalData> findRelatedQueue(TestSession testSession, AdapterIdentifier adapterIdentifier, String signature) {
+    HashMap<AdapterIdentifier, HashMap<String, PriorityBlockingQueue<SignalData>>> adapteMap = null;
+    if (!wrapperMap.containsKey(testSession)) {
+      adapteMap = new HashMap<AdapterIdentifier, HashMap<String, PriorityBlockingQueue<SignalData>>>();
+      wrapperMap.put(testSession, adapteMap);
     } else {
-      signalMap = wrapperMap.get(adapterIdentifier);
+      adapteMap = wrapperMap.get(testSession);
+    }
+
+    HashMap<String, PriorityBlockingQueue<SignalData>> signalMap = null;
+    if (!adapteMap.containsKey(adapterIdentifier)) {
+      signalMap = new HashMap<String, PriorityBlockingQueue<SignalData>>();
+      adapteMap.put(adapterIdentifier,signalMap);
+    } else {
+      signalMap = adapteMap.get(adapterIdentifier);
     }
 
     PriorityBlockingQueue<SignalData> queue = null;

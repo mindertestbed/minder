@@ -48,7 +48,7 @@ public abstract class BuiltInWrapper extends Wrapper implements IMinderClient, I
     if (session == null)
       throw new IllegalArgumentException("No active owner session found");
 
-    User user = SessionMap.getObject(session.getSession(), "owner");
+    User user = GlobalSignalRegistry.getObject(session.getSession(), "owner");
     if (user == null) {
       throw new IllegalArgumentException("No owner defined for session " + session);
     }

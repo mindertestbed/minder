@@ -32,7 +32,7 @@ public class MinderServer implements IMinderServer {
    */
   @Override
   public UserDTO getUserInfo(TestSession testSession) {
-    User user = SessionMap.getObject(testSession.getSession(), "owner");
+    User user = GlobalSignalRegistry.getObject(testSession.getSession(), "owner");
     if (user == null)
       throw new IllegalArgumentException("No owner defined for session " + testSession);
 
@@ -40,13 +40,13 @@ public class MinderServer implements IMinderServer {
   }
 
   @Override
-  public Object signalEmitted(TestSession testSession, AdapterIdentifier adapterIdentifier, String signature, SignalData signalData) {
+  public Object signalEmitted(TestSession testSession, AdapterIdentifier adapterIdentifier,String signature, SignalData signalData) {
     Logger.debug("Signal emitted [" + testSession + "." + adapterIdentifier.getName() + "." + signature + "]");
-    MinderSignalRegistry me = SessionMap.getObject(testSession.getSession(), "signalRegistry");
+    MinderSignalRegistry me = GlobalSignalRegistry.getObject(testSession.getSession(), "signalRegistry");
     if (me == null)
       throw new IllegalArgumentException("No MinderSignalRegistry object defined for session " + testSession);
 
-    me.enqueueSignal(adapterIdentifier, signature, signalData);
+    me.enqueueSignal(testSession,adapterIdentifier, signature, signalData);
     return null;
   }
 }

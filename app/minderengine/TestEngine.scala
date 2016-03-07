@@ -14,6 +14,7 @@ import scala.collection.JavaConversions._
 import scala.collection.mutable
 import controllers.{TestRunContext, TestQueueController}
 import com.gitb.core.v1.StepStatus
+import controllers.common.Utils;
 
 /**
   * Created by yerlibilgin on 07/12/14.
@@ -93,7 +94,7 @@ object TestEngine {
     * @param wrapperMapping
     * @param testRunContext
     */
-  def runTest(userEmail: String, clsMinderTDL: Class[MinderTdl],
+  def runTest(sessionID:String, userEmail: String, clsMinderTDL: Class[MinderTdl],
               wrapperMapping: collection.mutable.Map[String, MappedWrapper],
               testRunContext: TestRunContext, params: String): Unit = {
     val lgr: org.apache.log4j.Logger = org.apache.log4j.Logger.getLogger("test");
@@ -126,7 +127,7 @@ object TestEngine {
       val properties = new Properties()
       properties.load(new ByteArrayInputStream(params.getBytes()))
 
-      session.setSession(userEmail)
+      session.setSession(sessionID)
       startTestObject.setSession(session)
       startTestObject.setProperties(properties)
 
@@ -171,7 +172,7 @@ object TestEngine {
 
           try {
             for (tuple@(label, signature) <- rivet.signalPipeMap.keySet) {
-              val me: MinderSignalRegistry = SessionMap.getObject(userEmail, "signalRegistry")
+              val me: MinderSignalRegistry = GlobalSignalRegistry.getObject(sessionID, "signalRegistry")
               if (me == null) {
                 msg = "No MinderSignalRegistry object defined for session " + userEmail;
                 gtb.notifyErrorInfo(msg, rivet)
@@ -197,7 +198,7 @@ object TestEngine {
 
 
               val signalData: SignalData = try {
-                me.dequeueSignal(signalAdapterIdentifier, signature, signal.timeout)
+                me.dequeueSignal(session,signalAdapterIdentifier, signature, signal.timeout)
               } catch {
                 case rte: RuntimeException => {
                   signal.handleTimeout(rte)

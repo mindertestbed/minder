@@ -3,7 +3,7 @@ package controllers;
 
 import com.avaje.ebean.Ebean;
 import com.fasterxml.jackson.databind.JsonNode;
-import controllers.common.enumeration.Utils;
+import controllers.common.Utils;
 import editormodels.TestCaseEditorModel;
 import global.Util;
 import minderengine.AdapterIdentifier;
@@ -15,7 +15,6 @@ import play.Logger;
 import play.data.Form;
 import play.mvc.Controller;
 import play.mvc.Result;
-import play.mvc.Security;
 import security.AllowedRoles;
 import security.Role;
 import views.html.testCase.mainView;

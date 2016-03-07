@@ -2,7 +2,7 @@ package controllers;
 
 import com.avaje.ebean.Ebean;
 import com.fasterxml.jackson.databind.JsonNode;
-import controllers.common.enumeration.Utils;
+import controllers.common.Utils;
 import editormodels.JobEditorModel;
 import global.ReportUtils;
 import global.Util;
@@ -20,6 +20,8 @@ import java.util.Comparator;
 import java.util.List;
 
 import views.html.job.*;
+import java.io.ByteArrayOutputStream;
+import java.util.*;
 import static play.data.Form.form;
 
 /**
