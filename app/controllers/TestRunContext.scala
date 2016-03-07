@@ -27,7 +27,7 @@ class TestRunContext(val testRun: TestRun) extends Runnable with TestProcessWatc
   var error = ""
   var job: AbstractJob = AbstractJob.findById(testRun.job.id)
   val user = testRun.runner;
-  val tdl = Tdl.findById(job.tdl.id);
+  val tdl = Tdl.findById(job.tdl.id);pde
   val testCase = TestCase.findById(tdl.testCase.id)
   val testAssertion = TestAssertion.findById(testCase.testAssertion.id)
   val testGroup = TestGroup.findById(testAssertion.testGroup.id)

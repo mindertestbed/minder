@@ -46,7 +46,7 @@ object TestQueueController extends Controller {
         var run1: TestRun = null;
         try {
           TestLogFeeder.log("--> Test Thread waiting on job queue");
-          activeRunContext = TestQueueController.jobQueue.take();
+          activeRunContext = TestQueueController.jobQu  eue.take();
           activeRunContext.updateNumber()
           TestRunFeeder.jobQueueUpdate()
           run1 = activeRunContext.testRun
