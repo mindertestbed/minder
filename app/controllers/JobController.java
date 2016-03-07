@@ -2,8 +2,7 @@ package controllers;
 
 import com.avaje.ebean.Ebean;
 import com.fasterxml.jackson.databind.JsonNode;
-import controllers.common.enumeration.Utils;
-import editormodels.AssertionEditorModel;
+import controllers.common.Utils;
 import editormodels.JobEditorModel;
 import global.Util;
 import models.*;
@@ -14,7 +13,6 @@ import play.Logger;
 import play.data.Form;
 import play.mvc.Controller;
 import play.mvc.Result;
-import play.mvc.Security;
 import security.AllowedRoles;
 import security.Role;
 import views.html.job.*;

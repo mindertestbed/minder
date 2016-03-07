@@ -2,6 +2,8 @@ organization := "gov.tubitak.minder"
 
 name := """minder"""
 
+offline := true
+
 version := "1.6-B0001"
 
 lazy val minder = (project in file(".")).enablePlugins(PlayJava, PlayEbean)
@@ -30,7 +32,7 @@ libraryDependencies ++= Seq(
   "postgresql" % "postgresql" % "9.1-901-1.jdbc4",
   "mysql" % "mysql-connector-java" % "5.1.18",
   "org.beybunproject" % "xoola" % "1.2.2",
-  "gov.tubitak.minder" % "minder-common" % "0.4.2",
+  "gov.tubitak.minder" % "minder-common" % "0.4.3",
   "gov.tubitak.minder" %% "minder-tdl" % "0.5",
   "org.webjars" % "webjars-play_2.11" % "2.4.0-1",
   "org.webjars" % "bootstrap" % "3.3.6",

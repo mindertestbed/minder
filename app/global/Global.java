@@ -43,22 +43,22 @@ public class Global extends GlobalSettings {
    */
   @SuppressWarnings("rawtypes")
   public play.mvc.Action onRequest(final Http.Request request, Method method) {
-    if ((!request.path().contains("/rest/")) || (request.path().equals("/rest/login")) || (request.path().equals("/rest/doLogin"))) {
+   // if ((!request.path().contains("/rest/")) || (request.path().equals("/rest/login")) || (request.path().equals("/rest/doLogin"))) {
       return super.onRequest(request, method);
-    }
+    //}
 
 
-    if (RestUtils.verifyAuthentication(request)) {
-      return super.onRequest(request, method);
-    }
+    //if (RestUtils.verifyAuthentication(request)) {
+    //  return super.onRequest(request, method);
+   // }
 
 
-    return new Action.Simple() {
+   /* return new Action.Simple() {
       public F.Promise<Result> call(Http.Context ctx) throws Throwable {
         System.out.println("Calling action for " + ctx);
         return F.Promise.pure(redirect(routes.LoginController.login()));
-      }
-    };
+
+    };*/
 
 
   }

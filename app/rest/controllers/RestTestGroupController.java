@@ -2,9 +2,7 @@ package rest.controllers;
 
 import com.avaje.ebean.Ebean;
 import com.fasterxml.jackson.databind.JsonNode;
-import com.sun.org.apache.xalan.internal.xsltc.dom.CurrentNodeListIterator;
-import controllers.Authentication;
-import controllers.common.enumeration.Utils;
+import controllers.common.Utils;
 import dependencyutils.DependencyClassLoaderCache;
 import editormodels.GroupEditorModel;
 import global.Util;
@@ -19,7 +17,6 @@ import rest.controllers.common.RestUtils;
 import rest.controllers.restbodyprocessor.IRestContentProcessor;
 import rest.models.*;
 
-import java.io.IOException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;

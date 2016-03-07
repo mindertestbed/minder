@@ -1,6 +1,7 @@
 package controllers
 
-import minderengine.{MinderSignalRegistry, SessionMap}
+import controllers.common.Utils
+import minderengine.{MinderSignalRegistry, GlobalSignalRegistry}
 import models.{Job, Tdl, TestCase, User}
 import play.Logger
 import play.api.libs.iteratee.Concurrent
@@ -17,7 +18,8 @@ object Tester extends Controller {
     val tdl = request.body.asText.mkString
     val mail = request.session.get("userEmail").mkString
 
-    SessionMap.registerObject(mail, "signalRegistry", new MinderSignalRegistry());
+    testMap(mail).sessionID = Utils.getCurrentTimeStamp;
+    GlobalSignalRegistry.registerObject(testMap(mail).sessionID, "signalRegistry", new MinderSignalRegistry());
     try {
       Ok
     } catch {
@@ -47,7 +49,8 @@ object Tester extends Controller {
   /**
    * This method starts a test in its first call,
    * then provides information about if (in successive calls)
-   * @param id
+    *
+    * @param id
    * @return
    */
   def runTest(id: Long, userId: Long) = Action { implicit request =>
@@ -61,13 +64,14 @@ object Tester extends Controller {
       if (testMap.contains(mail)) {
         val testRunner = testMap(mail);
         //if (testRunner.status == TestStatus.BAD || testRunner.status == TestStatus.GOOD) {
-        //  SessionMap.registerObject(mail, "signalRegistry", new MinderSignalRegistry());
+        //  GlobalSignalRegistry.registerObject(mail, "signalRegistry", new MinderSignalRegistry());
         //  SignalSlotInfoProvider.setSignalSlotInfoProvider(MinderWrapperRegistry.get())
         //val testRunner = new TestRunner(rc, user);
         // testMap(mail) = testRunner
         //a}
       } else {
-        SessionMap.registerObject(mail, "signalRegistry", new MinderSignalRegistry());
+        testMap(mail).sessionID = Utils.getCurrentTimeStamp;
+        GlobalSignalRegistry.registerObject(testMap(mail).sessionID, "signalRegistry", new MinderSignalRegistry());
         //val testRunner = new TestRunner(rc, user);
         // testMap(mail) = testRunner
       }
@@ -88,7 +92,8 @@ object Tester extends Controller {
   /**
    * This method starts a test in its first call,
    * then provides information about if (in successive calls)
-   * @param id
+    *
+    * @param id
    * @return
    */
   def syncTest(id: Long, userId: Long) = Action { implicit request =>

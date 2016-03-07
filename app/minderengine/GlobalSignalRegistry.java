@@ -5,17 +5,17 @@ import java.util.HashMap;
 /**
  * Created by yerlibilgin on 03/12/14.
  */
-public class SessionMap {
+public class GlobalSignalRegistry {
 
   private static final HashMap<String, HashMap<String, Object>> sessionMap = new HashMap<>();
 
-  public static void registerObject(String session, String key, Object o) {
+  public static void registerObject(String sessionId, String key, Object o) {
     HashMap<String, Object> objectMap;
-    if (sessionMap.containsKey(session)) {
-      objectMap = sessionMap.get(session);
+    if (sessionMap.containsKey(sessionId)) {
+      objectMap = sessionMap.get(sessionId);
     } else {
       objectMap = new HashMap<>();
-      sessionMap.put(session, objectMap);
+      sessionMap.put(sessionId, objectMap);
     }
 
     objectMap.put(key, o);

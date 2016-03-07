@@ -44,6 +44,8 @@ class TestRunContext(val testRun: TestRun) extends Runnable with TestProcessWatc
   val reportLogBuilder = new StringBuilder;
   var status = TestStatus.PENDING
 
+  var sessionID: String = null;
+
   /**
     * Number of steps that will be calculated at the beginning for percentage
     * calculation.
@@ -86,11 +88,12 @@ class TestRunContext(val testRun: TestRun) extends Runnable with TestProcessWatc
 
   override def run(): Unit = {
     status = TestStatus.RUNNING
-    TestEngine.runTest(user.email, cls, variableWrapperMapping, TestRunContext.this, job.mtdlParameters)
+    TestEngine.runTest(sessionID,user.email, cls, variableWrapperMapping, TestRunContext.this, job.mtdlParameters)
   }
 
   /**
     * This callback comes from the engine so that we can create our status data structure and later update it.
+    *
     * @param slotDefs
     */
   def describe(slotDefs: util.List[Rivet]): Unit = {

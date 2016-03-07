@@ -6,11 +6,12 @@ import java.util.concurrent.LinkedBlockingQueue
 import com.gitb.core.v1.StepStatus
 import controllers.LogFeeder.LogRecord
 import controllers.common.enumeration.OperationType
-import minderengine.{MinderSignalRegistry, SessionMap}
+import minderengine.{MinderSignalRegistry, GlobalSignalRegistry}
 import models._
 import play.Logger
 import play.api.mvc._
 import rest.controllers.GitbTestbedController
+import controllers.common.Utils
 
 /**
   * Manages the job lifecycle.
@@ -46,7 +47,9 @@ object TestQueueController extends Controller {
           activeRunContext.updateNumber()
           TestRunFeeder.jobQueueUpdate()
           run1 = activeRunContext.testRun
-          SessionMap.registerObject(run1.runner.email, "signalRegistry", new MinderSignalRegistry());
+
+          activeRunContext.sessionID = Utils.getCurrentTimeStamp;
+          GlobalSignalRegistry.registerObject(activeRunContext.sessionID, "signalRegistry", new MinderSignalRegistry());
 
           LogFeeder.log("--> Job with id [" + run1.job.id + "] arrived. Start in 5 seconds...");
           Thread.sleep(5000);
