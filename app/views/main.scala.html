@@ -103,7 +103,7 @@
                 <ul class="dropdown-menu" role="menu">
                   @* <li class="@("active".when(nav == "profile"))"><a href="@routes.Application.profile()">@Messages("authenticate.profile")</a></li>
                   <li class="divider"></li>
-                  *@ <li><a href="@routes.Authentication.doLogout()"><i class="icon-off"></i> @Messages("authenticate.logout")</a></li>
+                  *@ <li><a href="@routes.Authentication.doLogout()"><i class="fa fa-sign-out" style="color:red"></i> @Messages("authenticate.logout")</a></li>
                 </ul>
               </li>
             }
@@ -124,9 +124,9 @@
                 }
                 </style>
                 <div id="popoverdiv">
-                  <span class="fa-user" style="color:lightgrey">&nbsp;</span><input type="email" name="email" class="simpleinput"/>
-                  <span class="fa-key" style="color:lightgrey">&nbsp;</span><input type="password" name="password" class="simpleinput"/>
-                  <button type="button" class="btn btn-success btn-xs fa-signin" style="color:lightgrey" onclick="tryLogin()"></button>
+                  <span class="fa fa-user" style="color:lightgrey">&nbsp;</span><input type="email" name="email" class="simpleinput" onkeypress="if(event.keyCode==13){tryLogin()}" />
+                  <span class="fa fa-key" style="color:lightgrey">&nbsp;</span><input type="password" name="password" class="simpleinput" onkeypress="if(event.keyCode==13){tryLogin()}" />
+                  <button type="button" class="btn btn-success btn-xs fa fa-sign-in" style="color:lightgrey" onclick="tryLogin()"></button>
                 </div>
 
               </form>
@@ -178,12 +178,12 @@
             <form id="loginform2" method="post" action="@routes.Authentication.doLogin()">
               <table>
                 <tr>
-                  <td><span class="fa-user" style="color:darkgray">
-                    Username: </span></td><td style="padding: 5px ;"><input type="email" name="email"/></td>
+                  <td><span class="fa fa-user" style="color:darkgray">
+                    Username: </span></td><td style="padding: 5px ;"><input type="email" name="email" onkeypress="if(event.keyCode==13){tryLogin2()}" /></td>
                 </tr>
                 <tr>
-                  <td><span class="fa-key" style="color:darkgray">
-                    Password: </span></td><td style="padding: 5px ;"><input type="password" name="password"/></td>
+                  <td><span class="fa fa-key" style="color:darkgray">
+                    Password: </span></td><td style="padding: 5px ;"><input type="password" name="password" onkeypress="if(event.keyCode==13){tryLogin2()}" /></td>
                 </tr>
               </table>
 

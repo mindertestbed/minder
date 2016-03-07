@@ -11,8 +11,12 @@ import java.util.List;
  * Represents the ASSETS uploaded and used by users.
  */
 @Entity
-@Table(name = "TestAsset")
+@Table(name = "TestAsset", uniqueConstraints = {
+    @UniqueConstraint(columnNames = {"test_group_id", "name"})
+})
 public class TestAsset extends Model{
+  private static final Finder<Long, TestAsset> find = new Finder<>(TestAsset.class);
+
   @Id
   public Long id;
 
@@ -25,8 +29,6 @@ public class TestAsset extends Model{
    */
   @Column(nullable = false)
   public String name;
-
-  private static final Finder<Long, TestAsset> find = new Finder<>(TestAsset.class);
 
   @Column(length = ModelConstants.SHORT_DESC_LENGTH, columnDefinition = "TEXT")
   public String shortDescription;

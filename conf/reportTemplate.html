@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <style>
+        body {
+            font-size: 18pt;
+            font-family: 'Times New Roman';
+        }
+
+        .pageBreak {
+            page-break-before: always
+        }
+
+        th {
+            white-space: nowrap;
+            text-align: left;
+            padding: 5px;
+            vertical-align: middle;
+        }
+
+        td{
+            padding: 5px;
+            vertical-align: middle;
+        }
+        h1 {
+            color: rgb(0, 14, 75);
+        }
+
+        h2 {
+            color: rgb(10, 42, 109);
+        }
+
+        h3 {
+            color: rgb(15, 77, 163);
+        }
+
+        a {
+            text-decoration: none;
+        }
+
+        .h1 {
+            color: rgb(0, 14, 75) !important;
+        }
+
+        .h2 {
+            color: rgb(10, 42, 109) !important;
+        }
+
+        .h3 {
+            color: rgb(15, 77, 163) !important;
+        }
+
+
+    </style>
+
+</head>
+<body>
+
+
+<p>&nbsp;</p>
+<p>&nbsp;</p>
+<h1 align="center"><img src="conf/minder.png" height="100px"/></h1>
+<p>&nbsp;</p>
+<p>&nbsp;</p>
+<h1 style="text-align: center">Test Report</h1>
+<p>&nbsp;</p>
+<h2 style="text-align: center">Test Group: ${testGroup}</h2>
+<p>&nbsp;</p>
+<h3 style="text-align: center">${subTitle}</h3>
+<p>&nbsp;</p>
+<h4 style="text-align: center">${date}</h4>
+
+<br class="pageBreak"/>
+<h2>Summary</h2>
+<table style="width:100%;">
+    ${toc}
+</table>
+
+<br class="pageBreak"/>
+
+${testRuns}
+
+</body>
+</html>

@@ -31,7 +31,7 @@ public class Wrapper extends Model {
   @ManyToOne
   public User user;
 
-  @OneToMany
+  @OneToMany(cascade = CascadeType.ALL)
   public List<WrapperVersion> wrapperVersions;
 
   public static final Finder<Long, Wrapper> find = new Finder<>(Long.class,

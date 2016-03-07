@@ -1,0 +1,69 @@
+@import java.util.concurrent.atomic.AtomicInteger
+@import views.html.authentication.subjectIsnt
+@import views.html.authentication.subjectIs
+
+@(group: TestGroup, owner: User)
+
+@import scala.collection.JavaConversions._
+
+@* List all available tdls for this group *@
+
+<h3>Available MTDL Scripts</h3><br/>
+
+<style>
+.label-aligned {
+vertical-align: middle ;
+height:25px ;
+padding-top:2px ;
+background-color: rgba(121, 171, 228, 0.3) !important;
+border: 1px solid rgb(118, 168, 222);
+border-radius: 4px;
+color: black;
+font-size: small;
+}
+</style>
+
+@subjectIs(owner) {
+  <table width="100%">
+    <tr>
+      <td>
+        <label>Select</label>:
+        <button class="btn btn-xs btn-success" style="margin-bottom: 5px ;" type="button" onclick='$(".tdlVersionInput").prop("checked", true);updateNameList()'><span class="fa fa-list-ul">&nbsp;</span>
+          All</button>
+        <button class="btn btn-xs btn-primary" style="margin-bottom: 5px ;" type="button" onclick='$(".tdlVersionInput").prop("checked", false);$(".tdlLatest").prop("checked", true);updateNameList()'><span class="fa fa-clock-o">&nbsp;</span>
+          Latest</button>
+        <button class="btn btn-xs btn-warning" style="margin-bottom: 5px ;" type="button" onclick='$(".tdlVersionInput").prop("checked", false);updateNameList()'><span class="fa fa-square-o">&nbsp;</span>
+          None</button></td>
+      <td align="right">
+
+        <a tabindex="0" class="btn btn-xs btn-danger fa fa-angle-double-right" role="button" id="reconstructButton"  data-toggle="popover" onclick='reconstructList()' data-trigger="focus" title="Warning" data-content='Please click this button to select possible adapter candidates.'>List</a>
+      </td>
+    </tr>
+  </table>
+}
+
+@defining(TestSuiteController.listAllAssertionsWithTDLS(group)) { testAssertionList =>
+  <table class="table table-condensed table-hover noWrap">
+    <tr><th>Test Assertion</th><th>Test Case</th><th>TDL Versions</th></tr>
+    @for(testAssertion <- testAssertionList) {
+      @defining(new AtomicInteger(0)) { integer =>
+        @for(testCase <- testAssertion.testCases) {
+          <tr>
+            @if(integer.getAndIncrement() == 0) {
+              <td rowspan="@testAssertion.testCases.size()">
+              @testAssertion.taId
+              </td>
+            }
+          <td>@testCase.name</td> <td>
+            @defining(Tdl.getLatestTdl(testCase)) { latest =>
+              @for(tdl <- testCase.tdls) {
+                <span class="label label-info label-aligned"><input @subjectIsnt(owner){disabled="true"} id='checkBox_@{tdl.id}' type="checkbox" class="tdlVersionInput @if(tdl == latest){tdlLatest}" onchange='updateNameList($(this))' value="@tdl.id"/> @tdl.version</span> &nbsp;
+              }
+            }
+          </td>
+          </tr>
+        }
+      }
+    }
+  </table>
+}

@@ -1,9 +1,6 @@
 package controllers
 
-import java.util.concurrent.LinkedBlockingQueue
-
 import models.TestRun
-import net.sf.jasperreports.compilers.JavaScriptEvaluatorScope.JSValue
 import play.api.libs.EventSource
 import play.api.libs.concurrent.Execution.Implicits._
 import play.api.libs.iteratee.{Concurrent, Enumeratee}

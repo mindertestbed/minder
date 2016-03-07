@@ -18,8 +18,11 @@ public class TestRun extends Model {
   public Long id;
 
   @ManyToOne
-  @Column(nullable = false)
+  @Column(name="job_id")
   public AbstractJob job;
+
+  @ManyToOne
+  public SuiteRun suiteRun;
 
   public Date date;
 
@@ -72,6 +75,11 @@ public class TestRun extends Model {
   }
 
 
+  public static List<TestRun> findBySuiteRun(SuiteRun suiteRun) {
+    return find.where().eq("suiteRun", suiteRun).orderBy("date desc").findList();
+  }
+
+
   public static List<TestRun> findByJob(Long id) {
     return find.where().eq("job_id", id).orderBy("date desc").findList();
   }
@@ -93,5 +101,11 @@ public class TestRun extends Model {
 
   public static void updateUser(User user, User localUser) {
 
+  }
+
+  public static int countRunsForJob(Job job) {
+    com.avaje.ebean.SqlQuery qu = Ebean.createSqlQuery("Select count(id) from TestRun where job_id=" + job.id);
+    Object count = qu.findUnique().get("count");
+    return Integer.parseInt(count.toString());
   }
 }

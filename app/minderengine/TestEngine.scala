@@ -91,7 +91,7 @@ object TestEngine {
     * @param userEmail
     * @param clsMinderTDL
     * @param wrapperMapping
-    * @param testProcessWatcher
+    * @param testRunContext
     */
   def runTest(userEmail: String, clsMinderTDL: Class[MinderTdl],
               wrapperMapping: collection.mutable.Map[String, MappedWrapper],
@@ -154,7 +154,7 @@ object TestEngine {
       try {
         //var rivetIndex = 0;//replace with current rivet index from mindertdl
         var rivetIndex = minderTDL.currentRivetIndex;
-        for(rivet <- minderTDL.RivetDefs.slice(rivetIndex, minder.TDL.RivetDefs.size -1)){
+        for(rivet <- minderTDL.RivetDefs.slice(rivetIndex, minderTDL.RivetDefs.size -1)){
         //for (rivet <- minderTDL.RivetDefs) {
           var msg: String = "> RUN RIVET " + rivetIndex;
           lgr.info(msg)
@@ -220,7 +220,7 @@ object TestEngine {
               }
               val signalCallData: SignalCallData = signalData.asInstanceOf[SignalCallData]
 
-              testProcessWatcher.signalEmitted(rivetIndex, signalIndex, signalCallData)
+              testRunContext.signalEmitted(rivetIndex, signalIndex, signalCallData)
 
               for (paramPipe <- rivet.signalPipeMap(tuple)) {
                 //FIX for BUG-1 : added an if for -1 param
@@ -254,13 +254,13 @@ object TestEngine {
                 k += 1
               }
               val signalData2 = new SignalCallData(freeArgs);
-              testProcessWatcher.signalEmitted(rivetIndex, signalIndex, signalData2)
+              testRunContext.signalEmitted(rivetIndex, signalIndex, signalData2)
             }
 
             msg = "> CALL SLOT " + slotPair.adapterIdentifier + "." + rivet.wrapperFunction.signature
             lgr.info(msg)
             gtb.notifyProcessingInfo(msg, rivet)
-            testProcessWatcher.rivetInvoked(rivetIndex);
+            testRunContext.rivetInvoked(rivetIndex);
             rivet.result = slotPair.minderClient.callSlot(session, rivet.wrapperFunction.signature, args)
             msg = "< SLOT CALLED " + slotPair.adapterIdentifier + "." + rivet.wrapperFunction.signature;
             lgr.info(msg)
@@ -268,7 +268,7 @@ object TestEngine {
 
 
             msg = "< Rivet finished sucessfully";
-            testProcessWatcher.rivetFinished(rivetIndex)
+            testRunContext.rivetFinished(rivetIndex)
             gtb.notifyCompletedInfo(msg, rivet)
             lgr.info(msg)
             lgr.info("----------\n")
@@ -293,7 +293,7 @@ object TestEngine {
           throw minderTDL.exception;
         }
       }
-      testProcessWatcher.finished()
+      testRunContext.finished()
     } catch {
       case t: Throwable => {
 
@@ -312,7 +312,7 @@ object TestEngine {
           err
         }
         lgr.error(error);
-        testProcessWatcher.failed(error, t);
+        testRunContext.failed(error, t);
       }
     } finally {
       lgr.info("Test Finished")

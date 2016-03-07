@@ -8,9 +8,11 @@ GET         /root                                       controllers.Application.
 GET         /listTestGroups                             controllers.Application.testGroups()
 GET         /jobQueue                                   controllers.Application.jobQueue()
 GET         /adapters                                   controllers.Application.adapters()
-GET         /assets/javascript/routes.js                controllers.Application.jsRoutes
 GET         /profile                                    controllers.Application.profile
 GET         /about                                      controllers.Application.about()
+
+#JSRoutes
+GET         /assets/javascript/routes.js                controllers.JSRoutes.jsRoutes
 
 GET         /login                                      controllers.Authentication.login
 GET         /loginToTargetURL                           controllers.Authentication.loginToTargetURL(targetURL: String)
@@ -54,8 +56,8 @@ POST        /doCreateAssertion                          controllers.TestAssertio
 GET         /doDeleteAssertion                          controllers.TestAssertionController.doDeleteAssertion(id: Long)
 GET         /getAssertionDetailView                     controllers.TestAssertionController.getAssertionDetailView(id: Long, display : String ?= "cases")
 POST        /doEditAssertionField                       controllers.TestAssertionController.doEditAssertionField()
-POST        /renderDetails                              controllers.TestAssertionController.renderDetails(id: Long)
-POST        /renderTestCases                            controllers.TestAssertionController.renderTestCases(id: Long)
+GET         /renderAssertionDetails                     controllers.TestAssertionController.renderDetails(id: Long)
+GET         /renderTestCases                            controllers.TestAssertionController.renderTestCases(id: Long)
 
 #test case management
 GET         /getCreateCaseEditorView                    controllers.TestCaseController.getCreateCaseEditorView(assertionId: Long)
@@ -70,7 +72,6 @@ POST        /doEditCaseField                            controllers.TestCaseCont
 
 GET         /getCreateJobEditorView                     controllers.JobController.getCreateJobEditorView(tdlID: Long)
 POST        /doCreateJob                                controllers.JobController.doCreateJob()
-GET         /getEditJobEditorView                       controllers.JobController.getEditJobEditorView(id: Long)
 GET         /viewJob                                    controllers.JobController.displayJob(id: Long, showHistory: Boolean)
 GET         /doDeleteJob                                controllers.JobController.doDeleteJob(id: Long)
 GET         /viewTestRunHistory                         controllers.JobController.viewTestRunHistory(testRunId: Long)
@@ -112,22 +113,27 @@ GET         /adapterStatusFeed                          controllers.AdapterStatu
 GET         /jobQueueFeed                               controllers.TestRunFeeder.jobQueueFeed
 GET         /testProgressFeed                           controllers.TestRunFeeder.testProgressFeed
 GET         /historyFeed                                controllers.TestRunFeeder.jobHistoryFeed
-GET         /logFeed                                    controllers.LogFeeder.logFeed
+GET         /logFeed                                    controllers.TestLogFeeder.logFeed
 GET         /cancelJob                                  controllers.TestQueueController.cancelJob(index: Int)
 GET         /cancelActiveJob                            controllers.TestQueueController.cancelActiveJob
 GET         /enqueueJob                                 controllers.TestQueueController.enqueueJob(id: Long, visibility: String)
+GET         /enqueueTestSuite                           controllers.TestQueueController.enqueueTestSuite(id: Long, visibility: String, jobIdList: String)
 
 
 POST        /doEditTestSuiteField                       controllers.TestSuiteController.doEditTestSuiteField
 GET         /getTestSuiteDetailView                     controllers.TestSuiteController.getTestSuiteDetailView(id: Long, display: String)
 GET         /createTestSuite                            controllers.TestSuiteController.getCreateTestSuiteView(groupId: Long)
 POST        /createTestSuite                            controllers.TestSuiteController.doCreateTestSuite
+POST        /doEditTestSuite                            controllers.TestSuiteController.doEditTestSuite
 GET         /doDeleteTestSuite                          controllers.TestSuiteController.doDeleteTestSuite(id: Long)
-GET         /listAvailableTdlsForSuite                  controllers.TestSuiteController.listAvailableTdlsForSuite(testSuiteId: Long)
-GET         /renderJoblistView                          controllers.TestSuiteController.renderJoblistView(id: Long)
-GET         /renderTestRunListView                      controllers.TestSuiteController.renderTestRunListView(id: Long)
-GET         /renderDetailView                           controllers.TestSuiteController.renderDetailView(id: Long)
-GET         /renderTdlList                              controllers.TestSuiteController.renderTdlList(id: Long)
+GET         /renderSuiteDetailView                      controllers.TestSuiteController.renderDetails(id: Long)
+GET         /renderTestStatus                           controllers.TestSuiteController.renderStatus(id: Long)
+GET         /renderTestSuiteEditor                      controllers.TestSuiteController.renderEditor(id: Long)
+POST        /getNamesAndAdaptersForTdls                 controllers.TestSuiteController.getNamesAndAdaptersForTdls()
+
+
+GET         /getSuiteRunDetailView                      controllers.SuiteRunController.getSuiteRunDetailView(id: Long)
+GET         /generateReport                             controllers.SuiteRunController.generateReport(id: Long, testRuns:String, subTitle:String ?= "")
 
 GET         /getCreateUtilClassEditorView               controllers.UtilClassController.getCreateUtilClassEditorView(groupId: Long)
 POST        /doCreateUtilClass                          controllers.UtilClassController.doCreateUtilClass

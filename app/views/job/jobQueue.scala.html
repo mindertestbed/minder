@@ -7,7 +7,7 @@
         var logfeed = $( "#logfeed" )[0];
         var logarea = $("#logarea")
 
-        new EventSource ( '@controllers.routes.LogFeeder.logFeed()' ).onmessage = function ( event ) {
+        new EventSource ( '@controllers.routes.TestLogFeeder.logFeed()' ).onmessage = function ( event ) {
           var newd  = event.data
           logarea[0].textContent += "\n" + newd;
           console.log("Log " + event.data)
@@ -59,11 +59,11 @@
         global.Util.remaining
       }" style="height:100%;">
         <div class="panel panel-info" style="height:97% ; padding: 0px ;">
-          <div class="panel-heading">Log</div>
+          <div class="panel-heading"><span class="fa fa-terminal">&nbsp;</span>Log</div>
           <div class="panel-body zeropad" style="height:100% ;">
 
             <textarea readonly="readonly" id="logarea" class="lightMinderBlue"
-            style="resize: none ; font-family:monospace ; height:calc(100% - 2em) ; width:100% ; border:1px solid #ddeee6 ; border-radius:2px ; overflow:scroll">@LogFeeder.currentLogString(Authentication.getLocalUser)</textarea>
+            style="resize: none ; font-family:monospace ; height:calc(100% - 2em) ; width:100% ; border:1px solid #ddeee6 ; border-radius:2px ; overflow:scroll">@TestLogFeeder.currentLogString(Authentication.getLocalUser)</textarea>
 
           </div>
         </div>

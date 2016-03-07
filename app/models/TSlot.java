@@ -9,6 +9,7 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
+import java.util.List;
 
 /**
  * Created by yerlibilgin on 31/12/14.
@@ -24,8 +25,11 @@ public class TSlot extends Model {
 
   public String signature;
 
-  public static final Finder<Long, TSlot> find = new Finder<>(
-      Long.class, TSlot.class);
+  public static final Finder<Long, TSlot> find = new Finder<>(TSlot.class);
+
+  public static List<TSlot> findBySignature(String signature) {
+    return find.where().eq("signature", signature).findList();
+  }
 
   public static void deleteByVersion(WrapperVersion wrapperVersion) {
     SqlUpdate tangoDown = Ebean.createSqlUpdate("DELETE FROM TSlot WHERE wrapper_version_id = " + wrapperVersion.id);

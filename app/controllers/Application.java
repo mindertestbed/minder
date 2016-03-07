@@ -82,35 +82,6 @@ public class Application extends Controller {
     return ok(profile.render(localUser));
   }
 
-  public static Result jsRoutes() {
-    return ok(
-        Routes.javascriptRouter("jsRoutes",
-            routes.javascript.Authentication.login(),
-            routes.javascript.Authentication.doLogin(),
-            routes.javascript.TestSuiteController.listAvailableTdlsForSuite(),
-            routes.javascript.TestSuiteController.getTestSuiteDetailView(),
-            routes.javascript.TestSuiteController.renderJoblistView(),
-            routes.javascript.TestSuiteController.renderTestRunListView(),
-            routes.javascript.TestSuiteController.renderDetailView(),
-            routes.javascript.TestSuiteController.renderTdlList(),
-            routes.javascript.GroupController.renderDetails(),
-            routes.javascript.GroupController.renderTestAssertionList(),
-            routes.javascript.GroupController.renderTestSuites(),
-            routes.javascript.GroupController.renderTestAssets(),
-            routes.javascript.GroupController.renderUtilClasses(),
-            routes.javascript.GroupController.renderDependencies(),
-            routes.javascript.TestAssertionController.renderDetails(),
-            routes.javascript.TestAssertionController.renderTestCases(),
-            routes.javascript.JobController.changeTestRunVisibility(),
-            routes.javascript.JobController.changeJobVisibility(),
-            routes.javascript.TestQueueController.enqueueJob(),
-            routes.javascript.UserController.listUsers(),
-            routes.javascript.UserController.viewSettings(),
-                routes.javascript.GroupController.renderJobTemplates()
-        ))
-        .as("text/javascript");
-  }
-
   public static String formatTimestamp(final long t) {
     return new SimpleDateFormat("yyyy-dd-MM HH:mm:ss").format(new Date(t));
   }

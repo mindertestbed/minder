@@ -1,5 +1,7 @@
 package models;
 
+import com.avaje.ebean.Ebean;
+import com.avaje.ebean.ExpressionList;
 import com.avaje.ebean.Model;
 
 import javax.persistence.*;
@@ -13,6 +15,17 @@ import java.util.List;
 @Inheritance
 @DiscriminatorColumn(name = "_type", discriminatorType = DiscriminatorType.INTEGER)
 public abstract class AbstractJob extends Model {
+  private static final Finder<Long, AbstractJob> find = new Finder<>(
+      AbstractJob.class);
+
+  public static AbstractJob findById(Long id) {
+    AbstractJob byId = find.byId(id);
+    if (byId == null)
+      return null;
+    byId.owner = User.findById(byId.owner.id);
+    return byId;
+  }
+
   @Id
   public Long id;
 
@@ -28,13 +41,19 @@ public abstract class AbstractJob extends Model {
 
   public Visibility visibility;
 
-  @Column(nullable = false, length = ModelConstants.DESCRIPTION_LENGTH, columnDefinition = "TEXT")
+  @Column(length = ModelConstants.DESCRIPTION_LENGTH, columnDefinition = "TEXT")
   public String mtdlParameters;
 
 
-  @OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+  @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, mappedBy = "job")
   public List<MappedWrapper> mappedWrappers;
 
-  @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+  @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, mappedBy = "job")
   public List<TestRun> testRuns;
+
+  public static void deleteById(Long id) {
+    AbstractJob aj = findById(id);
+    if (aj != null)
+      aj.delete();
+  }
 }

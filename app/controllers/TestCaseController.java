@@ -208,8 +208,10 @@ public class TestCaseController extends Controller {
     }
   }
 
-
-  @AllowedRoles({Role.TEST_DESIGNER})
+  /**
+   * TODO: move this method to another class
+   * @param newTdl
+   */
   public static void detectAndSaveParameters(Tdl newTdl) {
     Logger.debug("Detect parameters for the newTdl");
     LinkedHashMap<String, Set<WrapperFunction>> descriptionMap = TestEngine.describeTdl(newTdl);

@@ -3,8 +3,7 @@ package controllers
 import java.util
 
 import builtin.ReportGenerator
-import controllers.LogFeeder
-import controllers.LogFeeder.LogRecord
+import controllers.TestLogFeeder.LogRecord
 import controllers.common.enumeration.TestStatus
 import minderengine._
 import models.Wrapper
@@ -26,9 +25,7 @@ class TestRunContext(val testRun: TestRun) extends Runnable with TestProcessWatc
   val mappedWrappers = MappedWrapper.findByJob(testRun.job)
   var sutNames: java.util.Set[String] = null;
   var error = ""
-  var job: AbstractJob = Job.findById(testRun.job.id)
-  if (job == null) job = SuiteJob.findById(testRun.job.id)
-  if (job == null) job = GitbJob.findById(testRun.job.id)
+  var job: AbstractJob = AbstractJob.findById(testRun.job.id)
   val user = testRun.runner;
   val tdl = Tdl.findById(job.tdl.id);
   val testCase = TestCase.findById(tdl.testCase.id)
@@ -40,7 +37,7 @@ class TestRunContext(val testRun: TestRun) extends Runnable with TestProcessWatc
   val packageRoot = "_" + testGroup.id;
   val packagePath = packageRoot + "/_" + testCase.id;
   val cls = TdlCompiler.compileTdl(packageRoot, packagePath, testGroup.dependencyString, testCase.name, source = tdl.tdl, version = tdl.version);
-  var MinderTDL : MinderTdl;
+  var MinderTDL: MinderTdl = null;
   val logStringBuilder = new StringBuilder;
   val reportLogBuilder = new StringBuilder;
   var status = TestStatus.PENDING
@@ -92,6 +89,7 @@ class TestRunContext(val testRun: TestRun) extends Runnable with TestProcessWatc
 
   /**
     * This callback comes from the engine so that we can create our status data structure and later update it.
+    *
     * @param slotDefs
     */
   def describe(slotDefs: util.List[Rivet]): Unit = {
@@ -134,14 +132,14 @@ class TestRunContext(val testRun: TestRun) extends Runnable with TestProcessWatc
 
   override def addLog(log: String): Unit = {
     logStringBuilder.append(log)
-    LogFeeder.log(LogRecord(testRun, log))
+    TestLogFeeder.log(LogRecord(testRun, log))
   }
 
 
   override def addReportLog(log: String): Unit = {
     reportLogBuilder.append(log)
     logStringBuilder.append(log)
-    LogFeeder.log(LogRecord(testRun, log))
+    TestLogFeeder.log(LogRecord(testRun, log))
   }
 
   def updateRun(): Unit = {
@@ -160,7 +158,6 @@ class TestRunContext(val testRun: TestRun) extends Runnable with TestProcessWatc
       }
       testRun.sutNames = sb.toString();
     }
-
     testRun.save()
   }
 
@@ -172,12 +169,10 @@ class TestRunContext(val testRun: TestRun) extends Runnable with TestProcessWatc
     testRun.number = TestRun.getMaxNumber() + 1
   }
 
-  def initialize() : MinderTdl = {
-
-    this.MinderTDL =cls.getConstructors()(0).newInstance(java.lang.Boolean.FALSE).asInstanceOf[MinderTdl];
+  def initialize(): MinderTdl = {
+    if (this.MinderTDL == null) {
+      this.MinderTDL = cls.getConstructors()(0).newInstance(java.lang.Boolean.FALSE).asInstanceOf[MinderTdl];
+    }
     MinderTDL;
-
-
   }
-
 }

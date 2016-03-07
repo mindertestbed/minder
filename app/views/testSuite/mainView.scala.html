@@ -1,44 +1,69 @@
 @(ts: TestSuite, display: String = "details")
-  @import java.util.concurrent.atomic.AtomicInteger
-  @import global.Util._;
-  @import views.html.util._
+@import java.util.concurrent.atomic.AtomicInteger
+@import global.Util._;
+@import views.html.util._
+@import views.html.authentication._
 
-  @main(Messages("minder.navigation.restricted.testdesigner"), "testGroups", "Test Groups") {
+@main(Messages("minder.navigation.restricted.testdesigner"), "testGroups",
+  Array(("Test Groups", controllers.routes.Application.testGroups().path()),
+    (ts.testGroup.name, controllers.routes.GroupController.getGroupDetailView(ts.testGroup.id, "suites").path()),
+    (ts.name, controllers.routes.TestSuiteController.getTestSuiteDetailView(ts.id, "details")))) {
 
-    @dialogs()
+  @dialogs()
 
-    <div class="padabit">
-      <script>
-          $(function(){
-            bindValues($("#name@{ts.id}"))
-          });
+  <div class="padabit container-fluid">
+    <script>
+        $(function(){
+          bindValues($("#name@ts.id"))
+        });
 
-          function showDetails() {
-            ajaxRouteGet(jsRoutes.controllers.TestSuiteController.renderDetailView, @ts.id, $("#habura"))
-          }
+        function showDetails() {
+          ajaxRouteGet(jsRoutes.controllers.TestSuiteController.renderDetails, @ts.id)
+        }
+        function showEdit() {
+          ajaxRouteGet(jsRoutes.controllers.TestSuiteController.renderEditor, @ts.id)
+        }
 
-          function showJobs() {
-            ajaxRouteGet(jsRoutes.controllers.TestSuiteController.renderJoblistView, @ts.id, $("#habura"))
-          }
+        function showStatus(){
+          ajaxRouteGet(jsRoutes.controllers.TestSuiteController.renderStatus, @ts.id)
+        }
+    </script>
 
-          function showRuns(){
-            ajaxRouteGet(jsRoutes.controllers.TestSuiteController.renderTestRunListView, @ts.id, $("#habura"))
-          }
-      </script>
+    <div class="row">
+      <div class="col-sm-@{
+        global.Util.remaining
+      }">
 
-      <h2>@Messages("testSuite.TestSuite")
-        <div id="name@{
-          ts.id
-        }" onclick='showUpdateInputTextDialog(@ts.id, "name", $(this).next(), "/doEditTestSuiteField")' class="hl editable"></div>
-        <input type="hidden" value="@ts.name"/>
-      </h2>
+        <h3>@Messages("testSuite.TestSuite")
+          <div id="name@ts.id"
 
-      <div class="indent">
+            @subjectIs(ts.owner) {
+              onclick='showUpdateInputTextDialog(@ts.id, "name", $(this).next(), "/doEditTestSuiteField")'
+            }
+              class="hl editable">
 
-        @ajaxDisplaySelector(display, "details" ->("Details", "showDetails"), "jobs" ->("Jobs", "showJobs"), "runs" ->("Test Runs", "showRuns"))
+          </div>
+          <input type="hidden" value="@ts.name"/>
+        </h3>
 
-        <div id="habura"></div>
+        <div class="indent">
+          @subjectIsOr(ts.owner) {
+            @ajaxDisplaySelector(display, "status" ->("Status", "showStatus"), "details" ->("Details", "showDetails"), "edit" ->("Edit", "showEdit"))
+          }{
+          @ajaxDisplaySelector(display, "status" ->("Status", "showStatus"), "details" ->("Details", "showDetails"))
+        }
 
+          <div class="ajaxContent container-fluid"></div>
+
+        </div>
+      </div>
+      <div class="col-sm-@{
+        global.Util.feedWidth
+      } hidden-xs">
+        @views.html.job.jobQueueFeed()
+        <hr />
+        @views.html.job.jobHistoryFeed()
       </div>
     </div>
-  }
+  </div>
+}
