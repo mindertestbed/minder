@@ -80,7 +80,7 @@ POST        /doEditJobField                             controllers.JobControlle
 
 #Job Template
 POST        /doCreateJobTemplate                        controllers.JobTemplateController.doCreateJobTemplate(groupId: Long)
-GET         /createJobTemplateForm                      controllers.JobTemplateController.createJobTemplateForm()
+GET         /createJobTemplateForm                      controllers.JobTemplateController.createJobTemplateForm(groupId: Long)
 
 #test asset management
 POST        /doCreateTestAsset                          controllers.TestAssetController.doCreateTestAsset(groupId: Long)

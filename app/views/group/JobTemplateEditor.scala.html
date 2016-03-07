@@ -1,79 +1,148 @@
-@(frm: Form[_], localUser: models.User = null)
+@(frm: Form[_], tg: TestGroup)
 
-@import views.html.util._
-@import authentication._
 @import views.html.helper._
-@import helper._
+@import views.html.util._
 
 @implicitFieldConstructor = @{
   FieldConstructor(twitterBootstrapBasic.f)
 }
-<script>
-        $(function(){
-          $( "#rc1@{frm("id").value}" ).tabs();
-        });
-</script>
 
-<h2>New Job Template</h2>
-@if(frm.hasGlobalErrors) {
-  <p class="alert alert-danger">
-  @frm.globalError.message
-  </p>
+
+@main(Messages("minder.navigation.restricted.testdesigner"), "mainNavigation") {
+
+  <div class="padabit">
+    @dialogs()
+
+    <script>
+            $(function(){
+              $( "#rc1@{frm("id").value}" ).tabs();
+            });
+    </script>
+
+
+    <h2>New Job Template</h2>
+
+    <form action="@routes.JobTemplateController.doCreateJobTemplate(tg.id)" method="post">
+    @if(frm.hasGlobalErrors) {
+      <p class="alert alert-danger">
+      @frm.globalError.message
+      </p>
+
+    }
+      <div class="container">
+        <div class="row">
+          <div class="col-md-6">
+            <table class="topCells paddedTable noWrap formInput">
+              <tr><td>Job Template Name:</td><td>
+                <input type="text" name="name" value="@frm("name").value()" />
+                @formChecker(frm("name"))
+              </td></tr>
+              <tr><td>
+                Parameters:</td><td><textarea name="mtdlParameters" rows="5">@frm("mtdlParameters").value()</textarea></td></tr>
+            </table>
+          </div>
+          <div class="col-md-6">
+            <table class="topCells paddedTable noWrap formInput">
+
+              <tr><td>Visibility:</td><td>
+                <select id="visibility" name="visibility" >
+                @for(vis <- Visibility.values()) {
+                  @if(vis == frm("visibility").value) {
+                    <option selected="selected" value="@vis">@vis</option>
+                  } else {
+                    <option value="@vis">@vis</option>
+                  }
+                }
+                </select><br /></td></tr>
+
+          @repeat(frm("wrapperMappingList"), min = 0) { field =>
+            @defining(field.value.get) { str =>
+              @defining(MappedWrapperModel.parse(str)) { entry =>
+                <tr><td>
+                  <label for="@field.name" class="control-label">@entry.wrapperParam.name</label>:
+                </td><td><select id="@entry.wrapperParam.id" name="@field.name" style="width:200px ;">
+                @for(wrapperVersion <- JobController.listFittingWrappers(entry)) {
+                  <option value="@entry.toJsonWith(wrapperVersion)"
+                    @if(entry.wrapperVersion == wrapperVersion) {
+                      selected="selected" }>@{
+                    wrapperVersion.wrapper.name + " (" + wrapperVersion.version + ")"
+                  }</option>
+                }
+                </select><br /></td></tr>
+              }
+            }
+          }
+              <div class="col-md-8">
+                <table id = "wrapperMappingsTable" class="topCells paddedTable noWrap formInput">
+                  <tr>
+                    <td>Wrapper Parameter Mappings:<td>
+                  </tr>
+                  <tr>
+                    <td>
+                      <button id ="add" type="button" class="btn btn-default btn-sm">+</button> &nbsp;
+                    </td>
+                  </tr>
+                   <tr id ="variableWrapperPair"><td>
+                    Variable: <input type="text" name="variable">
+                  </td>
+                  @defining(Wrapper.getAll()) { wrapperList =>
+                  <td>
+                    Wrapper: <select id = 'wrapperlist'> 
+                      @for(wrapper <- wrapperList) { 
+                      <option> @wrapper.name</option> 
+                    } 
+                    </select>
+                  </td>
+                  }
+                   </tr>
+
+
+                      <script type="text/javascript">
+                              $(function(){
+                                $('#add').on('click',function(e) {
+
+                                  var wmtable = document.getElementById("wrapperMappingsTable");
+                                  var row = document.getElementById("variableWrapperPair");
+                                  var rowCopy = row.cloneNode(true);
+
+                                  wmtable.appendChild(rowCopy);
+
+
+                                })
+                              })
+                      </script>
+
+
+                    </td>
+                  </td>
+
+                </table>
+              </div>
+
+
+
+
+
+
+
+
+    <br />
+    <br />
+    <br />
+
+    <input type="hidden" name="id" id="id" value='@frm("id").value' />
+
+          </div></div>
+
+            <br />
+
+            <div align="center">
+              <button type="submit" class="btn btn-success btn-sm">Create</button> &nbsp;
+              <button type="reset" class="btn btn-primary btn-sm">Reset</button> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+              <button type="button" onclick="history.back ( )" class="btn btn-warning btn-sm">Cancel</button>
+            </div>
+
+    </form>
+  </div>
+
 }
-@inputText(
-  frm("name"),
-  '_label -> "Job Template Name"
-)
-
-@textarea(frm("mtdlParameters"), 'rows -> 5, '_label -> "Parameters", '_style -> "height:auto;")
-
-<label for="visibility">Visibility: </label>
-<select id="visibility" name="visibility" >
-@for(vis <- Visibility.values()) {
-  @if(vis == frm("visibility").value) {
-    <option selected="selected" value="@vis">@vis</option>
-  } else {
-    <option value="@vis">@vis</option>
-  }
-}
-</select><br />
-<br />
-<table>
-  <tr>
-    <td>
-      <label for="wrapperMappings">Wrapper Parameter Mappings: </label>
-  <td>
-  </tr>
-  <tr>
-    <td>
-      <button id ="btn" type="button" class="btn btn-default" >
-        <span class="glyphicon glyphicon-plus" aria-hidden="true" ></span>
-        <script type="text/javascript">
-                $(function(){
-                  $('#btn').on('click',function() {
-                    //alert('Hello!');
-                    var wmtable = document.getElementById("WrapperMappingsTable");
-                    var rowCount = wmtable.rows.length;
-                    var row = wmtable.insertRow(rowCount);
-                    var cell = row.insertCell(0);
-                    cell.innerHTML = cell.innerHTML +'<tr><td>Variable: <input type="text" name="variable"></td></tr>' +
-                            '<tr><td>Wrapper: <input type="text" name="wrapper"></td></tr>';
-                  })
-                })
-        </script>
-      </button>
-
-    </td>
-  </tr>
-  <tr>
-    <table id="WrapperMappingsTable">
-    </table>
-  </tr>
-</table>
-
-
-<br />
-<br />
-<br />
-
-<input type="hidden" name="id" id="id" value='@frm("id").value' />

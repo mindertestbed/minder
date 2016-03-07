@@ -69,6 +69,7 @@ restrictedTestPage.createJob = Create New Job
 restrictedTestPage.createWrapper= Create New Wrapper
 restrictedTestPage.createAsset= Create New Asset
 restrictedTestPage.importGroup= Import a Test Group
+restrictedTestPage.createJobTemplate= Create New Job Template
 
 
 minder.index.title=Minder (Test Bed)

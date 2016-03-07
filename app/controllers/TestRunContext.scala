@@ -9,7 +9,7 @@ import controllers.common.enumeration.TestStatus
 import minderengine._
 import models.Wrapper
 import models._
-import mtdl.{Rivet, TdlCompiler}
+import mtdl._
 import play.Logger
 
 import scala.collection.JavaConversions._
@@ -40,6 +40,7 @@ class TestRunContext(val testRun: TestRun) extends Runnable with TestProcessWatc
   val packageRoot = "_" + testGroup.id;
   val packagePath = packageRoot + "/_" + testCase.id;
   val cls = TdlCompiler.compileTdl(packageRoot, packagePath, testGroup.dependencyString, testCase.name, source = tdl.tdl, version = tdl.version);
+  var MinderTDL : MinderTdl;
   val logStringBuilder = new StringBuilder;
   val reportLogBuilder = new StringBuilder;
   var status = TestStatus.PENDING
@@ -169,6 +170,14 @@ class TestRunContext(val testRun: TestRun) extends Runnable with TestProcessWatc
 
   def updateNumber() = {
     testRun.number = TestRun.getMaxNumber() + 1
+  }
+
+  def initialize() : MinderTdl = {
+
+    this.MinderTDL =cls.getConstructors()(0).newInstance(java.lang.Boolean.FALSE).asInstanceOf[MinderTdl];
+    MinderTDL;
+
+
   }
 
 }

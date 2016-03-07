@@ -12,7 +12,7 @@ import play.Logger
 import scala.InterruptedException
 import scala.collection.JavaConversions._
 import scala.collection.mutable
-import controllers.TestQueueController
+import controllers.{TestRunContext, TestQueueController}
 import com.gitb.core.v1.StepStatus
 
 /**
@@ -87,6 +87,7 @@ object TestEngine {
 
   /**
     * Runs the provided already compiled tdl class with the given parameter mapping
+ *
     * @param userEmail
     * @param clsMinderTDL
     * @param wrapperMapping
@@ -94,9 +95,9 @@ object TestEngine {
     */
   def runTest(userEmail: String, clsMinderTDL: Class[MinderTdl],
               wrapperMapping: collection.mutable.Map[String, MappedWrapper],
-              testProcessWatcher: TestProcessWatcher, params: String): Unit = {
+              testRunContext: TestRunContext, params: String): Unit = {
     val lgr: org.apache.log4j.Logger = org.apache.log4j.Logger.getLogger("test");
-    val app = new MyAppender(testProcessWatcher);
+    val app = new MyAppender(testRunContext);
     val gtb = new GitbWatcher();
     app.setLayout(new EnhancedPatternLayout("%d{ISO8601}: %-5p - %m%n%throwable"));
     lgr.addAppender(app);
@@ -107,7 +108,9 @@ object TestEngine {
       lgr.info("Initialize test case")
 
       val const = clsMinderTDL.getConstructors()(0)
-      minderTDL = const.newInstance(java.lang.Boolean.TRUE).asInstanceOf[MinderTdl]
+
+
+      minderTDL = testRunContext.initialize();
 
       initializeFunctionsAndParameters(params, lgr)
 
@@ -146,11 +149,13 @@ object TestEngine {
       })
 
       //update the SUT names on the watcher
-      testProcessWatcher.updateSUTNames(sutNameSet)
+      testRunContext.updateSUTNames(sutNameSet)
 
       try {
-        var rivetIndex = 0;
-        for (rivet <- minderTDL.RivetDefs) {
+        //var rivetIndex = 0;//replace with current rivet index from mindertdl
+        var rivetIndex = minderTDL.currentRivetIndex;
+        for(rivet <- minderTDL.RivetDefs.slice(rivetIndex, minder.TDL.RivetDefs.size -1)){
+        //for (rivet <- minderTDL.RivetDefs) {
           var msg: String = "> RUN RIVET " + rivetIndex;
           lgr.info(msg)
           gtb.notifyProcessingInfo(msg, rivet)
