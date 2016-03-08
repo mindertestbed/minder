@@ -114,4 +114,8 @@ public class MinderSignalRegistry {
     wrapperMap.remove(testSession);
   }
 
+  public boolean hasSession(TestSession testSession){
+    return wrapperMap.containsKey(testSession);
+  }
+
 }

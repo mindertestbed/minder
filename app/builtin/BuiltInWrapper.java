@@ -98,4 +98,9 @@ public abstract class BuiltInWrapper extends Wrapper implements IMinderClient, I
   public SUTIdentifiers getSUTIdentifiers() {
     return null;
   }
+
+  @Override
+  public TestSession trigger(Long jobID, Visibility visibility) {
+    return null;
+  }
 }
