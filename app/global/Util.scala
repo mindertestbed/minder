@@ -392,6 +392,7 @@ object Util {
         wv.slots = null
         wv.wrapper.user = null;
         wv.wrapper.wrapperVersions = null
+        wv.mappedWrappers = null
         //wv.version="mami"
         temporaryList.add(wv)
       }
