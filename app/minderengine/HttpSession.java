@@ -5,7 +5,7 @@ import java.util.HashMap;
 /**
  * Created by yerlibilgin on 03/12/14.
  */
-public class GlobalSignalRegistry {
+public class HttpSession {
 
   private static final HashMap<String, HashMap<String, Object>> sessionMap = new HashMap<>();
 

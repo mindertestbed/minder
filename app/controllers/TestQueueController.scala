@@ -8,7 +8,7 @@ import com.avaje.ebean.Ebean
 import com.gitb.core.v1.StepStatus
 import controllers.TestLogFeeder.LogRecord
 import controllers.common.enumeration.OperationType
-import minderengine.{MinderSignalRegistry, GlobalSignalRegistry}
+import minderengine.{TestSession, MinderSignalRegistry, HttpSession}
 import models._
 import play.Logger
 import play.api.mvc._
@@ -51,8 +51,9 @@ object TestQueueController extends Controller {
           TestRunFeeder.jobQueueUpdate()
           run1 = activeRunContext.testRun
 
-          activeRunContext.sessionID = Utils.getCurrentTimeStamp;
-          GlobalSignalRegistry.registerObject(activeRunContext.sessionID, "signalRegistry", new MinderSignalRegistry());
+          val session = new TestSession
+          session.setSession(Utils.getCurrentTimeStamp)
+          MinderSignalRegistry.get().initTestSession(session)
 
           TestLogFeeder.log("--> Job with id [" + run1.job.id + "] arrived. Start");
           Thread.sleep(1000);
