@@ -91,11 +91,6 @@ POST        /doEditAsset                                controllers.TestAssetCon
 GET         /doDeleteAsset                              controllers.TestAssetController.doDeleteAsset(id: Long)
 GET         /downloadAsset                              controllers.TestAssetController.downloadAsset(id: Long)
 
-#TESTING
-POST        /testme                                     controllers.Tester.test
-GET         /runTest                                    controllers.Tester.runTest(id: Long, userId: Long)
-GET         /syncTest                                   controllers.Tester.syncTest(id: Long, userId: Long)
-
 #test run listing
 GET         /listTestRunsForm                           controllers.JobController.listTestRuns(configurationId: Long)
 GET         /viewReport                                 controllers.JobController.viewReport(testRunId: Long, type: String)

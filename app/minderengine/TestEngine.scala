@@ -4,17 +4,16 @@ import java.io.ByteArrayInputStream
 import java.lang.reflect.InvocationTargetException
 import java.util
 import java.util.Properties
+
+import com.gitb.core.v1.StepStatus
+import controllers.{TestQueueController, TestRunContext}
 import models._
 import mtdl._
 import org.apache.log4j.spi.LoggingEvent
 import org.apache.log4j.{AppenderSkeleton, EnhancedPatternLayout, Level}
-import play.Logger
-import scala.InterruptedException
+
 import scala.collection.JavaConversions._
-import scala.collection.mutable
-import controllers.{TestRunContext, TestQueueController}
-import com.gitb.core.v1.StepStatus
-import controllers.common.Utils;
+import scala.collection.mutable;
 
 /**
   * Created by yerlibilgin on 07/12/14.
@@ -156,8 +155,8 @@ object TestEngine {
       try {
         //var rivetIndex = 0;//replace with current rivet index from mindertdl
         var rivetIndex = minderTDL.currentRivetIndex;
-        for (rivet <- minderTDL.RivetDefs.slice(rivetIndex, minderTDL.RivetDefs.size - 1)) {
-          //for (rivet <- minderTDL.RivetDefs) {
+        for(rivet <- minderTDL.RivetDefs.slice(rivetIndex, minderTDL.RivetDefs.size -1)){
+        //for (rivet <- minderTDL.RivetDefs) {
           var msg: String = "> RUN RIVET " + rivetIndex;
           lgr.info(msg)
           gtb.notifyProcessingInfo(msg, rivet)
@@ -184,7 +183,7 @@ object TestEngine {
 
             try {
               for (tuple@(label, signature) <- rivet.signalPipeMap.keySet) {
-                val me: MinderSignalRegistry = GlobalSignalRegistry.getObject(sessionID, "signalRegistry")
+              val me: MinderSignalRegistry = HttpSession.getObject(sessionID, "signalRegistry")
                 if (me == null) {
                   msg = "No MinderSignalRegistry object defined for session " + userEmail;
                   gtb.notifyErrorInfo(msg, rivet)
