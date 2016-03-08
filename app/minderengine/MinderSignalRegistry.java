@@ -42,7 +42,7 @@ public class MinderSignalRegistry {
 
   /**
    * If the signal is not yet emitted, we still have to settle down
-   * and wait on a queue. That is why, we have to call init-map method here too
+   * and wait on a queue. That is why, we have to call findRelatedQueue method here too
    *
    * @param adapterIdentifier
    * @param signature

@@ -53,7 +53,9 @@ object TestQueueController extends Controller {
 
           val session = new TestSession
           session.setSession(activeRunContext.sessionID)
-          MinderSignalRegistry.get().initTestSession(session)
+          val minderSignalRegistry : MinderSignalRegistry = MinderSignalRegistry.get();
+          minderSignalRegistry.initTestSession(session)
+          HttpSession.registerObject(activeRunContext.sessionID, "signalRegistry", minderSignalRegistry);
 
           TestLogFeeder.log("--> Job with id [" + run1.job.id + "] arrived. Start");
           Thread.sleep(1000);
