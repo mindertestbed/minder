@@ -155,7 +155,7 @@ object TestEngine {
       try {
         //var rivetIndex = 0;//replace with current rivet index from mindertdl
         var rivetIndex = minderTDL.currentRivetIndex;
-        for(rivet <- minderTDL.RivetDefs.slice(rivetIndex, minderTDL.RivetDefs.size -1)){
+        for(rivet <- minderTDL.RivetDefs.slice(rivetIndex, minderTDL.RivetDefs.size)){
         //for (rivet <- minderTDL.RivetDefs) {
           var msg: String = "> RUN RIVET " + rivetIndex;
           lgr.info(msg)
