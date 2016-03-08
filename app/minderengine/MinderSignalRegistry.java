@@ -61,20 +61,20 @@ public class MinderSignalRegistry {
   * Adding an incoming signal into the related queue.
   * */
   private PriorityBlockingQueue<SignalData> findRelatedQueue(TestSession testSession, AdapterIdentifier adapterIdentifier, String signature) {
-    HashMap<AdapterIdentifier, HashMap<String, PriorityBlockingQueue<SignalData>>> adapteMap = null;
+    HashMap<AdapterIdentifier, HashMap<String, PriorityBlockingQueue<SignalData>>> adapterMap = null;
     if (!wrapperMap.containsKey(testSession)) {
-      adapteMap = new HashMap<AdapterIdentifier, HashMap<String, PriorityBlockingQueue<SignalData>>>();
-      wrapperMap.put(testSession, adapteMap);
+      adapterMap = new HashMap<AdapterIdentifier, HashMap<String, PriorityBlockingQueue<SignalData>>>();
+      wrapperMap.put(testSession, adapterMap);
     } else {
-      adapteMap = wrapperMap.get(testSession);
+      adapterMap = wrapperMap.get(testSession);
     }
 
     HashMap<String, PriorityBlockingQueue<SignalData>> signalMap = null;
-    if (!adapteMap.containsKey(adapterIdentifier)) {
+    if (!adapterMap.containsKey(adapterIdentifier)) {
       signalMap = new HashMap<String, PriorityBlockingQueue<SignalData>>();
-      adapteMap.put(adapterIdentifier,signalMap);
+      adapterMap.put(adapterIdentifier,signalMap);
     } else {
-      signalMap = adapteMap.get(adapterIdentifier);
+      signalMap = adapterMap.get(adapterIdentifier);
     }
 
     PriorityBlockingQueue<SignalData> queue = null;
