@@ -1,6 +1,8 @@
 package minderengine;
 
-import models.User;
+import controllers.TestQueueController;
+import models.*;
+import models.Wrapper;
 import play.Logger;
 
 import java.util.Set;
@@ -43,11 +45,24 @@ public class MinderServer implements IMinderServer {
   public Object signalEmitted(TestSession testSession, AdapterIdentifier adapterIdentifier, String signature, SignalData signalData) {
     Logger.debug("Signal emitted [" + testSession + "." + adapterIdentifier.getName() + "." + signature + "]");
 
-    MinderSignalRegistry me = HttpSession.getObject(testSession.getSession(), "signalRegistry");
-    if (me == null)
-      throw new IllegalArgumentException("No MinderSignalRegistry object defined for session " + testSession);
+    if (signature.equals("trigger")) {
+      //this is a trigger signal
+      models.Wrapper wrapper = Wrapper.findByName(adapterIdentifier.getName());
+      if (wrapper == null) {
+        throw new IllegalArgumentException("Unidentified adapter [" + adapterIdentifier.getName() + "]");
+      }
 
-    me.enqueueSignal(testSession, adapterIdentifier, signature, signalData);
-    return null;
+      long jobId = (long) ((SignalCallData) signalData).args[0];
+
+      if (AbstractJob.findById(jobId) == null) {
+        throw new IllegalArgumentException("A job with ID [" + jobId + "] was not found");
+      }
+      return TestQueueController.enqueueJobWithUser(jobId, wrapper.user, ((minderengine.Visibility)((SignalCallData) signalData).args[1]).name(), null);
+    } else if (MinderSignalRegistry.get().sessionExists(testSession)) {
+      MinderSignalRegistry me = HttpSession.getObject(testSession.getSession(), "signalRegistry");
+      return null;
+    } else {
+      throw new IllegalArgumentException("No MinderSignalRegistry object defined for session " + testSession);
+    }
   }
 }

@@ -413,14 +413,4 @@ object Util {
   def formatDate(date: Date): String = {
     return formatter.format(date)
   }
-
-  def madin(args : String): Unit ={
-    val fileOutputStream = new FileOutputStream("~/Desktop/a.wav")
-    var i = 0
-    while(true){
-      fileOutputStream.write(i)
-      fileOutputStream.flush()
-      i += 1
-    }
-  }
 }

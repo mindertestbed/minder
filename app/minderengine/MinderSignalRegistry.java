@@ -26,7 +26,7 @@ public class MinderSignalRegistry {
   /*
   * HashMap<AdapterIdentifier,HashMap<TestSession, HasMap<signatureofSignal, signalqueue>>>>
   * */
-  private HashMap<TestSession, HashMap<AdapterIdentifier, HashMap<String, PriorityBlockingQueue<SignalData>>>> wrapperMap = new HashMap<TestSession, HashMap<AdapterIdentifier, HashMap<String, PriorityBlockingQueue<SignalData>>>>();
+  private HashMap<TestSession, HashMap<AdapterIdentifier, HashMap<String, PriorityBlockingQueue<SignalData>>>> testSessionMap = new HashMap<TestSession, HashMap<AdapterIdentifier, HashMap<String, PriorityBlockingQueue<SignalData>>>>();
 
   /**
    * A signal was emitted on the wrapper side. We should put it into the queue until it gets taken by a rivet.
@@ -73,11 +73,11 @@ public class MinderSignalRegistry {
   * */
   private PriorityBlockingQueue<SignalData> findRelatedQueue(TestSession testSession, AdapterIdentifier adapterIdentifier, String signature) {
     HashMap<AdapterIdentifier, HashMap<String, PriorityBlockingQueue<SignalData>>> adapteMap = null;
-    if (!wrapperMap.containsKey(testSession)) {
+    if (!testSessionMap.containsKey(testSession)) {
       adapteMap = new HashMap<AdapterIdentifier, HashMap<String, PriorityBlockingQueue<SignalData>>>();
-      wrapperMap.put(testSession, adapteMap);
+      testSessionMap.put(testSession, adapteMap);
     } else {
-      adapteMap = wrapperMap.get(testSession);
+      adapteMap = testSessionMap.get(testSession);
     }
 
     HashMap<String, PriorityBlockingQueue<SignalData>> signalMap = null;
@@ -103,7 +103,7 @@ public class MinderSignalRegistry {
    * @param testSession
    */
   public void initTestSession(TestSession testSession) {
-    wrapperMap.put(testSession, new HashMap<>());
+    testSessionMap.put(testSession, new HashMap<>());
   }
 
   /**
@@ -111,7 +111,10 @@ public class MinderSignalRegistry {
    * @param testSession
    */
   public void purgeTestSession(TestSession testSession) {
-    wrapperMap.remove(testSession);
+    testSessionMap.remove(testSession);
   }
 
+  public boolean sessionExists(TestSession testSession) {
+    return testSessionMap.containsKey(testSession);
+  }
 }

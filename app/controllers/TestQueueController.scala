@@ -1,5 +1,6 @@
 package controllers
 
+import java.io.FileOutputStream
 import java.util
 import java.util.Date
 import java.util.concurrent.LinkedBlockingQueue
@@ -7,14 +8,15 @@ import java.util.concurrent.LinkedBlockingQueue
 import com.avaje.ebean.Ebean
 import com.gitb.core.v1.StepStatus
 import controllers.TestLogFeeder.LogRecord
+import controllers.common.Utils
 import controllers.common.enumeration.OperationType
-import minderengine.{TestSession, MinderSignalRegistry, HttpSession}
+import minderengine.{MinderSignalRegistry, TestSession}
 import models._
 import play.Logger
 import play.api.mvc._
 import rest.controllers.GitbTestbedController
+
 import scala.collection.JavaConversions._
-import controllers.common.Utils
 
 /**
   * Manages the job lifecycle.
@@ -114,20 +116,24 @@ object TestQueueController extends Controller {
     *
     * @return
     */
-  def enqueueGitbJobWithUser(id: Long, user: User, replyToUrlAddress: String) {
+  def enqueueJobWithUser(id: Long, user: User, replyToUrlAddress: String, visibility: Visibility): TestSession = {
     if (jobQueue.size >= 30) {
-      BadRequest("The job queue is full.")
+      throw new IllegalStateException("Test queue is full")
     } else {
-      val job = GitbJob.findById(id)
+      val job = AbstractJob.findById(id)
       if (job == null) {
-        BadRequest("A job with id [" + id + "] was not found!")
+        throw new IllegalStateException("A job with id [" + id + "] was not found!")
       } else {
-        var testRunContext = createTestRunContext(job, user, Visibility.PROTECTED);
+        var testRunContext = createTestRunContext(job, user, visibility);
         testRunContext.gitbReplyToUrlAddress = replyToUrlAddress
         jobQueue.synchronized {
           jobQueue.offer(testRunContext)
         }
         TestRunFeeder.jobQueueUpdate()
+
+        val ts = new TestSession()
+        ts.setSession(testRunContext.sessionID)
+        return ts;
       }
     }
   }
