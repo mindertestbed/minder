@@ -18,6 +18,7 @@ import java.io.StringWriter;
 import java.lang.reflect.Field;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.TimeZone;
 
@@ -86,10 +87,7 @@ public class Utils extends Controller {
 
   // Gets the current timestamp in ISO 8601 Format : 2016-03-03T08:21:45+00:00
   public static String getCurrentTimeStamp(){
-    TimeZone tz = TimeZone.getTimeZone("UTC");
-    DateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mmZ");
-    df.setTimeZone(tz);
-    return df.format(new Date());
+    return javax.xml.bind.DatatypeConverter.printDateTime(Calendar.getInstance(TimeZone.getTimeZone("UTC")));
   }
 
 }

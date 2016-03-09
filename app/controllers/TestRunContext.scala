@@ -4,6 +4,7 @@ import java.util
 
 import builtin.ReportGenerator
 import controllers.TestLogFeeder.LogRecord
+import controllers.common.Utils
 import controllers.common.enumeration.TestStatus
 import minderengine._
 import models.Wrapper
@@ -42,7 +43,7 @@ class TestRunContext(val testRun: TestRun) extends Runnable with TestProcessWatc
   val reportLogBuilder = new StringBuilder;
   var status = TestStatus.PENDING
 
-  var sessionID: String = null;
+  var sessionID: String = Utils.getCurrentTimeStamp;
 
   /**
     * Number of steps that will be calculated at the beginning for percentage

@@ -42,7 +42,7 @@ public class MinderSignalRegistry {
 
   /**
    * If the signal is not yet emitted, we still have to settle down
-   * and wait on a queue. That is why, we have to call init-map method here too
+   * and wait on a queue. That is why, we have to call findRelatedQueue method here too
    *
    * @param adapterIdentifier
    * @param signature
@@ -72,20 +72,20 @@ public class MinderSignalRegistry {
   * Adding an incoming signal into the related queue.
   * */
   private PriorityBlockingQueue<SignalData> findRelatedQueue(TestSession testSession, AdapterIdentifier adapterIdentifier, String signature) {
-    HashMap<AdapterIdentifier, HashMap<String, PriorityBlockingQueue<SignalData>>> adapteMap = null;
+    HashMap<AdapterIdentifier, HashMap<String, PriorityBlockingQueue<SignalData>>> adapterMap = null;
     if (!testSessionMap.containsKey(testSession)) {
-      adapteMap = new HashMap<AdapterIdentifier, HashMap<String, PriorityBlockingQueue<SignalData>>>();
+      adapterMap = new HashMap<AdapterIdentifier, HashMap<String, PriorityBlockingQueue<SignalData>>>();
       testSessionMap.put(testSession, adapteMap);
     } else {
-      adapteMap = testSessionMap.get(testSession);
+      adapterMap = testSessionMap.get(testSession);
     }
 
     HashMap<String, PriorityBlockingQueue<SignalData>> signalMap = null;
-    if (!adapteMap.containsKey(adapterIdentifier)) {
+    if (!adapterMap.containsKey(adapterIdentifier)) {
       signalMap = new HashMap<String, PriorityBlockingQueue<SignalData>>();
-      adapteMap.put(adapterIdentifier, signalMap);
+      adapterMap.put(adapterIdentifier,signalMap);
     } else {
-      signalMap = adapteMap.get(adapterIdentifier);
+      signalMap = adapterMap.get(adapterIdentifier);
     }
 
     PriorityBlockingQueue<SignalData> queue = null;
@@ -114,7 +114,8 @@ public class MinderSignalRegistry {
     testSessionMap.remove(testSession);
   }
 
-  public boolean sessionExists(TestSession testSession) {
+  public boolean hasSession(TestSession testSession){
     return testSessionMap.containsKey(testSession);
   }
+
 }

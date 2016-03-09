@@ -155,7 +155,7 @@ object TestEngine {
       try {
         //var rivetIndex = 0;//replace with current rivet index from mindertdl
         var rivetIndex = minderTDL.currentRivetIndex;
-        for(rivet <- minderTDL.RivetDefs.slice(rivetIndex, minderTDL.RivetDefs.size -1)){
+        for(rivet <- minderTDL.RivetDefs.slice(rivetIndex, minderTDL.RivetDefs.size)){
         //for (rivet <- minderTDL.RivetDefs) {
           var msg: String = "> RUN RIVET " + rivetIndex;
           lgr.info(msg)
@@ -183,8 +183,8 @@ object TestEngine {
 
             try {
               for (tuple@(label, signature) <- rivet.signalPipeMap.keySet) {
-              val me: MinderSignalRegistry = HttpSession.getObject(sessionID, "signalRegistry")
-                if (me == null) {
+
+                if (!MinderSignalRegistry.get().hasSession(session)) {
                   msg = "No MinderSignalRegistry object defined for session " + userEmail;
                   gtb.notifyErrorInfo(msg, rivet)
                   throw new scala.IllegalArgumentException(msg)
@@ -209,7 +209,7 @@ object TestEngine {
 
 
                 val signalData: SignalData = try {
-                  me.dequeueSignal(session, signalAdapterIdentifier, signature, signal.timeout)
+                  MinderSignalRegistry.get().dequeueSignal(session, signalAdapterIdentifier, signature, signal.timeout)
                 } catch {
                   case rte: RuntimeException => {
                     signal.handleTimeout(rte)
