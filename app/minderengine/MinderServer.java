@@ -1,6 +1,7 @@
 package minderengine;
 
 import controllers.TestQueueController;
+import controllers.TestRunContext;
 import models.*;
 import models.Wrapper;
 import play.Logger;
@@ -57,9 +58,15 @@ public class MinderServer implements IMinderServer {
       if (AbstractJob.findById(jobId) == null) {
         throw new IllegalArgumentException("A job with ID [" + jobId + "] was not found");
       }
-      return TestQueueController.enqueueJobWithUser(jobId, wrapper.user, ((minderengine.Visibility)((SignalCallData) signalData).args[1]).name(), null);
-    } else if (MinderSignalRegistry.get().sessionExists(testSession)) {
-      MinderSignalRegistry me = HttpSession.getObject(testSession.getSession(), "signalRegistry");
+      return TestQueueController.enqueueJobWithUser(jobId, wrapper.user, ((minderengine.Visibility) ((SignalCallData) signalData).args[1]).name(), null);
+    } else if (MinderSignalRegistry.get().hasSession(testSession)) {
+      MinderSignalRegistry.get().enqueueSignal(testSession, adapterIdentifier, signature, signalData);
+
+
+      if (ContextContainer.get().contains(testSession)) {
+        TestRunContext testRunContext = ContextContainer.get().findAndPurge(testSession);
+        TestQueueController.enqueueTestRunContext(testRunContext);
+      }
       return null;
     } else {
       throw new IllegalArgumentException("No MinderSignalRegistry object defined for session " + testSession);

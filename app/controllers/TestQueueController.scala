@@ -53,11 +53,10 @@ object TestQueueController extends Controller {
           TestRunFeeder.jobQueueUpdate()
           run1 = activeRunContext.testRun
 
-          val session = new TestSession
-          session.setSession(activeRunContext.sessionID)
-          val minderSignalRegistry : MinderSignalRegistry = MinderSignalRegistry.get();
-          minderSignalRegistry.initTestSession(session)
-          HttpSession.registerObject(activeRunContext.sessionID, "signalRegistry", minderSignalRegistry);
+          val session: TestSession = new TestSession(activeRunContext.sessionID)
+
+          if (!MinderSignalRegistry.get().hasSession(session))
+            MinderSignalRegistry.get().initTestSession(session)
 
           TestLogFeeder.log("--> Job with id [" + run1.job.id + "] arrived. Start");
           Thread.sleep(1000);
@@ -71,6 +70,7 @@ object TestQueueController extends Controller {
             TestLogFeeder.log(LogRecord(run1, "<-- Job Interrupted"))
           }
           case t: Throwable => {
+            Logger.error(t.getMessage, t)
             TestLogFeeder.log(LogRecord(run1, "<-- Error [" + t.getMessage + "]"))
           }
         } finally {
@@ -356,5 +356,10 @@ object TestQueueController extends Controller {
         }
       }
     }
+  }
+
+  def enqueueTestRunContext(testRunContext: TestRunContext): Unit = {
+    jobQueue.offer(testRunContext)
+    TestRunFeeder.jobQueueUpdate()
   }
 }

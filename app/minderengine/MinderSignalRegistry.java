@@ -3,7 +3,6 @@ package minderengine;
 import org.interop.xoola.core.XoolaProperty;
 
 import java.util.HashMap;
-import java.util.concurrent.PriorityBlockingQueue;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -23,10 +22,10 @@ public class MinderSignalRegistry {
     return instance;
   }
 
-  /*
-  * HashMap<AdapterIdentifier,HashMap<TestSession, HasMap<signatureofSignal, signalqueue>>>>
-  * */
-  private HashMap<TestSession, HashMap<AdapterIdentifier, HashMap<String, PriorityBlockingQueue<SignalData>>>> testSessionMap = new HashMap<TestSession, HashMap<AdapterIdentifier, HashMap<String, PriorityBlockingQueue<SignalData>>>>();
+  /**
+   * This structure maps the test sessions to the adapters-signals queues
+   */
+  private HashMap<TestSession, AdapterSignalMap> testSessionMap = new HashMap<TestSession, AdapterSignalMap>();
 
   /**
    * A signal was emitted on the wrapper side. We should put it into the queue until it gets taken by a rivet.
@@ -36,7 +35,7 @@ public class MinderSignalRegistry {
    * @param signalData
    */
   public void enqueueSignal(TestSession testSession, AdapterIdentifier adapterIdentifier, String signature, SignalData signalData) {
-    PriorityBlockingQueue<SignalData> signalQueue = findRelatedQueue(testSession, adapterIdentifier, signature);
+    SignalQueue signalQueue = findRelatedQueue(testSession, adapterIdentifier, signature);
     signalQueue.offer(signalData);
   }
 
@@ -51,7 +50,7 @@ public class MinderSignalRegistry {
    * @return
    */
   public SignalData dequeueSignal(TestSession testSession, AdapterIdentifier adapterIdentifier, String signature, long timeout) {
-    PriorityBlockingQueue<SignalData> signalQueue = findRelatedQueue(testSession, adapterIdentifier, signature);
+    SignalQueue signalQueue = findRelatedQueue(testSession, adapterIdentifier, signature);
 
     if (timeout == 0)
       timeout = Long.parseLong(XoolaServer.properties.getProperty(XoolaProperty.NETWORK_RESPONSE_TIMEOUT));
@@ -71,50 +70,52 @@ public class MinderSignalRegistry {
   /*
   * Adding an incoming signal into the related queue.
   * */
-  private PriorityBlockingQueue<SignalData> findRelatedQueue(TestSession testSession, AdapterIdentifier adapterIdentifier, String signature) {
-    HashMap<AdapterIdentifier, HashMap<String, PriorityBlockingQueue<SignalData>>> adapterMap = null;
+  private SignalQueue findRelatedQueue(TestSession testSession, AdapterIdentifier adapterIdentifier, String signature) {
+    AdapterSignalMap adapterMap;
     if (!testSessionMap.containsKey(testSession)) {
-      adapterMap = new HashMap<AdapterIdentifier, HashMap<String, PriorityBlockingQueue<SignalData>>>();
-      testSessionMap.put(testSession, adapteMap);
+      adapterMap = new AdapterSignalMap();
+      testSessionMap.put(testSession, adapterMap);
     } else {
       adapterMap = testSessionMap.get(testSession);
     }
 
-    HashMap<String, PriorityBlockingQueue<SignalData>> signalMap = null;
+    SignalMap signalMap;
     if (!adapterMap.containsKey(adapterIdentifier)) {
-      signalMap = new HashMap<String, PriorityBlockingQueue<SignalData>>();
-      adapterMap.put(adapterIdentifier,signalMap);
+      signalMap = new SignalMap();
+      adapterMap.put(adapterIdentifier, signalMap);
     } else {
       signalMap = adapterMap.get(adapterIdentifier);
     }
 
-    PriorityBlockingQueue<SignalData> queue = null;
+    SignalQueue signalQueue;
     if (!signalMap.containsKey(signature)) {
-      queue = new PriorityBlockingQueue<SignalData>();
-      signalMap.put(signature, queue);
+      signalQueue = new SignalQueue();
+      signalMap.put(signature, signalQueue);
     } else {
-      queue = signalMap.get(signature);
+      signalQueue = signalMap.get(signature);
     }
-    return queue;
+    return signalQueue;
   }
 
   /**
    * Initialize the necessary data structures for a test session
+   *
    * @param testSession
    */
   public void initTestSession(TestSession testSession) {
-    testSessionMap.put(testSession, new HashMap<>());
+      testSessionMap.put(testSession, new AdapterSignalMap());
   }
 
   /**
    * Remove the map for that specific test session
+   *
    * @param testSession
    */
   public void purgeTestSession(TestSession testSession) {
     testSessionMap.remove(testSession);
   }
 
-  public boolean hasSession(TestSession testSession){
+  public boolean hasSession(TestSession testSession) {
     return testSessionMap.containsKey(testSession);
   }
 

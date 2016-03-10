@@ -87,6 +87,10 @@ public class Utils extends Controller {
 
   // Gets the current timestamp in ISO 8601 Format : 2016-03-03T08:21:45+00:00
   public static String getCurrentTimeStamp(){
+    try {
+      Thread.sleep(1);
+    } catch (InterruptedException e) {
+    }
     return javax.xml.bind.DatatypeConverter.printDateTime(Calendar.getInstance(TimeZone.getTimeZone("UTC")));
   }
 

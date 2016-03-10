@@ -176,6 +176,7 @@ public class TestCaseController extends Controller {
         try {
           TestEngine.describeTdl(tdl);
         } catch (Exception ex) {
+          Logger.error(ex.getMessage(), ex);
           filledForm.reject(ex.getMessage());
           return badRequest(testCaseEditor.render(filledForm, true));
 
