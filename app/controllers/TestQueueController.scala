@@ -1,6 +1,5 @@
 package controllers
 
-import java.io.FileOutputStream
 import java.util
 import java.util.Date
 import java.util.concurrent.LinkedBlockingQueue
@@ -8,9 +7,8 @@ import java.util.concurrent.LinkedBlockingQueue
 import com.avaje.ebean.Ebean
 import com.gitb.core.v1.StepStatus
 import controllers.TestLogFeeder.LogRecord
-import controllers.common.Utils
 import controllers.common.enumeration.OperationType
-import minderengine.{MinderSignalRegistry, TestSession}
+import minderengine.{MinderSignalRegistry, TestSession, Visibility}
 import models._
 import play.Logger
 import play.api.mvc._

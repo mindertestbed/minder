@@ -3,6 +3,7 @@ package models;
 import com.avaje.ebean.Ebean;
 import com.avaje.ebean.ExpressionList;
 import com.avaje.ebean.Model;
+import minderengine.Visibility;
 
 import javax.persistence.*;
 import java.util.List;

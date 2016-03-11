@@ -1,25 +1,17 @@
 package rest.controllers;
 
-import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.GregorianCalendar;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Set;
-
-import javax.xml.datatype.DatatypeConfigurationException;
-import javax.xml.datatype.DatatypeFactory;
-import javax.xml.datatype.XMLGregorianCalendar;
-
+import com.avaje.ebean.Ebean;
+import com.gitb.core.v1.*;
+import com.gitb.tbs.v1.*;
+import com.gitb.tpl.v1.*;
+import com.gitb.tr.v1.TestResultType;
+import controllers.TestQueueController;
+import minderengine.Visibility;
 import models.*;
+import models.TestCase;
 import mtdl.MinderTdl;
 import mtdl.Rivet;
 import mtdl.TdlCompiler;
-
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
@@ -27,7 +19,6 @@ import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.util.EntityUtils;
-
 import play.mvc.Controller;
 import play.mvc.Http;
 import play.mvc.Result;
@@ -38,36 +29,14 @@ import rest.controllers.restbodyprocessor.XMLContentProcessor;
 import rest.models.GetTestCaseDefinitions;
 import scala.collection.JavaConversions;
 
-import com.avaje.ebean.Ebean;
-import com.gitb.core.v1.Actor;
-import com.gitb.core.v1.ActorConfiguration;
-import com.gitb.core.v1.ConfigurationType;
-import com.gitb.core.v1.Endpoint;
-import com.gitb.core.v1.Metadata;
-import com.gitb.core.v1.Parameter;
-import com.gitb.core.v1.Roles;
-import com.gitb.core.v1.StepStatus;
-import com.gitb.core.v1.TestRole;
-import com.gitb.core.v1.TestRoleEnumeration;
-import com.gitb.core.v1.UsageEnumeration;
-import com.gitb.core.v1.ValueEmbeddingEnumeration;
-import com.gitb.tbs.v1.BasicCommand;
-import com.gitb.tbs.v1.BasicRequest;
-import com.gitb.tbs.v1.ConfigureRequest;
-import com.gitb.tbs.v1.ConfigureResponse;
-import com.gitb.tbs.v1.GetActorDefinitionRequest;
-import com.gitb.tbs.v1.GetActorDefinitionResponse;
-import com.gitb.tbs.v1.GetTestCaseDefinitionResponse;
-import com.gitb.tbs.v1.InitiateResponse;
-import com.gitb.tbs.v1.TestStepStatus;
-import com.gitb.tpl.v1.DecisionStep;
-import com.gitb.tpl.v1.MessagingStep;
-import com.gitb.tpl.v1.Preliminary;
-import com.gitb.tpl.v1.Sequence;
-import com.gitb.tpl.v1.TestStep;
-import com.gitb.tr.v1.TestResultType;
-
-import controllers.TestQueueController;
+import javax.xml.datatype.DatatypeConfigurationException;
+import javax.xml.datatype.DatatypeFactory;
+import javax.xml.datatype.XMLGregorianCalendar;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.*;
 
 public class GitbTestbedController extends Controller {
 

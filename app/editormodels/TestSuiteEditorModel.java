@@ -1,7 +1,7 @@
 package editormodels;
 
 import models.ModelConstants;
-import models.Visibility;
+import minderengine.Visibility;
 import play.data.validation.Constraints;
 
 import java.util.List;

@@ -46,7 +46,8 @@ public class MinderServer implements IMinderServer {
   public Object signalEmitted(TestSession testSession, AdapterIdentifier adapterIdentifier, String signature, SignalData signalData) {
     Logger.debug("Signal emitted [" + testSession + "." + adapterIdentifier.getName() + "." + signature + "]");
 
-    if (signature.equals("trigger")) {
+    if (signature.equals("trigger(java.lang.Long,minderengine.Visibility)")) {
+      Logger.debug("Received trigger signal");
       //this is a trigger signal
       models.Wrapper wrapper = Wrapper.findByName(adapterIdentifier.getName());
       if (wrapper == null) {
@@ -58,7 +59,15 @@ public class MinderServer implements IMinderServer {
       if (AbstractJob.findById(jobId) == null) {
         throw new IllegalArgumentException("A job with ID [" + jobId + "] was not found");
       }
-      return TestQueueController.enqueueJobWithUser(jobId, wrapper.user, ((minderengine.Visibility) ((SignalCallData) signalData).args[1]).name(), null);
+
+
+      Logger.debug("Trigger job " + jobId);
+
+      Visibility vis = (Visibility) ((SignalCallData) signalData).args[1];
+      System.out.println(vis);
+      TestSession session = TestQueueController.enqueueJobWithUser(jobId, wrapper.user, null, vis);
+      MinderSignalRegistry.get().initTestSession(session);
+      return session;
     } else if (MinderSignalRegistry.get().hasSession(testSession)) {
       MinderSignalRegistry.get().enqueueSignal(testSession, adapterIdentifier, signature, signalData);
 

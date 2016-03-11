@@ -9,16 +9,13 @@ import java.util.regex.Pattern
 import java.util.zip.{GZIPInputStream, GZIPOutputStream}
 
 import controllers.MappedWrapperModel
+import minderengine.Visibility
 import models._
 import play.Logger
-import play.api.i18n.Messages
 import play.data.Form
 import play.data.validation.{Constraints, ValidationError}
-import play.mvc.Http
-import play.twirl.api.Html
+
 import scala.collection.JavaConversions._
-import play.api.Play.current
-import play.api.i18n.Messages.Implicits._
 
 /**
   * Created by yerlibilgin on 02/05/15.
@@ -185,7 +182,7 @@ object Util {
     localUser.email == "root@minder" || localUser.email == owner.email
   }
 
-  def canAccess(subject: User, owner: User, visibility: models.Visibility): Boolean = {
+  def canAccess(subject: User, owner: User, visibility: Visibility): Boolean = {
     if (subject != null && owner != null) {
       if ((subject.email == "root@minder") || (subject.email == owner.email) ||
         (subject.hasRole(security.Role.TEST_DESIGNER) && visibility != Visibility.PRIVATE)

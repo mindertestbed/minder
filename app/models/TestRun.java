@@ -2,6 +2,7 @@ package models;
 
 import com.avaje.ebean.Ebean;
 import com.avaje.ebean.Model;
+import minderengine.Visibility;
 import play.Logger;
 
 import javax.persistence.*;

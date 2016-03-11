@@ -2,6 +2,7 @@ package models;
 
 import com.avaje.ebean.Ebean;
 import com.avaje.ebean.Model;
+import minderengine.Visibility;
 import play.Logger;
 
 import javax.persistence.*;
@@ -10,7 +11,7 @@ import java.util.List;
 
 /**
  * Created by yerlibilgin on 30/12/14.
- *
+ * <p>
  * Represents a collection of test runs created by a run on a test suite
  */
 @Entity

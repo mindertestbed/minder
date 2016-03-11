@@ -1,7 +1,7 @@
 package editormodels;
 
 import controllers.MappedWrapperModel;
-import models.Visibility;
+import minderengine.Visibility;
 import play.data.validation.Constraints;
 
 import java.util.List;

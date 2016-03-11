@@ -23,6 +23,7 @@ import views.html.job.*;
 import java.io.ByteArrayOutputStream;
 import java.util.*;
 import static play.data.Form.form;
+import minderengine.Visibility;
 
 /**
  * Created by yerlibilgin on 03/05/15.

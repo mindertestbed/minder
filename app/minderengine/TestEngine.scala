@@ -103,11 +103,13 @@ object TestEngine {
     app.setLayout(new EnhancedPatternLayout("%d{ISO8601}: %-5p - %m%n%throwable"));
     lgr.addAppender(app);
 
-    lgr.info("Start Test")
-
+    if (testRunContext.isSuspended()) {
+      lgr.info("Resume Test")
+    } else {
+      lgr.info("Start Test")
+    }
     var identifierMinderClientMap: util.Map[AdapterIdentifier, IdentifierClientPair] = null
 
-    var suspended = false
     val session = new TestSession(sessionID)
 
     try {
@@ -119,46 +121,46 @@ object TestEngine {
 
       initializeFunctionsAndParameters(params, lgr)
 
+      if (!testRunContext.isSuspended()) {
+        val sutNameSet = new util.HashSet[String]
 
-      val sutNameSet = new util.HashSet[String]
+        //first, call the start methods for all registered wrappers of this test.
 
-      //first, call the start methods for all registered wrappers of this test.
+        lgr.info("> Initialize the Adapters");
 
-      lgr.info("> Initialize the Adapters");
-
-      val startTestObject = new StartTestObject
-
-
-      val properties = new Properties()
-      properties.load(new ByteArrayInputStream(params.getBytes()))
+        val startTestObject = new StartTestObject
 
 
+        val properties = new Properties()
+        properties.load(new ByteArrayInputStream(params.getBytes()))
 
 
-      startTestObject.setSession(session)
-      startTestObject.setProperties(properties)
 
 
-      //call start test on all adapters and populate the SUT names
-      identifierMinderClientMap.values().foreach(pair => {
-        lgr.info("Call start test on " + pair.adapterIdentifier.getName)
-        pair.minderClient.startTest(startTestObject)
+        startTestObject.setSession(session)
+        startTestObject.setProperties(properties)
 
-        lgr.info("Obtain SUT Identifiers from " + pair.adapterIdentifier.getName)
-        val sutIdentifiers = pair.minderClient.getSUTIdentifiers;
 
-        if (sutIdentifiers != null) {
-          for (sutIdentifier <- sutIdentifiers.getIdentifiers) {
-            lgr.info("System Under Test: " + sutIdentifier.getSutName)
-            sutNameSet.add(sutIdentifier.getSutName)
+        //call start test on all adapters and populate the SUT names
+        identifierMinderClientMap.values().foreach(pair => {
+          lgr.info("Call start test on " + pair.adapterIdentifier.getName)
+          pair.minderClient.startTest(startTestObject)
+
+          lgr.info("Obtain SUT Identifiers from " + pair.adapterIdentifier.getName)
+          val sutIdentifiers = pair.minderClient.getSUTIdentifiers;
+
+          if (sutIdentifiers != null) {
+            for (sutIdentifier <- sutIdentifiers.getIdentifiers) {
+              lgr.info("System Under Test: " + sutIdentifier.getSutName)
+              sutNameSet.add(sutIdentifier.getSutName)
+            }
           }
-        }
-      })
+        })
 
 
-      //update the SUT names on the watcher
-      testRunContext.updateSUTNames(sutNameSet)
-
+        //update the SUT names on the watcher
+        testRunContext.updateSUTNames(sutNameSet)
+      }
 
       while (minderTDL.currentRivetIndex < minderTDL.RivetDefs.size()) {
         val currentRivet = minderTDL.RivetDefs(minderTDL.currentRivetIndex)
@@ -172,7 +174,7 @@ object TestEngine {
           minderTDL.currentRivetIndex += 1;
           minderengine.ContextContainer.get().addTestContext(session, testRunContext);
           lgr.info("Suspend Test Case")
-          suspended = true
+          testRunContext.suspend()
           return
         } else {
 
@@ -318,7 +320,7 @@ object TestEngine {
         testRunContext.failed(error, t);
       }
     } finally {
-      if (suspended) {
+      if (testRunContext.isSuspended()) {
         lgr.info("> Test Suspended")
       } else {
 

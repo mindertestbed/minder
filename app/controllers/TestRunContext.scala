@@ -21,7 +21,7 @@ import scala.io.Source
   * Created by yerlibilgin on 13/01/15.
   */
 class TestRunContext(val testRun: TestRun) extends Runnable with TestProcessWatcher {
-  //prepare a mapping
+  var suspended = false;
   val variableWrapperMapping = collection.mutable.Map[String, MappedWrapper]();
   val mappedWrappers = MappedWrapper.findByJob(testRun.job)
   var sutNames: java.util.Set[String] = null;
@@ -87,7 +87,7 @@ class TestRunContext(val testRun: TestRun) extends Runnable with TestProcessWatc
 
   override def run(): Unit = {
     status = TestStatus.RUNNING
-    TestEngine.runTest(sessionID,user.email, cls, variableWrapperMapping, TestRunContext.this, job.mtdlParameters)
+    TestEngine.runTest(sessionID, user.email, cls, variableWrapperMapping, TestRunContext.this, job.mtdlParameters)
   }
 
   /**
@@ -178,4 +178,17 @@ class TestRunContext(val testRun: TestRun) extends Runnable with TestProcessWatc
     }
     MinderTDL;
   }
+
+
+  def suspend() = {
+    this.suspended = true
+  }
+
+  def resume() = {
+    this.suspended = false
+  }
+
+  def isSuspended(): Boolean = suspended
+
+
 }

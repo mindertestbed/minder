@@ -2,6 +2,7 @@ package models;
 
 import com.avaje.ebean.Model;
 import editormodels.PreemptionPolicy;
+import minderengine.Visibility;
 
 import javax.persistence.*;
 import java.util.List;
