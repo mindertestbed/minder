@@ -27,110 +27,119 @@ import java.util.List;
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "testGroup", propOrder = {
-        "id",
-        "groupName",
-        "shortDescription",
-        "description",
-        "owner",
-        "dependencyString",
-        "testassertions",
-        "testassets"
+    "id",
+    "groupName",
+    "shortDescription",
+    "description",
+    "owner",
+    "dependencyString",
+    "testassertions",
+    "testassets",
+    "utilClasses"
 })
 @XmlRootElement(name = "testGroup")
 public class RestTestGroup {
 
-    @XmlElement(required = false)
-    protected String id;
+  @XmlElement(required = false)
+  protected String id;
 
-    @XmlElement(required = false)
-    protected String groupName;
+  @XmlElement(required = false)
+  protected String groupName;
 
-    @XmlElement(required = false)
-    protected String shortDescription;
+  @XmlElement(required = false)
+  protected String shortDescription;
 
-    @XmlElement(required = false)
-    protected String description;
+  @XmlElement(required = false)
+  protected String description;
 
-    @XmlElement(required = false)
-    protected String owner;
+  @XmlElement(required = false)
+  protected String owner;
 
-    @XmlElement(required = false)
-    protected String dependencyString;
+  @XmlElement(required = false)
+  protected String dependencyString;
 
-    @XmlElementWrapper(name="testassertions")
-    @XmlElement(required = false)
-    public List<RestTestAssertion> testassertions;
+  @XmlElementWrapper(name = "testassertions")
+  @XmlElement(required = false)
+  public List<RestTestAssertion> testassertions;
 
-    @XmlElementWrapper(name="testassets")
-    @XmlElement(required = false)
-    public List<RestTestAsset> testassets;
+  @XmlElementWrapper(name = "testassets")
+  @XmlElement(required = false)
+  public List<RestTestAsset> testassets;
 
-    @XmlElementWrapper(name="utilclasses")
-    @XmlElement(required = false)
-    public List<RestUtilClass> utilClasses;
+  @XmlElementWrapper(name = "utilclasses")
+  @XmlElement(required = false)
+  public List<RestUtilClass> utilClasses;
 
 
-    public String getGroupName() {
-        return groupName;
-    }
+  public String getGroupName() {
+    return groupName;
+  }
 
-    public void setGroupName(String groupName) {
-        this.groupName = groupName;
-    }
+  public void setGroupName(String groupName) {
+    this.groupName = groupName;
+  }
 
-    public String getShortDescription() {
-        return shortDescription;
-    }
+  public String getShortDescription() {
+    return shortDescription;
+  }
 
-    public void setShortDescription(String shortDescription) {
-        this.shortDescription = shortDescription;
-    }
+  public void setShortDescription(String shortDescription) {
+    this.shortDescription = shortDescription;
+  }
 
-    public String getDescription() {
-        return description;
-    }
+  public String getDescription() {
+    return description;
+  }
 
-    public void setDescription(String description) {
-        this.description = description;
-    }
+  public void setDescription(String description) {
+    this.description = description;
+  }
 
-    public String getId() {
-        return id;
-    }
+  public String getId() {
+    return id;
+  }
 
-    public void setId(String id) {
-        this.id = id;
-    }
+  public void setId(String id) {
+    this.id = id;
+  }
 
-    public String getOwner() { return owner;}
+  public String getOwner() {
+    return owner;
+  }
 
-    public void setOwner(String owner) {this.owner = owner;}
+  public void setOwner(String owner) {
+    this.owner = owner;
+  }
 
-    public String getDependencyString() {return dependencyString;}
+  public String getDependencyString() {
+    return dependencyString;
+  }
 
-    public void setDependencyString(String dependencyString) {this.dependencyString = dependencyString;}
+  public void setDependencyString(String dependencyString) {
+    this.dependencyString = dependencyString;
+  }
 
-    public List<RestTestAssertion> getTestassertions() {
-        return testassertions;
-    }
+  public List<RestTestAssertion> getTestassertions() {
+    return testassertions;
+  }
 
-    public void setTestassertions(List<RestTestAssertion> testassertions) {
-        this.testassertions = testassertions;
-    }
+  public void setTestassertions(List<RestTestAssertion> testassertions) {
+    this.testassertions = testassertions;
+  }
 
-    public List<RestTestAsset> getTestassets() {
-        return testassets;
-    }
+  public List<RestTestAsset> getTestassets() {
+    return testassets;
+  }
 
-    public void setTestassets(List<RestTestAsset> testassets) {
-        this.testassets = testassets;
-    }
+  public void setTestassets(List<RestTestAsset> testassets) {
+    this.testassets = testassets;
+  }
 
-    public List<RestUtilClass> getUtilClasses() {
-        return utilClasses;
-    }
+  public List<RestUtilClass> getUtilClasses() {
+    return utilClasses;
+  }
 
-    public void setUtilClasses(List<RestUtilClass> utilClasses) {
-        this.utilClasses = utilClasses;
-    }
+  public void setUtilClasses(List<RestUtilClass> utilClasses) {
+    this.utilClasses = utilClasses;
+  }
 }

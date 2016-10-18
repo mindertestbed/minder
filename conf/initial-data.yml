@@ -1,44 +1,56 @@
 #Users
 users:
-  - !!models.UserInitiator
-      password: 12345
-      user: &root !!models.User
-        email: root@minder
-        name: ROOT
-        roles:
-        - !!models.DBRole
-            user: *root
-            role: TEST_DESIGNER
-        - !!models.DBRole
-            user: *root
-            role: TEST_DEVELOPER
-        - !!models.DBRole
-            user: *root
-            role: TEST_OBSERVER
-        testGroups: []
-  - !!models.UserInitiator
-      password: 12345
-      user: &tester !!models.User
-        email: tester@minder
-        name: Tester
-        roles:
-        - !!models.DBRole
-            user: *tester
-            role: TEST_DESIGNER
-        - !!models.DBRole
-            user: *tester
-            role: TEST_DEVELOPER
-        testGroups: []
-  - !!models.UserInitiator
-      password: 12345
-      user: &guest !!models.User
-        email: guest@minder
-        name: Guest
-        roles:
-        - !!models.DBRole
-            user: *guest
-            role: TEST_OBSERVER
-        testGroups: []
+  - &root !!models.User
+      plainPassword: 12345
+      email: root@minder
+      name: ROOT
+      roles:
+      - !!models.DBRole
+          user: *root
+          role: TEST_DESIGNER
+      - !!models.DBRole
+          user: *root
+          role: TEST_DEVELOPER
+      - !!models.DBRole
+          user: *root
+          role: TEST_OBSERVER
+      testGroups: []
+  - &tester !!models.User
+      plainPassword: 12345
+      email: tester@minder
+      name: Tester
+      roles:
+      - !!models.DBRole
+          user: *tester
+          role: TEST_DESIGNER
+      - !!models.DBRole
+          user: *tester
+          role: TEST_DEVELOPER
+      testGroups: []
+  - &gitb !!models.User
+      plainPassword: 12345
+      email: gitb@minder
+      name: GITB
+      roles:
+      - !!models.DBRole
+          user: *gitb
+          role: TEST_OBSERVER
+      - !!models.DBRole
+          user: *gitb
+          role: TEST_DESIGNER
+      - !!models.DBRole
+          user: *gitb
+          role: TEST_DEVELOPER
+      testGroups: []
+  - &guest !!models.User
+      plainPassword: 12345
+      email: guest@minder
+      name: Guest
+      roles:
+      - !!models.DBRole
+          user: *guest
+          role: TEST_OBSERVER
+      testGroups: []
 
 #wrappers
 wrappers:
@@ -110,6 +122,16 @@ groups:
              testCase: *testCase1
            testAssertion: *taSample1
            name: TestCaseSample1
+        - &testCase2 !!models.TestCase
+           owner: *tester
+           tdls:
+           - !!models.Tdl
+             tdl: conf/initialdata/gitbxmltest.tdl
+             version: 1
+             creationDate: "2015-02-02 00:00:00"
+             testCase: *testCase2
+           testAssertion: *taSample1
+           name: GitbXMLTestCase
     - &taSample2 !!models.TestAssertion
         testGroup: *sampleGroup
         taId: AllSchemaTests

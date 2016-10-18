@@ -2,7 +2,7 @@ organization := "gov.tubitak.minder"
 
 name := """minder"""
 
-version := "1.7-Pre1"
+version := "2.0"
 
 lazy val minder = (project in file(".")).enablePlugins(PlayJava, PlayEbean)
 
@@ -33,7 +33,7 @@ libraryDependencies ++= Seq(
   "org.webjars" % "webjars-play_2.11" % "2.4.0-1",
   "org.webjars" % "bootstrap" % "3.3.6",
   "org.codehaus.groovy" % "groovy" % "2.3.9",
-  "gov.tubitak.minder" % "minder-gitb-bridge-common" % "0.0.1",
+  "gov.tubitak.minder" % "minder-gitb-bridge-common" % "0.1",
   "com.itextpdf" % "itextpdf" % "5.5.8",
   "com.itextpdf.tool" % "xmlworker" % "5.5.8",
   specs2 % Test,

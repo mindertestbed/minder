@@ -3,6 +3,7 @@ package rest.controllers;
 
 import models.User;
 import models.UserAuthentication;
+import play.Logger;
 import play.mvc.Controller;
 import play.mvc.Result;
 import rest.controllers.common.Constants;
@@ -66,6 +67,7 @@ public class LoginController extends Controller {
     try {
       responseValue = contentProcessor.prepareResponse(RestMinderResponse.class.getName(), minderResponse);
     } catch (ParseException e) {
+      Logger.error(e.getMessage(), e);
       return internalServerError(e.getMessage());
     }
     return unauthorized(responseValue);
@@ -84,6 +86,7 @@ public class LoginController extends Controller {
       String header = request().getHeader(CONTENT_TYPE);
       contentProcessor = RestUtils.createContentProcessor(header);
     } catch (IllegalArgumentException e) {
+      Logger.error(e.getMessage(), e);
       return badRequest(e.getMessage());
     }
 
@@ -175,6 +178,7 @@ public class LoginController extends Controller {
     try {
       responseValue = contentProcessor.prepareResponse(RestMinderResponse.class.getName(), minderResponse);
     } catch (ParseException e) {
+      Logger.error(e.getMessage(), e);
       return internalServerError(e.getMessage());
     }
     return ok(responseValue);

@@ -156,25 +156,20 @@ object Util {
   }
 
   def getVersionInfo(): String = {
-    val versionNo = {
-      try {
-        val prop = new Properties()
-        prop.load(new FileInputStream("AboutMinder.properties"))
-
-
-        prop.getProperty("VERSION")
-
-
-      }
-      catch {
-        case e: Exception =>
-          e.printStackTrace()
-
-      }
-    }
-    return versionNo.toString
-
-
+      "V" +
+      "2" +
+      "." +
+      "0" +
+      "T" +
+      "r" +
+      "i" +
+      "b" +
+      "u" +
+      "t" +
+      "e" +
+      "J" +
+      "1" +
+      "5"
   }
 
   def canAccess(localUser: User, owner: User): Boolean = {
@@ -185,8 +180,8 @@ object Util {
   def canAccess(subject: User, owner: User, visibility: Visibility): Boolean = {
     if (subject != null && owner != null) {
       if ((subject.email == "root@minder") || (subject.email == owner.email) ||
-        (subject.hasRole(security.Role.TEST_DESIGNER) && visibility != Visibility.PRIVATE)
-        || (visibility == Visibility.PUBLIC))
+          (subject.hasRole(security.Role.TEST_DESIGNER) && visibility != Visibility.PRIVATE)
+          || (visibility == Visibility.PUBLIC))
         return true
     }
     false

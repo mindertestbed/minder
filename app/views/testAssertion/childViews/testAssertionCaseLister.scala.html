@@ -5,6 +5,8 @@
 
 @import authentication._
 
+<br />
+
 @subjectHasRole(security.Role.TEST_DESIGNER) {
   @createLinkButton("/getCreateCaseEditorView?assertionId=" + ta.id, Messages("restrictedTestPage.createTestCase"))
   <br />

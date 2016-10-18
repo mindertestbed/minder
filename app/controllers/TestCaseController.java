@@ -150,8 +150,12 @@ public class TestCaseController extends Controller {
 
   @AllowedRoles({Role.TEST_DESIGNER})
   public static Result doEditCase() {
+
+    System.out.println("Hello world");
     final Form<TestCaseEditorModel> filledForm = TEST_CASE_FORM
         .bindFromRequest();
+
+    System.out.println(request().body().asFormUrlEncoded());
     if (filledForm.hasErrors()) {
       Util.printFormErrors(filledForm);
       return badRequest(testCaseEditor.render(filledForm, true));
@@ -210,6 +214,7 @@ public class TestCaseController extends Controller {
 
   /**
    * TODO: move this method to another class
+   *
    * @param newTdl
    */
   public static void detectAndSaveParameters(Tdl newTdl) {

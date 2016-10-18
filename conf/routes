@@ -45,7 +45,6 @@ GET         /renderDependencies                         controllers.GroupControl
 GET         /exportTestGroup                            controllers.GroupController.exportTestGroup(id: Long)
 POST        /importTestGroup                            controllers.GroupController.importTestGroup
 GET         /createNewTestGroupImportForm               controllers.GroupController.createNewTestGroupImportForm
-POST        /importTestGroup                            controllers.GroupController.importTestGroup
 GET         /renderJobTemplates                         controllers.GroupController.renderJobTemplates(id: Long)
 
 

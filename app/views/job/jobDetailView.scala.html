@@ -52,9 +52,7 @@
 
     <div class="container-fluid">
       <div class="row">
-        <div class="col-md-@{
-          global.Util.remaining
-        }">
+        <div class="col-xs-12">
           <div class="row">
             <div class="col-md-12">
               <table class="table table-condensed table-striped table-hover">
@@ -186,14 +184,14 @@
             </div>
           </div>
         </div>
+
+        @* <!-- disabled -->
         <div class="col-md-@{
           global.Util.feedWidth
         }">
-          @*Right side of the page, up *@
           @jobQueueFeed()
-          @*Right side of the page, down *@
           @jobHistoryFeed()
-        </div>
+        </div> *@
       </div>
     </div>
 

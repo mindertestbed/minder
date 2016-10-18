@@ -26,6 +26,7 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.text.ParseException;
+
 import views.html.group.childViews.*;
 import views.html.group.*;
 
@@ -126,7 +127,7 @@ public class GroupController extends Controller {
                 "groupId:artifactId[:extension[:classifier]]:version]]");
           }
         }
-      } else{
+      } else {
         Ebean.commitTransaction();
       }
     } finally {
@@ -205,7 +206,7 @@ public class GroupController extends Controller {
   public static Result exportTestGroup(Long id) {
     RestTestGroup responseRestTestGroup = new RestTestGroup();
     try {
-      responseRestTestGroup =  TestGroupImportExportController.exportTestGroupData(id);
+      responseRestTestGroup = TestGroupImportExportController.exportTestGroupData(id);
     } catch (NotFoundException e) {
       return internalServerError(e.getMessage());
     } catch (IOException e) {
@@ -231,7 +232,7 @@ public class GroupController extends Controller {
     System.out.println("responseValue:" + responseValue);
 
     response().setContentType("application/x-download");
-    response().setHeader("Content-disposition", "attachment; filename=" + responseRestTestGroup.getGroupName()+".json");
+    response().setHeader("Content-disposition", "attachment; filename=" + responseRestTestGroup.getGroupName() + ".json");
     return ok(responseValue);
   }
 
@@ -250,7 +251,7 @@ public class GroupController extends Controller {
         GroupImportModel model = filledForm.get();
 
         User user = User.findByEmail(model.useremail);
-        if(null == user) {
+        if (null == user) {
           filledForm.reject("You can't use this resource");
           return badRequest(testGroupImportEditor.render(filledForm));
         }
@@ -262,15 +263,15 @@ public class GroupController extends Controller {
           Logger.error(ex.getMessage(), ex);
           filledForm.reject(ex.getMessage());
           return badRequest(testGroupImportEditor.render(filledForm));
-        }catch (IOException ex) {
+        } catch (IOException ex) {
           Logger.error(ex.getMessage(), ex);
           filledForm.reject(ex.getMessage());
           return badRequest(testGroupImportEditor.render(filledForm));
-        }catch (ParseException ex) {
+        } catch (ParseException ex) {
           Logger.error(ex.getMessage(), ex);
           filledForm.reject(ex.getMessage());
           return badRequest(testGroupImportEditor.render(filledForm));
-        }catch (RuntimeException ex) {
+        } catch (RuntimeException ex) {
           Logger.error(ex.getMessage(), ex);
           filledForm.reject(ex.getMessage());
           return badRequest(testGroupImportEditor.render(filledForm));
@@ -287,7 +288,7 @@ public class GroupController extends Controller {
   /**
    * Reads the file uploaded with the current request (if any)
    */
-  private static void handleFileUpload(User user) throws IllegalArgumentException,IOException,ParseException, RuntimeException{
+  private static void handleFileUpload(User user) throws IllegalArgumentException, IOException, ParseException, RuntimeException {
     Http.MultipartFormData body = request().body().asMultipartFormData();
 
     if (body == null)
@@ -314,7 +315,7 @@ public class GroupController extends Controller {
 
       IRestContentProcessor contentProcessor = null;
       try {
-        contentProcessor = RestUtils.createContentProcessor("text/json",bodyStr);
+        contentProcessor = RestUtils.createContentProcessor("text/json", bodyStr);
       } catch (IllegalArgumentException e) {
         throw new IllegalArgumentException(e.getCause().toString());
       }
@@ -323,25 +324,32 @@ public class GroupController extends Controller {
       try {
         restTestGroup = (RestTestGroup) contentProcessor.parseRequest(RestTestGroup.class.getName());
       } catch (ParseException e) {
-        throw new ParseException(e.getCause().toString(),0);
+        throw new ParseException(e.getCause().toString(), 0);
       }
 
       try {
-        TestGroupImportExportController.importTestGroupData(restTestGroup,Authentication.getLocalUser().email);
+        TestGroupImportExportController.importTestGroupData(restTestGroup, user.email);
       } catch (IllegalAccessException e) {
         e.printStackTrace();
       } catch (IOException e) {
         e.printStackTrace();
-      }catch (IllegalArgumentException e) {
+      } catch (IllegalArgumentException e) {
         e.printStackTrace();
-      }catch (NullPointerException e) {
+      } catch (NullPointerException e) {
         e.printStackTrace();
       }
     }
   }
-  
+
   @AllowedRoles({Role.TEST_DESIGNER, Role.TEST_OBSERVER})
-  public static Result renderJobTemplates(long id){
+  public static Result renderJobTemplates(long id) {
     return ok(jobTemplatesList.render(TestGroup.findById(id)));
   }
 }
+
+
+
+
+
+
+

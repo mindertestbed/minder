@@ -15,9 +15,7 @@
 
       <div class="container-fluid">
         <div class="row">
-          <div class="col-sm-@{
-            global.Util.remaining
-          }">
+          <div class="col-xs-12">
             <h3>Test Case
               <div id="name@{
                 tc.id
@@ -82,15 +80,17 @@
 
           </div>
 
+          @* <!-- disabled due to performance issues ->
           <div class="col-sm-@{
-            global.Util.feedWidth
+          global.Util.feedWidth
           } hidden-xs">
-            @views.html.job.jobQueueFeed()
-            <hr />
+          @views.html.job.jobQueueFeed()
+          <hr />
 
-            @views.html.job.jobHistoryFeed()
+          @views.html.job.jobHistoryFeed()
 
           </div>
+          *@
         </div>
       </div>
       <script>

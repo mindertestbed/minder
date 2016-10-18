@@ -7,6 +7,7 @@ import java.util.Properties
 
 import com.gitb.core.v1.StepStatus
 import controllers.{TestQueueController, TestRunContext}
+import global.Util
 import models._
 import mtdl._
 import org.apache.log4j.spi.LoggingEvent
@@ -103,6 +104,7 @@ object TestEngine {
     app.setLayout(new EnhancedPatternLayout("%d{ISO8601}: %-5p - %m%n%throwable"));
     lgr.addAppender(app);
 
+    lgr.info(s"Minder version ${Util.getVersionInfo()}")
     if (testRunContext.isSuspended()) {
       lgr.info("Resume Test")
     } else {
@@ -322,6 +324,7 @@ object TestEngine {
     } finally {
       if (testRunContext.isSuspended()) {
         lgr.info("> Test Suspended")
+        lgr.removeAppender(app)
       } else {
 
         lgr.info("> Send finish message to all wrappers")
@@ -332,13 +335,14 @@ object TestEngine {
           pair.minderClient.finishTest(finishTestObject)
         })
 
+        lgr.info("Test Finished")
+        lgr.removeAppender(app)
+
         if (minderTDL.exception != null) {
           //we have a late error
           throw minderTDL.exception;
         }
-        lgr.info("Test Finished")
       }
-      lgr.removeAppender(app)
     }
   }
 

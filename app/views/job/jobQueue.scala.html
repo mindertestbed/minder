@@ -55,6 +55,17 @@
     <h3 class="hidden-xs">Test Monitor</h3>
 
     <div class="row" style="height:95%;">
+      <div class="col-sm-@{
+        global.Util.feedWidth
+      }" style="overflow:auto; scroll;height:100%;">
+        <div id="queDiv">
+        @jobQueueFeed()
+        </div>
+        <div id="historyDiv">
+          <hr/>
+          @jobHistoryFeed()
+        </div>
+      </div>
       <div id="logDiv" class="col-sm-@{
         global.Util.remaining
       }" style="height:100%;">
@@ -66,17 +77,6 @@
             style="resize: none ; font-family:monospace ; height:calc(100% - 2em) ; width:100% ; border:1px solid #ddeee6 ; border-radius:2px ; overflow:scroll">@TestLogFeeder.currentLogString(Authentication.getLocalUser)</textarea>
 
           </div>
-        </div>
-      </div>
-      <div class="col-sm-@{
-        global.Util.feedWidth
-      }" style="overflow:auto; scroll;height:100%;">
-        <div id="queDiv">
-        @jobQueueFeed()
-        </div>
-        <div id="historyDiv">
-          <hr/>
-          @jobHistoryFeed()
         </div>
       </div>
     </div>
