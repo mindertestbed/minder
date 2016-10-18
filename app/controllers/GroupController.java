@@ -328,7 +328,7 @@ public class GroupController extends Controller {
       }
 
       try {
-        TestGroupImportExportController.importTestGroupData(restTestGroup, user.email);
+        TestGroupImportExportController.importTestGroupData(restTestGroup, Authentication.getLocalUser().email);
       } catch (IllegalAccessException e) {
         e.printStackTrace();
       } catch (IOException e) {
