@@ -51,7 +51,7 @@ public class GroupController extends Controller {
   @AllowedRoles(Role.TEST_DESIGNER)
   public static Result doCreateTestGroup() {
     final Form<GroupEditorModel> filledForm = TEST_GROUP_FORM
-        .bindFromRequest();
+       .bindFromRequest();
     final User localUser = Authentication.getLocalUser();
     if (filledForm.hasErrors()) {
       Util.printFormErrors(filledForm);
@@ -123,8 +123,8 @@ public class GroupController extends Controller {
           } catch (Exception ex) {
             Logger.error(ex.getMessage(), ex);
             return badRequest("There was a problem with the dependency string.<br /> \n" +
-                "Please make sure that the dependencies are in format:<br />\n " +
-                "groupId:artifactId[:extension[:classifier]]:version]]");
+               "Please make sure that the dependencies are in format:<br />\n " +
+               "groupId:artifactId[:extension[:classifier]]:version]]");
           }
         }
       } else {
@@ -328,7 +328,7 @@ public class GroupController extends Controller {
       }
 
       try {
-        TestGroupImportExportController.importTestGroupData(restTestGroup, Authentication.getLocalUser().email);
+        TestGroupImportExportController.importTestGroupData(restTestGroup, user.email);
       } catch (IllegalAccessException e) {
         e.printStackTrace();
       } catch (IOException e) {
