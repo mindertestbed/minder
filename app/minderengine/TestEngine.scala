@@ -102,247 +102,246 @@ object TestEngine {
     val app = new MyAppender(testRunContext);
     val gtb = new GitbWatcher();
     app.setLayout(new EnhancedPatternLayout("%d{ISO8601}: %-5p - %m%n%throwable"));
-    lgr.addAppender(app);
-
-    lgr.info(s"Minder version ${Util.getVersionInfo()}")
-    if (testRunContext.isSuspended()) {
-      lgr.info("Resume Test")
-    } else {
-      lgr.info("Start Test")
-    }
-    var identifierMinderClientMap: util.Map[AdapterIdentifier, IdentifierClientPair] = null
-
-    val session = new TestSession(sessionID)
-
     try {
-      lgr.info("Initialize test case")
+      lgr.addAppender(app);
 
-      minderTDL = testRunContext.initialize();
-
-      identifierMinderClientMap = mapAllTransitiveWrappers(wrapperMapping)
-
-      initializeFunctionsAndParameters(params, lgr)
-
-      if (!testRunContext.isSuspended()) {
-        val sutNameSet = new util.HashSet[String]
-
-        //first, call the start methods for all registered wrappers of this test.
-
-        lgr.info("> Initialize the Adapters");
-
-        val startTestObject = new StartTestObject
-
-
-        val properties = new Properties()
-        properties.load(new ByteArrayInputStream(params.getBytes()))
-
-
-
-
-        startTestObject.setSession(session)
-        startTestObject.setProperties(properties)
-
-
-        //call start test on all adapters and populate the SUT names
-        identifierMinderClientMap.values().foreach(pair => {
-          lgr.info("Call start test on " + pair.adapterIdentifier.getName)
-          pair.minderClient.startTest(startTestObject)
-
-          lgr.info("Obtain SUT Identifiers from " + pair.adapterIdentifier.getName)
-          val sutIdentifiers = pair.minderClient.getSUTIdentifiers;
-
-          if (sutIdentifiers != null) {
-            for (sutIdentifier <- sutIdentifiers.getIdentifiers) {
-              lgr.info("System Under Test: " + sutIdentifier.getSutName)
-              sutNameSet.add(sutIdentifier.getSutName)
-            }
-          }
-        })
-
-
-        //update the SUT names on the watcher
-        testRunContext.updateSUTNames(sutNameSet)
+      lgr.info(s"Minder version ${Util.getVersionInfo()}")
+      if (testRunContext.isSuspended()) {
+        lgr.info("Resume Test")
+      } else {
+        lgr.info("Start Test")
       }
+      var identifierMinderClientMap: util.Map[AdapterIdentifier, IdentifierClientPair] = null
 
-      while (minderTDL.currentRivetIndex < minderTDL.RivetDefs.size()) {
-        val currentRivet = minderTDL.RivetDefs(minderTDL.currentRivetIndex)
-        //for (currentRivet <- minderTDL.RivetDefs) {
-        var msg: String = "> RUN RIVET " + minderTDL.currentRivetIndex;
-        lgr.info(msg)
-        gtb.notifyProcessingInfo(msg, currentRivet)
+      val session = new TestSession(sessionID)
 
-        if (currentRivet.isInstanceOf[Suspend]) {
-          //save testRunContext in a map
-          minderTDL.currentRivetIndex += 1;
-          minderengine.ContextContainer.get().addTestContext(session, testRunContext);
-          lgr.info("Suspend Test Case")
-          testRunContext.suspend()
-          return
-        } else {
+      try {
+        lgr.info("Initialize test case")
 
-          val rivetWrapperId: String = currentRivet.wrapperFunction.wrapperId
-          //resolve the minder client id. This might as well be resolved to a local built-in wrapper or the null slot.
-          val slotPair = findPairOrError(identifierMinderClientMap, AdapterIdentifier.parse(rivetWrapperId))
-          val args = Array.ofDim[Object](currentRivet.pipes.length)
+        minderTDL = testRunContext.initialize();
 
-          //a boolean flag used to see whether a timeout occurred or not
-          var thereIsTimoeut = false;
+        identifierMinderClientMap = mapAllTransitiveWrappers(wrapperMapping)
 
-          var signalIndex = 0
+        initializeFunctionsAndParameters(params, lgr)
 
-          try {
-            for (tuple@(label, signature) <- currentRivet.signalPipeMap.keySet) {
+        if (!testRunContext.isSuspended()) {
+          val sutNameSet = new util.HashSet[String]
 
-              if (!MinderSignalRegistry.get().hasSession(session)) {
-                msg = "No MinderSignalRegistry object defined for session " + userEmail;
-                gtb.notifyErrorInfo(msg, currentRivet)
-                throw new scala.IllegalArgumentException(msg)
+          //first, call the start methods for all registered wrappers of this test.
+
+          lgr.info("> Initialize the Adapters");
+
+          val startTestObject = new StartTestObject
+
+
+          val properties = new Properties()
+          properties.load(new ByteArrayInputStream(params.getBytes()))
+
+
+          startTestObject.setSession(session)
+          startTestObject.setProperties(properties)
+
+
+          //call start test on all adapters and populate the SUT names
+          identifierMinderClientMap.values().foreach(pair => {
+            lgr.info("Call start test on " + pair.adapterIdentifier.getName)
+            pair.minderClient.startTest(startTestObject)
+
+            lgr.info("Obtain SUT Identifiers from " + pair.adapterIdentifier.getName)
+            val sutIdentifiers = pair.minderClient.getSUTIdentifiers;
+
+            if (sutIdentifiers != null) {
+              for (sutIdentifier <- sutIdentifiers.getIdentifiers) {
+                lgr.info("System Under Test: " + sutIdentifier.getSutName)
+                sutNameSet.add(sutIdentifier.getSutName)
               }
-
-              //obtain the source signal object
-              val signalList = currentRivet.signalPipeMap(tuple);
-              if (signalList == null || signalList.isEmpty) {
-                msg = "singal list is empty for " + label + "." + signature;
-                gtb.notifyErrorInfo(msg, currentRivet);
-                throw new scala.IllegalArgumentException(msg);
-              }
-
-              val signal = signalList(0).inRef.source;
-
-              val signalPair = findPairOrError(identifierMinderClientMap, AdapterIdentifier.parse(label));
-
-              val signalAdapterIdentifier = signalPair.adapterIdentifier
-              msg = "> Wait For Signal:" + signalAdapterIdentifier + "." + signature;
-              lgr.debug(msg)
-              gtb.notifyWaitingInfo(msg, currentRivet)
+            }
+          })
 
 
-              val signalData: SignalData = try {
-                MinderSignalRegistry.get().dequeueSignal(session, signalAdapterIdentifier, signature, signal.timeout)
-              } catch {
-                case rte: RuntimeException => {
-                  signal.handleTimeout(rte)
-                  thereIsTimoeut = true
-                  gtb.notifyErrorInfo("Break currentRivet", currentRivet)
-                  throw new BreakException
+          //update the SUT names on the watcher
+          testRunContext.updateSUTNames(sutNameSet)
+        }
+
+        while (minderTDL.currentRivetIndex < minderTDL.RivetDefs.size()) {
+          val currentRivet = minderTDL.RivetDefs(minderTDL.currentRivetIndex)
+          //for (currentRivet <- minderTDL.RivetDefs) {
+          var msg: String = "> RUN RIVET " + minderTDL.currentRivetIndex;
+          lgr.info(msg)
+          gtb.notifyProcessingInfo(msg, currentRivet)
+
+          if (currentRivet.isInstanceOf[Suspend]) {
+            //save testRunContext in a map
+            minderTDL.currentRivetIndex += 1;
+            minderengine.ContextContainer.get().addTestContext(session, testRunContext);
+            lgr.info("Suspend Test Case")
+            testRunContext.suspend()
+            return
+          } else {
+
+            val rivetWrapperId: String = currentRivet.wrapperFunction.wrapperId
+            //resolve the minder client id. This might as well be resolved to a local built-in wrapper or the null slot.
+            val slotPair = findPairOrError(identifierMinderClientMap, AdapterIdentifier.parse(rivetWrapperId))
+            val args = Array.ofDim[Object](currentRivet.pipes.length)
+
+            //a boolean flag used to see whether a timeout occurred or not
+            var thereIsTimoeut = false;
+
+            var signalIndex = 0
+
+            try {
+              for (tuple@(label, signature) <- currentRivet.signalPipeMap.keySet) {
+
+                if (!MinderSignalRegistry.get().hasSession(session)) {
+                  msg = "No MinderSignalRegistry object defined for session " + userEmail;
+                  gtb.notifyErrorInfo(msg, currentRivet)
+                  throw new scala.IllegalArgumentException(msg)
                 }
+
+                //obtain the source signal object
+                val signalList = currentRivet.signalPipeMap(tuple);
+                if (signalList == null || signalList.isEmpty) {
+                  msg = "singal list is empty for " + label + "." + signature;
+                  gtb.notifyErrorInfo(msg, currentRivet);
+                  throw new scala.IllegalArgumentException(msg);
+                }
+
+                val signal = signalList(0).inRef.source;
+
+                val signalPair = findPairOrError(identifierMinderClientMap, AdapterIdentifier.parse(label));
+
+                val signalAdapterIdentifier = signalPair.adapterIdentifier
+                msg = "> Wait For Signal:" + signalAdapterIdentifier + "." + signature;
+                lgr.debug(msg)
+                gtb.notifyWaitingInfo(msg, currentRivet)
+
+
+                val signalData: SignalData = try {
+                  MinderSignalRegistry.get().dequeueSignal(session, signalAdapterIdentifier, signature, signal.timeout)
+                } catch {
+                  case rte: RuntimeException => {
+                    signal.handleTimeout(rte)
+                    thereIsTimoeut = true
+                    gtb.notifyErrorInfo("Break currentRivet", currentRivet)
+                    throw new BreakException
+                  }
+                }
+
+                msg = "< Signal Arrived: " + signalAdapterIdentifier + "." + signature
+                lgr.debug(msg)
+                gtb.notifyProcessingInfo(msg, currentRivet)
+
+                if (signalData.isInstanceOf[SignalErrorData]) {
+                  lgr.debug("This is an error signal");
+                  val signalErrorData = signalData.asInstanceOf[SignalErrorData]
+                  msg = "Signal [" + signalAdapterIdentifier + "." + signature + "] failed [" + signalErrorData.signalFailedException.getMessage
+                  gtb.notifyErrorInfo(msg, currentRivet)
+                  throw new scala.RuntimeException(msg, signalErrorData.signalFailedException)
+                }
+                val signalCallData: SignalCallData = signalData.asInstanceOf[SignalCallData]
+
+                testRunContext.signalEmitted(minderTDL.currentRivetIndex, signalIndex, signalCallData)
+
+                for (paramPipe <- currentRivet.signalPipeMap(tuple)) {
+                  //FIX for BUG-1 : added an if for -1 param
+                  if (paramPipe.in != -1) {
+                    convertParam(paramPipe.out, paramPipe.execute(signalCallData.args(paramPipe.in)), args)
+                  }
+                }
+                signalIndex += 1
+              }
+            } catch {
+              case breakException: BreakException => {
+              }
+            }
+
+            if (thereIsTimoeut) {
+              //we hit a timeout, skip to the next currentRivet
+              gtb.notifySkippedInfo("< Rivet skipped", currentRivet)
+            } else {
+              lgr.debug("Assign free vars")
+
+              for (paramPipe <- currentRivet.freeVariablePipes) {
+                val any = paramPipe.execute(null)
+                convertParam(paramPipe.out, any, args)
               }
 
-              msg = "< Signal Arrived: " + signalAdapterIdentifier + "." + signature
-              lgr.debug(msg)
+              if (currentRivet.freeVariablePipes.size > 0) {
+                val freeArgs = Array.ofDim[Object](currentRivet.freeVariablePipes.size);
+                var k = 0;
+                for (paramPipe <- currentRivet.freeVariablePipes) {
+                  freeArgs(k) = args(paramPipe.out)
+                  k += 1
+                }
+                val signalData2 = new SignalCallData(freeArgs);
+                testRunContext.signalEmitted(minderTDL.currentRivetIndex, signalIndex, signalData2)
+              }
+
+              msg = "> CALL SLOT " + slotPair.adapterIdentifier + "." + currentRivet.wrapperFunction.signature
+              lgr.info(msg)
+              gtb.notifyProcessingInfo(msg, currentRivet)
+              testRunContext.rivetInvoked(minderTDL.currentRivetIndex);
+              currentRivet.result = slotPair.minderClient.callSlot(session, currentRivet.wrapperFunction.signature, args)
+              msg = "< SLOT CALLED " + slotPair.adapterIdentifier + "." + currentRivet.wrapperFunction.signature;
+              lgr.info(msg)
               gtb.notifyProcessingInfo(msg, currentRivet)
 
-              if (signalData.isInstanceOf[SignalErrorData]) {
-                lgr.debug("This is an error signal");
-                val signalErrorData = signalData.asInstanceOf[SignalErrorData]
-                msg = "Signal [" + signalAdapterIdentifier + "." + signature + "] failed [" + signalErrorData.signalFailedException.getMessage
-                gtb.notifyErrorInfo(msg, currentRivet)
-                throw new scala.RuntimeException(msg, signalErrorData.signalFailedException)
-              }
-              val signalCallData: SignalCallData = signalData.asInstanceOf[SignalCallData]
 
-              testRunContext.signalEmitted(minderTDL.currentRivetIndex, signalIndex, signalCallData)
+              msg = "< Rivet finished sucessfully";
+              testRunContext.rivetFinished(minderTDL.currentRivetIndex)
+              gtb.notifyCompletedInfo(msg, currentRivet)
+              lgr.info(msg)
+              lgr.info("----------\n")
 
-              for (paramPipe <- currentRivet.signalPipeMap(tuple)) {
-                //FIX for BUG-1 : added an if for -1 param
-                if (paramPipe.in != -1) {
-                  convertParam(paramPipe.out, paramPipe.execute(signalCallData.args(paramPipe.in)), args)
-                }
-              }
-              signalIndex += 1
             }
-          } catch {
-            case breakException: BreakException => {
-            }
+
+
+            if (Thread.currentThread().isInterrupted) throw new scala.InterruptedException("Test interrupted")
           }
-
-          if (thereIsTimoeut) {
-            //we hit a timeout, skip to the next currentRivet
-            gtb.notifySkippedInfo("< Rivet skipped", currentRivet)
-          } else {
-            lgr.debug("Assign free vars")
-
-            for (paramPipe <- currentRivet.freeVariablePipes) {
-              val any = paramPipe.execute(null)
-              convertParam(paramPipe.out, any, args)
-            }
-
-            if (currentRivet.freeVariablePipes.size > 0) {
-              val freeArgs = Array.ofDim[Object](currentRivet.freeVariablePipes.size);
-              var k = 0;
-              for (paramPipe <- currentRivet.freeVariablePipes) {
-                freeArgs(k) = args(paramPipe.out)
-                k += 1
-              }
-              val signalData2 = new SignalCallData(freeArgs);
-              testRunContext.signalEmitted(minderTDL.currentRivetIndex, signalIndex, signalData2)
-            }
-
-            msg = "> CALL SLOT " + slotPair.adapterIdentifier + "." + currentRivet.wrapperFunction.signature
-            lgr.info(msg)
-            gtb.notifyProcessingInfo(msg, currentRivet)
-            testRunContext.rivetInvoked(minderTDL.currentRivetIndex);
-            currentRivet.result = slotPair.minderClient.callSlot(session, currentRivet.wrapperFunction.signature, args)
-            msg = "< SLOT CALLED " + slotPair.adapterIdentifier + "." + currentRivet.wrapperFunction.signature;
-            lgr.info(msg)
-            gtb.notifyProcessingInfo(msg, currentRivet)
-
-
-            msg = "< Rivet finished sucessfully";
-            testRunContext.rivetFinished(minderTDL.currentRivetIndex)
-            gtb.notifyCompletedInfo(msg, currentRivet)
-            lgr.info(msg)
-            lgr.info("----------\n")
-
-          }
-
-
-          if (Thread.currentThread().isInterrupted) throw new scala.InterruptedException("Test interrupted")
+          minderTDL.currentRivetIndex += 1;
         }
-        minderTDL.currentRivetIndex += 1;
-      }
-      testRunContext.finished()
-    } catch {
-      case t: Throwable => {
-        val error = {
-          var cause = t;
-          var err: String = null;
-          while (cause.getCause != null) {
-            cause = cause.getCause
-          }
+        testRunContext.finished()
+      } catch {
+        case t: Throwable => {
+          val error = {
+            var cause = t;
+            var err: String = null;
+            while (cause.getCause != null) {
+              cause = cause.getCause
+            }
 
-          err = cause.getMessage
+            err = cause.getMessage
 
-          if (err == null) {
-            err = "Unknown error [" + t.getClass.getName + "]";
+            if (err == null) {
+              err = "Unknown error [" + t.getClass.getName + "]";
+            }
+            err
           }
-          err
+          lgr.error(error);
+          testRunContext.failed(error, t);
         }
-        lgr.error(error);
-        testRunContext.failed(error, t);
+      } finally {
+        if (testRunContext.isSuspended()) {
+          lgr.info("> Test Suspended")
+        } else {
+
+          lgr.info("> Send finish message to all wrappers")
+          //make sure that we call finish test for all
+          val finishTestObject: FinishTestObject = new FinishTestObject
+          finishTestObject.setSession(session)
+          identifierMinderClientMap.values().foreach(pair => {
+            pair.minderClient.finishTest(finishTestObject)
+          })
+
+          lgr.info("Test Finished")
+          if (minderTDL.exception != null) {
+            //we have a late error
+            throw minderTDL.exception;
+          }
+        }
       }
     } finally {
-      if (testRunContext.isSuspended()) {
-        lgr.info("> Test Suspended")
-        lgr.removeAppender(app)
-      } else {
-
-        lgr.info("> Send finish message to all wrappers")
-        //make sure that we call finish test for all
-        val finishTestObject: FinishTestObject = new FinishTestObject
-        finishTestObject.setSession(session)
-        identifierMinderClientMap.values().foreach(pair => {
-          pair.minderClient.finishTest(finishTestObject)
-        })
-
-        lgr.info("Test Finished")
-        lgr.removeAppender(app)
-
-        if (minderTDL.exception != null) {
-          //we have a late error
-          throw minderTDL.exception;
-        }
-      }
+      lgr.removeAppender(app)
     }
   }
 
@@ -464,7 +463,7 @@ object TestEngine {
         val mapping: MappedWrapper = wrapperMapping(adapterIdentifier.getName)
 
         val transitiveAdapterIdentifier = AdapterIdentifier.parse(mapping.wrapperVersion.wrapper.name + "|" +
-          mapping.wrapperVersion.version)
+            mapping.wrapperVersion.version)
         val client = if (BuiltInWrapperRegistry.get().contains(transitiveAdapterIdentifier)) {
           BuiltInWrapperRegistry.get().getWrapper(transitiveAdapterIdentifier)
         } else {
