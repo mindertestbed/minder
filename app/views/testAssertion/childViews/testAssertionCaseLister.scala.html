@@ -13,6 +13,9 @@
   <br />
 }
 
+@{
+  ta.testCases.sortWith((t1, t2) => t1.name.compareTo(t2.name) < 0)
+}
 @if(ta.testCases.size() > 0) {
   <table class="table table-hover table-striped table-condensed">
     @createFirstRow {
