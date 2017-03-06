@@ -184,21 +184,6 @@ object TestQueueController extends Controller {
     new TestRunContext(testRun)
   }
 
-  //
-  def createDummyTestRun(i: Int): TestRun = {
-
-    val tpl = Array((5, 6))
-
-    for ((l, r) <- tpl) {
-
-    }
-    val tr = new TestRun()
-    tr.date = new Date()
-    tr.job = Job.findById(361L);
-    tr.runner = User.findByEmail("myildiz83@gmail.com")
-    tr;
-  }
-
   def cancelJob(index: Int) = Action {
     implicit request =>
       if (index >= 0 && index < jobQueue.size()) {

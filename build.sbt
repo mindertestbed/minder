@@ -29,7 +29,7 @@ libraryDependencies ++= Seq(
   "mysql" % "mysql-connector-java" % "5.1.18",
   "org.beybunproject" % "xoola" % "1.2.2",
   "gov.tubitak.minder" % "minder-common" % "0.4.4",
-  "gov.tubitak.minder" %% "minder-tdl" % "0.6",
+  "gov.tubitak.minder" %% "minder-tdl" % "0.7",
   "org.webjars" % "webjars-play_2.11" % "2.4.0-1",
   "org.webjars" % "bootstrap" % "3.3.6",
   "org.codehaus.groovy" % "groovy" % "2.3.9",
