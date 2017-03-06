@@ -300,6 +300,13 @@ object TestEngine {
           }
           minderTDL.currentRivetIndex += 1;
         }
+
+        if (minderTDL.exception != null) {
+          throw minderTDL.exception
+        } else {
+          lgr.info(s"Test #${testRunContext.testRun.number} Finished")
+          testRunContext.finished()
+        }
       } catch {
         case t: Throwable => {
           val error = {
@@ -316,6 +323,7 @@ object TestEngine {
             }
             err
           }
+          lgr.error(s"Test #${testRunContext.testRun.number} Failed")
           lgr.error(error, t)
           testRunContext.failed(error, t);
         }
@@ -330,15 +338,6 @@ object TestEngine {
           identifierMinderClientMap.values().foreach(pair => {
             pair.minderClient.finishTest(finishTestObject)
           })
-
-          if (minderTDL.exception != null) {
-            lgr.error(s"Test #${testRunContext.testRun.number} Failed")
-            lgr.error(minderTDL.exception.getMessage)
-            testRunContext.failed(minderTDL.exception.getMessage, minderTDL.exception);
-          } else{
-            lgr.info(s"Test #${testRunContext.testRun.number} Finished")
-            testRunContext.finished()
-          }
         }
       }
     }
