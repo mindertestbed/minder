@@ -129,7 +129,6 @@ class TestRunContext(val testRun: TestRun) extends Runnable with TestProcessWatc
   override def failed(err: String, t: Throwable) {
     status = TestStatus.BAD
     error = err
-    Logger.error(error, t)
     updateRun()
   }
 

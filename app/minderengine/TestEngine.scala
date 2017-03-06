@@ -300,7 +300,6 @@ object TestEngine {
           }
           minderTDL.currentRivetIndex += 1;
         }
-        testRunContext.finished()
       } catch {
         case t: Throwable => {
           val error = {
@@ -317,14 +316,13 @@ object TestEngine {
             }
             err
           }
-          lgr.error(error);
+          lgr.error(error, t)
           testRunContext.failed(error, t);
         }
       } finally {
         if (testRunContext.isSuspended()) {
           lgr.info("> Test Suspended")
         } else {
-
           lgr.info("> Send finish message to all wrappers")
           //make sure that we call finish test for all
           val finishTestObject: FinishTestObject = new FinishTestObject
@@ -333,14 +331,18 @@ object TestEngine {
             pair.minderClient.finishTest(finishTestObject)
           })
 
-          lgr.info("Test Finished")
           if (minderTDL.exception != null) {
-            //we have a late error
-            throw minderTDL.exception;
+            lgr.error(s"Test #${testRunContext.testRun.number} Failed")
+            lgr.error(minderTDL.exception.getMessage)
+            testRunContext.failed(minderTDL.exception.getMessage, minderTDL.exception);
+          } else{
+            lgr.info(s"Test #${testRunContext.testRun.number} Finished")
+            testRunContext.finished()
           }
         }
       }
-    } finally {
+    }
+    finally {
       lgr.removeAppender(app)
     }
   }

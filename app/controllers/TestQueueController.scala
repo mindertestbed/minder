@@ -60,19 +60,8 @@ object TestQueueController extends Controller {
           Thread.sleep(1000);
           TestLogFeeder.log("--> Run Job #[" + run1.number + "]")
           activeRunContext.run()
-        } catch {
-          case inter: InterruptedException => {
-            //someone interrupted me.
-            //check the exit flag and go back.
-            activeRunContext.failed("Job Cancelled", inter)
-            TestLogFeeder.log(LogRecord(run1, "<-- Job Interrupted"))
-          }
-          case t: Throwable => {
-            Logger.error(t.getMessage, t)
-            TestLogFeeder.log(LogRecord(run1, "<-- Error [" + t.getMessage + "]"))
-          }
         } finally {
-          TestLogFeeder.log(">>> Test Run  #[" + run1.number + "] finished.")
+          //TestLogFeeder.log(">>> Test Run  #[" + run1.number + "] finished.")
           activeRunContext = null
           TestRunFeeder.jobQueueUpdate()
           Thread.sleep(1000)
