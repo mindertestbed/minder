@@ -1,5 +1,5 @@
 <script>
-  $ ( function ( ) {
+  $(function () {
 
 
     var successImage = '<img src="@routes.Assets.versioned("/images/Check-icon.png")" height="12px" alt="G"/>'
@@ -7,13 +7,13 @@
 
     var rowTemplate = $("#historyRowTemplate").html()
 
-    var historyTableBody = $( "#historyListDiv" )
+    var historyTableBody = $("#historyListDiv")
 
-    new EventSource ('@{controllers.routes.TestRunFeeder.jobHistoryFeed()}' ).onmessage =
-        function ( event ) {
+    new EventSource('@{controllers.routes.TestRunFeeder.jobHistoryFeed()}').onmessage =
+        function (event) {
 
           console.log("History " + event.data)
-          var json = JSON.parse ( event.data )
+          var json = JSON.parse(event.data)
 
           var img = successImage
           var cls = 'goodTestRun'
@@ -23,25 +23,16 @@
           }
           var visibilityColor = 'red'
           var visibilityClass = "fa fa-lock"
-          if (json.visibility == "PUBLIC"){
+          if (json.visibility == "PUBLIC") {
             visibilityClass = 'fa fa-globe'
             visibilityColor = '#1fc36d'
           }
-          else if (json.visibility == "PROTECTED"){
+          else if (json.visibility == "PROTECTED") {
             visibilityClass = 'fa fa-group'
             visibilityColor = '#7cd8ff'
           }
 
-          var newRow  = rowTemplate.
-          replace(/Pimage/g, img).
-          replace(/Ptrclass/g, cls).
-          replace(/PtestRunNumber/g, json.no).
-          replace(/PtestRunId/g, json.id).
-          replace(/PjobName/g, json.name).
-          replace(/PjobId/g, json.jobId).
-          replace(/PvisibilityColor/g, visibilityColor).
-          replace(/PvisibilityClass/g, visibilityClass).
-          replace(/Pvisibility/g, json.visibility)
+          var newRow = rowTemplate.replace(/Pimage/g, img).replace(/Ptrclass/g, cls).replace(/PtestRunNumber/g, json.no).replace(/PtestRunId/g, json.id).replace(/PjobName/g, json.name).replace(/PjobId/g, json.jobId).replace(/PvisibilityColor/g, visibilityColor).replace(/PvisibilityClass/g, visibilityClass).replace(/Pvisibility/g, json.visibility)
 
 
           console.log(newRow)
@@ -52,18 +43,28 @@
 <style type="text/css">
 
 .ellipsis {
-overflow: hidden ;
-text-overflow: ellipsis ;
-white-space: nowrap ;
-display: inline-block ;
-width: calc(100% - 80px) ;
-font-size: smaller ;
-vertical-align: middle ;
+  overflow: hidden ;
+  text-overflow: ellipsis ;
+  white-space: nowrap ;
+  display: inline-block ;
+  font-size: smaller ;
 }
 
 .templateClass {
-white-space: nowrap ;
-margin-bottom: 5px ;
+  white-space: nowrap ;
+  display: flex;
+  margin-bottom: 5px;
+  padding-top: 2px;
+}
+
+.templateClass div {
+  padding-right: 5px;
+  vertical-align: text-bottom;
+}
+.templateClass a {
+  display: block;
+  padding-right: 5px;
+  vertical-align: text-bottom;
 }
 
 </style>
@@ -74,7 +75,8 @@ margin-bottom: 5px ;
   <div class="panel-body zeropad">
     <div align="center">
       <nav style="padding-top: 2px ;">
-        <ul class="pagination pagination-sm" style="margin:0px ; display: none">
+        <ul class="pagination pagination-sm" style="margin: 0px ;
+          display: none">
           <li>
             <a href="#" aria-label="Previous">
               <span aria-hidden="true">&laquo;</span>
@@ -99,29 +101,33 @@ margin-bottom: 5px ;
       @for(testRun <- testRunList) {
         @authentication.decideOnVisibility(testRun.visibility, testRun.runner) {
           <div class="templateClass @if(testRun.success) {goodTestRun} else {badTestRun}">
-            <div style="display: inline-block ; margin-left:5px ;">
+            <div style="display: inline-block ;
+              margin-left: 5px ;">
             @if(testRun.success) {
               <img src="@routes.Assets.versioned("/images/Check-icon.png")" height="12px" alt='G'/>
             } else {
               <img src="@routes.Assets.versioned("/images/Delete-icon.png")" height="12px" alt='B'/>
             }
             </div>
-            <div style="display: inline-block ; font-size: smaller">#@testRun.number</div>
+            <div style="display: inline-block ;
+              font-size: smaller">#@testRun.number</div>
             <a title='@testRun.job.name'
             href='@controllers.routes.JobController.displayJob(testRun.job.id, true)'
-            class='ellipsis'>
+            class='ellipsis' style="width: 100%;">
             @if(testRun.job != null) {
               @visibilityTagFragment(testRun.visibility, testRun.runner)
               @testRun.job.name
 
             }</a>
             <div align="center" style="display: inline-block">
-              <a href="/viewReport?testRunId=@testRun.id&type=pdf" title="View Report" class="celldiv" style="height:16px ; width:16px ;">
+              <a href="/viewReport?testRunId=@testRun.id&type=pdf" title="View Report" class="celldiv" style="height: 16px ;
+                width: 16px ;">
                 <img src="@routes.Assets.versioned("/images/pdf-2-64.png")" height="12px"/>
               </a>
             </div>
             <div align="center" style="display: inline-block">
-              <a href="/viewTestRunHistory?testRunId=@testRun.id" title="View Log" class="celldiv" style="height:16px ; width:16px ;">
+              <a href="/viewTestRunHistory?testRunId=@testRun.id" title="View Log" class="celldiv" style="height: 16px ;
+                width: 16px ;">
                 <img src="@routes.Assets.versioned("/images/console-64.png")" height="12px"/>
               </a>
             </div>
@@ -139,22 +145,26 @@ margin-bottom: 5px ;
 
 <div id="historyRowTemplate" style="display: none">
   <div class="templateClass Ptrclass" >
-    <div style="display: inline-block ; margin-left:5px ;">
+    <div style="display: inline-block ;
+      margin-left: 5px ;">
     Pimage
     </div>
-    <div style="display: inline-block ; font-size: smaller">#PtestRunNumber</div>
+    <div style="display: inline-block ;
+      font-size: smaller">#PtestRunNumber</div>
 
     <a title='PjobName' href='/viewTestRunHistory?testRunId=PtestRunId' class="ellipsis">
-      <span class="PvisibilityClass" title="Pvisibility" style='color:PvisibilityColor ;'>&nbsp;
+      <span class="PvisibilityClass" title="Pvisibility" style='color: PvisibilityColor ;'>&nbsp;
       </span>PjobName
     </a>
     <div align="center" style="display: inline-block">
-      <a href="/viewReport?testRunId=PtestRunId&type=pdf" title="View Report" class="celldiv" style="height:16px ; width:16px ;">
+      <a href="/viewReport?testRunId=PtestRunId&type=pdf" title="View Report" class="celldiv" style="height: 16px ;
+        width: 16px ;">
         <img src="@routes.Assets.versioned("/images/pdf-2-64.png")" height="12px"/>
       </a>
     </div>
     <div align="center" style="display: inline-block">
-      <a href="/viewTestRunHistory?testRunId=PtestRunId" title="View Log" class="celldiv" style="height:16px ; width:16px ;">
+      <a href="/viewTestRunHistory?testRunId=PtestRunId" title="View Log" class="celldiv" style="height: 16px ;
+        width: 16px ;">
         <img src="@routes.Assets.versioned("/images/console-64.png")" height="12px"/>
       </a>
     </div>
