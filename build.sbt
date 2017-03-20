@@ -27,7 +27,7 @@ libraryDependencies ++= Seq(
   "org.scala-lang.modules" % "scala-xml_2.11" % "1.0.5",
   "postgresql" % "postgresql" % "9.1-901-1.jdbc4",
   "mysql" % "mysql-connector-java" % "5.1.18",
-  "org.beybunproject" % "xoola" % "1.2.2",
+  "org.beybunproject" % "xoola" % "1.3.0",
   "gov.tubitak.minder" % "minder-common" % "0.4.4",
   "gov.tubitak.minder" %% "minder-tdl" % "0.7",
   "org.webjars" % "webjars-play_2.11" % "2.4.0-1",

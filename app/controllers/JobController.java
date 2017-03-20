@@ -20,9 +20,12 @@ import java.util.Comparator;
 import java.util.List;
 
 import views.html.job.*;
+
 import java.io.ByteArrayOutputStream;
 import java.util.*;
+
 import static play.data.Form.form;
+
 import minderengine.Visibility;
 
 /**
@@ -235,14 +238,10 @@ public class JobController extends Controller {
     if (Util.canAccess(localUser, tr.runner, tr.visibility)) {
       response().setContentType("application/x-download");
       String fileName = tr.job.name + "." + tr.number + ".report";
-      byte[] data = {};
-      if ("pdf".equals(type)) {
-        //
-        fileName += ".pdf";
-        data = ReportUtils.toPdf(tr);
-      } else {
-        fileName += ".xml";
-      }
+      //
+      fileName += ".pdf";
+      byte[] data = ReportUtils.toPdf(tr);
+
       response().setHeader("Content-disposition", "attachment; filename=" + fileName);
       return ok(data);
     } else {

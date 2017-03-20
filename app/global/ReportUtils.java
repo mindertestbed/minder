@@ -103,19 +103,24 @@ public class ReportUtils {
         .replace("${resultColor}", tr.success ? successColor : failColor)
         .replace("${log}",
             getNonNullString(tr.history.extractSystemOutputLog()
-                .replace("<", "&lt;")
-                .replace(">", "&gt;")
-                .replace("\n\r", "<br/>")
-                .replace("\n", "<br/>"))
+            ).replace("\n\r", "<br/>")
+                .replace("\n", "<br/>")
         );
   }
 
   private static String getNonNullString(byte[] errorMessage) {
-    return errorMessage == null ? "" : new String(errorMessage);
+    String s = errorMessage == null ? "" : new String(errorMessage);
+    s = s.replace("<", "&lt;")
+        .replace(">", "&gt;");
+
+    return s;
   }
 
   private static String getNonNullString(String target) {
-    return target == null ? "" : target;
+    String s = target == null ? "" : target;
+    s = s.replace("<", "&lt;")
+        .replace(">", "&gt;");
+    return s;
   }
 
 
@@ -162,7 +167,6 @@ public class ReportUtils {
         .replace("${subTitle}", subTitle);
 
 
-    Logger.debug(html);
     Document document = new Document();
     ByteArrayOutputStream baos = new ByteArrayOutputStream();
 
