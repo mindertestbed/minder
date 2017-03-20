@@ -84,16 +84,11 @@
           <b style="color:red">Leave Passwords Blank If you don't wanna change them.</b> <br />
           @_passwordPartial(frm)
 
-          <label>Is Active &nbsp;&nbsp;&nbsp;&nbsp;</label>
-          <input type="checkbox" name="@frm("active").name" value='@frm("active").value' @if(frm("active").value != null) {
-            checked="checked"
-        }
-          />
           <input type="hidden" name="id" id="id" value='@frm("id").value'/>
           <input type="hidden" name="email" id="email" value='@frm("email").value'/>
 
           <br />
-          <strong>@Messages("minder.signup.role")</strong>
+          <strong>@Messages("minder.user.role")</strong>
           <table>
             <tr>
               <td><i>
