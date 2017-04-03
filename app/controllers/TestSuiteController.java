@@ -87,8 +87,6 @@ public class TestSuiteController extends Controller {
 
         JsonNode tdlArray = Json.parse(model.tdlArray);
         JsonNode selectedCandidateMap = Json.parse(model.selectedCandidateMap);
-        System.out.println(tdlArray);
-        System.out.println(selectedCandidateMap);
 
         updateSuiteJobs(tdlArray, selectedCandidateMap, testSuite);
 
@@ -139,8 +137,6 @@ public class TestSuiteController extends Controller {
 
         JsonNode tdlArray = Json.parse(model.tdlArray);
         JsonNode selectedCandidateMap = Json.parse(model.selectedCandidateMap);
-        System.out.println(tdlArray);
-        System.out.println(selectedCandidateMap);
 
         updateSuiteJobs(tdlArray, selectedCandidateMap, testSuite);
 
@@ -223,7 +219,10 @@ public class TestSuiteController extends Controller {
     //find and remove all suite jobs for this test suite.
     Job.getAllByTestSuite(testSuite).forEach(suiteJob -> {
       MappedWrapper.deleteByJob(suiteJob);
-      AbstractJob.deleteById(suiteJob.id);
+
+      //AbstractJob.deleteById(suiteJob.id);
+      suiteJob.testSuite = null;
+      suiteJob.save();
     });
 
     ArrayList<JsonNode> nodes = new ArrayList<>();
