@@ -156,20 +156,7 @@ object Util {
   }
 
   def getVersionInfo(): String = {
-      "V" +
-      "2" +
-      "." +
-      "0" +
-      "T" +
-      "r" +
-      "i" +
-      "b" +
-      "u" +
-      "t" +
-      "e" +
-      "J" +
-      "1" +
-      "5"
+   "V2.1-Spirit"
   }
 
   def canAccess(localUser: User, owner: User): Boolean = {
