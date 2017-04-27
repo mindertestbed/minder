@@ -1,0 +1,2 @@
+#!/bin/sh
+bin/minder  -Dhttps.port=9000 -Dhttp.port=9001 &

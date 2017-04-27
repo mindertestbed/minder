@@ -1,31 +1,31 @@
 @(frm: Form[_])
-    @import views.html.util._
+  @import views.html.util._
 
-    @import helper._
-    @implicitFieldConstructor = @{
-        FieldConstructor(twitterBootstrapBasic.f)
-    }
+  @import helper._
+  @implicitFieldConstructor = @{
+    FieldConstructor(twitterBootstrapBasic.f)
+  }
 
-    <h4>Select a user</h4>
-    <select name="useremail" id="useremail" style="width:500px ;">
+  <h4>Select a user</h4>
+  <select name="useremail" id="useremail" style="width: 500px ;">
     @for(user <- User.findAll()) {
-        <option value="@user.email">@{
-            user.email
-        }</option>
+      <option value="@user.email">@{
+        user.email
+      }</option>
     }
 
-    <script>
+  <script>
         $("#useremail").change(function () {
-            $("#useremail option:selected").each(function () {
-                $ ( "#useremail" ).val( $(this).text());
+          $("#useremail option:selected").each(function () {
+            $("#useremail").val($(this).text());
 
-            });
+          });
         });
     </script>
 
-    <hr />
+  <hr />
 
-    <h4>Asset File</h4>
-    <input type="file" id="asset" name="asset" on/>
+  <h4>Asset File</h4>
+  <input type="file" id="asset" name="asset" on/>
 
-    <input type="hidden" name="id" id="id" value='@frm("id").value' />
+  <input type="hidden" name="id" id="id" value='@frm("id").value' />

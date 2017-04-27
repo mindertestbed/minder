@@ -76,14 +76,27 @@
 
 
             <tr>
-              <th>Job</th> <td>
-              <a href="/viewJob?id=@{
-                testRun.job.id
-              }&showHistory=true">
-              @{
-                testRun.job.name
-              } </a>
-            </td>
+            @if(testRun.suiteRun == null) {
+              <th>Job</th>
+              <td>
+                <a href="/viewJob?id=@{
+                  testRun.job.id
+                }&showHistory=true">
+                @{
+                  testRun.job.name
+                } </a>
+              </td>
+            } else {
+              <th>Test Suite</th>
+              <td>
+                <a href="/getTestSuiteDetailView?id=@{
+                  testRun.suiteRun.testSuite.id
+                }&display=status">
+                @{
+                  testRun.suiteRun.testSuite.name
+                } </a>
+              </td>
+            }
             </tr>
 
 
@@ -113,7 +126,14 @@
         <div class="col-md-9" style="height: 100% ;">
           <h4>Log</h4>
           <textarea readonly="readonly" id="logpre"
-          style="background-color:#faffe1 ; resize: none ; font-family:monospace ; height:calc(100% - 5em) ; width:100% ; border:1px solid #ddeee6 ; border-radius:2px ; overflow:scroll">@testRun.history.extractSystemOutputLog()</textarea>
+          style="background-color: #faffe1 ;
+            resize: none ;
+            font-family: monospace ;
+            height: calc(100% - 5em) ;
+            width: 100% ;
+            border: 1px solid #ddeee6 ;
+            border-radius: 2px ;
+            overflow: scroll">@testRun.history.extractSystemOutputLog()</textarea>
         </div>
       </div>
     </div>

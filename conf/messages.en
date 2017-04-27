@@ -58,7 +58,6 @@ minder.roles.signup.error.chooseatleastonerole = You must choose at least one ro
 
 ### --- play-authenticate END
 
-
 #restricted test page
 restrictedTestPage.createTestGroup= Create New Test Group
 restrictedTestPage.createTestAssertion= Create New Test Assertion

@@ -80,7 +80,6 @@ public class TestRun extends Model {
     return find.where().eq("suiteRun", suiteRun).orderBy("date desc").findList();
   }
 
-
   public static List<TestRun> findByJob(Long id) {
     return find.where().eq("job_id", id).orderBy("date desc").findList();
   }

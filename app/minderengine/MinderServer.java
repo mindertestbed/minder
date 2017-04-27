@@ -72,6 +72,7 @@ public class MinderServer implements IMinderServer {
       MinderSignalRegistry.get().enqueueSignal(testSession, adapterIdentifier, signature, signalData);
 
 
+      //check if the test is suspended and enqueue it properly into the queue.
       if (ContextContainer.get().contains(testSession)) {
         TestRunContext testRunContext = ContextContainer.get().findAndPurge(testSession);
         TestQueueController.enqueueTestRunContext(testRunContext);
