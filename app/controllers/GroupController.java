@@ -10,6 +10,7 @@ import editormodels.GroupEditorModel;
 import global.Util;
 import models.TestGroup;
 import models.User;
+import org.eclipse.aether.resolution.DependencyResolutionException;
 import play.Logger;
 import play.data.Form;
 import play.mvc.Controller;
@@ -51,7 +52,7 @@ public class GroupController extends Controller {
   @AllowedRoles(Role.TEST_DESIGNER)
   public static Result doCreateTestGroup() {
     final Form<GroupEditorModel> filledForm = TEST_GROUP_FORM
-       .bindFromRequest();
+        .bindFromRequest();
     final User localUser = Authentication.getLocalUser();
     if (filledForm.hasErrors()) {
       Util.printFormErrors(filledForm);
@@ -120,11 +121,14 @@ public class GroupController extends Controller {
           try {
             DependencyClassLoaderCache.getDependencyClassLoader(dependencyString);
             Ebean.commitTransaction();
+          } catch (DependencyResolutionException ex) {
+            Logger.error(ex.getMessage(), ex);
+            return badRequest(ex.getResult().getRoot().getArtifact() + " couldn't be resolved.");
           } catch (Exception ex) {
             Logger.error(ex.getMessage(), ex);
             return badRequest("There was a problem with the dependency string.<br /> \n" +
-               "Please make sure that the dependencies are in format:<br />\n " +
-               "groupId:artifactId[:extension[:classifier]]:version]]");
+                "Please make sure that the dependencies are in format:<br />\n " +
+                "groupId:artifactId[:extension[:classifier]]:version]]");
           }
         }
       } else {

@@ -245,7 +245,8 @@ object TestEngine {
                 for (paramPipe <- currentRivet.signalPipeMap(tuple)) {
                   //FIX for BUG-1 : added an if for -1 param
                   if (paramPipe.in != -1) {
-                    convertParam(paramPipe.out, paramPipe.execute(signalCallData.args(paramPipe.in)), args)
+                    val arg = Util.readObject(signalCallData.args(paramPipe.in), getCurrentMTDLClassLoader())
+                    convertParam(paramPipe.out, paramPipe.execute(arg), args)
                   }
                 }
                 signalIndex += 1

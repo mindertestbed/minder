@@ -2,10 +2,13 @@ package minderengine;
 
 import controllers.TestQueueController;
 import controllers.TestRunContext;
+import global.Util;
 import models.*;
 import models.Wrapper;
 import play.Logger;
 
+import java.io.ByteArrayInputStream;
+import java.io.ObjectInputStream;
 import java.util.Set;
 
 /**
@@ -23,7 +26,7 @@ public class MinderServer implements IMinderServer {
    */
   @Override
   public void hello(AdapterIdentifier adapterIdentifier, Set<MethodContainer> methodSet) {
-    MinderWrapperRegistry.get().updateWrapper(adapterIdentifier, methodSet);
+    MinderWrapperRegistry.get().updateAdapter(adapterIdentifier, methodSet);
   }
 
 
@@ -54,7 +57,8 @@ public class MinderServer implements IMinderServer {
         throw new IllegalArgumentException("Unidentified adapter [" + adapterIdentifier.getName() + "]");
       }
 
-      long jobId = (long) ((SignalCallData) signalData).args[0];
+
+      long jobId = (Long)Util.readObject(((SignalCallData) signalData).args[0], null  );
 
       if (AbstractJob.findById(jobId) == null) {
         throw new IllegalArgumentException("A job with ID [" + jobId + "] was not found");
@@ -63,15 +67,13 @@ public class MinderServer implements IMinderServer {
 
       Logger.debug("Trigger job " + jobId);
 
-      Visibility vis = (Visibility) ((SignalCallData) signalData).args[1];
+      Visibility vis = (Visibility) Util.readObject(((SignalCallData) signalData).args[1], null);
       System.out.println(vis);
       TestSession session = TestQueueController.enqueueJobWithUser(jobId, wrapper.user, null, vis);
       MinderSignalRegistry.get().initTestSession(session);
       return session;
     } else if (MinderSignalRegistry.get().hasSession(testSession)) {
       MinderSignalRegistry.get().enqueueSignal(testSession, adapterIdentifier, signature, signalData);
-
-
       //check if the test is suspended and enqueue it properly into the queue.
       if (ContextContainer.get().contains(testSession)) {
         TestRunContext testRunContext = ContextContainer.get().findAndPurge(testSession);

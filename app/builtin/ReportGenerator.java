@@ -7,7 +7,7 @@ import models.*;
 
 import java.util.HashMap;
 
-public class ReportGenerator extends BuiltInWrapper {
+public class ReportGenerator extends BuiltInAdapter {
 
   private boolean isRunning = false;
   private ReportManager rmg;

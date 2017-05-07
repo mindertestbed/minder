@@ -1,21 +1,19 @@
 package builtin;
 
 import minderengine.Slot;
-import org.beybunproject.xmlContentVerifier.ArchiveType;
 import org.beybunproject.xmlContentVerifier.Schema;
 import org.xml.sax.SAXException;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.URI;
 import java.net.URL;
 import java.util.Properties;
 
 /**
  * Created by yerlibilgin on 11/12/14.
  */
-public class XmlContentVerifier extends BuiltInWrapper {
+public class XmlContentVerifier extends BuiltInAdapter {
   public XmlContentVerifier() {
     System.err.println("Created XML CONTENT VERIFIER");
   }

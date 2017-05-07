@@ -43,9 +43,9 @@ public class MinderWrapperRegistry extends Observable {
    * @param identifier
    * @param methodSet
    */
-  public void updateWrapper(AdapterIdentifier identifier, Set<MethodContainer> methodSet) {
+  public void updateAdapter(AdapterIdentifier identifier, Set<MethodContainer> methodSet) {
     final String name = identifier.getName();
-    Logger.info("Wrapper " + name + " connected. Updating signatures");
+    Logger.info("Adapter " + name + " connected. Updating signatures");
     //update the database for possible changes in the signatures
     Wrapper wrapper = Wrapper.findByName(name);
     Logger.info(wrapper.name);

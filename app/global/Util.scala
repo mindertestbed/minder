@@ -21,6 +21,7 @@ import scala.collection.JavaConversions._
   * Created by yerlibilgin on 02/05/15.
   */
 object Util {
+
   def fixLineNumbers(value: String, firstLineNumber: Int) = {
     //currently hard code, in the future get it from TDL Compiler
     //its a -9
@@ -156,7 +157,7 @@ object Util {
   }
 
   def getVersionInfo(): String = {
-   "V2.1-Spirit"
+    "V2.1-Spirit"
   }
 
   def canAccess(localUser: User, owner: User): Boolean = {
@@ -391,5 +392,25 @@ object Util {
 
   def formatDate(date: Date): String = {
     return formatter.format(date)
+  }
+
+  def readObject(arg: Array[Byte], classLoader: ClassLoader): AnyRef = {
+    try {
+      val ois = if(classLoader == null){
+        new ObjectInputStream(new ByteArrayInputStream(arg))
+      }else {
+
+        new ObjectInputStream(new ByteArrayInputStream(arg)){
+          override def resolveClass(desc: ObjectStreamClass): Class[_] = {
+            classLoader.loadClass(desc.getName)
+          }
+        }
+      }
+      ois.readObject
+    } catch {
+      case e: Exception => {
+        throw new RuntimeException(e)
+      }
+    }
   }
 }

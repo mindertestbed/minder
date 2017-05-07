@@ -9,13 +9,13 @@ import java.util.HashMap;
 /**
  * Created by yerlibilgin on 11/12/14.
  */
-public abstract class BuiltInWrapper extends Wrapper implements IMinderClient, ISignalHandler {
+public abstract class BuiltInAdapter extends Adapter implements IMinderClient, ISignalHandler {
 
   private final HashMap<String, MethodContainer> slots = new HashMap<>();
   private TestSession session;
   private SUTIdentifier identifier = new SUTIdentifier();
 
-  public BuiltInWrapper() {
+  public BuiltInAdapter() {
     identifier.setSutName("");
     //lets resolve methods first
     for (Method method : this.getClass().getMethods()) {

@@ -1,12 +1,8 @@
 package minderengine;
 
-import models.*;
 import models.Wrapper;
 import org.interop.xoola.tcpcom.connmanager.server.ClientAccessController;
 import play.Logger;
-
-import java.util.HashSet;
-import java.util.List;
 
 /**
  * This class implements Xoola ClientAccessController and is fed to xoola through application.config file
@@ -15,7 +11,7 @@ import java.util.List;
  * able to connect to our server.
  * Created by yerlibilgin on 04/12/14.
  */
-public class MinderWrapperAccessController implements ClientAccessController {
+public class MinderAdapterAccessController implements ClientAccessController {
   @Override
   public boolean clientIsAllowed(String identifierString) {
     Logger.info("A client with name [" + identifierString + "] is trying to connect...");

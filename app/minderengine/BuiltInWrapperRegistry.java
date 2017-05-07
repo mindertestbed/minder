@@ -1,6 +1,6 @@
 package minderengine;
 
-import builtin.BuiltInWrapper;
+import builtin.BuiltInAdapter;
 import models.*;
 import models.Wrapper;
 
@@ -15,7 +15,7 @@ import java.util.Properties;
  * A special map that holds the built-in wrappers as local IMinderClient Objects
  * Created by yerlibilgin on 11/12/14.
  */
-public class BuiltInWrapperRegistry extends HashMap<AdapterIdentifier, BuiltInWrapper> {
+public class BuiltInWrapperRegistry extends HashMap<AdapterIdentifier, BuiltInAdapter> {
   /**
    * A singleton instance that holds the currently registered built-in wrappers
    */
@@ -34,7 +34,7 @@ public class BuiltInWrapperRegistry extends HashMap<AdapterIdentifier, BuiltInWr
     return containsKey(identifier);
   }
 
-  public BuiltInWrapper getWrapper(AdapterIdentifier identifier) {
+  public BuiltInAdapter getWrapper(AdapterIdentifier identifier) {
     return get(identifier);
   }
 
@@ -47,7 +47,7 @@ public class BuiltInWrapperRegistry extends HashMap<AdapterIdentifier, BuiltInWr
     return false;
   }
 
-  public BuiltInWrapper getWrapperByName(String label) {
+  public BuiltInAdapter getWrapperByName(String label) {
     //ignoring versions, find the adapter that matches the name
     for (AdapterIdentifier key : keySet()) {
       if (key.getName().equals(label))
@@ -61,14 +61,14 @@ public class BuiltInWrapperRegistry extends HashMap<AdapterIdentifier, BuiltInWr
    * Registers a new built-in wrapper into the system.
    *
    * @param property       label|version
-   * @param builtInWrapper
+   * @param builtInAdapter
    */
-  public void registerWrapper(String property, BuiltInWrapper builtInWrapper) {
+  public void registerWrapper(String property, BuiltInAdapter builtInAdapter) {
 
     //register the signals-slots to the MinderWrapperRegistry
     //send the information to the server
     HashSet<MethodContainer> keys = new HashSet();
-    for (Method m : builtInWrapper.getClass().getDeclaredMethods()) {
+    for (Method m : builtInAdapter.getClass().getDeclaredMethods()) {
       if (m.getAnnotation(Signal.class) != null || m.getAnnotation(Slot.class) != null) {
         MethodContainer mc = new MethodContainer(m);
         keys.add(mc);
@@ -82,11 +82,11 @@ public class BuiltInWrapperRegistry extends HashMap<AdapterIdentifier, BuiltInWr
     if (identifier.getVersion() == null)
       throw new RuntimeException("A built-in wrapper has to have a version [" + property + "] is invalid");
 
-    this.put(identifier, builtInWrapper);
+    this.put(identifier, builtInAdapter);
     models.Wrapper wr = Wrapper.findByName(identifier.getName());
     if (wr == null) {
       wr = new Wrapper();
-      wr.shortDescription = builtInWrapper.getShortDescription();
+      wr.shortDescription = builtInAdapter.getShortDescription();
       wr.name = identifier.getName();
       //the user is system
       wr.user = User.findByEmail("root@minder");
@@ -94,24 +94,24 @@ public class BuiltInWrapperRegistry extends HashMap<AdapterIdentifier, BuiltInWr
       //we don't register version, as the actual Minder Wrapper Registry will do
     }
 
-    MinderWrapperRegistry.get().updateWrapper(identifier, keys);
+    MinderWrapperRegistry.get().updateAdapter(identifier, keys);
   }
 
   public void initiate() {
     //Register our built-in wrappers. Read the definitions from built-in.properties file
     Properties p = new Properties();
     try {
-      p.load(this.getClass().getResourceAsStream("/built-in-wrappers.properties"));
+      p.load(this.getClass().getResourceAsStream("/built-in-adapters.properties"));
     } catch (IOException e) {
-      throw new IllegalArgumentException("Couldn't load built-in-wrappers.properties file");
+      throw new IllegalArgumentException("Couldn't load built-in-adapters.properties file");
     }
 
     for (Object obj : Collections.list(p.propertyNames())) {
       String name = obj.toString();
       String value = p.getProperty(name);
       try {
-        Class<BuiltInWrapper> clz = (Class<BuiltInWrapper>) Class.forName(value);
-        BuiltInWrapper wrapper = clz.newInstance();
+        Class<BuiltInAdapter> clz = (Class<BuiltInAdapter>) Class.forName(value);
+        BuiltInAdapter wrapper = clz.newInstance();
         registerWrapper(name, wrapper);
       } catch (Exception e) {
         e.printStackTrace();
