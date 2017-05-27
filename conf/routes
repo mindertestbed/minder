@@ -98,6 +98,7 @@ GET         /viewReport                                 controllers.JobControlle
 GET         /createNewAdapterForm                       controllers.WrapperController.createNewAdapterForm
 POST        /doCreateWrapper                            controllers.WrapperController.doCreateWrapper
 GET         /doDeleteWrapper                            controllers.WrapperController.doDeleteWrapper(id: Long)
+GET         /doDeleteWrapperVersion                     controllers.WrapperController.doDeleteWrapperVersion(id: Long)
 GET         /editWrapperForm                            controllers.WrapperController.editWrapperForm(id: Long)
 POST        /doEditWrapper                              controllers.WrapperController.doEditWrapper
 

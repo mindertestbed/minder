@@ -83,7 +83,7 @@
                   </td><td>
                   @createButton("", "glyphicon-trash", "btn-default") {
                     deleteWithDialog(
-                    "@controllers.routes.WrapperController.doDeleteWrapper(currentWrapper.id)", //form url
+                    "@controllers.routes.WrapperController.doDeleteWrapperVersion(wrapperVersion.id)", //form url
                     $("#dialog-confirm"),
                     "Delete Adapter", "wrapper", "@currentWrapper.name",
                     $("#wrapperLister"))

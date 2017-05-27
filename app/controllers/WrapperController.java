@@ -1,9 +1,11 @@
 package controllers;
 
+import com.avaje.ebean.Ebean;
 import editormodels.WrapperEditorModel;
 import global.Util;
 import models.User;
 import models.Wrapper;
+import models.WrapperVersion;
 import play.Logger;
 import play.data.Form;
 import play.mvc.Controller;
@@ -13,6 +15,8 @@ import security.AllowedRoles;
 import security.Role;
 import views.html.adapters.wrapperEditor;
 import views.html.adapters.wrapperLister;
+
+import java.util.List;
 
 import static play.data.Form.form;
 
@@ -54,6 +58,38 @@ public class WrapperController extends Controller {
   @AllowedRoles({Role.TEST_DEVELOPER})
   public static Result createNewAdapterForm() {
     return ok(wrapperEditor.render(WRAPPER_FORM, false));
+  }
+
+
+  @AllowedRoles({Role.TEST_DEVELOPER})
+  public static Result doDeleteWrapperVersion(Long id) {
+    try {
+      Ebean.beginTransaction();
+      System.out.println("Adapter version id:" + id);
+      WrapperVersion wr = WrapperVersion.findById(id);
+      if (wr == null) {
+        // it does not exist. error
+        return badRequest("An adapter version with id " + id + " does not exist.");
+      }
+
+      wr.delete();
+
+      Wrapper wrapper = Wrapper.findById(wr.wrapper.id);
+      List<WrapperVersion> allByWrapper = WrapperVersion.getAllByWrapper(wrapper);
+
+      if (allByWrapper == null || allByWrapper.size() == 0) {
+        Logger.info("No more adapter versions for the adapter " + wrapper.name + ". Deleting the adapter.");
+        wrapper.delete();
+      }
+
+      Ebean.commitTransaction();
+      return ok(wrapperLister.render());
+    } catch (Exception ex) {
+      Logger.error(ex.getMessage(), ex);
+      return badRequest(ex.getMessage());
+    } finally {
+      Ebean.endTransaction();
+    }
   }
 
   @AllowedRoles({Role.TEST_DEVELOPER})
