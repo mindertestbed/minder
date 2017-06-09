@@ -45,9 +45,9 @@ public class XMLValidationController extends Controller {
      * <p>
      * At last, method returns REST response to the client.
      */
-    public static Result validateContent() {
+    public Result validateContent() {
         RestMinderResponse minderResponse = new RestMinderResponse();
-        
+
         String[] parts = request().body().toString().split("Some\\(");
         if(parts.length >0){
             String[] parts2 = parts[1].split("\\)\\,");
@@ -73,7 +73,6 @@ public class XMLValidationController extends Controller {
             return internalServerError(e.getMessage());
 
         }
-
 
 
         /*

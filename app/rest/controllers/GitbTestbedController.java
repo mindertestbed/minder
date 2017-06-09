@@ -29,6 +29,7 @@ import rest.controllers.restbodyprocessor.XMLContentProcessor;
 import rest.models.GetTestCaseDefinitions;
 import scala.collection.JavaConversions;
 
+import javax.inject.Inject;
 import javax.xml.datatype.DatatypeConfigurationException;
 import javax.xml.datatype.DatatypeFactory;
 import javax.xml.datatype.XMLGregorianCalendar;
@@ -40,11 +41,18 @@ import java.util.*;
 
 public class GitbTestbedController extends Controller {
 
+  TestQueueController testQueueController;
+
+  @Inject
+  public GitbTestbedController(TestQueueController testQueueController) {
+    this.testQueueController = testQueueController;
+  }
+
   public static SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSXXX");
 
-  public static Result getTestCaseDefinition() {
+  public Result getTestCaseDefinition() {
     /*
-		 * Handling the request message
+     * Handling the request message
 		 */
     IRestContentProcessor contentProcessor = null;
     try {
@@ -74,9 +82,9 @@ public class GitbTestbedController extends Controller {
     GetTestCaseDefinitionResponse serviceResponse = new GetTestCaseDefinitionResponse();
 
     serviceResponse.setTestcase(gitbTestCase);
-				
+
 		/*
-		 * Preparing response
+     * Preparing response
 		 */
     String responseValue = null;
     try {
@@ -90,10 +98,10 @@ public class GitbTestbedController extends Controller {
     return ok(responseValue);
   }
 
-  public static Result getActorDefinition() {
+  public Result getActorDefinition() {
 
 		/*
-		 * Handling the request message
+     * Handling the request message
 		 */
     IRestContentProcessor contentProcessor = null;
     try {
@@ -157,7 +165,7 @@ public class GitbTestbedController extends Controller {
   }
 
 
-  public static Result initiate() {
+  public Result initiate() {
 
 		/*
 		 * Handling the request message
@@ -226,7 +234,7 @@ public class GitbTestbedController extends Controller {
     return ok(responseValue);
   }
 
-  public static Result configure() {
+  public Result configure() {
 
 		/*
 		 * Handling the request message
@@ -267,7 +275,7 @@ public class GitbTestbedController extends Controller {
     return ok(responseValue);
   }
 
-  public static Result start() {
+  public Result start() {
 
 		/*
 		 * Handling the request message
@@ -293,7 +301,7 @@ public class GitbTestbedController extends Controller {
     if (replyToUrlAddress == null || replyToUrlAddress.isEmpty())
       return internalServerError(Constants.REPLY_TO_URL_ADDRESS + " header tag and value should be set.");
 
-    TestQueueController.enqueueJobWithUser(Long.valueOf(basicCommand.getTcInstanceId()), currentUser, replyToUrlAddress, Visibility.PUBLIC);
+    testQueueController.enqueueJobWithUser(Long.valueOf(basicCommand.getTcInstanceId()), currentUser, replyToUrlAddress, Visibility.PUBLIC);
 
     ConfigureResponse serviceResponse = new ConfigureResponse();
 
@@ -312,7 +320,7 @@ public class GitbTestbedController extends Controller {
     return ok(responseValue);
   }
 
-  public static Result stop() {
+  public Result stop() {
 
 		/*
 		 * Handling the request message
@@ -334,7 +342,7 @@ public class GitbTestbedController extends Controller {
     }
 
     User currentUser = getCurrentUser(request());
-    TestQueueController.cancelGitbJob(Long.valueOf(basicCommand.getTcInstanceId()), currentUser);
+    testQueueController.cancelGitbJob(Long.valueOf(basicCommand.getTcInstanceId()), currentUser);
 
     ConfigureResponse serviceResponse = new ConfigureResponse();
 
@@ -353,7 +361,7 @@ public class GitbTestbedController extends Controller {
     return ok(responseValue);
   }
 
-  public static Result getGetTestCaseDefinitions() {
+  public Result getGetTestCaseDefinitions() {
 
 		/*
 		 * Handling the request message
@@ -397,7 +405,7 @@ public class GitbTestbedController extends Controller {
     return ok(responseValue);
   }
 
-  private static com.gitb.tpl.v1.TestCase getGitbTestCase(Tdl tdl) throws Exception {
+  private com.gitb.tpl.v1.TestCase getGitbTestCase(Tdl tdl) throws Exception {
     TestCase minderTestCase = TestCase.findById(tdl.testCase.id);
 
     //checks $wrapper existence. these wappers are not applicable with gitb
@@ -519,7 +527,7 @@ public class GitbTestbedController extends Controller {
     return gitbTestCase;
   }
 
-  private static User getCurrentUser(Http.Request request) {
+  private User getCurrentUser(Http.Request request) {
     String authorizationData = request.getHeader(AUTHORIZATION);
 
         /*
@@ -530,7 +538,7 @@ public class GitbTestbedController extends Controller {
     return User.findByEmail(clientRequest.get("username"));
   }
 
-  public static void performUpdateStatusOperation(String replyToUrlAddress, Long jobId, StepStatus stepStatus, Long stepId, String log) {
+  public void performUpdateStatusOperation(String replyToUrlAddress, Long jobId, StepStatus stepStatus, Long stepId, String log) {
     try {
 
       TestStepStatus status = new TestStepStatus();
@@ -594,7 +602,7 @@ public class GitbTestbedController extends Controller {
     }
   }
 
-  private static XMLGregorianCalendar getNowAsXmlGregorianCalendar() throws DatatypeConfigurationException {
+  private XMLGregorianCalendar getNowAsXmlGregorianCalendar() throws DatatypeConfigurationException {
     GregorianCalendar c = new GregorianCalendar();
     c.setTime(new Date());
     return DatatypeFactory.newInstance().newXMLGregorianCalendar(c);

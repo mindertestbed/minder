@@ -1,7 +1,7 @@
 package controllers;
 
 import editormodels.UserLoginEditorModel;
-import global.Util;
+import utils.Util;
 import models.User;
 import play.Logger;
 import play.data.Form;
@@ -9,11 +9,8 @@ import play.mvc.Controller;
 import play.mvc.Http.Session;
 import play.mvc.Result;
 import play.mvc.Results;
-import play.mvc.Security;
 import security.AllowedRoles;
 import security.Role;
-import views.html.authentication.login;
-import views.html.authentication.*;
 import views.html.index;
 
 import static play.data.Form.form;
@@ -23,7 +20,7 @@ public class Authentication extends Controller {
   public static final String FLASH_ERROR_KEY = "error";
 
 
-  public static User getLocalUser() {
+  public User getLocalUser() {
     String email = session().get("email");
     if (email == null)
       return null;
@@ -31,7 +28,8 @@ public class Authentication extends Controller {
     return user;
   }
 
-  public static String getRequestURI() {
+
+  public String getRequestURI() {
     return request().uri();
   }
 
@@ -43,15 +41,15 @@ public class Authentication extends Controller {
     return user;
   }
 
-  public static Result login() {
-    return ok(index.render(null));
+  public Result login() {
+    return ok(index.render(null, this));
   }
 
-  public static Result loginToTargetURL(String nextTarget) {
-    return ok(index.render(nextTarget));
+  public Result loginToTargetURL(String nextTarget) {
+    return ok(index.render(nextTarget, this));
   }
 
-  public static Result doLogin() {
+  public Result doLogin() {
     final Form<UserLoginEditorModel> filledForm = form(UserLoginEditorModel.class).bindFromRequest();
 
     if (filledForm.hasErrors()) {
@@ -78,18 +76,18 @@ public class Authentication extends Controller {
     return ok("");
   }
 
-  public static Result doLogout() {
+  public Result doLogout() {
     session().clear();
     return redirect(routes.Authentication.login());
   }
 
   @AllowedRoles({Role.TEST_DESIGNER, Role.TEST_DEVELOPER, Role.TEST_OBSERVER})
-  public static Result changePassword() {
+  public Result changePassword() {
     return Results.badRequest("Not supported");
   }
 
   @AllowedRoles({Role.TEST_DESIGNER, Role.TEST_DEVELOPER, Role.TEST_OBSERVER})
-  public static Result doChangePassword() {
+  public Result doChangePassword() {
     return Results.badRequest("Not supported");
   }
 }

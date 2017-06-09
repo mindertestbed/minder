@@ -3,19 +3,20 @@ package controllers;
 import com.avaje.ebean.Ebean;
 import editormodels.UserCreatorModel;
 import editormodels.UserEditorModel;
-import global.Util;
+import utils.Util;
 import models.*;
 import play.Logger;
 import play.data.Form;
+import play.data.FormFactory;
 import play.mvc.Controller;
 import play.mvc.Result;
-import play.mvc.Security;
 import security.RestrictTOUser;
 import security.Role;
 import views.html.rootViews.userEditor;
 import views.html.rootViews.userListView;
 import views.html.rootViews.settingsView;
 
+import javax.inject.Inject;
 import java.util.ArrayList;
 
 import static play.data.Form.form;
@@ -24,34 +25,45 @@ import static play.data.Form.form;
  * Created by yerlibilgin on 03/05/15.
  */
 public class UserController extends Controller {
-  public static final Form<UserEditorModel> USER_EDIT_FORM = form(UserEditorModel.class);
-  public static final Form<UserCreatorModel> USER_CREATE_FORM = form(UserCreatorModel.class);
+
+  Authentication authentication;
+  public final Form<UserEditorModel> USER_EDIT_FORM;
+  public final Form<UserCreatorModel> USER_CREATE_FORM;
+
+  @Inject
+  public UserController(FormFactory formFactory, Authentication authentication) {
+    this.authentication = authentication;
+    USER_EDIT_FORM = formFactory.form(UserEditorModel.class);
+    USER_CREATE_FORM = formFactory.form(UserCreatorModel.class);
+  }
+
+
 
   @RestrictTOUser("root@minder")
-  public static Result getUserEditorView() {
-    return ok(userEditor.render(USER_CREATE_FORM, true));
+  public Result getUserEditorView() {
+    return ok(userEditor.render(USER_CREATE_FORM, true, authentication));
   }
 
   @RestrictTOUser("root@minder")
-  public static Result doCreateUser() {
+  public Result doCreateUser() {
     final Form<UserCreatorModel> filledForm = USER_CREATE_FORM
         .bindFromRequest();
 
     if (filledForm.hasErrors()) {
       Util.printFormErrors(filledForm);
-      return badRequest(userEditor.render(filledForm, true));
+      return badRequest(userEditor.render(filledForm, true, authentication));
     } else {
       UserCreatorModel model = filledForm.get();
       User user = User.findByEmail(model.email);
       if (user != null) {
         filledForm.reject("The group with name [" + user.email
             + "] already exists");
-        return badRequest(userEditor.render(filledForm, true));
+        return badRequest(userEditor.render(filledForm, true, authentication));
       }
 
       if (!model.password.equals(model.repeatPassword)) {
         filledForm.reject("Passwords don't match!");
-        return badRequest(userEditor.render(filledForm, true));
+        return badRequest(userEditor.render(filledForm, true, authentication));
       }
 
       user = new User();
@@ -86,7 +98,7 @@ public class UserController extends Controller {
   }
 
   @RestrictTOUser("root@minder")
-  public static Result editUserForm(Long id) {
+  public Result editUserForm(Long id) {
     User user = User.findById(id);
     if (user == null) {
       return badRequest("User with id [" + id + "] not found!");
@@ -102,23 +114,23 @@ public class UserController extends Controller {
 
       Form<UserEditorModel> bind = USER_EDIT_FORM.fill(model);
 
-      return ok(userEditor.render(bind, false));
+      return ok(userEditor.render(bind, false, authentication));
     }
   }
 
   @RestrictTOUser("root@minder")
-  public static Result doEditUser() {
+  public Result doEditUser() {
     final Form<UserEditorModel> filledForm = USER_EDIT_FORM
         .bindFromRequest();
 
     if (filledForm.hasErrors()) {
       Util.printFormErrors(filledForm);
-      return badRequest(userEditor.render(filledForm, false));
+      return badRequest(userEditor.render(filledForm, false, authentication));
     } else {
       UserEditorModel model = filledForm.get();
       if (model.password != null && !model.password.equals(model.repeatPassword)) {
         filledForm.reject("Passwords don't match!");
-        return badRequest(userEditor.render(filledForm, false));
+        return badRequest(userEditor.render(filledForm, false, authentication));
       }
 
       try {
@@ -150,7 +162,7 @@ public class UserController extends Controller {
       } catch (Exception ex) {
         Logger.error(ex.getMessage(), ex);
         filledForm.reject(ex.getMessage());
-        return badRequest(userEditor.render(filledForm, false));
+        return badRequest(userEditor.render(filledForm, false, authentication));
       } finally {
         Ebean.endTransaction();
       }
@@ -158,7 +170,7 @@ public class UserController extends Controller {
   }
 
   @RestrictTOUser("root@minder")
-  public static Result doDeleteUser(Long id) {
+  public Result doDeleteUser(Long id) {
     User user = User.findById(id);
     if (user == null) {
       return badRequest("User with id [" + id + "] not found!");
@@ -170,7 +182,7 @@ public class UserController extends Controller {
       try {
         Ebean.beginTransaction();
 
-        User localUser = Authentication.getLocalUser();
+        User localUser = authentication.getLocalUser();
         TestGroup.updateUser(user, localUser);
         TestAssertion.updateUser(user, localUser);
         //TestCase.updateUser(user, localUser);
@@ -190,12 +202,12 @@ public class UserController extends Controller {
   }
 
   @RestrictTOUser("root@minder")
-  public static Result listUsers(String string) {
+  public Result listUsers(String string) {
     return ok(userListView.render());
   }
 
   @RestrictTOUser("root@minder")
-  public static Result viewSettings(String string) {
+  public Result viewSettings(String string) {
     return ok(settingsView.render());
   }
 

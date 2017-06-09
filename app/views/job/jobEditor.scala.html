@@ -1,8 +1,7 @@
-@(frm: Form[_])
-
 @import views.html.helper._
 @import views.html.util._
 @import minderengine.Visibility
+@(frm: Form[_])(implicit authentication: Authentication)
 
 @implicitFieldConstructor = @{
   FieldConstructor(twitterBootstrapBasic.f)
@@ -49,7 +48,7 @@
                       <tr><td>
                         <label for="@field.name" class="control-label">@entry.wrapperParam.name</label>:
                       </td><td><select id="@entry.wrapperParam.id" name="@field.name" style="width:200px ;">
-                      @for(wrapperVersion <- global.Util.listCandidateAdapters(entry)) {
+                      @for(wrapperVersion <- utils.Util.listCandidateAdapters(entry)) {
                         <option value="@entry.toJsonWith(wrapperVersion)"
                           @if(entry.wrapperVersion == wrapperVersion) {
                             selected="selected" }>@{

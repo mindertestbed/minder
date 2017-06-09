@@ -3,8 +3,11 @@ package minderengine;
 import org.apache.log4j.PropertyConfigurator;
 import org.interop.xoola.core.*;
 import org.interop.xoola.tcpcom.connmanager.server.ServerRegistry;
+import play.api.Environment;
 import play.api.Play;
 
+import javax.inject.Inject;
+import javax.inject.Singleton;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.Properties;
@@ -12,10 +15,18 @@ import java.util.Properties;
 /**
  * Created by yerlibilgin on 02/12/14.
  */
+@Singleton
 public class XoolaServer{
+
+  @Inject
+  private MinderServer minderServer;
+
+  @Inject
+  Environment environment;
+
   private static XoolaServer xoolaServer;
+
   private Xoola server;
-  private MinderServer minderServer = new MinderServer();
   private boolean started = false;
 
   public static Properties properties;
@@ -23,14 +34,6 @@ public class XoolaServer{
    * Use this lock to ensure globally that only one thread tries to start the server
    */
   private static Object startLock = new Object();
-
-  public static XoolaServer get() {
-    if (xoolaServer == null) {
-      xoolaServer = new XoolaServer();
-    }
-
-    return xoolaServer;
-  }
 
   public void start() {
     if (started) {
@@ -46,7 +49,7 @@ public class XoolaServer{
         properties.load(new FileInputStream("XoolaServer.properties"));
         properties.setProperty(XoolaProperty.MODE, XoolaTierMode.SERVER);
 
-        ServerRegistry.classLoader = Play.classloader(Play.current());
+        ServerRegistry.classLoader = environment.classLoader();
         server = Xoola.init(properties);
         System.out.println(properties.getProperty("PORT"));
         System.out.println("Created xoola server");

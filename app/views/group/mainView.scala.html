@@ -1,11 +1,7 @@
-@(tg: TestGroup, display: String = "assertions")
-
-@import java.util.concurrent.atomic.AtomicInteger
-@import global.Util._
 @import authentication._
 @import views.html._
-@import views.html.group._
 @import views.html.util._
+@(tg: TestGroup, display: String = "assertions")(implicit authentication: Authentication)
 
 @main(Messages("minder.navigation.restricted.testdesigner"), "testGroups",
   Array(("Test Groups", controllers.routes.Application.testGroups().path()),
@@ -44,7 +40,7 @@
     @putSpace()
 
     <script>
-        $(function(){
+        $(function () {
           bindValues($("#name@{tg.id}"))
           bindValues($("#shortDescription@{tg.id}"))
         })
@@ -52,38 +48,38 @@
 
 
     <script>
-        function showDetails(){
+        function showDetails() {
           ajaxRouteGet(jsRoutes.controllers.GroupController.renderDetails, @tg.id, $("#groupSubItems"))
         }
-        function showAssertions(){
+        function showAssertions() {
           ajaxRouteGet(jsRoutes.controllers.GroupController.renderTestAssertionList, @tg.id, $("#groupSubItems"))
         }
-        function showSuites(){
+        function showSuites() {
           ajaxRouteGet(jsRoutes.controllers.GroupController.renderTestSuites, @tg.id, $("#groupSubItems"))
         }
-        function showAssets(){
+        function showAssets() {
           ajaxRouteGet(jsRoutes.controllers.GroupController.renderTestAssets, @tg.id, $("#groupSubItems"))
         }
-        function showUtils(){
+        function showUtils() {
           ajaxRouteGet(jsRoutes.controllers.GroupController.renderUtilClasses, @tg.id, $("#groupSubItems"))
         }
-        function showDependencies(){
+        function showDependencies() {
           ajaxRouteGet(jsRoutes.controllers.GroupController.renderDependencies, @tg.id, $("#groupSubItems"))
         }
-        function showJobTemplates(){
-          ajaxRouteGet(jsRoutes.controllers.GroupController.renderJobTemplates,@tg.id,$("#groupSubItems"))
+        function showJobTemplates() {
+          ajaxRouteGet(jsRoutes.controllers.GroupController.renderJobTemplates, @tg.id, $("#groupSubItems"))
         }
     </script>
 
     @ajaxDisplaySelector(display,
-      "assertions" ->("Test Assertions", "showAssertions"),
-      "details" ->("Details", "showDetails"),
+      "assertions" -> ("Test Assertions", "showAssertions"),
+      "details" -> ("Details", "showDetails"),
       "suites" -> ("Test Suites", "showSuites"),
-      "assets" ->("Test Assets", "showAssets"),
-      "utils" ->("Utility Classes", "showUtils"),
-      "deps" ->("Dependencies", "showDependencies"),
-      "jobTemplates" ->("Job Templates", "showJobTemplates")
-  )
+      "assets" -> ("Test Assets", "showAssets"),
+      "utils" -> ("Utility Classes", "showUtils"),
+      "deps" -> ("Dependencies", "showDependencies"),
+      "jobTemplates" -> ("Job Templates", "showJobTemplates")
+    )
 
 
     <br />

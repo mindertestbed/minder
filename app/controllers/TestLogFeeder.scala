@@ -2,16 +2,19 @@ package controllers
 
 import java.util
 import java.util.Collections
+import javax.inject.{Inject, Singleton}
 
-import models.{User, TestRun}
+import models.{TestRun, User}
 import play.Logger
 import play.api.libs.EventSource
 import play.api.libs.concurrent.Execution.Implicits._
 import play.api.libs.iteratee.{Concurrent, Enumeratee}
 import play.api.mvc._
+
 import scala.collection.JavaConversions._
 
-object TestLogFeeder extends Controller {
+@Singleton
+class TestLogFeeder @Inject()() extends Controller {
   val (logOut, logChannel) = Concurrent.broadcast[LogRecord];
 
   val currentLog = Collections.synchronizedList(new util.ArrayList[LogRecord]())
@@ -27,7 +30,7 @@ object TestLogFeeder extends Controller {
   def logFilter(user: models.User) = Enumeratee.filter[LogRecord] {
     logRecord =>
       if (logRecord.testRun != null && logRecord.testRun.runner != null) {
-        global.Util.canAccess(user, logRecord.testRun.runner, logRecord.testRun.visibility)
+        utils.Util.canAccess(user, logRecord.testRun.runner, logRecord.testRun.visibility)
       } else {
         true
       }
@@ -53,6 +56,7 @@ object TestLogFeeder extends Controller {
       val java_ctx = play.core.j.JavaHelpers.createJavaContext(request)
       val java_session = java_ctx.session()
       val user = Authentication.getLocalUser(java_session);
+
       Ok.chunked(logOut &> logFilter(user) &> logRenderer() &> EventSource()).as("text/event-stream")
   }
 
@@ -81,7 +85,7 @@ object TestLogFeeder extends Controller {
     val stringBuilder = new StringBuilder
     for (logRecord <- currentLog) {
       if (logRecord.testRun != null) {
-        if (global.Util.canAccess(localUser, logRecord.testRun.runner, logRecord.testRun.visibility)) {
+        if (utils.Util.canAccess(localUser, logRecord.testRun.runner, logRecord.testRun.visibility)) {
           stringBuilder append logRecord.log
         }
       } else {
@@ -91,7 +95,8 @@ object TestLogFeeder extends Controller {
     stringBuilder toString
   }
 
-  case class LogRecord(testRun: TestRun, log: String) {
-  }
 
+}
+
+case class LogRecord(testRun: TestRun, log: String) {
 }

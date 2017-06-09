@@ -1,4 +1,5 @@
-@import authentication._
+
+@()(implicit authentication: Authentication, testLogFeeder: TestLogFeeder)
 
 @main("Test Monitor", "jobQueue", "") {
   <div class="padabit" style="padding-left: 20px;padding-right: 20px;height:100%;">
@@ -56,7 +57,7 @@
 
     <div class="row" style="height:95%;">
       <div class="col-sm-@{
-        global.Util.feedWidth
+        utils.Util.feedWidth
       }" style="overflow:auto; scroll;height:100%;">
         <div id="queDiv">
         @jobQueueFeed()
@@ -67,14 +68,14 @@
         </div>
       </div>
       <div id="logDiv" class="col-sm-@{
-        global.Util.remaining
+        utils.Util.remaining
       }" style="height:100%;">
         <div class="panel panel-info" style="height:97% ; padding: 0px ;">
           <div class="panel-heading"><span class="fa fa-terminal">&nbsp;</span>Log</div>
           <div class="panel-body zeropad" style="height:100% ;">
 
             <textarea readonly="readonly" id="logarea" class="lightMinderBlue"
-            style="resize: none ; font-family:monospace ; height:calc(100% - 2em) ; width:100% ; border:1px solid #ddeee6 ; border-radius:2px ; overflow:scroll">@TestLogFeeder.currentLogString(Authentication.getLocalUser)</textarea>
+            style="resize: none ; font-family:monospace ; height:calc(100% - 2em) ; width:100% ; border:1px solid #ddeee6 ; border-radius:2px ; overflow:scroll">@testLogFeeder.currentLogString(authentication.getLocalUser)</textarea>
 
           </div>
         </div>

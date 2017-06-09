@@ -1,48 +1,48 @@
-@(display: String = "users")
-  @import views.html.util._
+@import views.html.util._
+@import utils.Util._
+@(display: String = "users")(implicit authentication: Authentication)
 
-  @import global.Util._
 
+@main("Danger Zone", "root", "Danger Zone!!!!") {
 
-  @main("Danger Zone", "root", "Danger Zone!!!!") {
-
-    <div class="padabit">
-      <style>
-      .navbar-inverse.navbar-nav >.active > a,.navbar-inverse.navbar-nav >.active > a : focus,.navbar-inverse.navbar-nav >.active > a : hover {
+  <div class="padabit">
+    <style>
+    .navbar-inverse.navbar-nav > .active > a, .navbar-inverse.navbar-nav > .active > a : focus, .navbar-inverse.navbar-nav > .active > a : hover {
       color: #fff ;
       background-color: red ;
-      }
-      .navbar-inverse {
+    }
+
+    .navbar-inverse {
       background-color: darkred ;
-      }
-      </style>
+    }
+    </style>
 
 
-      <h3 class="explanation"><img src="@routes.Assets.versioned("images/skull.png")" height="50px"/></h3>
-      <p>
-        Welcome ROOT!. Be Careful!!
-      </p>
+    <h3 class="explanation"><img src="@routes.Assets.versioned("images/skull.png")" height="50px"/></h3>
+    <p>
+      Welcome ROOT!. Be Careful!!
+    </p>
 
-      @dialogs()
-      <div class="indent">
-        <script>
-            function showUsers(){
-              var obj = jsRoutes.controllers.UserController.listUsers;
-              ajaxRouteGet(obj,"users",$("#rootSubItems"))
-            }
-            function showSettings(){
-              ajaxRouteGet(jsRoutes.controllers.UserController.viewSettings,"settings",$("#rootSubItems"))
-            }
-        </script>
+    @dialogs()
+    <div class="indent">
+      <script>
+          function showUsers() {
+            var obj = jsRoutes.controllers.UserController.listUsers;
+            ajaxRouteGet(obj, "users", $("#rootSubItems"))
+          }
+          function showSettings() {
+            ajaxRouteGet(jsRoutes.controllers.UserController.viewSettings, "settings", $("#rootSubItems"))
+          }
+      </script>
 
-        @ajaxDisplaySelector(display,
-          "users" ->("Users", "showUsers"),
-          "settings" ->("Settings", "showSettings")
-        )
+      @ajaxDisplaySelector(display,
+        "users" -> ("Users", "showUsers"),
+        "settings" -> ("Settings", "showSettings")
+      )
 
-        <div id="rootSubItems" style="padding: 4px ;">
+      <div id="rootSubItems" style="padding: 4px ;">
 
-        </div>
       </div>
     </div>
-  }
+  </div>
+}

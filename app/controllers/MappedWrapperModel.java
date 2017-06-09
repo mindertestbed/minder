@@ -63,18 +63,4 @@ public class MappedWrapperModel {
     JsonNode result = Json.toJson(map);
     return Json.stringify(result);
   }
-
-  static {
-    Formatters.register(MappedWrapperModel.class, new Formatters.SimpleFormatter<MappedWrapperModel>() {
-      @Override
-      public MappedWrapperModel parse(String jsonString, Locale arg1) throws ParseException {
-        return MappedWrapperModel.parse(jsonString);
-      }
-
-      @Override
-      public String print(MappedWrapperModel mappedWrapperModel, Locale arg1) {
-        return mappedWrapperModel.toJson();
-      }
-    });
-  }
 }

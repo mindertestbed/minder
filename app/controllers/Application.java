@@ -1,36 +1,42 @@
 package controllers;
 
 import models.User;
-import play.Routes;
 import play.mvc.Controller;
 import play.mvc.Result;
-import play.mvc.Security;
 import security.AllowedRoles;
 import security.Role;
 import views.html.authentication.profile;
 import views.html.rootViews.rootPage;
 
-import java.text.SimpleDateFormat;
-import java.util.Date;
+import javax.inject.Inject;
 
 public class Application extends Controller {
+  Authentication authentication;
+  TestLogFeeder testLogFeeder;
+
+
+  @Inject
+  public Application(Authentication authentication, TestLogFeeder testLogFeeder) {
+    this.authentication = authentication;
+    this.testLogFeeder = testLogFeeder;
+  }
 
   @AllowedRoles({Role.TEST_DESIGNER, Role.TEST_OBSERVER, Role.TEST_DEVELOPER})
-  public static Result index() {
-    final User localUser = Authentication.getLocalUser();
+  public Result index() {
+    final User localUser = authentication.getLocalUser();
     if (!session().containsKey("testPageMode")) {
       session().put("testPageMode", "none");
     }
-    return ok(views.html.index.render(null));
+    return ok(views.html.index.render(null, authentication));
   }
 
-  public static Result root(String display) {
-    final User localUser = Authentication.getLocalUser();
+  public Result root(String display) {
+    final User localUser = authentication.getLocalUser();
     if (localUser == null)
       return badRequest("You cannot access this resoruce.");
 
     if (localUser.email.equals("root@minder")) {
-      return ok(rootPage.render(display));
+      return ok(rootPage.render(display, authentication));
     } else {
       return badRequest("You cannot access this resoruce.");
     }
@@ -38,51 +44,47 @@ public class Application extends Controller {
 
 
   @AllowedRoles({Role.TEST_DESIGNER, Role.TEST_OBSERVER})
-  public static Result testGroups() {
-    final User localUser = Authentication.getLocalUser();
+  public Result testGroups() {
+    final User localUser = authentication.getLocalUser();
 
     if (!session().containsKey("testPageMode")) {
       session().put("testPageMode", "none");
     }
-    return ok(views.html.group.testGroupListView.render());
+    return ok(views.html.group.testGroupListView.render(authentication));
   }
 
   @AllowedRoles({Role.TEST_DESIGNER, Role.TEST_OBSERVER})
-  public static Result adapters() {
-    final User localUser = Authentication.getLocalUser();
+  public Result adapters() {
+    final User localUser = authentication.getLocalUser();
 
     if (!session().containsKey("testPageMode")) {
       session().put("testPageMode", "none");
     }
-    return ok(views.html.adapters.wrapperManager.render());
+    return ok(views.html.adapters.wrapperManager.render(authentication));
   }
 
   @AllowedRoles({Role.TEST_DESIGNER, Role.TEST_OBSERVER})
-  public static Result jobQueue() {
-    final User localUser = Authentication.getLocalUser();
+  public Result jobQueue() {
+    final User localUser = authentication.getLocalUser();
 
     if (!session().containsKey("testPageMode")) {
       session().put("testPageMode", "none");
     }
-    return ok(views.html.job.jobQueue.render());
+    return ok(views.html.job.jobQueue.render(authentication, testLogFeeder));
   }
 
-  public static Result about() {
-    final User localUser = Authentication.getLocalUser();
+  public Result about() {
+    final User localUser = authentication.getLocalUser();
 
     if (!session().containsKey("testPageMode")) {
       session().put("testPageMode", "none");
     }
-    return ok(views.html.aboutPage.render());
+    return ok(views.html.aboutPage.render(authentication));
   }
 
   @AllowedRoles({Role.TEST_DEVELOPER, Role.TEST_DESIGNER, Role.TEST_OBSERVER})
-  public static Result profile() {
-    final User localUser = Authentication.getLocalUser();
-    return ok(profile.render(localUser));
-  }
-
-  public static String formatTimestamp(final long t) {
-    return new SimpleDateFormat("yyyy-dd-MM HH:mm:ss").format(new Date(t));
+  public Result profile() {
+    final User localUser = authentication.getLocalUser();
+    return ok(profile.render(localUser, authentication));
   }
 }

@@ -21,13 +21,13 @@ public class UserHistory extends Model {
   public byte[] systemOutputLog;
 
   public String extractSystemOutputLog() {
-    return new String(global.Util.gunzip(systemOutputLog));
+    return new String(utils.Util.gunzip(systemOutputLog));
   }
 
 
   public void setSystemOutputLog(String log) {
     try {
-      this.systemOutputLog = global.Util.gzip(log.getBytes("utf-8"));
+      this.systemOutputLog = utils.Util.gzip(log.getBytes("utf-8"));
     } catch (UnsupportedEncodingException e) {
 
     }

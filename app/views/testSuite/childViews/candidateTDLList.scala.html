@@ -2,7 +2,7 @@
 @import views.html.authentication.subjectIsnt
 @import views.html.authentication.subjectIs
 
-@(group: TestGroup, owner: User)
+@(group: TestGroup, owner: User)(implicit authentication: Authentication)
 
 @import scala.collection.JavaConversions._
 

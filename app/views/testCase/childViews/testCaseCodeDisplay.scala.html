@@ -1,20 +1,20 @@
-@(tc: TestCase, selectedTdl: Tdl)
-@import java.util.concurrent.atomic.AtomicInteger
-@import views.html.util._
-@import global.Util._
 @import authentication._
+@import views.html.util._
+@(tc: TestCase, selectedTdl: Tdl)(implicit authentication: Authentication)
 
-<style type="text/css" media="screen">
-#editor {
-position: relative ;
-top: 10px ;
-right: 0 ;
-bottom: 0 ;
-left: 0px ;
-height:350px ;
-}
-</style>
-  </head>
+<head>
+  <style type="text/css" media="screen">
+      #editor {
+        position: relative ;
+        top: 10px ;
+        right: 0 ;
+        bottom: 0 ;
+        left: 0px ;
+        height: 350px ;
+      }
+  </style>
+</head>
+
 <body>
   @subjectIs(tc.owner) {
     @if(Tdl.getLatestTdl(tc).id == selectedTdl.id) {
@@ -23,7 +23,7 @@ height:350px ;
         &nbsp;
         &nbsp;}
   }
-Theme: <select id="select">
+  Theme: <select id="select">
   <option>chrome</option>
   <option>eclipse</option>
   <option>monokai</option>
@@ -44,12 +44,12 @@ Theme: <select id="select">
   <option value="24px">24px</option>
 </select>
 
-  <div id="editor-container">
-    <pre id="editor">@selectedTdl.tdl</pre>
-  </div>
+<div id="editor-container">
+  <pre id="editor">@selectedTdl.tdl</pre>
+</div>
 
 
-  <script type="text/javascript" src="@routes.Assets.versioned("javascripts/ace/ace.js")"></script>
+<script type="text/javascript" src="@routes.Assets.versioned("javascripts/ace/ace.js")"></script>
   <script>
 
 
@@ -64,7 +64,7 @@ Theme: <select id="select">
       $("#fontsize").change(function () {
         $("#fontsize option:selected").each(function () {
           editor.setTheme($(this).text());
-          document.getElementById('editor').style.fontSize=$(this).text();
+          document.getElementById('editor').style.fontSize = $(this).text();
         });
       });
 

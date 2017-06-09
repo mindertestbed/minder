@@ -4,17 +4,21 @@ package controllers;
 import com.fasterxml.jackson.databind.JsonNode;
 import controllers.common.Utils;
 import editormodels.UtilClassEditorModel;
-import global.Util;
+import models.ModelConstants;
+import utils.Util;
 import models.TestGroup;
 import models.User;
 import models.UtilClass;
 import play.Logger;
 import play.data.Form;
+import play.data.FormFactory;
 import play.mvc.Controller;
 import play.mvc.Result;
 import security.AllowedRoles;
 import security.Role;
 import views.html.utilClass.*;
+
+import javax.inject.Inject;
 
 import static play.data.Form.form;
 
@@ -23,10 +27,18 @@ import static play.data.Form.form;
  * Created by yerlibilgin on 03/05/15.
  */
 public class UtilClassController extends Controller {
-  public static final Form<UtilClassEditorModel> UTIL_CLASS_FORM = form(UtilClassEditorModel.class);
+  Authentication authentication;
+  public final Form<UtilClassEditorModel> UTIL_CLASS_FORM;
+
+
+  @Inject
+  public UtilClassController(FormFactory formFactory, Authentication authentication) {
+    this.authentication = authentication;
+    UTIL_CLASS_FORM = formFactory.form(UtilClassEditorModel.class);
+  }
 
   @AllowedRoles({Role.TEST_DESIGNER})
-  public static Result getCreateUtilClassEditorView(Long groupId) {
+  public Result getCreateUtilClassEditorView(Long groupId) {
     TestGroup testGroup = TestGroup.findById(groupId);
     if (testGroup == null) {
       return badRequest("Test group with id [" + groupId
@@ -37,23 +49,26 @@ public class UtilClassController extends Controller {
 
       Form<UtilClassEditorModel> bind = UTIL_CLASS_FORM
           .fill(utilClassEditorModel);
-      return ok(utilClassEditor.render(bind, false));
+      return ok(utilClassEditor.render(bind, false, authentication));
 
     }
   }
 
   @AllowedRoles({Role.TEST_DESIGNER})
-  public static Result doCreateUtilClass() {
+  public Result doCreateUtilClass() {
     final Form<UtilClassEditorModel> filledForm = UTIL_CLASS_FORM
         .bindFromRequest();
 
     if (filledForm.hasErrors()) {
       Util.printFormErrors(filledForm);
-      return badRequest(utilClassEditor.render(filledForm, false));
-
+      return badRequest(utilClassEditor.render(filledForm, false, authentication));
     } else {
-
       UtilClassEditorModel model = filledForm.get();
+
+      if (!isValid(model, filledForm)) {
+        return badRequest(utilClassEditor.render(filledForm, false, authentication));
+      }
+
       Logger.debug("Creating util class " + model.name);
 
       UtilClass utilClass = UtilClass.findByGroupIdAndName(model.groupId, model.name);
@@ -62,18 +77,18 @@ public class UtilClassController extends Controller {
 
         filledForm.reject("A util class with name [" + utilClass.name
             + "] already exists");
-        return badRequest(utilClassEditor.render(filledForm, false));
+        return badRequest(utilClassEditor.render(filledForm, false, authentication));
 
       }
 
       TestGroup tg = TestGroup.findById(model.groupId);
       if (tg == null) {
         filledForm.reject("No test group found with id [" + tg.id + "]");
-        return badRequest(utilClassEditor.render(filledForm, false));
+        return badRequest(utilClassEditor.render(filledForm, false, authentication));
 
       }
 
-      final User localUser = Authentication.getLocalUser();
+      final User localUser = authentication.getLocalUser();
 
       utilClass = new UtilClass();
       utilClass.name = model.name;
@@ -86,7 +101,7 @@ public class UtilClassController extends Controller {
       } catch (Exception ex) {
         filledForm.reject("Compilation Failed [" + ex.getMessage() + "]");
         Logger.error(ex.getMessage(), ex);
-        return badRequest(utilClassEditor.render(filledForm, false));
+        return badRequest(utilClassEditor.render(filledForm, false, authentication));
 
       }
 
@@ -98,8 +113,37 @@ public class UtilClassController extends Controller {
     }
   }
 
+  private boolean isValid(UtilClassEditorModel model, Form<UtilClassEditorModel> filledForm) {
+    if (!model.name.matches("[a-zA-Z_][a-zA-Z\\d_]*")) {
+      String errorMessage = "Util class name invalid: " + model.name;
+      Logger.error(errorMessage);
+      filledForm.reject(errorMessage);
+      return false;
+    }
+
+    String shortDescription = model.shortDescription;
+    if (shortDescription == null || shortDescription.isEmpty() || shortDescription.length() < ModelConstants.MIN_DESC_LENGTH || shortDescription.length() > ModelConstants.SHORT_DESC_LENGTH) {
+      String errorMessage = "Short description has to be between " + ModelConstants.MIN_DESC_LENGTH + "-" + ModelConstants.SHORT_DESC_LENGTH + " characters";
+      Logger.error(errorMessage);
+      filledForm.reject(errorMessage);
+
+      return false;
+    }
+
+
+    if(model.tdl == null || model.tdl.isEmpty()){
+      String errorMessage = "Script cannot be empty";
+      Logger.error(errorMessage);
+      filledForm.reject(errorMessage);
+
+      return false;
+    }
+
+    return true;
+  }
+
   @AllowedRoles({Role.TEST_DESIGNER})
-  public static Result getEditCaseEditorView(Long id) {
+  public Result getEditCaseEditorView(Long id) {
     UtilClass utilClass = UtilClass.findById(id);
     if (utilClass == null) {
       return badRequest("A utility class with id [" + id + "] was not found!");
@@ -112,19 +156,19 @@ public class UtilClassController extends Controller {
       ucModel.tdl = utilClass.source;
 
       Form<UtilClassEditorModel> bind = UTIL_CLASS_FORM.fill(ucModel);
-      return ok(utilClassEditor.render(bind, true));
+      return ok(utilClassEditor.render(bind, true, authentication));
 
     }
   }
 
   @AllowedRoles({Role.TEST_DESIGNER})
-  public static Result doEditUtilClass() {
+  public Result doEditUtilClass() {
     final Form<UtilClassEditorModel> filledForm = UTIL_CLASS_FORM
         .bindFromRequest();
 
     if (filledForm.hasErrors()) {
       Util.printFormErrors(filledForm);
-      return badRequest(utilClassEditor.render(filledForm, true));
+      return badRequest(utilClassEditor.render(filledForm, true, authentication));
 
     } else {
       UtilClassEditorModel model = filledForm.get();
@@ -133,8 +177,11 @@ public class UtilClassController extends Controller {
       if (uc == null) {
         filledForm.reject("A util class with ID [" + model.id
             + "] does not exist");
-        return badRequest(utilClassEditor.render(filledForm, true));
+        return badRequest(utilClassEditor.render(filledForm, true, authentication));
+      }
 
+      if (!isValid(model, filledForm)) {
+        return badRequest(utilClassEditor.render(filledForm, false, authentication));
       }
 
       uc.name = model.name;
@@ -148,10 +195,10 @@ public class UtilClassController extends Controller {
         // either no such name or it is already this object. so update
         try {
           uc.update();
-        }catch(Exception ex){
+        } catch (Exception ex) {
           Logger.error(ex.getMessage(), ex);
           filledForm.reject(ex.getMessage());
-          return badRequest(utilClassEditor.render(filledForm, true));
+          return badRequest(utilClassEditor.render(filledForm, true, authentication));
 
         }
         Logger.info("Test Util Class " + uc.id + ":" + uc.name
@@ -160,7 +207,7 @@ public class UtilClassController extends Controller {
       } else {
         filledForm.reject("The Name [" + model.name
             + "] is used by another test case");
-        return badRequest(utilClassEditor.render(filledForm, true));
+        return badRequest(utilClassEditor.render(filledForm, true, authentication));
 
       }
 
@@ -168,7 +215,7 @@ public class UtilClassController extends Controller {
   }
 
   @AllowedRoles({Role.TEST_DESIGNER})
-  public static Result doDeleteUtilClass(Long id) {
+  public Result doDeleteUtilClass(Long id) {
     UtilClass uc = UtilClass.findById(id);
     if (uc == null) {
       // it does not exist. error
@@ -186,22 +233,22 @@ public class UtilClassController extends Controller {
   }
 
   @AllowedRoles({Role.TEST_DESIGNER})
-  public static Result viewUtilClass(long id) {
+  public Result viewUtilClass(long id) {
     UtilClass uc = UtilClass.findById(id);
     if (uc == null) {
       return badRequest("No util class id " + id + ".");
     }
-    return ok(utilClassView.render(uc));
+    return ok(utilClassView.render(uc, authentication));
 
   }
 
   @AllowedRoles({Role.TEST_DESIGNER})
-  public static Result doEditUtilClassField() {
+  public Result doEditUtilClassField() {
     JsonNode jsonNode = request().body().asJson();
 
-    Result res = Utils.doEditField(UtilClassEditorModel.class, UtilClass.class, jsonNode,Authentication.getLocalUser());
+    Result res = Utils.doEditField(UtilClassEditorModel.class, UtilClass.class, jsonNode, authentication.getLocalUser());
 
-    if (res.toScala().header().status() == BAD_REQUEST) {
+    if (res.asScala().header().status() == BAD_REQUEST) {
       return res;
     } else {
       long id = jsonNode.findPath("id").asInt();

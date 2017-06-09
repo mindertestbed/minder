@@ -214,14 +214,6 @@ POST        /rest/testbed/stop                          rest.controllers.GitbTes
 POST        /rest/testbed/getTestCaseDefinitions        rest.controllers.GitbTestbedController.getGetTestCaseDefinitions()
 
 
-##-------------
-
-
-GET         /ui2                                        controllers.secondGen.Application.main
-GET         /ui2/loginPage                              controllers.secondGen.Application.loginPage
-GET         /ui2/mainLayout                             controllers.secondGen.Application.mainLayout
-
-
 # Map static resources from the /public folder to the /assets URL path
 GET         /assets/*file                               controllers.Assets.versioned(path="/public", file)
 GET         /webjars/*file                              controllers.WebJarAssets.at(file)

@@ -1,4 +1,4 @@
-@(ts: TestSuite)
+@(frm: Form[_])(implicit authentication: Authentication)
 
-@testSuiteForm(TestSuiteController.fillEditorModelForm(ts))
+@testSuiteForm(frm)
 

@@ -1,22 +1,21 @@
-@(tg: TestGroup)
+@import authentication._
+@(tg: TestGroup)(implicit authentication: Authentication)
 
-  @import authentication._
+<div class="indent">
+  <div id="dependencies@{
+    tg.id
+  }"
 
-  <div class="indent">
-    <div id="dependencies@{
-      tg.id
-    }"
-
-      @subjectIs(tg.owner) {
-        onclick='showUpdateTextAreaDialog(@tg.id, "dependencyString", $(this ).next(), "/doEditGroupField")'
-      }
-    class="editable"></div>
-    <input type="hidden" value="@tg.dependencyString"/>
-  </div>
+    @subjectIs(tg.owner) {
+      onclick='showUpdateTextAreaDialog(@tg.id, "dependencyString", $(this).next(), "/doEditGroupField")'
+    }
+  class="editable"></div>
+  <input type="hidden" value="@tg.dependencyString"/>
+</div>
 
 
-  <script>
-      $(function(){
-        bindValues($("#dependencies@{tg.id}"))
-      });
+<script>
+    $(function () {
+      bindValues($("#dependencies@{tg.id}"))
+    });
 </script>

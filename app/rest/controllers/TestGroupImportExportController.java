@@ -14,6 +14,7 @@ import rest.controllers.restbodyprocessor.IRestContentProcessor;
 import rest.models.*;
 
 
+import javax.inject.Inject;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.text.ParseException;
@@ -35,6 +36,16 @@ import java.util.List;
  * @date: 09/02/16.
  */
 public class TestGroupImportExportController extends Controller {
+
+  TestCaseController testCaseController;
+  RestTestAssetController restTestAssetController;
+
+  @Inject
+  public TestGroupImportExportController(TestCaseController testCaseController, RestTestAssetController restTestAssetController) {
+    this.testCaseController = testCaseController;
+    this.restTestAssetController = restTestAssetController;
+  }
+
   public static SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSXXX");
 
   /**
@@ -47,7 +58,7 @@ public class TestGroupImportExportController extends Controller {
    * <p>
    * Group id is required.
    */
-  public static Result exportTestGroup() {
+  public Result exportTestGroup() {
         /*
         * Parse client request and get user
         */
@@ -111,7 +122,7 @@ public class TestGroupImportExportController extends Controller {
    * The JSON request will be;
    * {"result":"SUCCESS","description":"Test group imported successfully!"}
    */
-  public static Result importTestGroup() {
+  public Result importTestGroup() {
     String authorizationData = request().getHeader(AUTHORIZATION);
     HashMap<String, String> clientRequest = RestUtils.createHashMapOfClientRequest(authorizationData);
     //User user = User.findByEmail(clientRequest.get("username"));
@@ -176,7 +187,7 @@ public class TestGroupImportExportController extends Controller {
     return ok(responseValue);
   }
 
-  public static RestTestGroup exportTestGroupData(Long groupId) throws NotFoundException, IOException {
+  public RestTestGroup exportTestGroupData(Long groupId) throws NotFoundException, IOException {
     RestTestGroup responseRestTestGroup = new RestTestGroup();
 
     //getting the  test group
@@ -251,7 +262,7 @@ public class TestGroupImportExportController extends Controller {
       rta.setGroupId(String.valueOf(tg.id));
       byte[] asset = null;
       try {
-        asset = RestTestAssetController.handleFileDownload(ta);
+        asset = restTestAssetController.handleFileDownload(ta);
       } catch (IOException e) {
         throw new IOException("Test Asset " + "[" + ta.name + "] cannot be downloaded." + e.getMessage());
       }
@@ -277,7 +288,7 @@ public class TestGroupImportExportController extends Controller {
     return responseRestTestGroup;
   }
 
-  public static void importTestGroupData(RestTestGroup restTestGroup, String userName) throws IllegalArgumentException, IllegalAccessException, IOException, NullPointerException, FileNotFoundException {
+  public void importTestGroupData(RestTestGroup restTestGroup, String userName) throws IllegalArgumentException, IllegalAccessException, IOException, NullPointerException, FileNotFoundException {
 
     //Creating the new test group
     TestGroup group = TestGroup.findByName(restTestGroup.getGroupName());
@@ -311,8 +322,8 @@ public class TestGroupImportExportController extends Controller {
           } catch (Exception ex) {
             Logger.error(ex.getMessage(), ex);
             throw new IOException("There was a problem with the dependency string.<br /> \n" +
-               "Please make sure that the dependencies are in format:<br />\n " +
-               "groupId:artifactId[:extension[:classifier]]:version]]" + ex.toString());
+                "Please make sure that the dependencies are in format:<br />\n " +
+                "groupId:artifactId[:extension[:classifier]]:version]]" + ex.toString());
           }
         }
       }
@@ -367,7 +378,7 @@ public class TestGroupImportExportController extends Controller {
           prescriptionLevel = PrescriptionLevel.valueOf(rta.getPrescriptionLevel());
         } catch (IllegalArgumentException e) {
           throw new IllegalArgumentException("The given prescription level [" + rta.getPrescriptionLevel()
-             + "] is not defined. Please select one of these: Mandatory, Preffered or Permitted");
+              + "] is not defined. Please select one of these: Mandatory, Preffered or Permitted");
         } catch (NullPointerException e) {
           throw new NullPointerException("The prescription level cannot be null. Please select one of these: Mandatory, Preffered or Permitted");
         }
@@ -409,7 +420,7 @@ public class TestGroupImportExportController extends Controller {
 
             try {
               tdl.save();
-              TestCaseController.detectAndSaveParameters(tdl);
+              testCaseController.detectAndSaveParameters(tdl);
             } catch (Exception e) {
               throw new IOException("An error occurred during save of tdl: " + e.getMessage());
             }
@@ -434,7 +445,7 @@ public class TestGroupImportExportController extends Controller {
 
         if (rta.getAsset() != null && rta.getAsset().length > 0) {
           try {
-            RestTestAssetController.handleFileUpload(ta, rta.getAsset());
+            restTestAssetController.handleFileUpload(ta, rta.getAsset());
           } catch (FileNotFoundException e) {
             throw new FileNotFoundException(e.getCause().toString());
           } catch (IOException e) {

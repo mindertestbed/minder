@@ -3,12 +3,12 @@ package controllers
 import java.util
 import java.util.Date
 import java.util.concurrent.LinkedBlockingQueue
+import javax.inject.{Inject, Provider, Singleton}
 
 import com.avaje.ebean.Ebean
 import com.gitb.core.v1.StepStatus
-import controllers.TestLogFeeder.LogRecord
 import controllers.common.enumeration.OperationType
-import minderengine.{MinderSignalRegistry, TestSession, Visibility}
+import minderengine.{MinderSignalRegistry, TestEngine, TestSession, Visibility}
 import models._
 import play.Logger
 import play.api.mvc._
@@ -20,7 +20,11 @@ import scala.collection.JavaConversions._
   * Manages the job lifecycle.
   * Holds a job queue.
   */
-object TestQueueController extends Controller {
+@Singleton
+class TestQueueController @Inject()(implicit testLogFeeder: Provider[TestLogFeeder],
+                                    testRunFeeder: Provider[TestRunFeeder],
+                                    gitbTestbedController: Provider[GitbTestbedController],
+                                    testEngine: Provider[TestEngine]) extends Controller {
   /**
     * The queue that holds test runs. When a job is started, a test run is created for it.
     * One can access all the information about a test run and a job here.
@@ -42,13 +46,13 @@ object TestQueueController extends Controller {
   val testThread = new Thread() {
     override def run(): Unit = {
       while (goon) {
-        TestLogFeeder.clear()
+        testLogFeeder.get().clear()
         var run1: TestRun = null;
         try {
-          TestLogFeeder.log("--> Test Thread waiting on job queue");
-          activeRunContext = TestQueueController.jobQueue.take();
+          testLogFeeder.get().log("--> Test Thread waiting on job queue");
+          activeRunContext = jobQueue.take();
           activeRunContext.updateNumber()
-          TestRunFeeder.jobQueueUpdate()
+          testRunFeeder.get().jobQueueUpdate()
           run1 = activeRunContext.testRun
 
           val session: TestSession = new TestSession(activeRunContext.sessionID)
@@ -56,16 +60,16 @@ object TestQueueController extends Controller {
           if (!MinderSignalRegistry.get().hasSession(session))
             MinderSignalRegistry.get().initTestSession(session)
 
-          TestLogFeeder.log("--> Job with id [" + run1.job.id + "] arrived. Start");
+          testLogFeeder.get().log("--> Job with id [" + run1.job.id + "] arrived. Start");
           Thread.sleep(1000);
-          TestLogFeeder.log("--> Run Job #[" + run1.number + "]")
+          testLogFeeder.get().log("--> Run Job #[" + run1.number + "]")
           activeRunContext.run()
         } finally {
-          //TestLogFeeder.log(">>> Test Run  #[" + run1.number + "] finished.")
+          //testLogFeeder.get().log(">>> Test Run  #[" + run1.number + "] finished.")
           activeRunContext = null
-          TestRunFeeder.jobQueueUpdate()
+          testRunFeeder.get().jobQueueUpdate()
           Thread.sleep(1000)
-          TestRunFeeder.jobHistoryUpdate(run1)
+          testRunFeeder.get().jobHistoryUpdate(run1)
         }
       }
     }
@@ -94,7 +98,7 @@ object TestQueueController extends Controller {
           jobQueue.synchronized {
             jobQueue.offer(createTestRunContext(job, user, Visibility.valueOf(visibility)))
           }
-          TestRunFeeder.jobQueueUpdate()
+          testRunFeeder.get().jobQueueUpdate()
           Ok;
         }
       }
@@ -118,7 +122,7 @@ object TestQueueController extends Controller {
         jobQueue.synchronized {
           jobQueue.offer(testRunContext)
         }
-        TestRunFeeder.jobQueueUpdate()
+        testRunFeeder.get().jobQueueUpdate()
 
         val ts = new TestSession()
         ts.setSession(testRunContext.sessionID)
@@ -130,7 +134,7 @@ object TestQueueController extends Controller {
 
   def gitbLogFeedUpdate(log: String, step: StepStatus, stepId: Long): Unit = {
     if (activeRunContext != null && activeRunContext.job != null && activeRunContext.job.isInstanceOf[GitbJob]) {
-      GitbTestbedController.performUpdateStatusOperation(activeRunContext.gitbReplyToUrlAddress, activeRunContext.job.id, step, stepId, log);
+      gitbTestbedController.get().performUpdateStatusOperation(activeRunContext.gitbReplyToUrlAddress, activeRunContext.job.id, step, stepId, log);
     }
   }
 
@@ -153,7 +157,7 @@ object TestQueueController extends Controller {
     userHistory.operationType.save()
     testRun.history = userHistory
     testRun.runner = user;
-    new TestRunContext(testRun)
+    new TestRunContext(testRun, testRunFeeder.get(), testLogFeeder.get(), testEngine.get())
   }
 
   def createTestRunContext(job: AbstractJob, user: User, visibility: Visibility, suiteRun: SuiteRun): TestRunContext = {
@@ -170,7 +174,7 @@ object TestQueueController extends Controller {
     testRun.history = userHistory
     testRun.runner = user;
     testRun.suiteRun = suiteRun
-    new TestRunContext(testRun)
+    new TestRunContext(testRun, testRunFeeder.get(), testLogFeeder.get(), testEngine.get())
   }
 
   def cancelJob(index: Int) = Action {
@@ -182,7 +186,7 @@ object TestQueueController extends Controller {
         jobQueue.synchronized {
           jobQueue.remove(tr)
         }
-        TestRunFeeder.jobQueueUpdate()
+        testRunFeeder.get().jobQueueUpdate()
       }
       Ok
   }
@@ -253,7 +257,7 @@ object TestQueueController extends Controller {
           jobQueue.synchronized {
             jobQueue.remove(tr)
           }
-          TestRunFeeder.jobQueueUpdate()
+          testRunFeeder.get().jobQueueUpdate()
           return
         }
       }
@@ -309,7 +313,7 @@ object TestQueueController extends Controller {
 
               }
             }
-            TestRunFeeder.jobQueueUpdate()
+            testRunFeeder.get().jobQueueUpdate()
             Ebean.commitTransaction()
             Ok("");
           }
@@ -332,6 +336,6 @@ object TestQueueController extends Controller {
 
   def enqueueTestRunContext(testRunContext: TestRunContext): Unit = {
     jobQueue.offer(testRunContext)
-    TestRunFeeder.jobQueueUpdate()
+    testRunFeeder.get().jobQueueUpdate()
   }
 }

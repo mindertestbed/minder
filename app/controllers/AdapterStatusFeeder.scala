@@ -2,7 +2,9 @@ package controllers
 
 import java.util
 import java.util.{Observable, Observer}
+import javax.inject.Inject
 
+import akka.actor.ActorSystem
 import minderengine.MinderWrapperRegistry
 import models.{Job, TestRun, WrapperVersion}
 import play.api.libs.EventSource
@@ -13,7 +15,7 @@ import play.api.mvc._
 
 import scala.collection.JavaConversions._
 
-object AdapterStatusFeeder extends Controller {
+class AdapterStatusFeeder @Inject()() extends Controller {
 
   val (wsOut, wsChannel) = Concurrent.broadcast[JsValue];
   val (adapterStatusOut, adapterStatusChannel) = Concurrent.broadcast[(WrapperVersion, Boolean)];
@@ -30,6 +32,7 @@ object AdapterStatusFeeder extends Controller {
 
   /**
     * Obsolete, remove it in the future
+    *
     * @param wrapperVersion
     * @param online
     */
@@ -71,6 +74,7 @@ object AdapterStatusFeeder extends Controller {
 
   /**
     * Filter adapter states with respoect to the job id
+    *
     * @param jobId
     * @return
     */

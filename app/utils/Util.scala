@@ -1,4 +1,4 @@
-package global
+package utils
 
 import java.io._
 import java.lang.reflect.Field
@@ -157,7 +157,7 @@ object Util {
   }
 
   def getVersionInfo(): String = {
-    "V2.1-Spirit"
+    "V2.2-Sirius"
   }
 
   def canAccess(localUser: User, owner: User): Boolean = {

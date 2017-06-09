@@ -1,6 +1,6 @@
 package rest.controllers.common;
 
-import global.Util;
+import utils.Util;
 import models.User;
 import models.UserAuthentication;
 import play.mvc.Http;

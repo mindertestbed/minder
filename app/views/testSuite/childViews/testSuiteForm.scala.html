@@ -2,13 +2,13 @@
 @import views.html.authentication._
 @import views.html.util._
 
-@(frm: Form[_], editMode: Boolean = true)
+@(frm: Form[_], editMode: Boolean = true)(implicit  authentication: Authentication)
 
 
 @defining(if(editMode) {
   TestSuite.findById(frm("id").value().toLong).owner
 } else {
-  Authentication.getLocalUser
+  authentication.getLocalUser
 }) { owner =>
 
   @subjectHasRole(security.Role.TEST_DESIGNER) {

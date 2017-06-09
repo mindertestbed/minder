@@ -1,47 +1,52 @@
-@(loginForm: Form[_])
-
-@import helper._
 @import views.html.util._
-@implicitFieldConstructor = @{
-  FieldConstructor(twitterBootstrapBasic.f)
-}
+@import helper._
+@(loginForm: Form[_])(implicit authentication: Authentication)
 
-@main(Messages("authenticate.title"), "login", "Login") {
+  @implicitFieldConstructor = @{
+    FieldConstructor(twitterBootstrapBasic.f)
+  }
 
-  <div class="row">
-    <div class="col-xs-6 col-sm-4">
-      <h1>@Messages("authenticate.title")</h1>
+  @main(Messages("authenticate.title"), "login", "Login") {
+
+    <div class="row">
+      <div class="col-xs-6 col-sm-4">
+        <h1>@Messages("authenticate.title")</h1>
+      </div>
     </div>
-  </div>
 
-  <div id="login" class="row">
-    <div class="col-xs-6 col-sm-4" style="position:absolute ; left:30% ; top:30% ; width:40% ; height:40% ;">
-      @* Display proprietary login form *@
-      @helper.form(routes.Authentication.doLogin, 'role -> "form") {
+    <div id="login" class="row">
+      <div class="col-xs-6 col-sm-4" style="position: absolute ;
+        left: 30% ;
+        top: 30% ;
+        width: 40% ;
+        height: 40% ;">
+        @* Display proprietary login form *@
+        @helper.form(routes.Authentication.doLogin, 'role -> "form") {
 
-        @if(loginForm.hasGlobalErrors) {
-          <p class="alert alert-danger">
-          @loginForm.globalError.message
-          </p>
+          @if(loginForm.hasGlobalErrors) {
+            <p class="alert alert-danger">
+            @loginForm.globalError.message
+            </p>
+          }
+
+          @_emailPartial(loginForm)
+
+          @inputPassword(
+            loginForm("password"),
+            '_showConstraints -> false,
+            '_label -> Messages("authenticate.password")
+          )
+
+          <button type="submit" class="btn btn-default">@Messages("authenticate.login")</button>
+
+          <a href="javascript:void(0);" onclick="window.location.href = jsRoutes.controllers.Signup.forgotPassword($('#email').val() || null).absoluteURL();">@Messages("authenticate.login.forgot.password")</a>
+
         }
+      </div>
 
-        @_emailPartial(loginForm)
 
-        @inputPassword(
-          loginForm("password"),
-          '_showConstraints -> false,
-          '_label -> Messages("authenticate.password")
-        )
-
-        <button type="submit" class="btn btn-default">@Messages("authenticate.login")</button>
-
-        <a href="javascript:void(0);" onclick="window.location.href = jsRoutes.controllers.Signup.forgotPassword($('#email').val() || null).absoluteURL();">@Messages("authenticate.login.forgot.password")</a>
-
-      }
     </div>
 
+  }
 
-  </div>
-
-}
 

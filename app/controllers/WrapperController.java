@@ -2,34 +2,40 @@ package controllers;
 
 import com.avaje.ebean.Ebean;
 import editormodels.WrapperEditorModel;
-import global.Util;
+import utils.Util;
 import models.User;
 import models.Wrapper;
 import models.WrapperVersion;
 import play.Logger;
 import play.data.Form;
+import play.data.FormFactory;
 import play.mvc.Controller;
 import play.mvc.Result;
-import play.mvc.Security;
 import security.AllowedRoles;
 import security.Role;
 import views.html.adapters.wrapperEditor;
 import views.html.adapters.wrapperLister;
 
+import javax.inject.Inject;
 import java.util.List;
-
-import static play.data.Form.form;
 
 /**
  * Created by yerlibilgin on 31/12/14.
  */
 public class WrapperController extends Controller {
-  public static final Form<WrapperEditorModel> WRAPPER_FORM = form(WrapperEditorModel.class);
+  Authentication authentication;
+  public final Form<WrapperEditorModel> WRAPPER_FORM;
+
+  @Inject
+  public WrapperController(FormFactory formFactory, Authentication authentication) {
+    this.authentication = authentication;
+    WRAPPER_FORM = formFactory.form(WrapperEditorModel.class);
+  }
 
   @AllowedRoles({Role.TEST_DEVELOPER})
-  public static Result doCreateWrapper() {
+  public Result doCreateWrapper() {
     final Form<WrapperEditorModel> filledForm = WRAPPER_FORM.bindFromRequest();
-    final User localUser = Authentication.getLocalUser();
+    final User localUser = authentication.getLocalUser();
     if (filledForm.hasErrors()) {
       Util.printFormErrors(filledForm);
       return badRequest(wrapperEditor.render(filledForm, false));
@@ -56,13 +62,13 @@ public class WrapperController extends Controller {
   }
 
   @AllowedRoles({Role.TEST_DEVELOPER})
-  public static Result createNewAdapterForm() {
+  public Result createNewAdapterForm() {
     return ok(wrapperEditor.render(WRAPPER_FORM, false));
   }
 
 
   @AllowedRoles({Role.TEST_DEVELOPER})
-  public static Result doDeleteWrapperVersion(Long id) {
+  public Result doDeleteWrapperVersion(Long id) {
     try {
       Ebean.beginTransaction();
       System.out.println("Adapter version id:" + id);
@@ -93,7 +99,7 @@ public class WrapperController extends Controller {
   }
 
   @AllowedRoles({Role.TEST_DEVELOPER})
-  public static Result doDeleteWrapper(Long id) {
+  public Result doDeleteWrapper(Long id) {
     System.out.println("Adapter id:" + id);
     Wrapper wr = Wrapper.findById(id);
     if (wr == null) {
@@ -114,7 +120,7 @@ public class WrapperController extends Controller {
   }
 
   @AllowedRoles({Role.TEST_DEVELOPER})
-  public static Result editWrapperForm(Long id) {
+  public Result editWrapperForm(Long id) {
     Wrapper wr = Wrapper.find.byId(id);
     if (wr == null) {
       return badRequest("Wrapper with id [" + id + "] not found!");
@@ -131,12 +137,12 @@ public class WrapperController extends Controller {
   }
 
   @AllowedRoles({Role.TEST_DEVELOPER})
-  public static Result doEditWrapper() {
+  public Result doEditWrapper() {
     final Form<WrapperEditorModel> filledForm = WRAPPER_FORM.bindFromRequest();
 
     if (filledForm.hasErrors()) {
       Util.printFormErrors(filledForm);
-      return badRequest("");//wrapperEditor2.render(filledForm, null));
+      return badRequest("");
     } else {
       WrapperEditorModel model = filledForm.get();
       Wrapper wr = Wrapper.find.byId(model.id);

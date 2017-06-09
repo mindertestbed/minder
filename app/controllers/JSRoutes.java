@@ -1,13 +1,12 @@
 package controllers;
 
-import play.Routes;
 import play.mvc.Controller;
 import play.mvc.Result;
 
 public class JSRoutes extends Controller {
-  public static Result jsRoutes() {
+  public Result jsRoutes() {
     return ok(
-        Routes.javascriptRouter("jsRoutes",
+        play.routing.JavaScriptReverseRouter.create("jsRoutes",
             routes.javascript.Authentication.login(),
             routes.javascript.Authentication.doLogin(),
             routes.javascript.GroupController.renderDetails(),

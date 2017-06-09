@@ -1,24 +1,17 @@
-@(testSuite: TestSuite)
-
-
 @import util._
 @import authentication._
 @import job._
+@(testSuite: TestSuite)(implicit authentication: Authentication)
 
 <script>
 
     var selectedMTDLS = []
     var previousHighlighedRow = null
 
-
-
-
-
-
     /**
      * Without selecting anything, run all the jobs under the test suite
      */
-    function runAllTests(){
+    function runAllTests() {
       //empty the array
       selectedMTDLS = []
 
@@ -27,16 +20,13 @@
     }
 
 
-
-
-
     /**
      * Require the user to select at least one job, and run the selected jobs
      */
-    function runSelectedTests(){
+    function runSelectedTests() {
 
       //the user must select some tdls
-      if (selectedMTDLS.length == 0){
+      if (selectedMTDLS.length == 0) {
         showError("Please select at least one Job to Run")
         return
       }
@@ -46,18 +36,16 @@
     }
 
 
-
-
     /**
      * Common function to run jobs. Takes the selected mtdl array, joins witha Comma
      * and sends it to the jsRoutes enqueue function.
      */
-    function runTests(){
+    function runTests() {
       showInputDialog("Please select visibility", ['PUBLIC', 'PROTECTED', 'PRIVATE'], '@testSuite.visibility.name()',
-          function(result){
+          function (result) {
             console.log("Run all tdls with visibility " + result)
             ajaxRouteGet(jsRoutes.controllers.TestQueueController.enqueueTestSuite, [@testSuite.id, result, selectedMTDLS.join(',')],
-                function(){
+                function () {
                   showInfoDialog('Success', 'A new suite run was added to the queue')
                 },
                 showError
@@ -67,11 +55,8 @@
     }
 
 
-
-
-
-    function updateSelectedJobList(theInput, jobId){
-      if($(theInput).prop('checked') == true){
+    function updateSelectedJobList(theInput, jobId) {
+      if ($(theInput).prop('checked') == true) {
         console.log('checked    ' + jobId)
 
         selectedMTDLS.push(jobId)
@@ -85,24 +70,22 @@
     }
 
 
-
-
     /**
      * When a suite run is clicked from the BatchJob table, its detailed are filled to the 'batch job details'
      *
      */
-    function grabSuiteRunDetails(suiteRunId, targetRow){
+    function grabSuiteRunDetails(suiteRunId, targetRow) {
       spin($('#testRunListDiv')[0])
       ajaxRouteGet(jsRoutes.controllers.SuiteRunController.getSuiteRunDetailView, suiteRunId,
-          function (data){
+          function (data) {
             stopSpin($('#testRunListDiv')[0])
             $('#testRunListDiv').html(data)
-          }, function(data){
+          }, function (data) {
             stopSpin($('#testRunListDiv')[0])
             showError(data)
           })
 
-      if(previousHighlighedRow != null){
+      if (previousHighlighedRow != null) {
         previousHighlighedRow.removeClass('highlight')
       }
       $(targetRow).addClass('highlight')
@@ -121,22 +104,29 @@
     <table width="100%" style="padding-bottom: 3px ;">
       <tr>
         <td align="right">
-          <button class="btn btn-xs btn-success" style="margin-bottom: 5px ;" type="button" onclick='runAllTests();'><span class="fa fa-rocket">&nbsp;</span><span class="fa fa-rocket">&nbsp;</span>
+          <button class="btn btn-xs btn-success" style="margin-bottom: 5px ;" type="button" onclick='runAllTests();'><span class="fa fa-rocket">&nbsp;</span>
+            <span class="fa fa-rocket">&nbsp;</span>
             Run All Tdls</button>
-          <button class="btn btn-xs btn-primary" style="margin-bottom: 5px ;" type="button" onclick='runSelectedTests()'><span class="fa fa-rocket">&nbsp;</span><span class="fa fa-check-square-o">&nbsp;</span>
+          <button class="btn btn-xs btn-primary" style="margin-bottom: 5px ;" type="button" onclick='runSelectedTests()'><span class="fa fa-rocket">&nbsp;</span>
+            <span class="fa fa-check-square-o">&nbsp;</span>
             Run Selected Tdls</button></td>
       </tr>
     </table>
     <table class="table table-striped">
-      <tr><th>&nbsp;</th><th>Test Assertion</th><th>Test Case</th><th>MTDL Script Version</th></tr>
+      <tr><th>&nbsp;</th>
+        <th>Test Assertion</th>
+        <th>Test Case</th>
+        <th>MTDL Script Version</th></tr>
       @defining(new java.util.concurrent.atomic.AtomicInteger(1)) { index =>
         @for(job <- Job.findByTestSuite(testSuite)) {
           <tr>
-            <td class="tabshrink">@index.getAndIncrement(). &nbsp; <input type="checkbox" id="checkBox@{
+            <td class="tabshrink">@{
+              index.getAndIncrement()
+            }.&nbsp;
+            <input type="checkbox" id="checkBox@{
               job.id
             }" onchange='updateSelectedJobList(this, @job.id)'/>
             </td>
-
 
             <td>
               <a href="@controllers.routes.TestAssertionController.getAssertionDetailView(job.tdl.testCase.testAssertion.id, "cases")">
@@ -146,14 +136,12 @@
               </a>
             </td>
 
-
             <td>
               <a href="@controllers.routes.TestCaseController.viewTestCase(job.tdl.testCase.id, "jobs")">
               @{
                 job.tdl.testCase.name
               }</a>
             </td>
-
 
 
             <td>
@@ -184,7 +172,8 @@
 
                 @decideOnVisibility(suiteRun.visibility, suiteRun.runner) {
                   <tr onclick="grabSuiteRunDetails(@suiteRun.id, this)" id="tr_@suiteRun.id" style="cursor: pointer">
-                    <td style="text-align:center ; vertical-align: middle ;" class="tabshrink">
+                    <td style="text-align: center ;
+                      vertical-align: middle ;" class="tabshrink">
                       <a role="button" onclick='grabSuiteRunDetails(@suiteRun.id, "#tr_@suiteRun.id")' style="text-decoration: none ;">
                       @suiteRun.number
                       </a>
@@ -195,7 +184,7 @@
                     </td>
 
                     <td><a role="button" onclick='grabSuiteRunDetails(@suiteRun.id, "#tr_@suiteRun.id")' style="text-decoration: none ;">
-                    @global.Util.formatDate(suiteRun.date)
+                    @utils.Util.formatDate(suiteRun.date)
                     </a>
                     </td>
                   </tr>

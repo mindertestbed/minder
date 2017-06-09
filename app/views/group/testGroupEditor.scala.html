@@ -1,35 +1,37 @@
-@(frm: Form[_])
-    @import views.html.util._
-    @import helper._
-    @implicitFieldConstructor = @{
-        FieldConstructor(twitterBootstrapBasic.f)
+@import views.html.util._
+@import helper._
+@(frm: Form[_])(implicit authentication: Authentication)
+  @implicitFieldConstructor = @{
+    FieldConstructor(twitterBootstrapBasic.f)
+  }
+
+  @main(Messages("minder.navigation.restricted.testdesigner"), "mainNavigation") {
+
+    @dialogs()
+
+    <h2>Create New Test Group</h2>
+    @helper.form(action = routes.GroupController.doCreateTestGroup()) {
+      @if(frm.hasGlobalErrors) {
+        <p class="alert alert-danger">
+        @frm.globalError.message
+        </p>
+      }
+      @inputText(
+        frm("name"),
+        '_label -> "Test Group Name"
+      )
+
+      @inputText(frm("shortDescription"), 'rows -> 5, '_label -> "Short Description")
+
+      @textarea(frm("description"), 'rows -> 5, '_label -> "Description")
+
+      <input type="hidden" name="id" id="id" value='@frm("id").value' />
+
+      <br />
+      <button type="submit">Create</button>
+        &nbsp;
+      <button type="reset">Reset</button>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+      <button type="button" onclick="history.back()">Cancel</button>
     }
-
-    @main(Messages("minder.navigation.restricted.testdesigner"), "mainNavigation") {
-
-        @dialogs()
-
-        <h2>Create New Test Group</h2>
-        @helper.form(action = routes.GroupController.doCreateTestGroup()) {
-            @if(frm.hasGlobalErrors) {
-                <p class="alert alert-danger">
-                @frm.globalError.message
-                </p>
-            }
-            @inputText(
-                frm("name"),
-                '_label -> "Test Group Name"
-            )
-
-            @inputText(frm("shortDescription"), 'rows -> 5, '_label -> "Short Description")
-
-            @textarea(frm("description"), 'rows -> 5, '_label -> "Description")
-
-            <input type="hidden" name="id" id="id" value='@frm("id").value' />
-
-            <br />
-            <button type="submit">Create</button>&nbsp;
-            <button type="reset">Reset</button>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-            <button type="button" onclick="history.back()">Cancel</button>
-        }
-    }
+  }

@@ -1,9 +1,8 @@
 @import authentication._
 @import views.html.util._
-@import security.Role
+@(job: Job, showHistory: Boolean = true, localUser: models.User = null)(implicit authentication: Authentication)
 
-@(job: Job, showHistory: Boolean = true, localUser: models.User = null)
-@main(Messages("minder.navigation.restricted.testdesigner"), "testGroups",
+  @main(Messages("minder.navigation.restricted.testdesigner"), "testGroups",
   Array(("Test Groups", controllers.routes.Application.testGroups().path()),
     (job.tdl.testCase.testAssertion.testGroup.name, controllers.routes.GroupController.getGroupDetailView(job.tdl.testCase.testAssertion.testGroup.id, "assertions").path()),
     (job.tdl.testCase.testAssertion.taId, controllers.routes.TestAssertionController.getAssertionDetailView(job.tdl.testCase.testAssertion.id, "cases").path()),

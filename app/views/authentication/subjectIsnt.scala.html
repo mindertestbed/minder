@@ -1,2 +1,2 @@
 @(target: models.User)(content: => Html)
-@defining(Authentication.getLocalUser) { user => @if(user == null || target == null || (user.email != target.email)) {@content}}
+@defining(Authentication.getLocalUser(session())) { user => @if(user == null || target == null || (user.email != target.email)) {@content}}

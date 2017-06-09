@@ -1,5 +1,6 @@
-@(testRun: TestRun, localUser: models.User = null)
-@import views.html.util._
+@import util._
+@import authentication._
+@(testRun: TestRun, localUser: models.User = null)(implicit authentication: Authentication)
 
 @main(Messages("minder.navigation.restricted.testdesigner"), "User History View",
   Array(("Test Groups", controllers.routes.Application.testGroups().path()),
@@ -46,7 +47,6 @@
                 </tr>
               }
             }
-
 
             <tr>
               <th>Test Assertion</th><td>
@@ -112,7 +112,7 @@
 
 
             <tr>
-              <th>Date</th><td> @global.Util.formatDate(testRun.date)</td>
+              <th>Date</th><td> @utils.Util.formatDate(testRun.date)</td>
             </tr>
 
 
@@ -138,7 +138,7 @@
       </div>
     </div>
   </div>
-  @authentication.subjectIs(testRun.runner) {
+  @subjectIs(testRun.runner) {
     @visibilityEditorFragment("jsRoutes.controllers.JobController.changeTestRunVisibility", testRun.id, testRun.visibility, "visibilityTd")
   }
 }

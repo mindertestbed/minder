@@ -38,7 +38,7 @@ public class LoginController extends Controller {
    *
    * @return 401 Unauthorized
    */
-  public static Result login() {
+  public Result login() {
     System.out.println("login()");
     IRestContentProcessor contentProcessor = null;
     String header = request().getHeader(CONTENT_TYPE);
@@ -79,7 +79,7 @@ public class LoginController extends Controller {
    *
    * @return 200 Success
    */
-  public static Result doLogin() {
+  public Result doLogin() {
     System.out.println("doLogin");
     IRestContentProcessor contentProcessor = null;
     try {

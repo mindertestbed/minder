@@ -1,14 +1,13 @@
-@(tg: TestGroup)
-  @import java.util.concurrent.atomic.AtomicInteger
+@import java.util.concurrent.atomic.AtomicInteger
+@import authentication._
+@import views.html.util._
+@(tg: TestGroup)(implicit authentication: Authentication)
 
-  @import authentication._
-  @import views.html.util._
+<div class="indent">
 
-  <div class="indent">
-
-    @subjectHasRole(security.Role.TEST_DESIGNER) {
-      @createLinkButton("/getCreateUtilClassEditorView?groupId=" + tg.id, "Add new utility class")
-    }
+  @subjectHasRole(security.Role.TEST_DESIGNER) {
+    @createLinkButton("/getCreateUtilClassEditorView?groupId=" + tg.id, "Add new utility class")
+  }
 
   @if(tg.utilClasses.size() > 0) {
     <table class="table table-condensed table-hover">
@@ -18,23 +17,23 @@
         <th>Author</th>
       }
       @defining(new AtomicInteger(1)) { index =>
-        @for( tc <- tg.utilClasses) {
+        @for(tc <- tg.utilClasses) {
           <tr>
             <td>@index.getAndIncrement()</td>
             <td><a href="/viewUtilClass?id=@tc.id">@tc.name</a></td>
             <td>@tc.shortDescription</td>
             <td>@tc.owner.email</td>
-            @subjectIs(tc.owner){
-            <td>
-              <button class="btn btn-default"
-              onclick='deleteWithDialog("/doDeleteUtilClass?id=@tc.id", $("#dialog-confirm"), "Delete Utility Class", "util class", "@tc.name")'>
-                <img src="@routes.Assets.versioned("/images/trash2-64.png")" height="16px" alt='@tc.id'/>
-              </button>
-            </td>
+            @subjectIs(tc.owner) {
+              <td>
+                <button class="btn btn-default"
+                onclick='deleteWithDialog("/doDeleteUtilClass?id=@tc.id", $("#dialog-confirm"), "Delete Utility Class", "util class", "@tc.name")'>
+                  <img src="@routes.Assets.versioned("/images/trash2-64.png")" height="16px" alt='@tc.id'/>
+                </button>
+              </td>
             }
           </tr>
         }
       }
     </table>
   }
-  </div>
+</div>

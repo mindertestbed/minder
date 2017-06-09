@@ -4,11 +4,12 @@ import com.avaje.ebean.Ebean;
 import com.fasterxml.jackson.databind.JsonNode;
 import controllers.common.Utils;
 import editormodels.JobEditorModel;
-import global.ReportUtils;
-import global.Util;
+import utils.ReportUtils;
+import utils.Util;
 import models.*;
 import play.Logger;
 import play.data.Form;
+import play.data.FormFactory;
 import play.mvc.Controller;
 import play.mvc.Result;
 import security.AllowedRoles;
@@ -21,35 +22,41 @@ import java.util.List;
 
 import views.html.job.*;
 
-import java.io.ByteArrayOutputStream;
-import java.util.*;
-
 import static play.data.Form.form;
 
 import minderengine.Visibility;
+
+import javax.inject.Inject;
 
 /**
  * Created by yerlibilgin on 03/05/15.
  */
 public class JobController extends Controller {
-  public static final Form<JobEditorModel> JOB_FORM = form(JobEditorModel.class);
+  Authentication authentication;
+  public final Form<JobEditorModel> JOB_FORM;
+
+  @Inject
+  public JobController(FormFactory formFactory, Authentication authentication) {
+    this.authentication = authentication;
+    JOB_FORM = formFactory.form(JobEditorModel.class);
+  }
 
 
   @AllowedRoles({Role.TEST_DESIGNER, Role.TEST_DEVELOPER, Role.TEST_OBSERVER})
-  public static Result listTestRuns(Long configurationId) {
+  public Result listTestRuns(Long configurationId) {
     Job rc = Job.findById(configurationId);
     if (rc == null) {
       return badRequest("Job with id [" + configurationId
           + "] not found!");
     } else {
 
-      return ok(testRunLister.render(configurationId));
+      return ok(testRunLister.render(configurationId, authentication));
     }
 
   }
 
   @AllowedRoles(Role.TEST_DESIGNER)
-  public static Result getCreateJobEditorView(Long tdlId) {
+  public Result getCreateJobEditorView(Long tdlId) {
     Tdl tdl = Tdl.findById(tdlId);
     tdl.testCase = TestCase.findById(tdl.testCase.id);
 
@@ -81,11 +88,11 @@ public class JobController extends Controller {
     //
     initWrapperListForModel(tdl, model);
 
-    return ok(jobEditor.render(JOB_FORM.fill(model)));
+    return ok(jobEditor.render(JOB_FORM.fill(model), authentication));
   }
 
   @AllowedRoles(Role.TEST_DESIGNER)
-  private static void initWrapperListForModel(Tdl tdl, JobEditorModel model) {
+  private void initWrapperListForModel(Tdl tdl, JobEditorModel model) {
     model.wrapperMappingList = new ArrayList<>();
 
     for (WrapperParam parameter : tdl.parameters) {
@@ -101,12 +108,12 @@ public class JobController extends Controller {
   }
 
   @AllowedRoles(Role.TEST_DESIGNER)
-  public static Result doCreateJob() {
+  public Result doCreateJob() {
     Form<JobEditorModel> form = JOB_FORM.bindFromRequest();
 
     if (form.hasErrors()) {
       Util.printFormErrors(form);
-      return badRequest(jobEditor.render(form));
+      return badRequest(jobEditor.render(form, authentication));
     }
 
     JobEditorModel model = form.get();
@@ -117,7 +124,7 @@ public class JobController extends Controller {
 
     if (existing != null) {
       form.reject("A Job with the name [" + model.name + "] already exists");
-      return badRequest(jobEditor.render(form));
+      return badRequest(jobEditor.render(form, authentication));
     }
 
     // check the parameters.
@@ -125,14 +132,14 @@ public class JobController extends Controller {
       for (MappedWrapperModel mappedWrapper : model.wrapperMappingList) {
         if (mappedWrapper.wrapperVersion == null) {
           form.reject("You have to fill all parameters");
-          return badRequest(jobEditor.render(form));
+          return badRequest(jobEditor.render(form, authentication));
         }
       }
     } else {
       if (tdl.parameters.size() > 0) {
         initWrapperListForModel(tdl, model);
         form.reject("You have to fill all parameters");
-        return badRequest(jobEditor.render(form));
+        return badRequest(jobEditor.render(form, authentication));
       }
     }
 
@@ -141,7 +148,7 @@ public class JobController extends Controller {
     job.name = model.name;
     job.tdl = tdl;
     job.visibility = model.visibility;
-    job.owner = Authentication.getLocalUser();
+    job.owner = authentication.getLocalUser();
 
     try {
       Ebean.beginTransaction();
@@ -163,7 +170,7 @@ public class JobController extends Controller {
       Ebean.endTransaction();
 
       form.reject(ex.getMessage());
-      return badRequest(jobEditor.render(form));
+      return badRequest(jobEditor.render(form, authentication));
     }
 
     return redirect(routes.TestCaseController.viewTestCase(tdl.testCase.id, "jobs"));
@@ -171,7 +178,7 @@ public class JobController extends Controller {
 
 
   @AllowedRoles(Role.TEST_DESIGNER)
-  public static Result doDeleteJob(Long id) {
+  public Result doDeleteJob(Long id) {
     Job rc = Job.findById(id);
     if (rc == null) {
       // it does not exist. error
@@ -180,7 +187,7 @@ public class JobController extends Controller {
     }
 
 
-    if (!Util.canAccess(Authentication.getLocalUser(), rc.owner))
+    if (!Util.canAccess(authentication.getLocalUser(), rc.owner))
       return unauthorized("You don't have permission to modify this resource");
 
 
@@ -196,30 +203,30 @@ public class JobController extends Controller {
   }
 
   @AllowedRoles({Role.TEST_DESIGNER, Role.TEST_DEVELOPER, Role.TEST_OBSERVER})
-  public static Result displayJob(Long id, boolean showHistory) {
+  public Result displayJob(Long id, boolean showHistory) {
     Job rc = Job.findById(id);
 
-    final User localUser = Authentication.getLocalUser();
+    final User localUser = authentication.getLocalUser();
 
     if (rc == null) {
       return badRequest("A Job with id [" + id + "] was not found");
     }
 
     if (Util.canAccess(localUser, rc.owner, rc.visibility))
-      return ok(views.html.job.jobDetailView.render(rc, showHistory, localUser));
+      return ok(views.html.job.jobDetailView.render(rc, showHistory, localUser, authentication));
     else
       return unauthorized("You can't see this resource");
   }
 
   @AllowedRoles({Role.TEST_DESIGNER, Role.TEST_DEVELOPER, Role.TEST_OBSERVER})
-  public static Result viewTestRunHistory(Long testRunId) {
+  public Result viewTestRunHistory(Long testRunId) {
     TestRun tr = TestRun.findById(testRunId);
     if (tr == null) {
       return badRequest("Test Run with id [" + testRunId + "] not found!");
     } else {
-      final User localUser = Authentication.getLocalUser();
+      final User localUser = authentication.getLocalUser();
       if (Util.canAccess(localUser, tr.runner, tr.visibility)) {
-        return ok(testRunDetailView.render(tr, null));
+        return ok(testRunDetailView.render(tr, null, authentication));
       } else {
         return unauthorized("You don't have permission to modify this resource");
       }
@@ -227,14 +234,14 @@ public class JobController extends Controller {
   }
 
   @AllowedRoles({Role.TEST_DESIGNER, Role.TEST_DEVELOPER, Role.TEST_OBSERVER})
-  public static Result viewReport(Long testRunId, String type) {
+  public Result viewReport(Long testRunId, String type) {
     TestRun tr = TestRun.findById(testRunId);
     if (tr == null)
       return badRequest("A test run with id " + testRunId + " was not found");
 
 
     System.out.println("Type: " + type);
-    final User localUser = Authentication.getLocalUser();
+    final User localUser = authentication.getLocalUser();
     if (Util.canAccess(localUser, tr.runner, tr.visibility)) {
       response().setContentType("application/x-download");
       String fileName = tr.job.name + "." + tr.number + ".report";
@@ -250,44 +257,44 @@ public class JobController extends Controller {
   }
 
   @AllowedRoles(Role.TEST_DESIGNER)
-  public static Result changeTestRunVisibility(long id, String visibility) {
+  public Result changeTestRunVisibility(long id, String visibility) {
     TestRun tr = TestRun.findById(id);
     if (tr == null)
       return badRequest("A test run with id " + id + " was not found");
 
     System.out.println(visibility);
-    final User localUser = Authentication.getLocalUser();
+    final User localUser = authentication.getLocalUser();
     if (Util.canAccess(localUser, tr.runner, tr.visibility)) {
       tr.visibility = Visibility.valueOf(visibility);
       tr.save();
-      return ok(visibilityTagFragment.render(tr.visibility, tr.runner, true, true));
+      return ok(visibilityTagFragment.render(tr.visibility, tr.runner, true, true, authentication));
     } else {
       return unauthorized("You don't have permission to modify this resource");
     }
   }
 
   @AllowedRoles(Role.TEST_DESIGNER)
-  public static Result changeJobVisibility(long id, String visibility) {
+  public Result changeJobVisibility(long id, String visibility) {
     Job job = Job.findById(id);
     if (job == null)
       return badRequest("A job with id " + id + " was not found");
 
     System.out.println(visibility);
-    final User localUser = Authentication.getLocalUser();
+    final User localUser = authentication.getLocalUser();
     if (Util.canAccess(localUser, job.owner, job.visibility)) {
       job.visibility = Visibility.valueOf(visibility);
       job.save();
-      return ok(visibilityTagFragment.render(job.visibility, job.owner, true, true));
+      return ok(visibilityTagFragment.render(job.visibility, job.owner, true, true, authentication));
     } else {
       return unauthorized("You don't have permission to modify this resource");
     }
   }
 
   @AllowedRoles(Role.TEST_DESIGNER)
-  public static Result doEditJobField() {
+  public Result doEditJobField() {
     JsonNode jsonNode = request().body().asJson();
 
-    return Utils.doEditField(JobEditorModel.class, Job.class, jsonNode, Authentication.getLocalUser());
+    return Utils.doEditField(JobEditorModel.class, Job.class, jsonNode, authentication.getLocalUser());
   }
 
 }

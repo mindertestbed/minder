@@ -18,9 +18,9 @@ libraryDependencies ++= Seq(
   javaJdbc,
   evolutions,
   "xalan" % "serializer" % "2.7.2",
-  "com.typesafe.play" % "play-java-ws_2.11" % "2.4.2",
-  "com.typesafe.play" % "play-cache_2.11" % "2.4.2",
-  "com.typesafe.play" % "play-java_2.11" % "2.4.2",
+  "com.typesafe.play" % "play-java-ws_2.11" % "2.5.8",
+  "com.typesafe.play" % "play-cache_2.11" % "2.5.8",
+  "com.typesafe.play" % "play-java_2.11" % "2.5.8",
   "org.scala-lang" % "scala-library" % "2.11.7",
   "org.scala-lang" % "scala-reflect" % "2.11.7",
   "org.scala-lang" % "scala-actors" % "2.11.7",
@@ -73,3 +73,5 @@ binaries in Aspectj <++= update map { report =>
 products in Compile <<= products in Aspectj
 
 products in Runtime <<= products in Compile
+
+routesGenerator := InjectedRoutesGenerator

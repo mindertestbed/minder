@@ -4,37 +4,37 @@ package controllers;
  * Created by edonafasllija on 17/02/16.
  */
 
-import com.avaje.ebean.Ebean;
-import editormodels.*;
-import global.Util;
-import models.*;
-import play.Logger;
+import editormodels.JobTemplateEditorModel;
+import models.JobTemplate;
+import models.TestGroup;
 import play.data.Form;
+import play.data.FormFactory;
 import play.mvc.Controller;
 import play.mvc.Result;
-import play.mvc.Security;
 import security.AllowedRoles;
 import security.Role;
-import views.html.job.*;
+import utils.Util;
 
-import static play.data.Form.form;
-
-import views.html.group.childViews.jobTemplatesList;
+import javax.inject.Inject;
 
 
 public class JobTemplateController extends Controller {
+  Authentication authentication;
+  public final Form<JobTemplateEditorModel> JOB_TEMPLATE_FORM;
 
-
-  //public static final Form<JobEditorModel> JOB_TEMPLATE_FORM = form(JobEditorModel.class);
-  public static final Form<JobTemplateEditorModel> JOB_TEMPLATE_FORM = form(JobTemplateEditorModel.class);
-
-  @AllowedRoles({Role.TEST_DESIGNER})
-  public static Result createJobTemplateForm(Long testGroupId) {
-    return ok(views.html.group.JobTemplateEditor.render(JOB_TEMPLATE_FORM,TestGroup.findById(testGroupId)));
+  @Inject
+  public JobTemplateController(FormFactory formFactory, Authentication authentication) {
+    this.authentication = authentication;
+    JOB_TEMPLATE_FORM = formFactory.form(JobTemplateEditorModel.class);
   }
 
   @AllowedRoles({Role.TEST_DESIGNER})
-  public static Result doCreateJobTemplate(Long testGroupId) {
+  public Result createJobTemplateForm(Long testGroupId) {
+    return ok(views.html.group.JobTemplateEditor.render(JOB_TEMPLATE_FORM, TestGroup.findById(testGroupId), authentication));
+  }
+
+  @AllowedRoles({Role.TEST_DESIGNER})
+  public Result doCreateJobTemplate(Long testGroupId) {
     //return ok(views.html.group.JobTemplateEditor.render(JOB_TEMPLATE_FORM, null));
 
     Form<JobTemplateEditorModel> form = JOB_TEMPLATE_FORM.bindFromRequest();
@@ -47,7 +47,7 @@ public class JobTemplateController extends Controller {
 
     if (form.hasErrors()) {
       Util.printFormErrors(form);
-      return badRequest(views.html.group.JobTemplateEditor.render(form,group));
+      return badRequest(views.html.group.JobTemplateEditor.render(form, group, authentication));
     }
 
 
@@ -57,22 +57,19 @@ public class JobTemplateController extends Controller {
     JobTemplate jtl = JobTemplate.findByGroup(group, model.name);
     if (jtl != null) {
       form.reject("A Job Template with name [" + jtl.name + "] already exists");
-      return badRequest(views.html.group.JobTemplateEditor.render(form,group));
+      return badRequest(views.html.group.JobTemplateEditor.render(form, group, authentication));
     }
 
     jtl = new JobTemplate();
     jtl.testGroup = group;
     jtl.name = model.name;
-    jtl.owner = Authentication.getLocalUser();
+    jtl.owner = authentication.getLocalUser();
     jtl.mtdlParameters = model.mtdlParameters;
 
     jtl.save();
 
 
     return redirect(routes.GroupController.getGroupDetailView(group.id, "jobTemplates"));
-
-
-
-}
+  }
 }
 

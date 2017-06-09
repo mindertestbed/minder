@@ -1,5 +1,5 @@
 @(content: => Html)
 
-@if(Authentication.getLocalUser() == null){
+@if(Authentication.getLocalUser(session()) == null){
   @content
 }

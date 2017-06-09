@@ -7,12 +7,14 @@ import com.google.common.io.Files;
 import controllers.common.Utils;
 import dependencyutils.DependencyClassLoaderCache;
 import editormodels.GroupEditorModel;
-import global.Util;
+import utils.Util;
 import models.TestGroup;
 import models.User;
+import org.asynchttpclient.request.body.multipart.FilePart;
 import org.eclipse.aether.resolution.DependencyResolutionException;
 import play.Logger;
 import play.data.Form;
+import play.data.FormFactory;
 import play.mvc.Controller;
 import play.mvc.Http;
 import play.mvc.Result;
@@ -31,39 +33,53 @@ import java.text.ParseException;
 import views.html.group.childViews.*;
 import views.html.group.*;
 
+import javax.inject.Inject;
+
 import static play.data.Form.form;
 
 /**
  * Created by yerlibilgin on 03/05/15.
  */
 public class GroupController extends Controller {
-  public static final Form<GroupEditorModel> TEST_GROUP_FORM = form(GroupEditorModel.class);
-  public static final Form<GroupImportModel> TEST_GROUP_IMPORT_FORM = form(GroupImportModel.class);
+  Authentication authentication;
+  TestGroupImportExportController testGroupImportExportController;
+
+  public final Form<GroupEditorModel> TEST_GROUP_FORM;
+  public final Form<GroupImportModel> TEST_GROUP_IMPORT_FORM;
+
+  @Inject
+  public GroupController(FormFactory formFactory, Authentication authentication, TestGroupImportExportController testGroupImportExportController) {
+    this.authentication = authentication;
+    this.testGroupImportExportController = testGroupImportExportController;
+
+    TEST_GROUP_FORM = formFactory.form(GroupEditorModel.class);
+    TEST_GROUP_IMPORT_FORM = formFactory.form(GroupImportModel.class);
+  }
 
   public static class GroupImportModel {
     public String useremail;
   }
 
   @AllowedRoles(Role.TEST_DESIGNER)
-  public static Result getCreateGroupEditorView() {
-    return ok(testGroupEditor.render(TEST_GROUP_FORM));
+  public Result getCreateGroupEditorView() {
+    return ok(testGroupEditor.render(TEST_GROUP_FORM, authentication));
   }
 
   @AllowedRoles(Role.TEST_DESIGNER)
-  public static Result doCreateTestGroup() {
+  public Result doCreateTestGroup() {
     final Form<GroupEditorModel> filledForm = TEST_GROUP_FORM
         .bindFromRequest();
-    final User localUser = Authentication.getLocalUser();
+    final User localUser = authentication.getLocalUser();
     if (filledForm.hasErrors()) {
       Util.printFormErrors(filledForm);
-      return badRequest(testGroupEditor.render(filledForm));
+      return badRequest(testGroupEditor.render(filledForm, authentication));
     } else {
       GroupEditorModel model = filledForm.get();
 
       TestGroup group = TestGroup.findByName(model.name);
       if (group != null) {
         filledForm.reject("The group with name [" + group.name + "] already exists");
-        return badRequest(testGroupEditor.render(filledForm));
+        return badRequest(testGroupEditor.render(filledForm, authentication));
       }
 
       group = new TestGroup();
@@ -79,14 +95,14 @@ public class GroupController extends Controller {
   }
 
   @AllowedRoles(Role.TEST_DESIGNER)
-  public static Result editGroupForm(Long id) {
-    final User localUser = Authentication.getLocalUser();
+  public Result editGroupForm(Long id) {
+    final User localUser = authentication.getLocalUser();
     TestGroup tg = TestGroup.findById(id);
     if (tg == null) {
       return badRequest("Test group with id [" + id + "] not found!");
     } else {
 
-      if (!Util.canAccess(Authentication.getLocalUser(), tg.owner))
+      if (!Util.canAccess(authentication.getLocalUser(), tg.owner))
         return badRequest("You don't have permission to modify this resource");
 
       GroupEditorModel tgem = new GroupEditorModel();
@@ -96,18 +112,18 @@ public class GroupController extends Controller {
       tgem.description = tg.description;
       Form<GroupEditorModel> bind = TEST_GROUP_FORM.fill(tgem);
 
-      return ok(testGroupEditor.render(bind));
+      return ok(testGroupEditor.render(bind, authentication));
     }
   }
 
   @AllowedRoles(Role.TEST_DESIGNER)
-  public static Result doEditGroupField() {
+  public Result doEditGroupField() {
     JsonNode jsonNode = request().body().asJson();
 
     Result result = ok();
     try {
       Ebean.beginTransaction();
-      result = Utils.doEditField(GroupEditorModel.class, TestGroup.class, jsonNode, Authentication.getLocalUser());
+      result = Utils.doEditField(GroupEditorModel.class, TestGroup.class, jsonNode, authentication.getLocalUser());
 
       String field = jsonNode.findPath("field").asText();
 
@@ -142,12 +158,12 @@ public class GroupController extends Controller {
 
 
   @AllowedRoles(Role.TEST_DESIGNER)
-  public static Result doDeleteGroup(Long id) {
+  public Result doDeleteGroup(Long id) {
     TestGroup tg = TestGroup.findById(id);
     if (tg == null) {
       return badRequest("Test group with id [" + id + "] not found!");
     } else {
-      if (!Util.canAccess(Authentication.getLocalUser(), tg.owner))
+      if (!Util.canAccess(authentication.getLocalUser(), tg.owner))
         return badRequest("You don't have permission to modify this resource");
 
       try {
@@ -161,56 +177,56 @@ public class GroupController extends Controller {
   }
 
   @AllowedRoles({Role.TEST_DESIGNER, Role.TEST_OBSERVER})
-  public static Result getGroupDetailView(Long id, String display) {
+  public Result getGroupDetailView(Long id, String display) {
     TestGroup tg = TestGroup.findById(id);
     if (tg == null) {
       return badRequest("No job with id " + id + ".");
     }
-    return ok(mainView.render(tg, display));
+    return ok(mainView.render(tg, display, authentication));
   }
 
 
   @AllowedRoles({Role.TEST_DESIGNER, Role.TEST_OBSERVER})
-  public static Result renderTestAssertionList(long id) {
-    return ok(testAssertionList.render(TestGroup.findById(id)));
+  public Result renderTestAssertionList(long id) {
+    return ok(testAssertionList.render(TestGroup.findById(id), authentication));
   }
 
 
   @AllowedRoles({Role.TEST_DESIGNER, Role.TEST_OBSERVER})
-  public static Result renderTestSuites(long id) {
-    return ok(testSuiteList.render(TestGroup.findById(id)));
+  public Result renderTestSuites(long id) {
+    return ok(testSuiteList.render(TestGroup.findById(id), authentication));
   }
 
   @AllowedRoles({Role.TEST_DESIGNER, Role.TEST_OBSERVER})
-  public static Result renderTestAssets(long id) {
-    return ok(testAssetList.render(TestGroup.findById(id)));
+  public Result renderTestAssets(long id) {
+    return ok(testAssetList.render(TestGroup.findById(id), authentication));
   }
 
   @AllowedRoles({Role.TEST_DESIGNER, Role.TEST_OBSERVER})
-  public static Result renderUtilClasses(long id) {
-    return ok(utilClassList.render(TestGroup.findById(id)));
+  public Result renderUtilClasses(long id) {
+    return ok(utilClassList.render(TestGroup.findById(id), authentication));
   }
 
   @AllowedRoles({Role.TEST_DESIGNER, Role.TEST_OBSERVER})
-  public static Result renderDependencies(long id) {
-    return ok(dependencies.render(TestGroup.findById(id)));
+  public Result renderDependencies(long id) {
+    return ok(dependencies.render(TestGroup.findById(id), authentication));
   }
 
   @AllowedRoles({Role.TEST_DESIGNER, Role.TEST_OBSERVER})
-  public static Result renderDetails(long id) {
-    return ok(details.render(TestGroup.findById(id)));
+  public Result renderDetails(long id) {
+    return ok(details.render(TestGroup.findById(id), authentication));
   }
 
   @AllowedRoles({Role.TEST_DESIGNER})
-  public static Result createNewTestGroupImportForm() {
+  public Result createNewTestGroupImportForm() {
     return ok(testGroupImportEditor.render(form(GroupImportModel.class)));
   }
 
   @AllowedRoles({Role.TEST_DESIGNER, Role.TEST_OBSERVER})
-  public static Result exportTestGroup(Long id) {
-    RestTestGroup responseRestTestGroup = new RestTestGroup();
+  public Result exportTestGroup(Long id) {
+    RestTestGroup responseRestTestGroup;
     try {
-      responseRestTestGroup = TestGroupImportExportController.exportTestGroupData(id);
+      responseRestTestGroup = testGroupImportExportController.exportTestGroupData(id);
     } catch (NotFoundException e) {
       return internalServerError(e.getMessage());
     } catch (IOException e) {
@@ -241,10 +257,10 @@ public class GroupController extends Controller {
   }
 
   @AllowedRoles({Role.TEST_DESIGNER, Role.TEST_OBSERVER})
-  public static Result importTestGroup() {
+  public Result importTestGroup() {
     final Form<GroupImportModel> filledForm = TEST_GROUP_IMPORT_FORM.bindFromRequest();
 
-    User localUser = Authentication.getLocalUser();
+    User localUser = authentication.getLocalUser();
     if (localUser.email.equals("root@minder")) {
 
       if (filledForm.hasErrors()) {
@@ -281,7 +297,7 @@ public class GroupController extends Controller {
           return badRequest(testGroupImportEditor.render(filledForm));
         }
 
-        return ok(testGroupListView.render());
+        return ok(testGroupListView.render(authentication));
       }
     } else {
       filledForm.reject("Only root role may import a test group");
@@ -292,7 +308,7 @@ public class GroupController extends Controller {
   /**
    * Reads the file uploaded with the current request (if any)
    */
-  private static void handleFileUpload(User user) throws IllegalArgumentException, IOException, ParseException, RuntimeException {
+  private void handleFileUpload(User user) throws IllegalArgumentException, IOException, ParseException, RuntimeException {
     Http.MultipartFormData body = request().body().asMultipartFormData();
 
     if (body == null)
@@ -301,7 +317,7 @@ public class GroupController extends Controller {
     File asset = null;
 
     if (body.getFiles() != null && body.getFiles().size() > 0)
-      asset = body.getFiles().get(0).getFile();
+      asset = ((FilePart) body.getFiles().get(0)).getFile();
 
     if (asset == null) {
       throw new RuntimeException("No asset file was specified!");
@@ -332,7 +348,7 @@ public class GroupController extends Controller {
       }
 
       try {
-        TestGroupImportExportController.importTestGroupData(restTestGroup, user.email);
+        testGroupImportExportController.importTestGroupData(restTestGroup, user.email);
       } catch (IllegalAccessException e) {
         e.printStackTrace();
       } catch (IOException e) {
@@ -346,8 +362,8 @@ public class GroupController extends Controller {
   }
 
   @AllowedRoles({Role.TEST_DESIGNER, Role.TEST_OBSERVER})
-  public static Result renderJobTemplates(long id) {
-    return ok(jobTemplatesList.render(TestGroup.findById(id)));
+  public Result renderJobTemplates(long id) {
+    return ok(jobTemplatesList.render(TestGroup.findById(id), authentication));
   }
 }
 

@@ -1,7 +1,5 @@
-@(localUser: models.User = null)
-
+@(localUser: models.User = null)(implicit authentication: Authentication)
   @main(Messages("authenticate.profile.title"), "profile") {
-
     <h1>@Messages("authenticate.profile.title")</h1>
     <p>
       Your name is @localUser.name and your email address is @if(!localUser.email) {

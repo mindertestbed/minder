@@ -1,7 +1,7 @@
-package global;
+package utils;
 
-import com.avaje.ebean.Ebean;
 import com.avaje.ebean.Model;
+import controllers.MappedWrapperModel;
 import controllers.TestCaseController;
 import minderengine.BuiltInWrapperRegistry;
 import minderengine.XoolaServer;
@@ -10,68 +10,51 @@ import mtdl.TDLClassLoaderProvider;
 import org.beybunproject.xmlContentVerifier.utils.Utils;
 import org.yaml.snakeyaml.Yaml;
 import org.yaml.snakeyaml.constructor.CustomClassLoaderConstructor;
-import play.Application;
-import play.GlobalSettings;
 import play.Logger;
+import play.api.Environment;
 import play.api.Play;
-import play.libs.F;
-import play.mvc.Action;
-import play.mvc.Http;
-import play.mvc.Result;
-import rest.controllers.common.RestUtils;
-import rest.controllers.routes;
+import play.data.format.Formatters;
 import scala.io.BufferedSource;
 import scala.io.Source;
 
+import javax.inject.Inject;
+import javax.inject.Provider;
+import javax.inject.Singleton;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
-import java.lang.reflect.Method;
-import java.util.Base64;
+import java.text.ParseException;
 import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
-public class Global extends GlobalSettings {
+@Singleton
+public class Startup {
+  @Inject
+  public Startup(Environment environment, XoolaServer xoolaServer, Formatters formatters) {
+    System.out.println(xoolaServer);
 
-  /**
-   * Call to create the root Action of a request for a Java application.
-   * The request and actionMethod values are passed for information.
-   *
-   * @param method  The action method containing the user code for this Action.
-   * @param request The HTTP Request
-   * @return The default implementation returns a raw Action calling the method.
-   */
-  @SuppressWarnings("rawtypes")
-  public play.mvc.Action onRequest(final Http.Request request, Method method) {
-   // if ((!request.path().contains("/rest/")) || (request.path().equals("/rest/login")) || (request.path().equals("/rest/doLogin"))) {
-      return super.onRequest(request, method);
-    //}
-
-
-    //if (RestUtils.verifyAuthentication(request)) {
-    //  return super.onRequest(request, method);
-   // }
-
-
-   /* return new Action.Simple() {
-      public F.Promise<Result> call(Http.Context ctx) throws Throwable {
-        System.out.println("Calling action for " + ctx);
-        return F.Promise.pure(redirect(routes.LoginController.login()));
-
-    };*/
-
-
-  }
-
-  public void onStart(Application app) {
-    TDLClassLoaderProvider.appendExternalClassLoader(Play.classloader(Play.current()));
+    TDLClassLoaderProvider.appendExternalClassLoader(environment.classLoader());
     TDLClassLoaderProvider.appendExternalClassLoader(ClassLoader.getSystemClassLoader());
 
     initialData();
 
     BuiltInWrapperRegistry.get().initiate();
-    XoolaServer.get().start();
+    xoolaServer.start();
+
+    //TODO: Bad place for this code. Where to put?
+    formatters.register(MappedWrapperModel.class, new Formatters.SimpleFormatter<MappedWrapperModel>() {
+      @Override
+      public MappedWrapperModel parse(String jsonString, Locale arg1) throws ParseException {
+        return MappedWrapperModel.parse(jsonString);
+      }
+
+      @Override
+      public String print(MappedWrapperModel mappedWrapperModel, Locale arg1) {
+        return mappedWrapperModel.toJson();
+      }
+    });
   }
 
   private void initialData() {

@@ -3,12 +3,10 @@ package controllers
 import java.util
 
 import builtin.ReportGenerator
-import controllers.TestLogFeeder.LogRecord
 import controllers.common.Utils
 import controllers.common.enumeration.TestStatus
 import minderengine._
-import models.Wrapper
-import models._
+import models.{Wrapper, _}
 import mtdl._
 import play.Logger
 
@@ -20,7 +18,7 @@ import scala.io.Source
   * provides information to the main actor (status)
   * Created by yerlibilgin on 13/01/15.
   */
-class TestRunContext(val testRun: TestRun) extends Runnable with TestProcessWatcher {
+class TestRunContext(val testRun: TestRun, testRunFeeder: TestRunFeeder, testLogFeeder: TestLogFeeder, testEngine: TestEngine) extends Runnable with TestProcessWatcher {
   var suspended = false;
   val variableWrapperMapping = collection.mutable.Map[String, MappedWrapper]();
   val mappedWrappers = MappedWrapper.findByJob(testRun.job)
@@ -87,7 +85,7 @@ class TestRunContext(val testRun: TestRun) extends Runnable with TestProcessWatc
 
   override def run(): Unit = {
     status = TestStatus.RUNNING
-    TestEngine.runTest(sessionID, user.email, cls, variableWrapperMapping, TestRunContext.this, job.mtdlParameters)
+    testEngine.runTest(sessionID, user.email, cls, variableWrapperMapping, TestRunContext.this, job.mtdlParameters)
   }
 
   /**
@@ -105,7 +103,7 @@ class TestRunContext(val testRun: TestRun) extends Runnable with TestProcessWatc
     if (progressPercent > 100)
       progressPercent = 100
 
-    TestRunFeeder.testProgressUpdate(progressPercent)
+    testRunFeeder.testProgressUpdate(progressPercent)
   }
 
   override def rivetFinished(rivetIndex: Int): Unit = {
@@ -134,14 +132,14 @@ class TestRunContext(val testRun: TestRun) extends Runnable with TestProcessWatc
 
   override def addLog(log: String): Unit = {
     logStringBuilder.append(log)
-    TestLogFeeder.log(LogRecord(testRun, log))
+    testLogFeeder.log(LogRecord(testRun, log))
   }
 
 
   override def addReportLog(log: String): Unit = {
     reportLogBuilder.append(log)
     logStringBuilder.append(log)
-    TestLogFeeder.log(LogRecord(testRun, log))
+    testLogFeeder.log(LogRecord(testRun, log))
   }
 
   def updateRun(): Unit = {

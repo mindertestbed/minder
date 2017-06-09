@@ -1,11 +1,7 @@
-@(ta: TestAssertion, display: String = "cases")
-
-@import java.util.concurrent.atomic.AtomicInteger
-@import global.Util._
 @import authentication._
 @import views.html._
-@import views.html.testAssertion._
 @import views.html.util._
+@(ta: TestAssertion, display: String = "cases")(implicit authentication: Authentication)
 
 @main(Messages("minder.navigation.restricted.testdesigner"), "testGroups",
   Array(("Test Groups", controllers.routes.Application.testGroups().path()),

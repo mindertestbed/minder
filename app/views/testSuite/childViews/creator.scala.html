@@ -1,6 +1,5 @@
-
 @import views.html.util.dialogs
-@(frm: Form[_])
+@(frm: Form[_])(implicit authentication: Authentication)
 
 @defining(TestGroup.findById(frm("groupId").value.toLong)) { testGroup =>
   @main(Messages("minder.navigation.restricted.testdesigner"), "mainNavigation",

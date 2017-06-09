@@ -1,23 +1,25 @@
 package controllers;
 
-import global.Util;
+import utils.Util;
 import models.ModelConstants;
 import models.TestAsset;
 import models.TestGroup;
 import models.User;
 import play.Logger;
 import play.data.Form;
+import play.data.FormFactory;
 import play.data.validation.Constraints;
 import play.mvc.Controller;
 import play.mvc.Http;
 import play.mvc.Result;
-import play.mvc.Security;
 import security.AllowedRoles;
 import security.Role;
 import views.html.group.testAssetEditor;
 import views.html.group.childViews.testAssetList;
 
+import javax.inject.Inject;
 import java.io.*;
+import java.util.List;
 
 import static play.data.Form.form;
 
@@ -25,8 +27,15 @@ import static play.data.Form.form;
  * Created by yerlibilgin on 31/12/14.
  */
 public class TestAssetController extends Controller {
-  public static final Form<TestAssetModel> TEST_ASSET_FORM = form(TestAssetModel.class);
+  Authentication authentication;
 
+  public final Form<TestAssetModel> TEST_ASSET_FORM;
+
+  @Inject
+  public TestAssetController(FormFactory formFactory, Authentication authentication) {
+    this.authentication = authentication;
+    TEST_ASSET_FORM = formFactory.form(TestAssetModel.class);
+  }
 
   public static class TestAssetModel {
     public Long id;
@@ -40,10 +49,14 @@ public class TestAssetController extends Controller {
     public String shortDescription;
 
     public String description;
+
+    public TestAssetModel(){
+
+    }
   }
 
   @AllowedRoles({Role.TEST_DESIGNER})
-  public static Result doCreateTestAsset(Long testGroupId) {
+  public Result doCreateTestAsset(Long testGroupId) {
     final Form<TestAssetModel> filledForm = TEST_ASSET_FORM.bindFromRequest();
 
     TestGroup group = TestGroup.findById(testGroupId);
@@ -52,7 +65,7 @@ public class TestAssetController extends Controller {
       return badRequest("Test Group with [" + testGroupId + "] not found");
     }
 
-    User localUser = Authentication.getLocalUser();
+    User localUser = authentication.getLocalUser();
     if (localUser.email.equals("root@minder") || group.owner.email.equals(localUser.email)) {
 
       if (filledForm.hasErrors()) {
@@ -84,7 +97,7 @@ public class TestAssetController extends Controller {
 
         asset.save();
 
-        return ok(testAssetList.render(group));
+        return ok(testAssetList.render(group, authentication));
       }
     } else {
       return badRequest("You can't use this resource");
@@ -93,13 +106,13 @@ public class TestAssetController extends Controller {
 
 
   @AllowedRoles({Role.TEST_DESIGNER})
-  public static Result createNewAssetForm() {
+  public Result createNewAssetForm() {
     return ok(testAssetEditor.render(TEST_ASSET_FORM, null));
   }
 
   @AllowedRoles({Role.TEST_DESIGNER})
-  public static Result editAssetForm(Long id) {
-    User localUser = Authentication.getLocalUser();
+  public Result editAssetForm(Long id) {
+    User localUser = authentication.getLocalUser();
 
     TestAsset asset = TestAsset.findById(id);
     TestGroup group = asset.testGroup;
@@ -110,7 +123,6 @@ public class TestAssetController extends Controller {
     if (ta == null) {
       return badRequest("Test asset with id [" + id + "] not found!");
     } else {
-
 
 
       TestAssetModel tgem = new TestAssetModel();
@@ -127,7 +139,7 @@ public class TestAssetController extends Controller {
 
 
   @AllowedRoles({Role.TEST_DESIGNER})
-  public static Result doEditAsset() {
+  public Result doEditAsset() {
     final Form<TestAssetModel> filledForm = TEST_ASSET_FORM.bindFromRequest();
 
     if (filledForm.hasErrors()) {
@@ -136,7 +148,7 @@ public class TestAssetController extends Controller {
     } else {
       TestAssetModel model = filledForm.get();
       TestAsset ta = TestAsset.findById(model.id);
-      User localUser = Authentication.getLocalUser();
+      User localUser = authentication.getLocalUser();
       if (localUser == null || (!localUser.email.equals("root@minder") && !ta.testGroup.owner.email.equals(localUser.email))) {
         return badRequest("You cant use this resource");
       }
@@ -159,7 +171,7 @@ public class TestAssetController extends Controller {
   }
 
   @AllowedRoles({Role.TEST_DESIGNER})
-  public static Result doDeleteAsset(Long id) {
+  public Result doDeleteAsset(Long id) {
     TestAsset ta = TestAsset.findById(id);
     if (ta == null) {
       return badRequest("Test asset with id [" + id + "] not found!");
@@ -170,7 +182,7 @@ public class TestAssetController extends Controller {
         ex.printStackTrace();
         return badRequest(ex.getMessage());
       }
-      User user = Authentication.getLocalUser();
+      User user = authentication.getLocalUser();
 
       new File("assets/_" + ta.testGroup.id + "/" + ta.name).delete();
 
@@ -179,7 +191,7 @@ public class TestAssetController extends Controller {
   }
 
   @AllowedRoles({Role.TEST_DESIGNER, Role.TEST_OBSERVER, Role.TEST_DEVELOPER})
-  public static Result downloadAsset(Long id) {
+  public Result downloadAsset(Long id) {
     TestAsset ta = TestAsset.findById(id);
     if (ta == null) {
       return badRequest("Test asset with id [" + id + "] not found!");
@@ -199,7 +211,7 @@ public class TestAssetController extends Controller {
    * @param name
    * @return
    */
-  public static InputStream getAssetAsStream(long tgId, String name) {
+  public InputStream getAssetAsStream(long tgId, String name) {
     try {
       FileInputStream fis = new FileInputStream("assets/_" + tgId + "/" + name);
       return fis;
@@ -216,7 +228,7 @@ public class TestAssetController extends Controller {
    * @param name
    * @return
    */
-  public static byte[] getAssetAsByteArray(long groupId, String name) {
+  public byte[] getAssetAsByteArray(long groupId, String name) {
     int read = -1;
     byte[] bulk = new byte[1024];
     ByteArrayOutputStream baos = new ByteArrayOutputStream();
@@ -240,7 +252,7 @@ public class TestAssetController extends Controller {
    * @param groupId
    * @param name
    */
-  private static void handleFileUpload(long groupId, String name) {
+  private void handleFileUpload(long groupId, String name) {
     Http.MultipartFormData body = request().body().asMultipartFormData();
 
     if (body == null)
@@ -248,8 +260,10 @@ public class TestAssetController extends Controller {
 
     File asset = null;
 
-    if (body.getFiles() != null && body.getFiles().size() > 0)
-      asset = body.getFiles().get(0).getFile();
+    List<Http.MultipartFormData.FilePart> files = body.getFiles();
+    if (files != null && files.size() > 0) {
+      asset = (File) files.get(0).getFile();
+    }
 
     new File("assets/_" + groupId).mkdirs();
     File fl = new File("assets/_" + groupId + "/" + name);

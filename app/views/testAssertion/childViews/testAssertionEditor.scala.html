@@ -1,5 +1,5 @@
-@(frm: Form[_])
 @import views.html.util._
+@(frm: Form[_])(implicit authentication: Authentication)
 
 @main(Messages("minder.navigation.restricted.testdesigner"), "mainNavigation") {
 

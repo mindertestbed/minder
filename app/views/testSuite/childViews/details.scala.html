@@ -1,8 +1,5 @@
-@(testSuite: TestSuite)
-
-
-  @import views.html.authentication._
-
+@import views.html.authentication._
+@(testSuite: TestSuite)(implicit authentication: Authentication)
 
 <script>
 

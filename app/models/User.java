@@ -1,7 +1,7 @@
 package models;
 
 import com.avaje.ebean.Model;
-import global.Util;
+import utils.Util;
 import play.data.format.Formats;
 import play.data.validation.Constraints;
 import security.Role;

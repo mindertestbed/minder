@@ -1,25 +1,28 @@
-@(targetURL:String = null)
-
 @import authentication._
+@(targetURL: String = null)(implicit authentication: Authentication)
+
 
 @loginOrActual(call: Call) = {
-  @subjectPresentOr {href='@call'} {href='#' onclick='showLoginOverlay("@call")'}
+@subjectPresentOr {href='@call'} {href='#' onclick='showLoginOverlay("@call")'}
 }
 
 @main("Minder", "index", "", targetURL) {
   <script>
-      $(function(){
+      $(function () {
         var introdiv = $("#introdiv")
-        $(window).resize(function(){
-          introdiv.css("height", parseInt(introdiv.css("width"))*1370/2928)//0.48);//0.5625)
+        $(window).resize(function () {
+          introdiv.css("height", parseInt(introdiv.css("width")) * 1370 / 2928)//0.48);//0.5625)
         });
-        introdiv.css("height", parseInt(introdiv.css("width"))* 1370/2928)//1439/2736);//0.5625)
+        introdiv.css("height", parseInt(introdiv.css("width")) * 1370 / 2928)//1439/2736);//0.5625)
       })
   </script>
-  <div id="introdiv" style="background: url( @routes.Assets.versioned("images/bogaz5.jpg") ); background-size: 100% auto; background-repeat: no-repeat ;">
+  <div id="introdiv" style="background: url( @routes.Assets.versioned("images/bogaz5.jpg") );
+    background-size: 100% auto;
+    background-repeat: no-repeat ;">
 
     <table style="height: 100% ;"><tr><td style="vertical-align: text-top ;">
-      <div class="jumbotron" style="background: transparent ; padding-top: 5px ;">
+      <div class="jumbotron" style="background: transparent ;
+        padding-top: 5px ;">
         <h1><img src="@routes.Assets.versioned("/images/minder.png")" height="100px"/>
           <br/>
           <small>
@@ -29,7 +32,8 @@
     </td></tr>
 
 
-      <tr class="hidden-xs"><td style="height: 50px ; padding:15px ;">
+      <tr class="hidden-xs"><td style="height: 50px ;
+        padding: 15px ;">
         <a class="btn btn-info" role="button" href="#features">Read more...</a>
         <a class="btn btn-success" role="button" @loginOrActual(routes.Application.testGroups())>Browse the inventory</a>
         <a class="btn btn-warning" role="button" @loginOrActual(routes.Application.adapters())>Check the adapters</a>
@@ -38,52 +42,57 @@
   </div>
 
   <div class="featurette" id="features">
-    <h1 class="page-header" style="color:#337ab7 ; text-align: center; margin:5px;margin-top:10px;">Features
+    <h1 class="page-header" style="color: #337ab7 ;
+      text-align: center;
+      margin: 5px;
+      margin-top: 10px;">Features
     </h1>
 
     <table align="center">
-      <tr><td style="padding:20px;padding-top:10px;">
+      <tr><td style="padding: 20px;
+        padding-top: 10px;">
         <div>
           <table>
             <tr>
               <td style="padding-right: 10px ;"><img src="@routes.Assets.versioned("images/unblocked-padlock.png")"/></td>
-              <td style="width:200px ;"><h3>Open Source</h3>
+              <td style="width: 200px ;"><h3>Open Source</h3>
                 Minder is an open source online control flow management application (testbed) licenced under <a href="https://joinup.ec.europa.eu/community/eupl/og_page/eupl">
                   EUPL1.1</a></td>
             </tr>
           </table>
         </div>
 
-      </td><td style="padding:20px;padding-top:10px;">
+      </td><td style="padding: 20px;
+        padding-top: 10px;">
         <div>
           <table>
             <tr>
               <td style="padding-right: 10px ;"><img src="@routes.Assets.versioned("images/sand-castle.png")"/></td>
-              <td style="width:200px ;"><h3>Stable</h3>
+              <td style="width: 200px ;"><h3>Stable</h3>
                 The Powerful Play-Scala-Java combination cooked with our teams experience provides a stable architecture that is immune to performance drawbacks.</td>
             </tr>
           </table>
         </div>
 
       </td></tr>
-      <tr><td style="padding:20px">
+      <tr><td style="padding: 20px">
         <div>
           <table>
             <tr>
               <td style="padding-right: 10px ;"><img src="@routes.Assets.versioned("images/puzzle-black-piece-shape.png")"/></td>
-              <td style="width:200px ;"><h3>Modular</h3>
+              <td style="width: 200px ;"><h3>Modular</h3>
                 The modular development framework enables arbitrarily complex inter-system communication to be handled easily</td>
             </tr>
           </table>
         </div>
 
       </td>
-        <td style="padding:20px">
+        <td style="padding: 20px">
           <div align="center">
             <table>
               <tr>
                 <td style="padding-right: 10px ;"><img src="@routes.Assets.versioned("images/bull.png")"/></td>
-                <td style="width:200px ;"><h3>Powerful</h3>
+                <td style="width: 200px ;"><h3>Powerful</h3>
                   The SCALA Based MTDL scripting capability with the help of additional maven dependency support provides an extremely powerful testing engine</td>
               </tr>
             </table>
@@ -92,23 +101,23 @@
 
       </tr>
       <tr>
-        <td style="padding:20px">
+        <td style="padding: 20px">
           <div align="center">
             <table>
               <tr>
                 <td style="padding-right: 10px ;"><img src="@routes.Assets.versioned("images/wind-mill.png")"/></td>
-                <td style="width:200px ;"><h3>Sustainable</h3>
+                <td style="width: 200px ;"><h3>Sustainable</h3>
                   An online scripting capability and open source modular Minder development framework helps create a sustainable architecture</td>
               </tr>
             </table>
           </div>
         </td>
-        <td style="padding:20px">
+        <td style="padding: 20px">
           <div>
             <table>
               <tr>
                 <td style="padding-right: 10px ;"> <img src="@routes.Assets.versioned("images/handshake.png")"/></td>
-                <td style="width:200px ;"><h3>User Friendly</h3>
+                <td style="width: 200px ;"><h3>User Friendly</h3>
                   Minder provides an easy to explore data model that is based on grouping of the inventories</td>
               </tr>
             </table>
@@ -125,15 +134,18 @@
     <div align="center">
       <table style="text-align: center">
         <tr>
-          <td style="padding-left: 15px ; padding-right: 15px ;">
+          <td style="padding-left: 15px ;
+            padding-right: 15px ;">
             <a href="https://joinup.ec.europa.eu/software/minder/home"><img class="img-square img-responsive img-center" width='100px' src="@routes.Assets.versioned("images/joinup_logo.png")" alt=""></a>
           </td>
-          <td style="padding-left: 15px ; padding-right: 15px ;">
+          <td style="padding-left: 15px ;
+            padding-right: 15px ;">
             <a href="http://www.esens.eu">
               <img class="img-square img-responsive img-center" width='100px' src="@routes.Assets.versioned("images/e-sens_logo3.jpg")" alt="">
             </a>
           </td>
-          <td style="padding-left: 15px ; padding-right: 15px ;">
+          <td style="padding-left: 15px ;
+            padding-right: 15px ;">
             <a href="https://joinup.ec.europa.eu/software/minder/home"><img class="img-square img-responsive img-center" width='100px' src="@routes.Assets.versioned("images/GitHub_Logo1.png")" alt="">
             </a>
           </td>
@@ -141,7 +153,7 @@
       </table>
     </div>
   </footer>
-  <div style="font-size:2px ;">Icons made by <a href="http://www.flaticon.com/authors/yannick" title="Yannick">Yannick</a>
+  <div style="font-size: 2px ;">Icons made by <a href="http://www.flaticon.com/authors/yannick" title="Yannick">Yannick</a>
     from <a href="http://www.flaticon.com" title="Flaticon">www.flaticon.com</a>
     is licensed by <a href="http://creativecommons.org/licenses/by/3.0/" title="Creative Commons BY 3.0" target="_blank">
       CC 3.0 BY</a>&nbsp; Icons made by <a href="http://www.freepik.com" title="Freepik">Freepik</a>

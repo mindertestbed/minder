@@ -20,13 +20,12 @@ import static play.data.Form.form;
  */
 public class SettingsController extends Controller {
 
-
   public static class SettingsModel{
     public long timeout;
   }
 
   @AllowedRoles({Role.TEST_DESIGNER})
-  public static Result updateSettings() {
+  public Result updateSettings() {
     Form<SettingsModel> form = form(SettingsModel.class).bindFromRequest();
     SettingsModel model = form.get();
     System.out.println(model.timeout);

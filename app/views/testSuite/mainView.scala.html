@@ -1,8 +1,6 @@
-@(ts: TestSuite, display: String = "details")
-@import java.util.concurrent.atomic.AtomicInteger
-@import global.Util._;
-@import views.html.util._
 @import views.html.authentication._
+@import views.html.util._
+@(ts: TestSuite, display: String = "details")(implicit authentication: Authentication)
 
 @main(Messages("minder.navigation.restricted.testdesigner"), "testGroups",
   Array(("Test Groups", controllers.routes.Application.testGroups().path()),
@@ -30,9 +28,7 @@
     </script>
 
     <div class="row">
-      <div class="col-sm-@{
-        global.Util.remaining
-      }">
+      <div class="col-sm-12">
 
         <h3>@Messages("testSuite.TestSuite")
           <div id="name@ts.id"
@@ -56,13 +52,6 @@
           <div class="ajaxContent container-fluid"></div>
 
         </div>
-      </div>
-      <div class="col-sm-@{
-        global.Util.feedWidth
-      } hidden-xs">
-        @views.html.job.jobQueueFeed()
-        <hr />
-        @views.html.job.jobHistoryFeed()
       </div>
     </div>
   </div>

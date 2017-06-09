@@ -1,6 +1,6 @@
-@(tg: TestGroup)
 @import authentication._
 @import views.html.util._
+@(tg: TestGroup)(implicit authentication: Authentication)
 
 <h4>Description</h4>
 <div id="description@{tg.id}"

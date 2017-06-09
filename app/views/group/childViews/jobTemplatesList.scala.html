@@ -1,8 +1,7 @@
-@(testGroup: TestGroup)
-
 @import java.util.concurrent.atomic.AtomicInteger
 @import views.html.util._
 @import authentication._
+@(testGroup: TestGroup)(implicit authentication: Authentication)
 
 <script>
         $(function() {

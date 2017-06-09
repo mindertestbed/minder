@@ -1,39 +1,45 @@
 @import minderengine.Visibility
+@import views.html.authentication._
+@(visibility: Visibility, owner: User, renderName: Boolean = false, renderEditLink: Boolean = false)(implicit authentication: Authentication)
 
-
-@(visibility: Visibility, owner: User, renderName: Boolean = false, renderEditLink: Boolean = false)
-<span
-  @visibility match {
+@visibilityClass = @{
+  visibility match {
     case Visibility.PUBLIC => {
-      class="fa fa-globe"
+      "fa fa-globe"
     }
     case Visibility.PRIVATE => {
-      class="fa fa-lock"
+      "fa fa-lock"
     }
     case Visibility.PROTECTED => {
-      class="fa fa-group"
+      "fa fa-group"
+    }
+    case _ => "fa fa-globe"
+  }
+}
+
+@visibilityColor = @{
+  visibility match {
+    case Visibility.PUBLIC => {
+      "#1fc36d"
+    }
+    case Visibility.PRIVATE => {
+      "red"
+    }
+    case Visibility.PROTECTED => {
+      "#7cd8ff"
     }
   }
+}
 
-    title="@visibility" style="color: @visibility match {
-    case Visibility.PUBLIC => {
-      #1fc36d
-    }
-    case Visibility.PRIVATE => {
-      red
-    }
-    case Visibility.PROTECTED => {
-      #7cd8ff
-    }
-  }"
-  ></span>
+<span class="@visibilityClass" title="@visibility" style="color: @visibilityColor"> </span>
 
 @if(renderName) {
   @visibility
 }
 
-@authentication.subjectIs(owner) {
+@subjectIs(owner) {
   @if(renderEditLink) {
-    &nbsp;<a href="#" style="text-decoration: none" onclick='changeTestRunVisibility()' class="fa fa-edit"></a>
+      &nbsp;
+    <a href="#" style="text-decoration: none" onclick='changeTestRunVisibility()' class="fa fa-edit"></a>
   }
 }

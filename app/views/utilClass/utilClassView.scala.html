@@ -1,100 +1,100 @@
-@(utilClass: UtilClass)
-  @import views.html.util._
-  @import authentication._
+@import views.html.util._
+@import authentication._
+@(utilClass: UtilClass)(implicit authentication: Authentication)
 
-  @main(Messages("minder.navigation.restricted.testdesigner"), "mainNavigation",
-    Array(("Test Groups", controllers.routes.Application.testGroups().path()),
-      (utilClass.testGroup.name, controllers.routes.GroupController.getGroupDetailView(utilClass.testGroup.id, "utils").path()),
-      (utilClass.name, ""))) {
-    <div class="padabit">
-      @dialogs()
-      <head>
-        <style>      #editor {
+@main(Messages("minder.navigation.restricted.testdesigner"), "mainNavigation",
+  Array(("Test Groups", controllers.routes.Application.testGroups().path()),
+    (utilClass.testGroup.name, controllers.routes.GroupController.getGroupDetailView(utilClass.testGroup.id, "utils").path()),
+    (utilClass.name, ""))) {
+  <div class="padabit">
+    @dialogs()
+    <head>
+      <style>      #editor {
         position: relative ;
         top: 10px ;
         right: 0 ;
         bottom: 0 ;
         left: 0px ;
-        height:350px ;
-        }
+        height: 350px ;
+      }
 
 
-        </style>
-      </head>
-      <h3>Util Class
-        <div id="name@{
-          utilClass.id
-        }"
-          @subjectIs(utilClass.owner) {
-            onclick='showUpdateInputTextDialog(@utilClass.id, "name", $(this).next(), "/doEditUtilClassField")'
-          }
-        class="hl editable"></div>
-        <input type="hidden" value="@utilClass.name"/>
-      </h3>
-
-      <h4>Short Description</h4>
-      <div id="shortDescription@{
+      </style>
+    </head>
+    <h3>Util Class
+      <div id="name@{
         utilClass.id
       }"
-
         @subjectIs(utilClass.owner) {
-          onclick='showUpdateInputTextDialog(@utilClass.id, "shortDescription", $(this).next(), "/doEditUtilClassField")'
+          onclick='showUpdateInputTextDialog(@utilClass.id, "name", $(this).next(), "/doEditUtilClassField")'
         }
-      class="editable"></div>
+      class="hl editable"></div>
+      <input type="hidden" value="@utilClass.name"/>
+    </h3>
 
-      <input type="hidden" value="@utilClass.shortDescription"/>
-      <br />
+    <h4>Short Description</h4>
+    <div id="shortDescription@{
+      utilClass.id
+    }"
 
-      <h4>Code</h4>
+      @subjectIs(utilClass.owner) {
+        onclick='showUpdateInputTextDialog(@utilClass.id, "shortDescription", $(this).next(), "/doEditUtilClassField")'
+      }
+    class="editable"></div>
 
-      <div>
-        @subjectIs(utilClass.owner) {
-          <button class="btn btn-primary btn-sm" onclick='window.location="/getEditUtilClassEditorView?id=@{utilClass.id}"' >&nbsp;&nbsp;&nbsp;Edit&nbsp;&nbsp;&nbsp;</button>
-        }
-        Theme: <select id="select">
-        <option>chrome</option>
-        <option>eclipse</option>
-        <option>monokai</option>
-        <option>sqlserver</option>
-        <option selected>clouds</option>
-        <option>textmate</option>
-        <option>xcode</option>
-      </select>
-      </div>
-      <div id="editor-container">
-        <pre id="editor">@utilClass.source</pre>
-      </div>
-      <script type="text/javascript" src="@routes.Assets.versioned("javascripts/ace/ace.js")"></script>
-      <script>
+    <input type="hidden" value="@utilClass.shortDescription"/>
+    <br />
 
+    <h4>Code</h4>
 
-          var editor = ace.edit("editor");
-          editor.setTheme("ace/theme/clouds");
-          editor.getSession().setMode("ace/mode/scala");
-          editor.setReadOnly(true);
-          editor.setOptions({
-            maxLines: 50
-          });
-
-
-          $("#select").change(function () {
-            $("#select option:selected").each(function () {
-              var theme = "ace/theme/".concat($(this).text()) ;
-              editor.setTheme(theme);
-            });
-          });
-      </script>
-
-      <br />
-
-      <script>
-          $(function(){
-            bindValues($("#name@{utilClass.id}"))
-            bindValues($("#shortDescription@{utilClass.id}"))
-          })
-      </script>
+    <div>
+      @subjectIs(utilClass.owner) {
+        <button class="btn btn-primary btn-sm" onclick='window.location = "/getEditUtilClassEditorView?id=@{utilClass.id}"' >&nbsp;&nbsp;&nbsp;Edit&nbsp;&nbsp;&nbsp;</button>
+      }
+      Theme: <select id="select">
+      <option>chrome</option>
+      <option>eclipse</option>
+      <option>monokai</option>
+      <option>sqlserver</option>
+      <option selected>clouds</option>
+      <option>textmate</option>
+      <option>xcode</option>
+    </select>
     </div>
-  }
+    <div id="editor-container">
+      <pre id="editor">@utilClass.source</pre>
+    </div>
+    <script type="text/javascript" src="@routes.Assets.versioned("javascripts/ace/ace.js")"></script>
+    <script>
+
+
+        var editor = ace.edit("editor");
+        editor.setTheme("ace/theme/clouds");
+        editor.getSession().setMode("ace/mode/scala");
+        editor.setReadOnly(true);
+        editor.setOptions({
+          maxLines: 50
+        });
+
+
+        $("#select").change(function () {
+          $("#select option:selected").each(function () {
+            var theme = "ace/theme/".concat($(this).text()) ;
+            editor.setTheme(theme);
+          });
+        });
+    </script>
+
+    <br />
+
+    <script>
+        $(function () {
+          bindValues($("#name@{utilClass.id}"))
+          bindValues($("#shortDescription@{utilClass.id}"))
+        })
+    </script>
+  </div>
+}
 
 
 

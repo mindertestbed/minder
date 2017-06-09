@@ -2,13 +2,13 @@ package minderengine;
 
 import controllers.TestQueueController;
 import controllers.TestRunContext;
-import global.Util;
+import utils.Util;
 import models.*;
 import models.Wrapper;
 import play.Logger;
 
-import java.io.ByteArrayInputStream;
-import java.io.ObjectInputStream;
+import javax.inject.Inject;
+import javax.inject.Singleton;
 import java.util.Set;
 
 /**
@@ -16,7 +16,11 @@ import java.util.Set;
  * respond to Xoola remote requests.
  * Created by yerlibilgin on 02/12/14.
  */
+@Singleton
 public class MinderServer implements IMinderServer {
+
+  @Inject
+  TestQueueController testQueueController;
 
   /**
    * The client calls this method after a sucessfull handshake.
@@ -69,7 +73,7 @@ public class MinderServer implements IMinderServer {
 
       Visibility vis = (Visibility) Util.readObject(((SignalCallData) signalData).args[1], null);
       System.out.println(vis);
-      TestSession session = TestQueueController.enqueueJobWithUser(jobId, wrapper.user, null, vis);
+      TestSession session = testQueueController.enqueueJobWithUser(jobId, wrapper.user, null, vis);
       MinderSignalRegistry.get().initTestSession(session);
       return session;
     } else if (MinderSignalRegistry.get().hasSession(testSession)) {
@@ -77,7 +81,7 @@ public class MinderServer implements IMinderServer {
       //check if the test is suspended and enqueue it properly into the queue.
       if (ContextContainer.get().contains(testSession)) {
         TestRunContext testRunContext = ContextContainer.get().findAndPurge(testSession);
-        TestQueueController.enqueueTestRunContext(testRunContext);
+        testQueueController.enqueueTestRunContext(testRunContext);
       }
       return null;
     } else {

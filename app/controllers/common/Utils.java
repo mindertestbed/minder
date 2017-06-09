@@ -5,7 +5,7 @@ import com.avaje.ebean.Query;
 import com.avaje.ebean.Update;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import global.Util;
+import utils.Util;
 import models.User;
 import play.libs.Json;
 import play.mvc.Controller;

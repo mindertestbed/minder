@@ -4,10 +4,11 @@ import java.io.ByteArrayInputStream
 import java.lang.reflect.InvocationTargetException
 import java.util
 import java.util.Properties
+import javax.inject.{Inject, Provider, Singleton}
 
 import com.gitb.core.v1.StepStatus
 import controllers.{TestQueueController, TestRunContext}
-import global.Util
+import utils.Util
 import models._
 import mtdl._
 import org.apache.log4j.spi.LoggingEvent
@@ -19,12 +20,9 @@ import scala.collection.mutable;
 /**
   * Created by yerlibilgin on 07/12/14.
   */
-object TestEngine {
-  def describe(clsMinderTDL: Class[MinderTdl]): util.List[Rivet] = {
-    val minderTDL = clsMinderTDL.getConstructors()(0).newInstance(java.lang.Boolean.FALSE).asInstanceOf[MinderTdl]
-    minderTDL.RivetDefs
-  }
-
+@Singleton
+class TestEngine @Inject()(implicit testQueueController: Provider[TestQueueController],
+                           xoolaServer: Provider[XoolaServer]) {
   var minderTDL: MinderTdl = null
   var suspendedTestsMap = new mutable.HashMap[String, TestRunContext]();
 
@@ -83,7 +81,7 @@ object TestEngine {
     }
 
     def notify(log: String, stepStatus: StepStatus, rivet: Rivet): Unit = {
-      TestQueueController.gitbLogFeedUpdate(log, stepStatus, rivet.tplStepId)
+      testQueueController.get().gitbLogFeedUpdate(log, stepStatus, rivet.tplStepId)
     }
   }
 
@@ -336,9 +334,13 @@ object TestEngine {
           //make sure that we call finish test for all
           val finishTestObject: FinishTestObject = new FinishTestObject
           finishTestObject.setSession(session)
-          identifierMinderClientMap.values().foreach(pair => {
-            pair.minderClient.finishTest(finishTestObject)
-          })
+          try {
+            identifierMinderClientMap.values().foreach(pair => {
+              pair.minderClient.finishTest(finishTestObject)
+            })
+          } catch {
+            case th: Throwable =>
+          }
         }
       }
     }
@@ -346,64 +348,6 @@ object TestEngine {
       lgr.removeAppender(app)
     }
   }
-
-  /**
-    * Evaluates the whole test case without running it and creates a list of wrappers and their signals-slots.
-    *
-    * @param tdl
-    * @return
-    */
-  def describeTdl(tdl: Tdl): util.LinkedHashMap[String, util.Set[WrapperFunction]] = {
-    val testCase = tdl.testCase;
-    testCase.testAssertion = TestAssertion.findById(testCase.testAssertion.id)
-    testCase.testAssertion.testGroup = TestGroup.findById(testCase.testAssertion.testGroup.id)
-    val root = "_" + testCase.testAssertion.testGroup.id;
-    val packagePath = root + "/_" + testCase.id;
-    val minderClass = TdlCompiler.compileTdl(root, packagePath, testCase.testAssertion.testGroup.dependencyString, testCase.name, source = tdl.tdl, version = tdl.version);
-
-    val minderTdl = try {
-      minderClass.getConstructors()(0).newInstance(java.lang.Boolean.FALSE).asInstanceOf[MinderTdl]
-    } catch {
-      case ex: InvocationTargetException => {
-        var cause: Throwable = ex
-        while (cause.getCause != null) cause = cause.getCause
-        throw cause
-      }
-    }
-
-    val slotDefs = minderTdl.RivetDefs
-
-    val hm: util.LinkedHashMap[String, util.Set[WrapperFunction]] = new util.LinkedHashMap()
-    val map: collection.mutable.LinkedHashMap[String, util.Set[WrapperFunction]] = collection.mutable.LinkedHashMap()
-
-    for (r <- slotDefs) {
-      //check the slot
-      val wrapperName = r.wrapperFunction.wrapperId
-      val slotSignature = r.wrapperFunction.signature
-
-      var set = map.getOrElseUpdate(wrapperName, new util.HashSet[WrapperFunction]())
-      set.add(new WrapperFunction(wrapperId = wrapperName, signature = slotSignature))
-      println(wrapperName + "::" + slotSignature)
-
-      for (e@(k@(wn, ws), v) <- r.signalPipeMap) {
-        println(wn + "::" + ws)
-        set = map.getOrElseUpdate(wn, new util.HashSet[WrapperFunction]())
-        set.add(new WrapperFunction(wn, ws))
-      }
-    }
-
-    for ((k, v) <- map) {
-      println("---------")
-      println(k)
-      for (ss <- v) {
-        println("\t" + ss.signature)
-      }
-      hm.put(k, v)
-    }
-
-    hm
-  }
-
 
   private def initializeFunctionsAndParameters(params: String, lgr: org.apache.log4j.Logger): Unit = {
     lgr.debug("Parameters")
@@ -469,7 +413,7 @@ object TestEngine {
         val client = if (BuiltInWrapperRegistry.get().contains(transitiveAdapterIdentifier)) {
           BuiltInWrapperRegistry.get().getWrapper(transitiveAdapterIdentifier)
         } else {
-          XoolaServer.get().getClient(transitiveAdapterIdentifier);
+          xoolaServer.get().getClient(transitiveAdapterIdentifier);
         }
         identifierMinderClientMap.put(adapterIdentifier, IdentifierClientPair(transitiveAdapterIdentifier, client))
       } else {
@@ -495,7 +439,7 @@ object TestEngine {
         val client = if (BuiltInWrapperRegistry.get().contains(transitiveAdapterIdentifier)) {
           BuiltInWrapperRegistry.get().getWrapper(transitiveAdapterIdentifier)
         } else {
-          XoolaServer.get().getClient(transitiveAdapterIdentifier);
+          xoolaServer.get().getClient(transitiveAdapterIdentifier);
         }
         identifierMinderClientMap.put(adapterIdentifier, IdentifierClientPair(transitiveAdapterIdentifier, client))
       }
@@ -512,5 +456,66 @@ object TestEngine {
 
 }
 
+object TestEngine {
+  def describe(clsMinderTDL: Class[MinderTdl]): util.List[Rivet] = {
+    val minderTDL = clsMinderTDL.getConstructors()(0).newInstance(java.lang.Boolean.FALSE).asInstanceOf[MinderTdl]
+    minderTDL.RivetDefs
+  }
 
+  /**
+    * Evaluates the whole test case without running it and creates a list of wrappers and their signals-slots.
+    *
+    * @param tdl
+    * @return
+    */
+  def describeTdl(tdl: Tdl): util.LinkedHashMap[String, util.Set[WrapperFunction]] = {
+    val testCase = tdl.testCase;
+    testCase.testAssertion = TestAssertion.findById(testCase.testAssertion.id)
+    testCase.testAssertion.testGroup = TestGroup.findById(testCase.testAssertion.testGroup.id)
+    val root = "_" + testCase.testAssertion.testGroup.id;
+    val packagePath = root + "/_" + testCase.id;
+    val minderClass = TdlCompiler.compileTdl(root, packagePath, testCase.testAssertion.testGroup.dependencyString, testCase.name, source = tdl.tdl, version = tdl.version);
 
+    val minderTdl = try {
+      minderClass.getConstructors()(0).newInstance(java.lang.Boolean.FALSE).asInstanceOf[MinderTdl]
+    } catch {
+      case ex: InvocationTargetException => {
+        var cause: Throwable = ex
+        while (cause.getCause != null) cause = cause.getCause
+        throw cause
+      }
+    }
+
+    val slotDefs = minderTdl.RivetDefs
+
+    val hm: util.LinkedHashMap[String, util.Set[WrapperFunction]] = new util.LinkedHashMap()
+    val map: collection.mutable.LinkedHashMap[String, util.Set[WrapperFunction]] = collection.mutable.LinkedHashMap()
+
+    for (r <- slotDefs) {
+      //check the slot
+      val wrapperName = r.wrapperFunction.wrapperId
+      val slotSignature = r.wrapperFunction.signature
+
+      var set = map.getOrElseUpdate(wrapperName, new util.HashSet[WrapperFunction]())
+      set.add(new WrapperFunction(wrapperId = wrapperName, signature = slotSignature))
+      println(wrapperName + "::" + slotSignature)
+
+      for (e@(k@(wn, ws), v) <- r.signalPipeMap) {
+        println(wn + "::" + ws)
+        set = map.getOrElseUpdate(wn, new util.HashSet[WrapperFunction]())
+        set.add(new WrapperFunction(wn, ws))
+      }
+    }
+
+    for ((k, v) <- map) {
+      println("---------")
+      println(k)
+      for (ss <- v) {
+        println("\t" + ss.signature)
+      }
+      hm.put(k, v)
+    }
+
+    hm
+  }
+}

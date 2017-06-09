@@ -1,6 +1,6 @@
 @(role: security.Role)(content1: => Html)(content2: => Html)
 
-@defining(Authentication.getLocalUser) { user =>
+@defining(Authentication.getLocalUser(session())) { user =>
   @if(user == null) {
     @content2
   } else {

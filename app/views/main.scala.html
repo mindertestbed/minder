@@ -1,7 +1,6 @@
 @import authentication._
 @import util._
-
-@(title: String, nav: String = "", navObject: Object = null, targetURL:String = null)(content: Html)
+@(title: String, nav: String = "", navObject: Object = null, targetURL:String = null)(content: Html)(implicit authentication: Authentication)
 
 
 <!DOCTYPE html>
@@ -87,7 +86,7 @@
               Test Monitor</a></li>
             <li class="@("active".when(nav == "about"))"><a href='@routes.Application.about()'>About</a></li>
 
-            @defining(Authentication.getLocalUser()) { user =>
+            @defining(authentication.getLocalUser()) { user =>
               @if(user != null && user.email == "root@minder") {
                 <li class="@("active".when(nav == "root"))"><a href="@routes.Application.root()">@Messages("authenticate.root")</a></li>
               }
@@ -96,7 +95,7 @@
 
           @subjectPresentOr {
             <ul class="nav navbar-nav navbar-right">
-            @defining(Authentication.getLocalUser()) { user =>
+            @defining(authentication.getLocalUser()) { user =>
               <li class="dropdown">
                 <a href="#" class="dropdown-toggle" data-toggle="dropdown">
                   <i class="glyphicon glyphicon-user"></i>@user.name <span class="caret"></span></a>

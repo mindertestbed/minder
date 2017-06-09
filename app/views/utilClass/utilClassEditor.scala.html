@@ -1,7 +1,6 @@
-@(frm: Form[_], editMode: Boolean = true)
-
 @import helper._
 @import views.html.util._
+@(frm: Form[_], editMode: Boolean = true)(implicit authentication: Authentication)
 
 
 @implicitFieldConstructor = @{
@@ -44,7 +43,6 @@
             $("#editor").data('AceInstance', editor);
 
             var content = $("#tdl");
-
 
             editor.getSession().on("change", function() {
               content.val(editor.getSession().getValue());
@@ -136,7 +134,7 @@
             @if(frm.hasErrors) {
               @for(error <- frm.errors) {
                 @for(err <- error._2) {
-                  @Html(global.Util.fixLineNumbers(Messages(err.message), 9).replaceAll("\n", "<br/>"))
+                  @Html(utils.Util.fixLineNumbers(Messages(err.message), 9).replaceAll("\n", "<br/>"))
                 }
               }
             }

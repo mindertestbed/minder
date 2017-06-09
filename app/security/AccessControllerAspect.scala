@@ -1,21 +1,22 @@
 package security
 
-import controllers.{routes, Authentication}
+import controllers.{Authentication, routes}
 import org.aspectj.lang.ProceedingJoinPoint
 import org.aspectj.lang.annotation.{Around, Aspect}
 import org.aspectj.lang.reflect.MethodSignature
+import play.api.Logger
+import play.mvc.Controller
 
 @Aspect
-class AccessControllerAspect {
+class AccessControllerAspect extends Controller {
   @Around("execution(@security.AllowedRoles * *.*(..))")
   def accessControl(pjp: ProceedingJoinPoint): Object = {
-    val myClass: Class[_] = pjp.getStaticPart().getSignature().getDeclaringType();
 
     try {
-      val user = Authentication.getLocalUser
+      val user = Authentication.getLocalUser(play.mvc.Http.Context.current().session())
       if (user == null) {
-        println(Authentication.getRequestURI)
-        play.mvc.Results.redirect(routes.Authentication.loginToTargetURL(Authentication.getRequestURI));
+        Logger.debug(s"LOGIN FAIL redirect ${play.mvc.Http.Context.current().request().uri()})")
+        play.mvc.Results.redirect(routes.Authentication.loginToTargetURL(play.mvc.Http.Context.current().request().uri()));
       } else {
         val signature = pjp.getSignature.asInstanceOf[MethodSignature]
         val allowedRoles = signature.getMethod.getAnnotation(classOf[AllowedRoles]).value()
@@ -37,13 +38,14 @@ class AccessControllerAspect {
 
   @Around("execution(@security.RestrictTOUser * *.*(..))")
   def restrictToUser(pjp: ProceedingJoinPoint): Object = {
-    val myClass: Class[_] = pjp.getStaticPart().getSignature().getDeclaringType();
+    val field = pjp.getTarget.getClass.getDeclaredField("authentication");
+    val authentication = field.get(pjp.getTarget).asInstanceOf[Authentication];
 
     try {
-      val user = Authentication.getLocalUser
+      val user = Authentication.getLocalUser(play.mvc.Http.Context.current().session())
       if (user == null) {
-        println(Authentication.getRequestURI)
-        play.mvc.Results.redirect(routes.Authentication.loginToTargetURL(Authentication.getRequestURI));
+        Logger.debug(s"LOGIN FAIL redirect ${play.mvc.Http.Context.current().request().uri()})")
+        play.mvc.Results.redirect(routes.Authentication.loginToTargetURL(play.mvc.Http.Context.current().request().uri()));
       } else {
         val signature = pjp.getSignature.asInstanceOf[MethodSignature]
         val restrictTo = signature.getMethod.getAnnotation(classOf[RestrictTOUser]).value()

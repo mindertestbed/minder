@@ -1,21 +1,23 @@
 package controllers
 
+import javax.inject.{Inject, Singleton}
+
 import models.TestRun
 import play.api.libs.EventSource
 import play.api.libs.concurrent.Execution.Implicits._
 import play.api.libs.iteratee.{Concurrent, Enumeratee}
 import play.api.libs.json._
 import play.api.mvc._
-
 import scala.collection.JavaConversions._
 
-object TestRunFeeder extends Controller {
+@Singleton
+class TestRunFeeder @Inject()(implicit testQueueController: TestQueueController) extends Controller  {
   val (jobQueueOut, jobQueueChannel) = Concurrent.broadcast[String];
   val (testStatusOut, testProgressChannel) = Concurrent.broadcast[String];
   val (jobHistoryOut, jobHistoryChannel) = Concurrent.broadcast[TestRun];
 
   def historyFilter(user: models.User) = Enumeratee.filter[TestRun] {
-    testRun: TestRun => global.Util.canAccess(user, testRun.runner, testRun.visibility)
+    testRun: TestRun => utils.Util.canAccess(user, testRun.runner, testRun.visibility)
   }
 
   def historyJsonRenderer(): Enumeratee[TestRun, String] = Enumeratee.map[TestRun] {
@@ -36,11 +38,11 @@ object TestRunFeeder extends Controller {
   def queueRenderer(user: models.User): Enumeratee[String, String] = Enumeratee.map[String] {
     dummy => {
       println("Before render")
-      TestQueueController.jobQueue.synchronized {
-        val queue = TestQueueController.jobQueue
+      testQueueController.jobQueue.synchronized {
+        val queue = testQueueController.jobQueue
 
         println("Render job que")
-        if (queue.isEmpty && TestQueueController.activeRunContext == null)
+        if (queue.isEmpty && testQueueController.activeRunContext == null)
           ""
         else {
           val sb = new StringBuilder
@@ -49,8 +51,8 @@ object TestRunFeeder extends Controller {
           sb.append("[")
 
           //if we have an active run context, send it with an -1 index.
-          if (TestQueueController.activeRunContext != null) {
-            val cotx = TestQueueController.activeRunContext
+          if (testQueueController.activeRunContext != null) {
+            val cotx = testQueueController.activeRunContext
             sb.append("{\"jobId\":\"").append(cotx.testRun.job.id).append("\",").
               append("\"jobName\":\"").append(cotx.testRun.job.name).append("\",").
               append("\"email\":\"").append(cotx.testRun.runner.email).append("\",").

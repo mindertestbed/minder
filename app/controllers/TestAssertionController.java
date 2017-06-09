@@ -3,32 +3,42 @@ package controllers;
 import com.fasterxml.jackson.databind.JsonNode;
 import controllers.common.Utils;
 import editormodels.AssertionEditorModel;
-import global.Util;
+import utils.Util;
 import models.PrescriptionLevel;
 import models.TestAssertion;
 import models.TestGroup;
 import play.Logger;
 import play.data.Form;
+import play.data.FormFactory;
 import play.mvc.Controller;
 import play.mvc.Result;
 import security.AllowedRoles;
 import security.Role;
-import views.html.testAssertion.childViews.*;
+import views.html.testAssertion.childViews.testAssertionCaseLister;
+import views.html.testAssertion.childViews.testAssertionDetailView;
+import views.html.testAssertion.childViews.testAssertionEditor;
 import views.html.testAssertion.mainView;
 
-import static play.data.Form.form;
+import javax.inject.Inject;
 
 /**
  * Created by yerlibilgin on 03/05/15.
  */
 public class TestAssertionController extends Controller {
-  public static final Form<AssertionEditorModel> TEST_ASSERTION_FORM = form(AssertionEditorModel.class);
+  Authentication authentication;
+  public final Form<AssertionEditorModel> TEST_ASSERTION_FORM;
+
+  @Inject
+  public TestAssertionController(FormFactory formFactory, Authentication authentication) {
+    this.authentication = authentication;
+    TEST_ASSERTION_FORM = formFactory.form(AssertionEditorModel.class);
+  }
 
   /*
-   * Test Asertion CRUD
-   */
+     * Test Asertion CRUD
+     */
   @AllowedRoles(Role.TEST_DESIGNER)
-  public static Result getCreateAssertionEditorView(Long groupId) {
+  public Result getCreateAssertionEditorView(Long groupId) {
     TestGroup tg = TestGroup.findById(groupId);
     if (tg == null) {
       return badRequest("Test group with id [" + groupId + "] not found!");
@@ -37,18 +47,18 @@ public class TestAssertionController extends Controller {
       testAssertionEditorModel.groupId = groupId;
       Form<AssertionEditorModel> bind = TEST_ASSERTION_FORM
           .fill(testAssertionEditorModel);
-      return ok(testAssertionEditor.render(bind));
+      return ok(testAssertionEditor.render(bind, authentication));
     }
   }
 
   @AllowedRoles(Role.TEST_DESIGNER)
-  public static Result doCreateAssertion() {
+  public Result doCreateAssertion() {
     final Form<AssertionEditorModel> filledForm = TEST_ASSERTION_FORM
         .bindFromRequest();
 
     if (filledForm.hasErrors()) {
       Util.printFormErrors(filledForm);
-      return badRequest(testAssertionEditor.render(filledForm));
+      return badRequest(testAssertionEditor.render(filledForm, authentication));
     } else {
       AssertionEditorModel model = filledForm.get();
 
@@ -56,14 +66,14 @@ public class TestAssertionController extends Controller {
       if (ta != null) {
         filledForm.reject("The test assertion with ID [" + ta.taId
             + "] already exists");
-        return badRequest(testAssertionEditor.render(filledForm));
+        return badRequest(testAssertionEditor.render(filledForm, authentication));
       }
 
       TestGroup tg = TestGroup.findById(model.groupId);
 
       if (tg == null) {
         filledForm.reject("No group found with id [" + tg.id + "]");
-        return badRequest(testAssertionEditor.render(filledForm));
+        return badRequest(testAssertionEditor.render(filledForm, authentication));
       }
 
       ta = new TestAssertion();
@@ -79,7 +89,7 @@ public class TestAssertionController extends Controller {
       ta.testGroup = tg;
       ta.prescriptionLevel = PrescriptionLevel
           .valueOf(model.prescriptionLevel);
-      ta.owner = Authentication.getLocalUser();
+      ta.owner = authentication.getLocalUser();
 
       ta.save();
 
@@ -92,14 +102,14 @@ public class TestAssertionController extends Controller {
   }
 
   @AllowedRoles(Role.TEST_DESIGNER)
-  public static Result editAssertionForm(Long id) {
+  public Result editAssertionForm(Long id) {
     TestAssertion ta = TestAssertion.findById(id);
     if (ta == null) {
       return badRequest("Test assertion with id [" + id + "] not found!");
 
     }
 
-    if (!Util.canAccess(Authentication.getLocalUser(), ta.owner))
+    if (!Util.canAccess(authentication.getLocalUser(), ta.owner))
       return badRequest("You don't have permission to modify this resource");
 
     AssertionEditorModel taModel = new AssertionEditorModel();
@@ -118,17 +128,17 @@ public class TestAssertionController extends Controller {
 
     Form<AssertionEditorModel> bind = TEST_ASSERTION_FORM
         .fill(taModel);
-    return ok(testAssertionEditor.render(bind));
+    return ok(testAssertionEditor.render(bind, authentication));
   }
 
   @AllowedRoles(Role.TEST_DESIGNER)
-  public static Result doEditAssertion() {
+  public Result doEditAssertion() {
     final Form<AssertionEditorModel> filledForm = TEST_ASSERTION_FORM
         .bindFromRequest();
 
     if (filledForm.hasErrors()) {
       Util.printFormErrors(filledForm);
-      return badRequest(testAssertionEditor.render(filledForm));
+      return badRequest(testAssertionEditor.render(filledForm, authentication));
     } else {
       AssertionEditorModel model = filledForm.get();
 
@@ -136,10 +146,10 @@ public class TestAssertionController extends Controller {
       if (ta == null) {
         filledForm.reject("The test assertion with ID [" + model.id
             + "] does not exist");
-        return badRequest(testAssertionEditor.render(filledForm));
+        return badRequest(testAssertionEditor.render(filledForm, authentication));
       }
 
-      if (!Util.canAccess(Authentication.getLocalUser(), ta.owner))
+      if (!Util.canAccess(authentication.getLocalUser(), ta.owner))
         return badRequest("You don't have permission to modify this resource");
 
       ta.taId = model.taId;
@@ -166,14 +176,14 @@ public class TestAssertionController extends Controller {
       } else {
         filledForm.reject("The ID [" + model.taId
             + "] is used by another test assertion");
-        return badRequest(testAssertionEditor.render(filledForm));
+        return badRequest(testAssertionEditor.render(filledForm, authentication));
       }
 
     }
   }
 
   @AllowedRoles(Role.TEST_DESIGNER)
-  public static Result doDeleteAssertion(Long id) {
+  public Result doDeleteAssertion(Long id) {
     TestAssertion ta = TestAssertion.findById(id);
     if (ta == null) {
       // it does not exist. error
@@ -181,7 +191,7 @@ public class TestAssertionController extends Controller {
           + " does not exist.");
     }
 
-    if (!Util.canAccess(Authentication.getLocalUser(), ta.owner))
+    if (!Util.canAccess(authentication.getLocalUser(), ta.owner))
       return badRequest("You don't have permission to modify this resource");
 
     try {
@@ -195,37 +205,37 @@ public class TestAssertionController extends Controller {
   }
 
   @AllowedRoles(Role.TEST_DESIGNER)
-  public static Result getAssertionDetailView(Long id, String display) {
+  public Result getAssertionDetailView(Long id, String display) {
     TestAssertion ta = TestAssertion.findById(id);
     if (ta == null) {
       return badRequest("No test assertion with id " + id + ".");
     }
-    return ok(mainView.render(ta, display));
+    return ok(mainView.render(ta, display, authentication));
   }
 
 
   @AllowedRoles(Role.TEST_DESIGNER)
-  public static Result doEditAssertionField() {
+  public Result doEditAssertionField() {
     JsonNode jsonNode = request().body().asJson();
 
-    return Utils.doEditField(AssertionEditorModel.class, TestAssertion.class, jsonNode, Authentication.getLocalUser());
+    return Utils.doEditField(AssertionEditorModel.class, TestAssertion.class, jsonNode, authentication.getLocalUser());
   }
 
 
   @AllowedRoles({Role.TEST_DESIGNER, Role.TEST_OBSERVER})
-  public static Result renderDetails(Long id) {
+  public Result renderDetails(Long id) {
     TestAssertion ta = TestAssertion.findById(id);
     if (ta == null) {
       return badRequest("No test assertion with id " + id + ".");
     }
-    return ok(testAssertionDetailView.render(ta));
+    return ok(testAssertionDetailView.render(ta, authentication));
   }
 
-  public static Result renderTestCases(long id) {
+  public Result renderTestCases(long id) {
     TestAssertion ta = TestAssertion.findById(id);
     if (ta == null) {
       return badRequest("No test assertion with id " + id + ".");
     }
-    return ok(testAssertionCaseLister.render(ta));
+    return ok(testAssertionCaseLister.render(ta, authentication));
   }
 }
