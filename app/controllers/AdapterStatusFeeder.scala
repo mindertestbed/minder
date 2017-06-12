@@ -5,12 +5,14 @@ import java.util.{Observable, Observer}
 import javax.inject.Inject
 
 import akka.actor.ActorSystem
+import akka.stream.scaladsl.Source
 import minderengine.MinderWrapperRegistry
 import models.{Job, TestRun, WrapperVersion}
 import play.api.libs.EventSource
 import play.api.libs.concurrent.Execution.Implicits._
 import play.api.libs.iteratee.{Concurrent, Enumeratee}
 import play.api.libs.json._
+import play.api.libs.streams.Streams
 import play.api.mvc._
 
 import scala.collection.JavaConversions._
@@ -86,7 +88,8 @@ class AdapterStatusFeeder @Inject()() extends Controller {
       labelMap.put(mw.wrapperVersion.id + "", mw.wrapperVersion);
     })
     threadPool.submit(new AdapterStatusRunnable(labelMap))
-    Ok.chunked(wsOut &> filterWS(labelMap) &> EventSource()).as("text/event-stream")
+    val source = Source.fromPublisher(Streams.enumeratorToPublisher(wsOut &> filterWS(labelMap)));
+    Ok.chunked(source via EventSource.flow).as("text/event-stream")
   }
 
 
@@ -115,6 +118,8 @@ class AdapterStatusFeeder @Inject()() extends Controller {
         }
       }
     }
-    Ok.chunked(adapterStatusOut &> filterAdapterId(id) &> renderAdapterStatus() &> EventSource()).as("text/event-stream")
+
+    val source = Source.fromPublisher(Streams.enumeratorToPublisher(adapterStatusOut &> filterAdapterId(id) &> renderAdapterStatus()));
+    Ok.chunked(source via EventSource.flow).as("text/event-stream")
   }
 }

@@ -8,7 +8,6 @@ GET         /root                                       controllers.Application.
 GET         /listTestGroups                             controllers.Application.testGroups()
 GET         /jobQueue                                   controllers.Application.jobQueue()
 GET         /adapters                                   controllers.Application.adapters()
-GET         /profile                                    controllers.Application.profile
 GET         /about                                      controllers.Application.about()
 
 #JSRoutes

@@ -1,6 +1,10 @@
 package controllers;
 
+import models.ModelConstants;
 import models.User;
+import play.data.Form;
+import play.data.FormFactory;
+import play.data.validation.Constraints;
 import play.mvc.Controller;
 import play.mvc.Result;
 import security.AllowedRoles;
@@ -14,9 +18,8 @@ public class Application extends Controller {
   Authentication authentication;
   TestLogFeeder testLogFeeder;
 
-
   @Inject
-  public Application(Authentication authentication, TestLogFeeder testLogFeeder) {
+  public Application(Authentication authentication, TestLogFeeder testLogFeeder, FormFactory formFactory) {
     this.authentication = authentication;
     this.testLogFeeder = testLogFeeder;
   }
@@ -45,8 +48,6 @@ public class Application extends Controller {
 
   @AllowedRoles({Role.TEST_DESIGNER, Role.TEST_OBSERVER})
   public Result testGroups() {
-    final User localUser = authentication.getLocalUser();
-
     if (!session().containsKey("testPageMode")) {
       session().put("testPageMode", "none");
     }
@@ -55,8 +56,6 @@ public class Application extends Controller {
 
   @AllowedRoles({Role.TEST_DESIGNER, Role.TEST_OBSERVER})
   public Result adapters() {
-    final User localUser = authentication.getLocalUser();
-
     if (!session().containsKey("testPageMode")) {
       session().put("testPageMode", "none");
     }
@@ -65,8 +64,6 @@ public class Application extends Controller {
 
   @AllowedRoles({Role.TEST_DESIGNER, Role.TEST_OBSERVER})
   public Result jobQueue() {
-    final User localUser = authentication.getLocalUser();
-
     if (!session().containsKey("testPageMode")) {
       session().put("testPageMode", "none");
     }
@@ -74,17 +71,9 @@ public class Application extends Controller {
   }
 
   public Result about() {
-    final User localUser = authentication.getLocalUser();
-
     if (!session().containsKey("testPageMode")) {
       session().put("testPageMode", "none");
     }
     return ok(views.html.aboutPage.render(authentication));
-  }
-
-  @AllowedRoles({Role.TEST_DEVELOPER, Role.TEST_DESIGNER, Role.TEST_OBSERVER})
-  public Result profile() {
-    final User localUser = authentication.getLocalUser();
-    return ok(profile.render(localUser, authentication));
   }
 }

@@ -2,19 +2,22 @@ package controllers
 
 import javax.inject.{Inject, Singleton}
 
+import akka.stream.scaladsl.Source
 import models.TestRun
 import play.api.libs.EventSource
 import play.api.libs.concurrent.Execution.Implicits._
 import play.api.libs.iteratee.{Concurrent, Enumeratee}
 import play.api.libs.json._
+import play.api.libs.streams.Streams
 import play.api.mvc._
+
 import scala.collection.JavaConversions._
 
 @Singleton
 class TestRunFeeder @Inject()(implicit testQueueController: TestQueueController) extends Controller  {
   val (jobQueueOut, jobQueueChannel) = Concurrent.broadcast[String];
   val (testStatusOut, testProgressChannel) = Concurrent.broadcast[String];
-  val (jobHistoryOut, jobHistoryChannel) = Concurrent.broadcast[TestRun];
+  val (jobHistoryEnumerator, jobHistoryChannel) = Concurrent.broadcast[TestRun];
 
   def historyFilter(user: models.User) = Enumeratee.filter[TestRun] {
     testRun: TestRun => utils.Util.canAccess(user, testRun.runner, testRun.visibility)
@@ -95,7 +98,8 @@ class TestRunFeeder @Inject()(implicit testQueueController: TestQueueController)
       val java_session = java_ctx.session()
       val user = Authentication.getLocalUser(java_session);
 
-      Ok.chunked(jobHistoryOut &> historyFilter(user) &> historyJsonRenderer() &> EventSource()).as("text/event-stream")
+      val source = Source.fromPublisher(Streams.enumeratorToPublisher(jobHistoryEnumerator &> historyFilter(user) &> historyJsonRenderer));
+      Ok.chunked(source via EventSource.flow).as("text/event-stream")
   }
 
 
@@ -116,8 +120,9 @@ class TestRunFeeder @Inject()(implicit testQueueController: TestQueueController)
           jobQueueUpdate()
         }
       }.start()
-      println("Someone asks for que")
-      Ok.chunked(jobQueueOut &> queueRenderer(user) &> EventSource()).as("text/event-stream")
+
+      val source = Source.fromPublisher(Streams.enumeratorToPublisher(jobQueueOut &> queueRenderer(user)));
+      Ok.chunked(source via EventSource.flow).as("text/event-stream")
   }
 
 
@@ -127,7 +132,8 @@ class TestRunFeeder @Inject()(implicit testQueueController: TestQueueController)
     * @return
     */
   def testProgressFeed() = Action {
-    Ok.chunked(testStatusOut &> EventSource()).as("text/event-stream")
+    val source = Source.fromPublisher(Streams.enumeratorToPublisher(testStatusOut));
+    Ok.chunked(source via EventSource.flow).as("text/event-stream")
   }
 
 

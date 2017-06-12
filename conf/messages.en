@@ -39,6 +39,7 @@ authenticate.title = Login
 authenticate.login = Login
 authenticate.logout = Logout
 authenticate.password = Password
+authenticate.changePassword = Change Password
 authenticate.profile.title = Profile
 authenticate.profile = Profile
 

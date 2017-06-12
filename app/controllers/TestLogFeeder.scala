@@ -4,18 +4,20 @@ import java.util
 import java.util.Collections
 import javax.inject.{Inject, Singleton}
 
+import akka.stream.scaladsl.{Flow, Sink, Source}
 import models.{TestRun, User}
 import play.Logger
 import play.api.libs.EventSource
 import play.api.libs.concurrent.Execution.Implicits._
 import play.api.libs.iteratee.{Concurrent, Enumeratee}
+import play.api.libs.streams.Streams
 import play.api.mvc._
 
 import scala.collection.JavaConversions._
 
 @Singleton
 class TestLogFeeder @Inject()() extends Controller {
-  val (logOut, logChannel) = Concurrent.broadcast[LogRecord];
+  val (logEnumerator, logChannel) = Concurrent.broadcast[LogRecord];
 
   val currentLog = Collections.synchronizedList(new util.ArrayList[LogRecord]())
 
@@ -37,15 +39,6 @@ class TestLogFeeder @Inject()() extends Controller {
   }
 
   /**
-    * This filter renders the log
-    *
-    * @return
-    */
-  def logRenderer(): Enumeratee[LogRecord, String] = Enumeratee.map[LogRecord] {
-    logRecord => logRecord.log
-  }
-
-  /**
     * An action that provides information about the current
     * running job.
     *
@@ -57,7 +50,8 @@ class TestLogFeeder @Inject()() extends Controller {
       val java_session = java_ctx.session()
       val user = Authentication.getLocalUser(java_session);
 
-      Ok.chunked(logOut &> logFilter(user) &> logRenderer() &> EventSource()).as("text/event-stream")
+      val source = Source.fromPublisher(Streams.enumeratorToPublisher(logEnumerator &> logFilter(user)))
+      Ok.chunked(source.map { logRecord => logRecord.log } via EventSource.flow).as("text/event-stream")
   }
 
 

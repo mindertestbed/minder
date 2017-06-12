@@ -1,17 +1,21 @@
 package controllers;
 
 import editormodels.UserLoginEditorModel;
-import utils.Util;
 import models.User;
 import play.Logger;
 import play.data.Form;
+import play.data.FormFactory;
+import play.data.validation.Constraints;
 import play.mvc.Controller;
 import play.mvc.Http.Session;
 import play.mvc.Result;
-import play.mvc.Results;
 import security.AllowedRoles;
 import security.Role;
+import utils.Util;
+import views.html.authentication.changePasswordForm;
 import views.html.index;
+
+import javax.inject.Inject;
 
 import static play.data.Form.form;
 
@@ -19,6 +23,22 @@ public class Authentication extends Controller {
   public static final String FLASH_MESSAGE_KEY = "message";
   public static final String FLASH_ERROR_KEY = "error";
 
+
+  private final Form<ChangePasswordModel> form;
+
+  public static class ChangePasswordModel {
+    @Constraints.Required
+    public String password;
+
+    @Constraints.Required
+    public String passwordAgain;
+  }
+
+
+  @Inject
+  public Authentication(FormFactory formFactory) {
+    this.form = formFactory.form(ChangePasswordModel.class);
+  }
 
   public User getLocalUser() {
     String email = session().get("email");
@@ -83,11 +103,22 @@ public class Authentication extends Controller {
 
   @AllowedRoles({Role.TEST_DESIGNER, Role.TEST_DEVELOPER, Role.TEST_OBSERVER})
   public Result changePassword() {
-    return Results.badRequest("Not supported");
+    return ok(changePasswordForm.render(form, this));
   }
+
 
   @AllowedRoles({Role.TEST_DESIGNER, Role.TEST_DEVELOPER, Role.TEST_OBSERVER})
   public Result doChangePassword() {
-    return Results.badRequest("Not supported");
+    ChangePasswordModel changePasswordModel = form.bindFromRequest(request()).get();
+    if (changePasswordModel.password.equals(changePasswordModel.passwordAgain)) {
+      User user = getLocalUser();
+      if (user != null) {
+        user.setPlainPassword(changePasswordModel.password);
+        user.save();
+        return redirect(routes.Application.index());
+      }
+      return badRequest("User does not exist");
+    }
+    return badRequest("Passwords don't match");
   }
 }
