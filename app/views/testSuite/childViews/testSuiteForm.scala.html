@@ -206,7 +206,7 @@
         @subjectIsOr(owner) {
           <select id="visibility" name="visibility" >
           @for(vis <- Visibility.values()) {
-            @if(vis == frm("visibility").value) {
+            @if(vis.name() == frm("visibility").value) {
               <option selected="selected" value="@vis">@vis</option>
             } else {
               <option value="@vis">@vis</option>
