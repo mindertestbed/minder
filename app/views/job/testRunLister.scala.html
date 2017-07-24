@@ -2,32 +2,39 @@
 @import authentication._
 @(configurationId: Long)(implicit authentication: Authentication)
 
-  <br />
+<br />
 
-  <div>
-    <table class="table table-bordered table-striped table-hover">
-      <tr>
-        <th>#</th> <th>Status</th> <th>Date</th> <th>Visibility</th> <th>Run by</th> <th>Details</th> <th>Report</th>
-      </tr>
-      @defining(TestRun.findByJob(configurationId)) { testRunList =>
-        @for( testRun <- testRunList) {
+<div>
+  <table class="table table-bordered table-striped table-hover">
+    <tr>
+      <th>#</th> <th>Status</th> <th>Date</th> <th>Visibility</th> <th>Run by</th> <th>Details</th> <th>Report</th>
+    </tr>
+    @defining(TestRun.findByJob(configurationId)) { testRunList =>
+      @for(testRun <- testRunList) {
+        @if(testRun.number > 0) {
           @decideOnVisibility(testRun.visibility, testRun.runner) {
             <tr class="@if(testRun.success) {goodTestRun} else {badTestRun}">
-              <td style="text-align:center ;vertical-align: middle;" class="tabshrink">
+              <td style="text-align: center ;
+                vertical-align: middle;" class="tabshrink">
               @testRun.number
               </td>
-              <td style="text-align:center ;vertical-align: middle;" class="tabshrink">
+              <td style="text-align: center ;
+                vertical-align: middle;" class="tabshrink">
               @if(testRun.success) {
                 <img src="@routes.Assets.versioned("/images/Check-icon.png")" height="16px" alt='G'/>
               } else {
                 <img src="@routes.Assets.versioned("/images/Delete-icon.png")" height="16px" alt='B'/>
               }
               </td>
-              <td style="text-align:left ;vertical-align: middle;" class="tabshrink">@utils.Util.formatDate(testRun.date)</td>
-              <td style="text-align:center ; font-size:20px ;vertical-align: middle;" class="tabshrink">@visibilityTagFragment(testRun.visibility, testRun.runner)</td>
-              <td style="text-align:left ;vertical-align: middle;" class="tabexpand">@testRun.runner.email</td>
+              <td style="text-align: left ;
+                vertical-align: middle;" class="tabshrink">@utils.Util.formatDate(testRun.date)</td>
+              <td style="text-align: center ;
+                font-size: 20px ;
+                vertical-align: middle;" class="tabshrink">@visibilityTagFragment(testRun.visibility, testRun.runner)</td>
+              <td style="text-align: left ;
+                vertical-align: middle;" class="tabexpand">@testRun.runner.email</td>
               <td align="center" style="vertical-align: middle" class="tabshrink">
-                @createLinkButton("/viewTestRunHistory?testRunId="+ testRun.id, "", "glyphicon-option-horizontal", "btn-default")
+              @createLinkButton("/viewTestRunHistory?testRunId=" + testRun.id, "", "glyphicon-option-horizontal", "btn-default")
               </td>
               <td align="center" class="tabshrink">
               @reportMenu(testRun)
@@ -36,5 +43,6 @@
           }
         }
       }
-    </table>
-  </div>
+    }
+  </table>
+</div>

@@ -72,7 +72,6 @@ public class MinderServer implements IMinderServer {
       Logger.debug("Trigger job " + jobId);
 
       Visibility vis = (Visibility) Util.readObject(((SignalCallData) signalData).args[1], null);
-      System.out.println(vis);
       TestSession session = testQueueController.enqueueJobWithUser(jobId, wrapper.user, null, vis);
       MinderSignalRegistry.get().initTestSession(session);
       return session;

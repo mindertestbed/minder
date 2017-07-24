@@ -141,8 +141,6 @@ POST        /updateSettings                             controllers.SettingsCont
 
 
 ######### REEEEEESSSTTT
-GET         /rest/login                                 rest.controllers.LoginController.login
-GET         /rest/doLogin                               rest.controllers.LoginController.doLogin
 POST        /rest/validatecontent                       rest.controllers.XMLValidationController.validateContent
 
 #Rest test group management
@@ -212,6 +210,12 @@ POST        /rest/testbed/start                         rest.controllers.GitbTes
 POST        /rest/testbed/stop                          rest.controllers.GitbTestbedController.stop()
 POST        /rest/testbed/getTestCaseDefinitions        rest.controllers.GitbTestbedController.getGetTestCaseDefinitions()
 
+
+#REST RUNS
+POST        /rest/run/runJob                            rest.controllers.RestRunController.runJob
+POST        /rest/run/testRunStatus                     rest.controllers.RestRunController.testRunStatus
+POST        /rest/run/runSuite                          rest.controllers.RestRunController.runSuite
+POST        /rest/run/suiteRunStatus                    rest.controllers.RestRunController.suiteRunStatus
 
 # Map static resources from the /public folder to the /assets URL path
 GET         /assets/*file                               controllers.Assets.versioned(path="/public", file)

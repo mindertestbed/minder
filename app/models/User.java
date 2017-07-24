@@ -118,39 +118,6 @@ public class User extends Model {
     return find.where().eq("email", email).findUnique();
   }
 
-
-  /**
-   * Created for ease of use in the initialization YML file
-   * @param plainPassword
-   */
-  public void setPlainPassword(String plainPassword) {
-    this.password = Util.sha256(plainPassword.getBytes());
-  }
-
-  public void updatePassword(String email, String password) {
-    User user = findByEmail(email);
-    if (null != user) {
-      user.password = Util.sha256(password.getBytes());
-      user.save();
-    }
-  }
-
-  public static byte[] getHashedPassword(String email) {
-    User user = findByEmail(email);
-    if (null == user) {
-      return null;
-    }
-    return user.password;
-  }
-
-  public void resetPassword(String email) {
-    User user = findByEmail(email);
-    if (null != user) {
-      user.password = Util.sha256("12345".getBytes());
-      user.save();
-    }
-  }
-
   public static User findById(Long id) {
     return find.byId(id);
   }

@@ -1,15 +1,10 @@
 package controllers;
 
-import models.ModelConstants;
 import models.User;
-import play.data.Form;
-import play.data.FormFactory;
-import play.data.validation.Constraints;
 import play.mvc.Controller;
 import play.mvc.Result;
 import security.AllowedRoles;
 import security.Role;
-import views.html.authentication.profile;
 import views.html.rootViews.rootPage;
 
 import javax.inject.Inject;
@@ -19,14 +14,13 @@ public class Application extends Controller {
   TestLogFeeder testLogFeeder;
 
   @Inject
-  public Application(Authentication authentication, TestLogFeeder testLogFeeder, FormFactory formFactory) {
+  public Application(Authentication authentication, TestLogFeeder testLogFeeder) {
     this.authentication = authentication;
     this.testLogFeeder = testLogFeeder;
   }
 
   @AllowedRoles({Role.TEST_DESIGNER, Role.TEST_OBSERVER, Role.TEST_DEVELOPER})
   public Result index() {
-    final User localUser = authentication.getLocalUser();
     if (!session().containsKey("testPageMode")) {
       session().put("testPageMode", "none");
     }

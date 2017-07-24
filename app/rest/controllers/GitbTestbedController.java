@@ -276,7 +276,6 @@ public class GitbTestbedController extends Controller {
   }
 
   public Result start() {
-
 		/*
 		 * Handling the request message
 		 */

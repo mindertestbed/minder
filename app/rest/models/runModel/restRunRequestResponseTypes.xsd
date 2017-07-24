@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<xs:schema version="1.0" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+
+  <xs:element name="suiteRunRequest" type="suiteRunRequest" nillable="true"/>
+  <xs:element name="suiteRunResponse" type="suiteRunResponse" nillable="true"/>
+  <xs:element name="suiteRunStatusRequest" type="suiteRunStatusRequest" nillable="true"/>
+  <xs:element name="suiteRunStatusResponse" type="suiteRunStatusResponse" nillable="true"/>
+  <xs:element name="testCaseRunRequest" type="testCaseRunRequest" nillable="true"/>
+  <xs:element name="testCaseRunResponse" type="testCaseRunResponse" nillable="true"/>
+  <xs:element name="testRunStatusRequest" type="testRunStatusRequest" nillable="true"/>
+  <xs:element name="testRunStatusResponse" type="testRunStatusResponse" nillable="true"/>
+  <xs:element name="minderError" type="minderError" nillable="true"/>
+
+  <xs:complexType name="suiteRunRequest">
+    <xs:sequence>
+      <xs:element name="suiteId" type="xs:long"/>
+      <xs:element name="jobs" type="xs:long" nillable="true" minOccurs="0" maxOccurs="unbounded"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="suiteRunResponse">
+    <xs:sequence>
+      <xs:element name="suiteId" type="xs:long"/>
+      <xs:element name="suiteRunId" type="xs:long"/>
+      <xs:element name="testRuns" type="xs:long" nillable="true" minOccurs="0" maxOccurs="unbounded"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="suiteRunStatusRequest">
+    <xs:sequence>
+      <xs:element name="suiteRunId" type="xs:long"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="suiteRunStatusResponse">
+    <xs:sequence>
+      <xs:element name="suiteRunId" type="xs:long"/>
+      <xs:element name="suiteRunStates" type="testRunStatusResponse" nillable="true" minOccurs="0" maxOccurs="unbounded"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="testCaseRunRequest">
+    <xs:sequence>
+      <xs:element name="jobId" type="xs:long"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="testCaseRunResponse">
+    <xs:sequence>
+      <xs:element name="jobId" type="xs:long"/>
+      <xs:element name="testRunId" type="xs:long"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="testRunStatusRequest">
+    <xs:sequence>
+      <xs:element name="testRunId" type="xs:long"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="testRunStatusResponse">
+    <xs:sequence>
+      <xs:element name="testRunId" type="xs:long"/>
+      <xs:element name="status" type="runStatus" minOccurs="0"/>
+      <xs:element name="log" type="xs:base64Binary" minOccurs="0"/>
+      <xs:element name="startDate" type="xs:dateTime" minOccurs="0"/>
+      <xs:element name="finishDate" type="xs:dateTime" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:simpleType name="runStatus">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="IDLE"/>
+      <xs:enumeration value="CANCELLED"/>
+      <xs:enumeration value="IN_PROGRESS"/>
+      <xs:enumeration value="SUCCESS"/>
+      <xs:enumeration value="FAIL"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:complexType name="minderError">
+    <xs:sequence>
+      <xs:element name="inventoryId" type="xs:long"/>
+      <xs:element name="errorCode" type="xs:int" minOccurs="1"/>
+      <xs:element name="errorSummary" type="xs:string" minOccurs="1"/>
+      <xs:element name="errorLog" type="xs:base64Binary" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+
+</xs:schema>
+

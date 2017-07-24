@@ -3,6 +3,8 @@ package controllers;
 import com.avaje.ebean.Ebean;
 import editormodels.UserCreatorModel;
 import editormodels.UserEditorModel;
+import rest.controllers.common.Constants;
+import utils.UserPasswordUtil;
 import utils.Util;
 import models.*;
 import play.Logger;
@@ -36,7 +38,6 @@ public class UserController extends Controller {
     USER_EDIT_FORM = formFactory.form(UserEditorModel.class);
     USER_CREATE_FORM = formFactory.form(UserCreatorModel.class);
   }
-
 
 
   @RestrictTOUser("root@minder")
@@ -140,7 +141,7 @@ public class UserController extends Controller {
 
         DBRole.deleteAllByUser(user);
         if (model.password != null && model.password.length() >= 5) {
-          user.password = Util.sha256(model.password.getBytes());
+          user.password = UserPasswordUtil.generateHA1(user.email, model.password);
         }
 
         if (toBoolean(model.istd)) {

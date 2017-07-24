@@ -1,12 +1,12 @@
-        <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <xs:schema version="1.0" xmlns:xs="http://www.w3.org/2001/XMLSchema">
 
-<xs:element name="minderResponse" type="minderResponse"/>
+  <xs:element name="minderResponse" type="minderResponse"/>
 
-<xs:complexType name="minderResponse">
+  <xs:complexType name="minderResponse">
     <xs:sequence>
-        <xs:element name="result" type="xs:string"/>
+      <xs:element name="result" type="xs:string"/>
     </xs:sequence>
-</xs:complexType>
+  </xs:complexType>
 </xs:schema>
 

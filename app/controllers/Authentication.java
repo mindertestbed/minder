@@ -9,8 +9,10 @@ import play.data.validation.Constraints;
 import play.mvc.Controller;
 import play.mvc.Http.Session;
 import play.mvc.Result;
+import rest.controllers.common.Constants;
 import security.AllowedRoles;
 import security.Role;
+import utils.UserPasswordUtil;
 import utils.Util;
 import views.html.authentication.changePasswordForm;
 import views.html.index;
@@ -84,7 +86,9 @@ public class Authentication extends Controller {
       return unauthorized("Plese provide a valid username and password");
     }
 
-    if (!Util.compareArray(Util.sha256(lgn.password.getBytes()), byEmail.password)) {
+    byte[] md5 = UserPasswordUtil.generateHA1(lgn.email, lgn.password);
+
+    if (!Util.compareArray(md5, byEmail.password)) {
       return unauthorized("Plese provide a valid username and password");
     }
 
@@ -106,14 +110,13 @@ public class Authentication extends Controller {
     return ok(changePasswordForm.render(form, this));
   }
 
-
   @AllowedRoles({Role.TEST_DESIGNER, Role.TEST_DEVELOPER, Role.TEST_OBSERVER})
   public Result doChangePassword() {
     ChangePasswordModel changePasswordModel = form.bindFromRequest(request()).get();
     if (changePasswordModel.password.equals(changePasswordModel.passwordAgain)) {
       User user = getLocalUser();
       if (user != null) {
-        user.setPlainPassword(changePasswordModel.password);
+        user.password = UserPasswordUtil.generateHA1(user.email, changePasswordModel.password);
         user.save();
         return redirect(routes.Application.index());
       }

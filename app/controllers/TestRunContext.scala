@@ -1,6 +1,7 @@
 package controllers
 
 import java.util
+import java.util.Date
 
 import builtin.ReportGenerator
 import controllers.common.Utils
@@ -167,6 +168,7 @@ class TestRunContext(val testRun: TestRun, testRunFeeder: TestRunFeeder, testLog
 
   def updateNumber() = {
     testRun.number = TestRun.getMaxNumber() + 1
+    testRun.date = new Date();
   }
 
   def initialize(): MinderTdl = {

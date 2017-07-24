@@ -55,12 +55,6 @@ public class TestRun extends Model {
 
   }
 
-  public TestRun(AbstractJob job, User runner) {
-    this.job = job;
-    this.runner = runner;
-    this.date = new Date();
-  }
-
   private static final Finder<Long, TestRun> find = new Finder<>(TestRun.class);
 
   public static TestRun findById(Long id) {

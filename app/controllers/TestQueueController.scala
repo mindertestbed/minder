@@ -117,13 +117,12 @@ class TestQueueController @Inject()(implicit testLogFeeder: Provider[TestLogFeed
       if (job == null) {
         throw new IllegalStateException("A job with id [" + id + "] was not found!")
       } else {
-        var testRunContext = createTestRunContext(job, user, visibility);
+        val testRunContext = createTestRunContext(job, user, visibility)
         testRunContext.gitbReplyToUrlAddress = replyToUrlAddress
         jobQueue.synchronized {
           jobQueue.offer(testRunContext)
         }
         testRunFeeder.get().jobQueueUpdate()
-
         val ts = new TestSession()
         ts.setSession(testRunContext.sessionID)
         return ts;
@@ -131,10 +130,9 @@ class TestQueueController @Inject()(implicit testLogFeeder: Provider[TestLogFeed
     }
   }
 
-
   def gitbLogFeedUpdate(log: String, step: StepStatus, stepId: Long): Unit = {
     if (activeRunContext != null && activeRunContext.job != null && activeRunContext.job.isInstanceOf[GitbJob]) {
-      gitbTestbedController.get().performUpdateStatusOperation(activeRunContext.gitbReplyToUrlAddress, activeRunContext.job.id, step, stepId, log);
+      gitbTestbedController.get().performUpdateStatusOperation(activeRunContext.gitbReplyToUrlAddress, activeRunContext.job.id, step, stepId, log)
     }
   }
 
@@ -147,9 +145,8 @@ class TestQueueController @Inject()(implicit testLogFeeder: Provider[TestLogFeed
   def createTestRunContext(job: AbstractJob, user: User, visibility: Visibility): TestRunContext = {
     Logger.info("Create Run with visibility " + visibility)
     val testRun = new TestRun()
-    testRun.date = new Date()
-    testRun.job = job;
-    testRun.visibility = visibility;
+    testRun.job = job
+    testRun.visibility = visibility
     val userHistory = new UserHistory
     userHistory.email = user.email;
     userHistory.operationType = new TOperationType
@@ -160,19 +157,19 @@ class TestQueueController @Inject()(implicit testLogFeeder: Provider[TestLogFeed
     new TestRunContext(testRun, testRunFeeder.get(), testLogFeeder.get(), testEngine.get())
   }
 
+
   def createTestRunContext(job: AbstractJob, user: User, visibility: Visibility, suiteRun: SuiteRun): TestRunContext = {
     Logger.info("Create Run with visibility " + visibility)
     val testRun = new TestRun()
-    testRun.date = new Date()
-    testRun.job = job;
-    testRun.visibility = visibility;
+    testRun.job = job
+    testRun.visibility = visibility
     val userHistory = new UserHistory
-    userHistory.email = user.email;
+    userHistory.email = user.email
     userHistory.operationType = new TOperationType
     userHistory.operationType.name = OperationType.RUN_TEST_CASE
     userHistory.operationType.save()
     testRun.history = userHistory
-    testRun.runner = user;
+    testRun.runner = user
     testRun.suiteRun = suiteRun
     new TestRunContext(testRun, testRunFeeder.get(), testLogFeeder.get(), testEngine.get())
   }
@@ -185,6 +182,8 @@ class TestQueueController @Inject()(implicit testLogFeeder: Provider[TestLogFeed
         val tr = arr(index).asInstanceOf[TestRunContext]
         jobQueue.synchronized {
           jobQueue.remove(tr)
+          tr.testRun.number = -1
+          tr.testRun.save()
         }
         testRunFeeder.get().jobQueueUpdate()
       }
@@ -200,14 +199,15 @@ class TestQueueController @Inject()(implicit testLogFeeder: Provider[TestLogFeed
         // REMEMBER: if you need to convert scala session to java session
         val java_ctx = play.core.j.JavaHelpers.createJavaContext(request)
         val java_session = java_ctx.session()
-        val user = Authentication.getLocalUser(java_session);
+        val user = Authentication.getLocalUser(java_session)
         //only allow root or the runner to do that
         if (user.email == "root@minder" || user.email == runContext.testRun.runner.email) {
           //cancel
-
           //now interrupt the thread.
           testThread.interrupt();
 
+          runContext.testRun.number = -1
+          runContext.testRun.save()
           Ok
         } else {
           BadRequest("Hey! <br/>Only root or the runner can cancel an active job!!!")
@@ -234,6 +234,8 @@ class TestQueueController @Inject()(implicit testLogFeeder: Provider[TestLogFeed
       if (user.email == "root@minder" || user.email == activeRunContext.job.owner.email) {
         //now interrupt the thread.
         testThread.interrupt();
+        activeRunContext.testRun.number = -1
+        activeRunContext.testRun.save()
         return
       }
       else {
@@ -272,50 +274,43 @@ class TestQueueController @Inject()(implicit testLogFeeder: Provider[TestLogFeed
     */
   def enqueueTestSuite(id: Long, visibility: String, jobIdList: String) = Action {
     implicit request => {
+      val java_ctx = play.core.j.JavaHelpers.createJavaContext(request)
+      val java_session = java_ctx.session()
+      val user = Authentication.getLocalUser(java_session)
       if (jobQueue.size >= 30) {
         BadRequest("The job queue is full.")
       } else {
-
-
         try {
           Ebean.beginTransaction()
-          val testSuite = TestSuite.findById(id);
+          val testSuite = TestSuite.findById(id)
           val suiteRun = new SuiteRun()
           suiteRun.date = new Date()
           suiteRun.number = SuiteRun.getMaxNumber + 1
           suiteRun.testSuite = testSuite
           suiteRun.visibility = Visibility.valueOf(visibility)
           suiteRun.testRuns = new util.ArrayList[TestRun]()
-          suiteRun.runner = testSuite.owner;
+          suiteRun.runner = testSuite.owner
           suiteRun.save()
           if (testSuite == null) {
             BadRequest("A test suite with id [" + id + "] was not found!")
           } else {
-            val java_ctx = play.core.j.JavaHelpers.createJavaContext(request)
-            val java_session = java_ctx.session()
-            val user = Authentication.getLocalUser(java_session)
             jobQueue.synchronized {
-
               //if the job id list is empty, then enqueue all jobs
               if (jobIdList == null || jobIdList.isEmpty) {
-
                 Job.getAllByTestSuite(testSuite).foreach(job => {
                   jobQueue.offer(createTestRunContext(job, user, Visibility.valueOf(visibility), suiteRun))
                 })
-
               } else {
-
                 //split the job id list with respect to comma and enqueue all
                 jobIdList.split(",").foreach(jobId => {
                   jobQueue.offer(createTestRunContext(Job.findById(jobId.toLong), user,
                     Visibility.valueOf(visibility), suiteRun))
                 })
-
               }
             }
             testRunFeeder.get().jobQueueUpdate()
             Ebean.commitTransaction()
-            Ok("");
+            Ok("")
           }
         } catch {
           case th: Throwable => {
@@ -335,7 +330,10 @@ class TestQueueController @Inject()(implicit testLogFeeder: Provider[TestLogFeed
   }
 
   def enqueueTestRunContext(testRunContext: TestRunContext): Unit = {
+    testRunContext.testRun.history.save()
+    testRunContext.testRun.save()
     jobQueue.offer(testRunContext)
     testRunFeeder.get().jobQueueUpdate()
   }
 }
+
