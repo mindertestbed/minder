@@ -11,16 +11,16 @@
     </tr>
     @defining(TestRun.findByJob(configurationId)) { testRunList =>
       @for(testRun <- testRunList) {
-        @if(testRun.number > 0) {
+        @if(testRun.isFinished) {
           @decideOnVisibility(testRun.visibility, testRun.runner) {
-            <tr class="@if(testRun.success) {goodTestRun} else {badTestRun}">
+            <tr class="@if(testRun.status == TestRunStatus.SUCCESS) {goodTestRun} else {badTestRun}">
               <td style="text-align: center ;
                 vertical-align: middle;" class="tabshrink">
               @testRun.number
               </td>
               <td style="text-align: center ;
                 vertical-align: middle;" class="tabshrink">
-              @if(testRun.success) {
+              @if(testRun.status == TestRunStatus.SUCCESS) {
                 <img src="@routes.Assets.versioned("/images/Check-icon.png")" height="16px" alt='G'/>
               } else {
                 <img src="@routes.Assets.versioned("/images/Delete-icon.png")" height="16px" alt='B'/>

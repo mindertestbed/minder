@@ -19,13 +19,16 @@ public class TestRun extends Model {
   public Long id;
 
   @ManyToOne
-  @Column(name="job_id")
+  @Column(name = "job_id")
   public AbstractJob job;
 
   @ManyToOne
   public SuiteRun suiteRun;
 
   public Date date;
+
+  @Column(name = "finishdate")
+  public Date finishDate;
 
   @ManyToOne
   @Column(nullable = false)
@@ -41,7 +44,7 @@ public class TestRun extends Model {
   public String sutNames;
 
   @Column(nullable = false)
-  public boolean success;
+  public TestRunStatus status;
 
   @Column
   public int number;
@@ -53,6 +56,22 @@ public class TestRun extends Model {
 
   public TestRun() {
 
+  }
+
+  @Override
+  public void save() {
+    this.history.save();
+    super.save();
+  }
+
+  @Override
+  public void update() {
+    this.history.update();
+    super.update();
+  }
+
+  public boolean isFinished() {
+    return status == TestRunStatus.SUCCESS || this.status == TestRunStatus.FAILED || this.status == TestRunStatus.CANCELLED;
   }
 
   private static final Finder<Long, TestRun> find = new Finder<>(TestRun.class);

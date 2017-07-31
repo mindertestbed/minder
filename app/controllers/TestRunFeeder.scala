@@ -3,7 +3,7 @@ package controllers
 import javax.inject.{Inject, Singleton}
 
 import akka.stream.scaladsl.Source
-import models.TestRun
+import models.{TestRun, TestRunStatus}
 import play.api.libs.EventSource
 import play.api.libs.concurrent.Execution.Implicits._
 import play.api.libs.iteratee.{Concurrent, Enumeratee}
@@ -14,7 +14,7 @@ import play.api.mvc._
 import scala.collection.JavaConversions._
 
 @Singleton
-class TestRunFeeder @Inject()(implicit testQueueController: TestQueueController) extends Controller  {
+class TestRunFeeder @Inject()(implicit testQueueController: TestQueueController) extends Controller {
   val (jobQueueOut, jobQueueChannel) = Concurrent.broadcast[String];
   val (testStatusOut, testProgressChannel) = Concurrent.broadcast[String];
   val (jobHistoryEnumerator, jobHistoryChannel) = Concurrent.broadcast[TestRun];
@@ -28,7 +28,7 @@ class TestRunFeeder @Inject()(implicit testQueueController: TestQueueController)
       var id = testRun.id
       if (id == null) id = -1L
       JsObject(Seq(
-        "success" -> JsBoolean(testRun.success),
+        "success" -> JsBoolean(testRun.status == TestRunStatus.SUCCESS),
         "no" -> JsString(testRun.number + ""),
         "id" -> JsString(id + ""),
         "jobId" -> JsString(testRun.job.id + ""),
@@ -57,11 +57,11 @@ class TestRunFeeder @Inject()(implicit testQueueController: TestQueueController)
           if (testQueueController.activeRunContext != null) {
             val cotx = testQueueController.activeRunContext
             sb.append("{\"jobId\":\"").append(cotx.testRun.job.id).append("\",").
-              append("\"jobName\":\"").append(cotx.testRun.job.name).append("\",").
-              append("\"email\":\"").append(cotx.testRun.runner.email).append("\",").
-              append("\"progress\":\"").append(cotx.progressPercent).append("\",").
-              append("\"index\":\"").append(-1).append("\"").
-              append("}")
+                append("\"jobName\":\"").append(cotx.testRun.job.name).append("\",").
+                append("\"email\":\"").append(cotx.testRun.runner.email).append("\",").
+                append("\"progress\":\"").append(cotx.progressPercent).append("\",").
+                append("\"index\":\"").append(-1).append("\"").
+                append("}")
             if (!queue.isEmpty) {
               sb.append(",")
             }
@@ -70,11 +70,11 @@ class TestRunFeeder @Inject()(implicit testQueueController: TestQueueController)
           var index = 0
           for (cotx <- queue) {
             sb.append("{\"jobId\":\"").append(cotx.testRun.job.id).append("\",").
-              append("\"jobName\":\"").append(cotx.testRun.job.name).append("\",").
-              append("\"email\":\"").append(cotx.testRun.runner.email).append("\",").
-              append("\"progress\":\"").append(cotx.progressPercent).append("\",").
-              append("\"index\":\"").append(index).append("\"").
-              append("}")
+                append("\"jobName\":\"").append(cotx.testRun.job.name).append("\",").
+                append("\"email\":\"").append(cotx.testRun.runner.email).append("\",").
+                append("\"progress\":\"").append(cotx.progressPercent).append("\",").
+                append("\"index\":\"").append(index).append("\"").
+                append("}")
             if (index != queue.size() - 1)
               sb.append(",")
 
@@ -90,6 +90,7 @@ class TestRunFeeder @Inject()(implicit testQueueController: TestQueueController)
 
   /**
     * An online feed for listing jobs runned
+    *
     * @return
     */
   def jobHistoryFeed() = Action {
@@ -106,6 +107,7 @@ class TestRunFeeder @Inject()(implicit testQueueController: TestQueueController)
   /**
     * An action that provides information about the current
     * jobs in the queue.
+    *
     * @return
     */
   def jobQueueFeed() = Action {
@@ -129,6 +131,7 @@ class TestRunFeeder @Inject()(implicit testQueueController: TestQueueController)
   /**
     * An action that provides information about the current
     * running job.
+    *
     * @return
     */
   def testProgressFeed() = Action {
