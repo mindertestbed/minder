@@ -92,13 +92,13 @@
   <tr><th>&nbsp;</th> <th>Result</th> <th>Date</th> <th>MTDL Script V.</th> <th>Test Case</th> <th>Test Assertion</th></tr>
   @defining(new java.util.concurrent.atomic.AtomicInteger(1)) { index =>
     @for(testRun <- TestRun.findBySuiteRun(suiteRun)) {
-      <tr class="@if(testRun.success) {goodTestRun} else {badTestRun}">
+      <tr class="@if(testRun.status == TestRunStatus.SUCCESS) {goodTestRun} else {badTestRun}">
         <td class="tabshrink">@index.getAndIncrement(). &nbsp;<input type="checkbox" id="testRun@{
           testRun.id
         }" onchange='updateSelectedTestRunList(this, @testRun.id)'/>
         </td>
         <td style="text-align:center ; vertical-align: middle ;" class="tabshrink">
-        @if(testRun.success) {
+        @if(testRun.status == TestRunStatus.SUCCESS) {
           <img src="@routes.Assets.versioned("/images/Check-icon.png")" height="16px" alt='G'/>
         } else {
           <img src="@routes.Assets.versioned("/images/Delete-icon.png")" height="16px" alt='B'/>

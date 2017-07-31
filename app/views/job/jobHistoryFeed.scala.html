@@ -102,13 +102,12 @@
     <div id="historyListDiv">
     @defining(TestRun.getRecentRuns(40)) { testRunList =>
       @for(testRun <- testRunList) {
-
-        @if(testRun.number > 0) {
+        @if(testRun.isFinished()) {
           @decideOnVisibility(testRun.visibility, testRun.runner) {
-            <div class="templateClass @if(testRun.success) {goodTestRun} else {badTestRun}">
+            <div class="templateClass @if(testRun.status == TestRunStatus.SUCCESS) {goodTestRun} else {badTestRun}">
               <div style="display: inline-block ;
                 margin-left: 5px ;">
-              @if(testRun.success) {
+              @if(testRun.status == TestRunStatus.SUCCESS) {
                 <img src="@routes.Assets.versioned("/images/Check-icon.png")" height="12px" alt='G'/>
               } else {
                 <img src="@routes.Assets.versioned("/images/Delete-icon.png")" height="12px" alt='B'/>

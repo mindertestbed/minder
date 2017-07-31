@@ -5,7 +5,6 @@ import java.util.Date
 
 import builtin.ReportGenerator
 import controllers.common.Utils
-import controllers.common.enumeration.TestStatus
 import minderengine._
 import models.{Wrapper, _}
 import mtdl._
@@ -40,7 +39,11 @@ class TestRunContext(val testRun: TestRun, testRunFeeder: TestRunFeeder, testLog
   var MinderTDL: MinderTdl = null;
   val logStringBuilder = new StringBuilder;
   val reportLogBuilder = new StringBuilder;
-  var status = TestStatus.PENDING
+
+  /**
+    * Assign this runnable in order to do one last job (set labels ...) before finishing this test run
+    */
+  var finalRunnable: Runnable = null;
 
   var sessionID: String = Utils.getCurrentTimeStamp;
 
@@ -85,7 +88,8 @@ class TestRunContext(val testRun: TestRun, testRunFeeder: TestRunFeeder, testLog
   describe(TestEngine.describe(cls))
 
   override def run(): Unit = {
-    status = TestStatus.RUNNING
+    testRun.status = TestRunStatus.IN_PROGRESS
+    testRun.save()
     testEngine.runTest(sessionID, user.email, cls, variableWrapperMapping, TestRunContext.this, job.mtdlParameters)
   }
 
@@ -121,13 +125,13 @@ class TestRunContext(val testRun: TestRun, testRunFeeder: TestRunFeeder, testLog
   }
 
   override def finished() {
-    status = TestStatus.GOOD
+    testRun.status = TestRunStatus.SUCCESS
     updateRun()
   }
 
   override def failed(err: String, t: Throwable) {
-    status = TestStatus.BAD
     error = err
+    testRun.status = TestRunStatus.FAILED
     updateRun()
   }
 
@@ -135,7 +139,6 @@ class TestRunContext(val testRun: TestRun, testRunFeeder: TestRunFeeder, testLog
     logStringBuilder.append(log)
     testLogFeeder.log(LogRecord(testRun, log))
   }
-
 
   override def addReportLog(log: String): Unit = {
     reportLogBuilder.append(log)
@@ -145,9 +148,8 @@ class TestRunContext(val testRun: TestRun, testRunFeeder: TestRunFeeder, testLog
 
   def updateRun(): Unit = {
     rg.setTestDetails(testGroup, testAssertion, testCase, job, sutNames, reportLogBuilder.toString())
+    testRun.finishDate = new Date();
     testRun.history.setSystemOutputLog(logStringBuilder.toString());
-    testRun.history.save();
-    testRun.success = (status == TestStatus.GOOD)
     testRun.report = rg.generateReport();
     testRun.errorMessage = error.getBytes("utf-8");
     if (sutNames != null) {
@@ -159,6 +161,11 @@ class TestRunContext(val testRun: TestRun, testRunFeeder: TestRunFeeder, testLog
       }
       testRun.sutNames = sb.toString();
     }
+
+    //if there is anything to be done before the last save action, do it
+    if (finalRunnable != null)
+      finalRunnable.run()
+
     testRun.save()
   }
 
@@ -166,8 +173,9 @@ class TestRunContext(val testRun: TestRun, testRunFeeder: TestRunFeeder, testLog
     sutNames = set;
   }
 
-  def updateNumber() = {
+  def init() = {
     testRun.number = TestRun.getMaxNumber() + 1
+    testRun.status = TestRunStatus.IN_PROGRESS;
     testRun.date = new Date();
   }
 

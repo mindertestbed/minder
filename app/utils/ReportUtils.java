@@ -5,6 +5,7 @@ import com.itextpdf.text.pdf.PdfWriter;
 import com.itextpdf.tool.xml.XMLWorkerHelper;
 import models.TestAssertion;
 import models.TestRun;
+import models.TestRunStatus;
 import play.Logger;
 
 import java.io.ByteArrayInputStream;
@@ -84,6 +85,7 @@ public class ReportUtils {
 
   private static String fillTestRun(TestRun tr, String targetString) {
     TestAssertion testAssertion = TestAssertion.findById(tr.job.tdl.testCase.testAssertion.id);
+    boolean isSuccess = tr.status == TestRunStatus.SUCCESS;
     return targetString
         .replace("${taID}", testAssertion.taId)
         .replace("${testGroup}", testAssertion.testGroup.name)
@@ -91,7 +93,7 @@ public class ReportUtils {
         .replace("${user}", tr.runner.name)
         .replace("${date}", Util.formatDate(tr.date))
         .replace("${systemsTested}", getNonNullString(tr.sutNames))
-        .replace("${resultCharacter}", tr.success ? checkString : crossString)
+        .replace("${resultCharacter}", isSuccess ? checkString : crossString)
         .replace("${target}", getNonNullString(testAssertion.target))
         .replace("${normativeSource}", getNonNullString(testAssertion.normativeSource))
         .replace("${prescriptionLevel}", getNonNullString(testAssertion.prescriptionLevel.name()))
@@ -99,8 +101,8 @@ public class ReportUtils {
         .replace("${predicate}", getNonNullString(testAssertion.predicate))
         .replace("${variables}", getNonNullString(testAssertion.variables))
         .replace("${tag}", getNonNullString(testAssertion.tag))
-        .replace("${result}", tr.success ? "Successful" : getNonNullString(tr.errorMessage))
-        .replace("${resultColor}", tr.success ? successColor : failColor)
+        .replace("${result}", isSuccess ? "Successful" : getNonNullString(tr.errorMessage))
+        .replace("${resultColor}", isSuccess ? successColor : failColor)
         .replace("${log}",
             getNonNullString(tr.history.extractSystemOutputLog()
             ).replace("\n\r", "<br/>")
@@ -148,13 +150,13 @@ public class ReportUtils {
       builder.append(fillTestRun(testRun, testRunTemplate)).append('\n');
       tocBuilder
           .append("<tr")
-          .append(testRun.success ? (" style='background-color:" + successColor + ";'") : (" style='background-color:" + failColor + "'"))
+          .append(testRun.status == TestRunStatus.SUCCESS ? (" style='background-color:" + successColor + ";'") : (" style='background-color:" + failColor + "'"))
           .append("><td><a href='#")
           .append(testRun.job.tdl.testCase.testAssertion.taId)
           .append("'>")
           .append(testRun.job.tdl.testCase.testAssertion.taId)
           .append("&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</a></td><td>")
-          .append((testRun.success ? checkString : crossString))
+          .append((testRun.status == TestRunStatus.SUCCESS ? checkString : crossString))
           .append("</td></tr>\n");
       testGroup = testRun.job.tdl.testCase.testAssertion.testGroup.name;
     }

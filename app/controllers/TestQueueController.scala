@@ -51,7 +51,7 @@ class TestQueueController @Inject()(implicit testLogFeeder: Provider[TestLogFeed
         try {
           testLogFeeder.get().log("--> Test Thread waiting on job queue");
           activeRunContext = jobQueue.take();
-          activeRunContext.updateNumber()
+          activeRunContext.init()
           testRunFeeder.get().jobQueueUpdate()
           run1 = activeRunContext.testRun
 
@@ -65,7 +65,6 @@ class TestQueueController @Inject()(implicit testLogFeeder: Provider[TestLogFeed
           testLogFeeder.get().log("--> Run Job #[" + run1.number + "]")
           activeRunContext.run()
         } finally {
-          //testLogFeeder.get().log(">>> Test Run  #[" + run1.number + "] finished.")
           activeRunContext = null
           testRunFeeder.get().jobQueueUpdate()
           Thread.sleep(1000)
@@ -202,12 +201,15 @@ class TestQueueController @Inject()(implicit testLogFeeder: Provider[TestLogFeed
         val user = Authentication.getLocalUser(java_session)
         //only allow root or the runner to do that
         if (user.email == "root@minder" || user.email == runContext.testRun.runner.email) {
-          //cancel
+
+          runContext.finalRunnable = new Runnable {
+            def run(): Unit = {
+              runContext.testRun.status=TestRunStatus.CANCELLED;
+            }
+          }
+
           //now interrupt the thread.
           testThread.interrupt();
-
-          runContext.testRun.number = -1
-          runContext.testRun.save()
           Ok
         } else {
           BadRequest("Hey! <br/>Only root or the runner can cancel an active job!!!")
@@ -233,9 +235,13 @@ class TestQueueController @Inject()(implicit testLogFeeder: Provider[TestLogFeed
     if (activeRunContext != null && activeRunContext.job.id == id) {
       if (user.email == "root@minder" || user.email == activeRunContext.job.owner.email) {
         //now interrupt the thread.
+        activeRunContext.finalRunnable = new Runnable {
+          def run(): Unit = {
+            activeRunContext.testRun.status=TestRunStatus.CANCELLED;
+          }
+        }
+
         testThread.interrupt();
-        activeRunContext.testRun.number = -1
-        activeRunContext.testRun.save()
         return
       }
       else {
@@ -330,7 +336,6 @@ class TestQueueController @Inject()(implicit testLogFeeder: Provider[TestLogFeed
   }
 
   def enqueueTestRunContext(testRunContext: TestRunContext): Unit = {
-    testRunContext.testRun.history.save()
     testRunContext.testRun.save()
     jobQueue.offer(testRunContext)
     testRunFeeder.get().jobQueueUpdate()

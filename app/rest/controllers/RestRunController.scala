@@ -82,20 +82,7 @@ class RestRunController @Inject()(implicit testQueueController: TestQueueControl
       c.setTime(testRun.date)
       resp.setStartDate(DatatypeFactory.newInstance.newXMLGregorianCalendar(c));
     }
-    resp.setStatus(
-      if (testRun.number == -1) {
-        RunStatus.CANCELLED
-      } else if (testRun.number == 0) {
-        RunStatus.IDLE
-      } else if (isActive) {
-        RunStatus.IN_PROGRESS
-      } else {
-        if (testRun.success)
-          RunStatus.SUCCESS
-        else
-          RunStatus.FAIL
-      }
-    );
+    resp.setStatus(RunStatus.mapFrom(testRun.status));
     resp
   }
 
