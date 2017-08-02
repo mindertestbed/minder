@@ -21,11 +21,7 @@ class RESTAuthFilter @Inject()(implicit override val mat: Materializer, ec: Exec
                                restAuthUtil: RestAuthUtil) extends Filter {
   override def apply(nextFilter: (RequestHeader) => Future[Result])(rh: RequestHeader): Future[Result] = {
     if (rh.path.startsWith("/rest")) {
-      //Logger.debug(s"requestheaders: ${rh.headers}")
-      //this is a rest service request
       rh.headers.get(RestAuthUtil.AUTHORIZATION).map { header =>
-        //Logger.debug(rh.remoteAddress + " sent an AUTHORIZATION HEADER:" + header)
-        //client has an Authorization header
         try {
           restAuthUtil.checkAuthorizationHeader(rh.method, header) match {
             case StaleNonce() => {
