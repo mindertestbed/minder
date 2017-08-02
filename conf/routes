@@ -212,6 +212,7 @@ POST        /rest/testbed/getTestCaseDefinitions        rest.controllers.GitbTes
 
 
 #REST RUNS
+GET         /rest/hello                                 rest.controllers.RestRunController.hello
 POST        /rest/run/runJob                            rest.controllers.RestRunController.runJob
 POST        /rest/run/testRunStatus                     rest.controllers.RestRunController.testRunStatus
 POST        /rest/run/runSuite                          rest.controllers.RestRunController.runSuite

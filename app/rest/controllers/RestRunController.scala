@@ -187,4 +187,15 @@ class RestRunController @Inject()(implicit testQueueController: TestQueueControl
         Ok(ByteString.fromArray(bytes))
       }
   }
+
+
+
+  def hello = UserAction(parse.raw) {
+    implicit request =>
+      val reqObj = request.requestObject.get.asInstanceOf[SuiteRunStatusRequest]
+      Logger.debug(s"${request.username} called suiteRunStatus with id ${reqObj.getSuiteRunId}")
+      val user = User.findByEmail(request.username);
+
+      Ok("Hi")
+  }
 }
