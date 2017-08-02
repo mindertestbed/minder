@@ -82,6 +82,12 @@ class RestRunController @Inject()(implicit testQueueController: TestQueueControl
       c.setTime(testRun.date)
       resp.setStartDate(DatatypeFactory.newInstance.newXMLGregorianCalendar(c));
     }
+
+    if(testRun.finishDate != null){
+      val c = new GregorianCalendar()
+      c.setTime(testRun.finishDate)
+      resp.setFinishDate(DatatypeFactory.newInstance.newXMLGregorianCalendar(c));
+    }
     resp.setStatus(RunStatus.mapFrom(testRun.status));
     resp
   }
