@@ -391,16 +391,19 @@ object Util {
   val formatter = new SimpleDateFormat("yyyy.MM.dd HH:mm:ss")
 
   def formatDate(date: Date): String = {
-    return formatter.format(date)
+    if (date == null) {
+      ""
+    } else
+      return formatter.format(date)
   }
 
   def readObject(arg: Array[Byte], classLoader: ClassLoader): AnyRef = {
     try {
-      val ois = if(classLoader == null){
+      val ois = if (classLoader == null) {
         new ObjectInputStream(new ByteArrayInputStream(arg))
-      }else {
+      } else {
 
-        new ObjectInputStream(new ByteArrayInputStream(arg)){
+        new ObjectInputStream(new ByteArrayInputStream(arg)) {
           override def resolveClass(desc: ObjectStreamClass): Class[_] = {
             classLoader.loadClass(desc.getName)
           }

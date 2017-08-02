@@ -20,8 +20,6 @@ class RESTAuthFilter @Inject()(implicit override val mat: Materializer, ec: Exec
                                configuration: Configuration,
                                restAuthUtil: RestAuthUtil) extends Filter {
   override def apply(nextFilter: (RequestHeader) => Future[Result])(rh: RequestHeader): Future[Result] = {
-    Logger.trace(s"${rh.path} ${this.getClass.getSimpleName}.apply")
-    Logger.debug(rh.headers.toString())
     if (rh.path.startsWith("/rest")) {
       //Logger.debug(s"requestheaders: ${rh.headers}")
       //this is a rest service request
