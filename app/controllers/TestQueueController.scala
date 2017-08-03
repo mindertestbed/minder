@@ -153,6 +153,7 @@ class TestQueueController @Inject()(implicit testLogFeeder: Provider[TestLogFeed
     userHistory.operationType.save()
     testRun.history = userHistory
     testRun.runner = user;
+    testRun.status = TestRunStatus.PENDING;
     new TestRunContext(testRun, testRunFeeder.get(), testLogFeeder.get(), testEngine.get())
   }
 
@@ -170,6 +171,7 @@ class TestQueueController @Inject()(implicit testLogFeeder: Provider[TestLogFeed
     testRun.history = userHistory
     testRun.runner = user
     testRun.suiteRun = suiteRun
+    testRun.status = TestRunStatus.PENDING;
     new TestRunContext(testRun, testRunFeeder.get(), testLogFeeder.get(), testEngine.get())
   }
 
@@ -204,7 +206,7 @@ class TestQueueController @Inject()(implicit testLogFeeder: Provider[TestLogFeed
 
           runContext.finalRunnable = new Runnable {
             def run(): Unit = {
-              runContext.testRun.status=TestRunStatus.CANCELLED;
+              runContext.testRun.status = TestRunStatus.CANCELLED;
             }
           }
 
@@ -237,7 +239,7 @@ class TestQueueController @Inject()(implicit testLogFeeder: Provider[TestLogFeed
         //now interrupt the thread.
         activeRunContext.finalRunnable = new Runnable {
           def run(): Unit = {
-            activeRunContext.testRun.status=TestRunStatus.CANCELLED;
+            activeRunContext.testRun.status = TestRunStatus.CANCELLED;
           }
         }
 

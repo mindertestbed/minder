@@ -82,6 +82,12 @@ class RestRunController @Inject()(implicit testQueueController: TestQueueControl
       c.setTime(testRun.date)
       resp.setStartDate(DatatypeFactory.newInstance.newXMLGregorianCalendar(c));
     }
+
+    if(testRun.finishDate != null){
+      val c = new GregorianCalendar()
+      c.setTime(testRun.finishDate)
+      resp.setFinishDate(DatatypeFactory.newInstance.newXMLGregorianCalendar(c));
+    }
     resp.setStatus(RunStatus.mapFrom(testRun.status));
     resp
   }
@@ -186,5 +192,11 @@ class RestRunController @Inject()(implicit testQueueController: TestQueueControl
         val bytes = ObjectUtil.marshalAsByteArray(suiteRunStatusResponse)
         Ok(ByteString.fromArray(bytes))
       }
+  }
+
+  def hello = UserAction {
+    implicit request =>
+      val user = User.findByEmail(request.username);
+      Ok(s"Hi ${user.email}")
   }
 }

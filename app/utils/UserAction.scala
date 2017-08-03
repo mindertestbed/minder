@@ -13,11 +13,15 @@ class UserRequest[A](val username: String, val requestObject: Option[Object], re
 object UserAction extends
     ActionBuilder[UserRequest] with ActionTransformer[Request, UserRequest] {
   def transform[A](request: Request[A]) = Future.successful {
-    request.body.asInstanceOf[RawBuffer].asBytes().map{str =>
-      var jaxbContext = JAXBContext.newInstance(classOf[ObjectFactory]);
-      val jaxbUnmarshaller = jaxbContext.createUnmarshaller()
-      val result = jaxbUnmarshaller.unmarshal(new ByteArrayInputStream(str.toArray)).asInstanceOf[JAXBElement[Object]];
-      new UserRequest(request.tags("email"), Option(result.getValue), request)
-    }.getOrElse(null)
+    if (request.body.isInstanceOf[RawBuffer]) {
+      request.body.asInstanceOf[RawBuffer].asBytes().map { str =>
+        var jaxbContext = JAXBContext.newInstance(classOf[ObjectFactory]);
+        val jaxbUnmarshaller = jaxbContext.createUnmarshaller()
+        val result = jaxbUnmarshaller.unmarshal(new ByteArrayInputStream(str.toArray)).asInstanceOf[JAXBElement[Object]];
+        new UserRequest(request.tags("email"), Option(result.getValue), request)
+      }.getOrElse(null)
+    } else {
+      new UserRequest(request.tags("email"), None, request)
+    }
   }
 }
