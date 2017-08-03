@@ -45,12 +45,7 @@ class RestAuthUtil @Inject()(configuration: Configuration, restKeyRenewer: RestK
     */
   def createDigestHeader(nonce: Nonce, stale: Boolean = false): (String, String) = {
     WWW_AUTHENTICATE ->
-        s"""Digest realm="${REALM}",
-           |   nonce="${nonce.nonce}",
-           |   qop="auth",
-           |   algorithm=$REST_AUTH_DIGEST_ALGORITHM,
-           |   stale=$stale,
-           |   opaque="${nonce.opaque}"""".stripMargin
+        s"""Digest realm="${REALM}", nonce="${nonce.nonce}", qop="auth", algorithm=$REST_AUTH_DIGEST_ALGORITHM, stale=$stale, opaque="${nonce.opaque}"""".stripMargin
   }
 
 
