@@ -148,12 +148,12 @@ class TestQueueController @Inject()(implicit testLogFeeder: Provider[TestLogFeed
     testRun.visibility = visibility
     val userHistory = new UserHistory
     userHistory.email = user.email;
-    userHistory.operationType = new TOperationType
-    userHistory.operationType.name = OperationType.RUN_TEST_CASE
-    userHistory.operationType.save()
+    userHistory.operationType  = OperationType.RUN_TEST_CASE
     testRun.history = userHistory
     testRun.runner = user;
     testRun.status = TestRunStatus.PENDING;
+    testRun.history.save();
+    testRun.save();
     new TestRunContext(testRun, testRunFeeder.get(), testLogFeeder.get(), testEngine.get())
   }
 
@@ -165,13 +165,13 @@ class TestQueueController @Inject()(implicit testLogFeeder: Provider[TestLogFeed
     testRun.visibility = visibility
     val userHistory = new UserHistory
     userHistory.email = user.email
-    userHistory.operationType = new TOperationType
-    userHistory.operationType.name = OperationType.RUN_TEST_CASE
-    userHistory.operationType.save()
+    userHistory.operationType = OperationType.RUN_TEST_CASE
     testRun.history = userHistory
     testRun.runner = user
     testRun.suiteRun = suiteRun
     testRun.status = TestRunStatus.PENDING;
+    testRun.history.save();
+    testRun.save();
     new TestRunContext(testRun, testRunFeeder.get(), testLogFeeder.get(), testEngine.get())
   }
 
@@ -338,7 +338,6 @@ class TestQueueController @Inject()(implicit testLogFeeder: Provider[TestLogFeed
   }
 
   def enqueueTestRunContext(testRunContext: TestRunContext): Unit = {
-    testRunContext.testRun.save()
     jobQueue.offer(testRunContext)
     testRunFeeder.get().jobQueueUpdate()
   }

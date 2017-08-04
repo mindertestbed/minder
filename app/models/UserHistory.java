@@ -3,6 +3,7 @@ package models;
 import javax.persistence.*;
 
 import com.avaje.ebean.Model;
+import controllers.common.enumeration.OperationType;
 
 import java.io.UnsupportedEncodingException;
 
@@ -14,8 +15,8 @@ public class UserHistory extends Model {
 
   public String email;
 
-  @OneToOne(fetch = FetchType.EAGER)
-  public TOperationType operationType;
+  @Column(name = "optype")
+  public OperationType operationType;
 
   @Column(name = "SYSLOG", length = ModelConstants.LOG_LENGTH)
   public byte[] systemOutputLog;
