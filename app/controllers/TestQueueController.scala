@@ -73,7 +73,10 @@ class TestQueueController @Inject()(implicit testLogFeeder: Provider[TestLogFeed
             testRunFeeder.get().jobHistoryUpdate(run1)
           }
         }
-      }finally{
+      } catch {
+        case th: Throwable => Logger.error(th.getMessage, th);
+      }
+      finally {
         Logger.info("Test Thread exit")
       }
     }
@@ -153,7 +156,7 @@ class TestQueueController @Inject()(implicit testLogFeeder: Provider[TestLogFeed
     testRun.visibility = visibility
     val userHistory = new UserHistory
     userHistory.email = user.email;
-    userHistory.operationType  = OperationType.RUN_TEST_CASE
+    userHistory.operationType = OperationType.RUN_TEST_CASE
     testRun.history = userHistory
     testRun.runner = user;
     testRun.status = TestRunStatus.PENDING;
