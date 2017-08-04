@@ -40,17 +40,12 @@ class TestRunFeeder @Inject()(implicit testQueueController: TestQueueController)
 
   def queueRenderer(user: models.User): Enumeratee[String, String] = Enumeratee.map[String] {
     dummy => {
-      println("Before render")
       testQueueController.jobQueue.synchronized {
         val queue = testQueueController.jobQueue
-
-        println("Render job que")
         if (queue.isEmpty && testQueueController.activeRunContext == null)
           ""
         else {
           val sb = new StringBuilder
-
-          println("print que")
           sb.append("[")
 
           //if we have an active run context, send it with an -1 index.
@@ -145,7 +140,6 @@ class TestRunFeeder @Inject()(implicit testQueueController: TestQueueController)
   }
 
   def jobQueueUpdate(): Unit = {
-    println("Update que")
     jobQueueChannel.push("")
   }
 

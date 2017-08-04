@@ -31,22 +31,26 @@ class LogDownloader @Inject()() extends Controller {
       if (user == null) {
         Unauthorized("You cannot access this resource")
       } else {
-        Logger.debug(s"${user.email} is downloading log $name")
-        val out = new ByteArrayOutputStream()
-        val zos = new ZipOutputStream(out)
-        val logFile = new FileInputStream("logs/" + name)
-        zos.putNextEntry(new ZipEntry(name))
+        if ("root@minder" != user.email) {
+          Unauthorized("You cannot access this resource")
+        } else {
+          Logger.debug(s"${user.email} is downloading log $name")
+          val out = new ByteArrayOutputStream()
+          val zos = new ZipOutputStream(out)
+          val logFile = new FileInputStream("logs/" + name)
+          zos.putNextEntry(new ZipEntry(name))
 
-        var read = logFile.read()
-        while (read != -1) {
-          zos.write(read);
-          read = logFile.read()
+          var read = logFile.read()
+          while (read != -1) {
+            zos.write(read);
+            read = logFile.read()
+          }
+
+          logFile.close();
+          zos.closeEntry();
+          zos.close();
+          Ok(out.toByteArray).as("application/x-download").withHeaders(("Content-disposition", "attachment; filename=" + name + ".zip"))
         }
-
-        logFile.close();
-        zos.closeEntry();
-        zos.close();
-        Ok(out.toByteArray).as("application/x-download").withHeaders(("Content-disposition", "attachment; filename=" + name + ".zip"))
       }
     }
   }
