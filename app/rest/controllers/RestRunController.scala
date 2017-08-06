@@ -7,13 +7,14 @@ import javax.xml.datatype.DatatypeFactory
 
 import akka.util.ByteString
 import com.avaje.ebean.Ebean
-import controllers.TestQueueController
+import controllers.{TestQueueController, TestRunContext}
 import minderengine.Visibility
 import models._
 import play.Logger
 import play.api.mvc.Controller
 import rest.models.runModel._
 import utils.UserAction
+
 import scala.collection.JavaConversions._
 
 /**
@@ -115,22 +116,22 @@ class RestRunController @Inject()(implicit testQueueController: TestQueueControl
           if (testSuite == null) {
             BadRequest("A test suite with id [" + testSuite + "] was not found!")
           } else {
-            val testRuns = new util.ArrayList[Long]()
+            //we are in a transaction, create a list, commit and then enque
+            //to avoid optimisticlockingexception.
+            val list = new util.ArrayList[TestRunContext]()
             testQueueController.jobQueue.synchronized {
               //if the job id list is empty, then enqueue all jobs
               if (reqObj.getJobs == null || reqObj.getJobs.isEmpty) {
                 Job.getAllByTestSuite(testSuite).foreach(job => {
                   val ctx = testQueueController.createTestRunContext(job, user, Visibility.PROTECTED, suiteRun)
-                  testQueueController.enqueueTestRunContext(ctx)
-                  testRuns.add(ctx.testRun.id)
+                  list.add(ctx)
                 })
               } else {
                 //split the job id list with respect to comma and enqueue all
                 reqObj.getJobs.foreach(jobId => {
                   val job = Job.findById(jobId)
                   val ctx = testQueueController.createTestRunContext(job, user, Visibility.PROTECTED, suiteRun)
-                  testQueueController.enqueueTestRunContext(ctx)
-                  testRuns.add(ctx.testRun.id)
+                  list.add(ctx)
                 })
               }
             }
@@ -142,7 +143,12 @@ class RestRunController @Inject()(implicit testQueueController: TestQueueControl
             resp.setSuiteRunId(suiteRun.id)
             val runs = resp.getTestRuns
 
-            testRuns.foreach(rid => runs.add(rid))
+            list.foreach(ctx => {
+              testQueueController.jobQueue.offer(ctx)
+              runs.add(ctx.testRun.id)
+            })
+
+            testQueueController.jobQueueUpdate()
 
             val bytes = ObjectUtil.marshalAsByteArray(resp)
             Ok(ByteString.fromArray(bytes))

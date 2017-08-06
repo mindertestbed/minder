@@ -66,7 +66,6 @@ function createFormDialog(sourceUrl, action, titl, target, multiPart, w, h) {
         if (typeof(target) === 'undefined' || target == null) {
           dialog.dialog("close");
         } else {
-
           var ajaxObject = {
             type: frm.attr('method'),
             url: frm.attr('action'),

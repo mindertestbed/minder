@@ -25,6 +25,7 @@ class TestQueueController @Inject()(implicit testLogFeeder: Provider[TestLogFeed
                                     testRunFeeder: Provider[TestRunFeeder],
                                     gitbTestbedController: Provider[GitbTestbedController],
                                     testEngine: Provider[TestEngine]) extends Controller {
+
   /**
     * The queue that holds test runs. When a job is started, a test run is created for it.
     * One can access all the information about a test run and a job here.
@@ -32,56 +33,13 @@ class TestQueueController @Inject()(implicit testLogFeeder: Provider[TestLogFeed
   val jobQueue = new LinkedBlockingQueue[TestRunContext]();
   var activeRunContext: TestRunContext = null;
 
-  /**
-    * A reusable thread pool for server side events
-    */
-  val threadPool = java.util.concurrent.Executors.newFixedThreadPool(20);
-
   //a flag indicating the life of the thread.
   var goon = true;
 
   /**
     * The main test thread
     */
-  val testThread = new Thread() {
-    override def run(): Unit = {
-      try {
-        while (goon) {
-          testLogFeeder.get().clear()
-          var run1: TestRun = null;
-          try {
-            testLogFeeder.get().log("--> Test Thread waiting on job queue");
-            activeRunContext = jobQueue.take();
-            testLogFeeder.get().log("--> New Job Taken");
-            activeRunContext.init()
-            testRunFeeder.get().jobQueueUpdate()
-            run1 = activeRunContext.testRun
-
-            val session: TestSession = new TestSession(activeRunContext.sessionID)
-
-            if (!MinderSignalRegistry.get().hasSession(session))
-              MinderSignalRegistry.get().initTestSession(session)
-
-            testLogFeeder.get().log("--> Job with id [" + run1.job.id + "] arrived. Start");
-            Thread.sleep(1000);
-            testLogFeeder.get().log("--> Run Job #[" + run1.number + ":" + run1.id + "]")
-            activeRunContext.run()
-          } finally {
-            activeRunContext = null
-            testRunFeeder.get().jobQueueUpdate()
-            Thread.sleep(1000)
-            testRunFeeder.get().jobHistoryUpdate(run1)
-          }
-        }
-      } catch {
-        case th: Throwable => Logger.error(th.getMessage, th);
-      }
-      finally {
-        Logger.info("Test Thread exit")
-      }
-    }
-  }
-
+  var testThread = createTestThread();
   testThread.start();
 
 
@@ -312,24 +270,31 @@ class TestQueueController @Inject()(implicit testLogFeeder: Provider[TestLogFeed
           if (testSuite == null) {
             BadRequest("A test suite with id [" + id + "] was not found!")
           } else {
+            //we are in a transaction, create a list, commit and then enque
+            //to avoid optimisticlockingexception.
+            val list = new util.ArrayList[TestRunContext]()
             Logger.debug("Create and enqueue test runs for suite")
             jobQueue.synchronized {
               //if the job id list is empty, then enqueue all jobs
               if (jobIdList == null || jobIdList.isEmpty) {
                 Job.getAllByTestSuite(testSuite).foreach(job => {
-                  jobQueue.offer(createTestRunContext(job, user, Visibility.valueOf(visibility), suiteRun))
+                  list.add(createTestRunContext(job, user, Visibility.valueOf(visibility), suiteRun))
                 })
               } else {
                 //split the job id list with respect to comma and enqueue all
                 jobIdList.split(",").foreach(jobId => {
-                  jobQueue.offer(createTestRunContext(Job.findById(jobId.toLong), user,
+                  list.add(createTestRunContext(Job.findById(jobId.toLong), user,
                     Visibility.valueOf(visibility), suiteRun))
                 })
               }
             }
-            Logger.debug(s"Done enqueuing jobs. JobQueue Size: ${jobQueue.size()}")
             testRunFeeder.get().jobQueueUpdate()
             Ebean.commitTransaction()
+
+            //after committing, now enque them
+            list.foreach(trc=>jobQueue.offer(trc))
+
+            Logger.debug(s"Done enqueing the jobs. JobQueue Size: ${jobQueue.size()}")
             Ok("")
           }
         } catch {
@@ -353,5 +318,61 @@ class TestQueueController @Inject()(implicit testLogFeeder: Provider[TestLogFeed
     jobQueue.offer(testRunContext)
     testRunFeeder.get().jobQueueUpdate()
   }
+
+
+  def reset(): Unit = {
+    testThread.interrupt();
+    testThread.join(5000);
+    jobQueue.clear();
+    testRunFeeder.get().jobQueueUpdate()
+    testThread = createTestThread();
+    testThread.start();
+  }
+
+  def createTestThread(): Thread = {
+    new Thread() {
+      override def run(): Unit = {
+        try {
+          while (goon) {
+            testLogFeeder.get().clear()
+            var run1: TestRun = null;
+            try {
+              testLogFeeder.get().log("--> Test Thread waiting on job queue");
+              activeRunContext = jobQueue.take();
+              testLogFeeder.get().log("--> New Job Taken");
+              activeRunContext.init()
+              testRunFeeder.get().jobQueueUpdate()
+              run1 = activeRunContext.testRun
+
+              val session: TestSession = new TestSession(activeRunContext.sessionID)
+
+              if (!MinderSignalRegistry.get().hasSession(session))
+                MinderSignalRegistry.get().initTestSession(session)
+
+              testLogFeeder.get().log("--> Job with id [" + run1.job.id + "] arrived. Start");
+              Thread.sleep(1000);
+              testLogFeeder.get().log("--> Run Job #[" + run1.number + ":" + run1.id + "]")
+              activeRunContext.run()
+            } finally {
+              activeRunContext = null
+              testRunFeeder.get().jobQueueUpdate()
+              Thread.sleep(1000)
+              testRunFeeder.get().jobHistoryUpdate(run1)
+            }
+          }
+        } catch {
+          case th: Throwable => Logger.error(th.getMessage, th);
+        }
+        finally {
+          Logger.info("Test Thread exit")
+        }
+      }
+    }
+  }
+
+  def jobQueueUpdate() = {
+    testRunFeeder.get().jobQueueUpdate()
+  }
+
 }
 

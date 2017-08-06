@@ -7,6 +7,7 @@ public class JSRoutes extends Controller {
   public Result jsRoutes() {
     return ok(
         play.routing.JavaScriptReverseRouter.create("jsRoutes",
+            routes.javascript.Application.restartQueThread(),
             routes.javascript.Authentication.login(),
             routes.javascript.Authentication.doLogin(),
             routes.javascript.GroupController.renderDetails(),

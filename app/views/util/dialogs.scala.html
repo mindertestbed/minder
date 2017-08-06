@@ -1,23 +1,30 @@
-<div id="dialog-confirm" title="" style="display:none">
-  <p><span class="ui-icon ui-icon-alert" style="float:left ; margin:0 7px 20px 0 ;"></span>
-    The <span class="itemtype"></span> <b><span class="itemname"></span></b> will be deleted. Are you sure?</p>
+<div id="dialog-confirm" title="" style="display: none">
+  <p><span class="ui-icon ui-icon-alert" style="float: left ;
+    margin: 0 7px 20px 0 ;"></span>
+    The <span class="itemtype"></span>
+    <b><span class="itemname"></span></b> will be deleted. Are you sure?
+  </p>
 </div>
 
-<div id="mainDialog" title="" style="display:none" class="absofull">
-  <form method="post" id="mainForm" style="height:100% ;">
+<div id="mainDialog" title="" style="display: none" class="absofull">
+  <form method="post" id="mainForm" style="height: 100% ;">
   </form>
 </div>
 
-<div id="updateInputTextDialog" title="Update Field" style="display:none">
-  <input type="text" style="width:100% ;" value=""/>
+<div id="updateInputTextDialog" title="Update Field" style="display: none">
+  <input type="text" style="width: 100% ;" value=""/>
 </div>
 
-<div id="updateTextAreaDialog" title="Update Field" style="display:none">
-  <textarea style="width:100% ; height:100% ; overflow:scroll ;"></textarea>
+<div id="updateTextAreaDialog" title="Update Field" style="display: none">
+  <textarea style="width: 100% ;
+    height: 100% ;
+    overflow: scroll ;"></textarea>
 </div>
 
-<div id="updateOptionDialog" title="Update Field" style="display:none">
-  <select style="width:100% ; height:100% ; overflow:scroll ;"></select>
+<div id="updateOptionDialog" title="Update Field" style="display: none">
+  <select style="width: 100% ;
+    height: 100% ;
+    overflow: scroll ;"></select>
 </div>
 
 
@@ -78,31 +85,31 @@
 
 <script>
 
-function showInfoDialog(title, body, onClose){
+function showInfoDialog(title, body, onClose) {
   $('#myAlertDialog .modal-title').html(title)
   $('#myAlertDialog .modal-body').html(body)
 
-  var dialog = $('#myAlertDialog');if (onClose !== undefined && onClose !== null){
+  var dialog = $('#myAlertDialog');
+  if (onClose !== undefined && onClose !== null) {
     dialog.on('hidden.bs.modal', function (e) {
       onClose()
     })
   }
-  dialog.modal({keyboard:true})
+  dialog.modal({keyboard: true})
 }
 
 
-function showInputDialog(title, data, initial, accept, reject){
-
+function showInputDialog(title, data, initial, accept, reject) {
   $('#myQuestionDialog .modal-title').html(title)
 
-  if(isArray(data)){
+  if (isArray(data)) {
     var str = '<select class="mySelect">'
-    for(var idx in data){
+    for (var idx in data) {
       var value = data[idx]
-      if(value===initial){
-        str += '<option selected="selected">'+value+'</option>'
+      if (value === initial) {
+        str += '<option selected="selected">' + value + '</option>'
       } else {
-        str += '<option>'+value+'</option>'
+        str += '<option>' + value + '</option>'
       }
     }
 
@@ -112,27 +119,27 @@ function showInputDialog(title, data, initial, accept, reject){
     $('#myQuestionDialog .modal-body').html(data + ':&nbsp;<input type="text" />')
   }
 
-  $('#myQuestionDialog .btn-success').on('click', function(){
-    dialog.accepted=true;
+  $('#myQuestionDialog .btn-success').on('click', function () {
+    dialog.accepted = true;
   })
 
-  $('#myQuestionDialog .btn-warning').on('click', function(){
-    dialog.accepted=false;
+  $('#myQuestionDialog .btn-warning').on('click', function () {
+    dialog.accepted = false;
   })
 
   var dialog = $('#myQuestionDialog');
   dialog.accepted = false
   dialog.on('hidden.bs.modal', function (e) {
-    if(dialog.accepted){
-      if(accept !== undefined){
-        if(isArray(data)){
+    if (dialog.accepted) {
+      if (accept !== undefined) {
+        if (isArray(data)) {
           accept($('#myQuestionDialog .mySelect').val())
         } else {
           accept($('#myQuestionDialog .modal-body input').val())
         }
       }
-    } else{
-      if(reject !== undefined)
+    } else {
+      if (reject !== undefined)
         reject()
     }
 
@@ -141,7 +148,39 @@ function showInputDialog(title, data, initial, accept, reject){
     dialog.off()
   })
 
-  dialog.modal({keyboard:true})
+  dialog.modal({keyboard: true})
+}
+
+function askQuestion(title, data, accept, reject) {
+  $('#myQuestionDialog .modal-title').html(title)
+  $('#myQuestionDialog .modal-body').html(data)
+
+  $('#myQuestionDialog .btn-success').on('click', function () {
+    dialog.accepted = true;
+  })
+
+  $('#myQuestionDialog .btn-warning').on('click', function () {
+    dialog.accepted = false;
+  })
+
+  var dialog = $('#myQuestionDialog');
+  dialog.accepted = false
+  dialog.on('hidden.bs.modal', function (e) {
+    if (dialog.accepted) {
+      if (accept !== undefined) {
+        accept()
+      }
+    } else {
+      if (reject !== undefined)
+        reject()
+    }
+
+    $('#myQuestionDialog .btn-success').off()
+    $('#myQuestionDialog .btn-warning').off()
+    dialog.off()
+  })
+
+  dialog.modal({keyboard: true})
 }
 
 
@@ -150,7 +189,7 @@ function showError(data) {
   $('#myErrorDialog .modal-body').html(data)
 
   var dialog = $('#myErrorDialog');
-  dialog.modal({keyboard:true})
+  dialog.modal({keyboard: true})
 }
 
 </script>
