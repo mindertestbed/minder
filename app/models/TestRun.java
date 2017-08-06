@@ -85,21 +85,22 @@ public class TestRun extends Model {
   }
 
   public static List<TestRun> findByJob(AbstractJob rc) {
-    return find.where().eq("job", rc).orderBy("date desc").findList();
+    return find.where().eq("job", rc).isNotNull("date").orderBy("date desc").findList();
   }
 
 
   public static List<TestRun> findBySuiteRun(SuiteRun suiteRun) {
-    return find.where().eq("suiteRun", suiteRun).orderBy("date desc").findList();
+    return find.where().eq("suiteRun", suiteRun).isNotNull("date").orderBy("date desc").findList();
   }
 
   public static List<TestRun> findByJob(Long id) {
-    return find.where().eq("job_id", id).orderBy("date desc").findList();
+    return find.where().eq("job_id", id).isNotNull("date").orderBy("date desc").findList();
   }
 
 
   public static List<TestRun> getRecentRuns(int num) {
-    return find.where().orderBy("date desc").findPagedList(0, num).getList();
+    List<TestRun> list = find.where().isNotNull("date").orderBy("date desc").findPagedList(0, num).getList();
+    return list;
   }
 
   public static int getMaxNumber() {
