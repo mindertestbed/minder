@@ -31,8 +31,11 @@ import java.util.Map;
 
 @Singleton
 public class Startup {
+  private final Environment environment;
+
   @Inject
   public Startup(Environment environment, XoolaServer xoolaServer, Formatters formatters) {
+    this.environment = environment;
     System.out.println(xoolaServer);
 
     TDLClassLoaderProvider.appendExternalClassLoader(environment.classLoader());
@@ -61,7 +64,7 @@ public class Startup {
     if (User.findRowCount() == 0) {
       System.out.println("Adding sample data");
       try {
-        Yaml yaml = new Yaml(new CustomClassLoaderConstructor(Play.classloader(Play.current())));
+        Yaml yaml = new Yaml(new CustomClassLoaderConstructor(environment.classLoader()));
 
         File currentDir = new File(".");
         Logger.debug("Current Directory:" + currentDir.getAbsolutePath());

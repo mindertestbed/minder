@@ -1,6 +1,7 @@
 package models;
 
 import com.avaje.ebean.Model;
+import utils.UserPasswordUtil;
 import utils.Util;
 import play.data.format.Formats;
 import play.data.validation.Constraints;
@@ -129,5 +130,13 @@ public class User extends Model {
 
   public static int findRowCount() {
     return find.findRowCount();
+  }
+
+  /**
+   * Created for ease of use in the initialization YML file
+   * @param plainPassword
+   */
+  public void setPlainPassword(String plainPassword) {
+    this.password = UserPasswordUtil.generateHA1(email, plainPassword);
   }
 }
