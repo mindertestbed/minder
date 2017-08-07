@@ -1,8 +1,8 @@
 #Users
 users:
   - &root !!models.User
-      plainPassword: 12345
       email: root@minder
+      plainPassword: 12345
       name: ROOT
       roles:
       - !!models.DBRole
@@ -16,8 +16,8 @@ users:
           role: TEST_OBSERVER
       testGroups: []
   - &tester !!models.User
-      plainPassword: 12345
       email: tester@minder
+      plainPassword: 12345
       name: Tester
       roles:
       - !!models.DBRole
@@ -28,8 +28,8 @@ users:
           role: TEST_DEVELOPER
       testGroups: []
   - &gitb !!models.User
-      plainPassword: 12345
       email: gitb@minder
+      plainPassword: 12345
       name: GITB
       roles:
       - !!models.DBRole
@@ -43,8 +43,8 @@ users:
           role: TEST_DEVELOPER
       testGroups: []
   - &guest !!models.User
-      plainPassword: 12345
       email: guest@minder
+      plainPassword: 12345
       name: Guest
       roles:
       - !!models.DBRole
@@ -87,10 +87,6 @@ wrappers:
     version: "1"
     creationDate: "2015-02-02 00:00:00"
     wrapper: *xmlValueInitiator
-#Operation Types
-TOperationTypes:
-- &opType1 !!models.TOperationType
-  name: RUN_TEST_CASE
 
 #Groups
 groups:
@@ -199,4 +195,3 @@ groups:
     - !!models.TestAsset
         name: simple-input.xml
         testGroup: *sampleGroup
-        

@@ -34,7 +34,7 @@ class RestKeyRenewer @Inject()(implicit configuration: Configuration,
   val tmpBuffer = new Array[Byte](32)
 
   actorSystem.scheduler.schedule(0.second, SESSION_PURGE_TIMEOUT.minute) {
-    Logger.debug("Oturum anahtarı yenileniyor")
+    Logger.trace("Rest session key being renewed")
     new Random().nextBytes(tmpBuffer);
     periodKey = new String(tmpBuffer)
   }
