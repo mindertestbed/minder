@@ -2,7 +2,7 @@ organization := "gov.tubitak.minder"
 
 name := """minder"""
 
-version := "2.2.4-Sirius"
+version := "2.2.5-Sirius"
 
 lazy val minder = (project in file(".")).enablePlugins(PlayJava, PlayEbean)
 
