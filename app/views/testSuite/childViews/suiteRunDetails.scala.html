@@ -92,37 +92,41 @@
   <tr><th>&nbsp;</th> <th>Result</th> <th>Date</th> <th>MTDL Script V.</th> <th>Test Case</th> <th>Test Assertion</th></tr>
   @defining(new java.util.concurrent.atomic.AtomicInteger(1)) { index =>
     @for(testRun <- TestRun.findBySuiteRun(suiteRun)) {
-      <tr class="@if(testRun.status == TestRunStatus.SUCCESS) {goodTestRun} else {badTestRun}">
-        <td class="tabshrink">@index.getAndIncrement(). &nbsp;<input type="checkbox" id="testRun@{
-          testRun.id
-        }" onchange='updateSelectedTestRunList(this, @testRun.id)'/>
-        </td>
-        <td style="text-align:center ; vertical-align: middle ;" class="tabshrink">
-        @if(testRun.status == TestRunStatus.SUCCESS) {
-          <img src="@routes.Assets.versioned("/images/Check-icon.png")" height="16px" alt='G'/>
-        } else {
-          <img src="@routes.Assets.versioned("/images/Delete-icon.png")" height="16px" alt='B'/>
-        }
-        </td>
-        <td><a href='@routes.JobController.viewTestRunHistory(testRun.id)'>@utils.Util.formatDate(testRun.date)</a></td>
-        <td>
-          <a href="@controllers.routes.TestCaseController.viewTestCase2(testRun.job.tdl.testCase.id, testRun.job.tdl.id, "jobs")">
+      @if(testRun.status != TestRunStatus.IN_PROGRESS && testRun.status != TestRunStatus.PENDING) {
+        <tr class="@if(testRun.status == TestRunStatus.SUCCESS) {goodTestRun} else {badTestRun}">
+          <td class="tabshrink">@index.getAndIncrement().&nbsp;
+            <input type="checkbox" id="testRun@{
+              testRun.id
+            }" onchange='updateSelectedTestRunList(this, @testRun.id)'/>
+          </td>
+          <td style="text-align: center ;
+            vertical-align: middle ;" class="tabshrink">
+          @if(testRun.status == TestRunStatus.SUCCESS) {
+            <img src="@routes.Assets.versioned("/images/Check-icon.png")" height="16px" alt='G'/>
+          } else {
+            <img src="@routes.Assets.versioned("/images/Delete-icon.png")" height="16px" alt='B'/>
+          }
+          </td>
+          <td><a href='@routes.JobController.viewTestRunHistory(testRun.id)'>@utils.Util.formatDate(testRun.date)</a></td>
+          <td>
+            <a href="@controllers.routes.TestCaseController.viewTestCase2(testRun.job.tdl.testCase.id, testRun.job.tdl.id, "jobs")">
+            @{
+              testRun.job.tdl.version
+            }</a>
+          </td> <td>
+          <a href="@controllers.routes.TestCaseController.viewTestCase(testRun.job.tdl.testCase.id, "jobs")">
           @{
-            testRun.job.tdl.version
+            testRun.job.tdl.testCase.name
           }</a>
         </td> <td>
-        <a href="@controllers.routes.TestCaseController.viewTestCase(testRun.job.tdl.testCase.id, "jobs")">
-        @{
-          testRun.job.tdl.testCase.name
-        }</a>
-      </td> <td>
-        <a href="@controllers.routes.TestAssertionController.getAssertionDetailView(testRun.job.tdl.testCase.testAssertion.id, "cases")">
-        @{
-          testRun.job.tdl.testCase.testAssertion.taId
-        }
-        </a>
-      </td>
-      </tr>
+          <a href="@controllers.routes.TestAssertionController.getAssertionDetailView(testRun.job.tdl.testCase.testAssertion.id, "cases")">
+          @{
+            testRun.job.tdl.testCase.testAssertion.taId
+          }
+          </a>
+        </td>
+        </tr>
+      }
     }
   }
 </table>
