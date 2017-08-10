@@ -157,7 +157,7 @@ object Util {
   }
 
   def getVersionInfo(): String = {
-    "V2.2.4-Sirius"
+    "V2.2.5-Sirius"
   }
 
   def canAccess(localUser: User, owner: User): Boolean = {
