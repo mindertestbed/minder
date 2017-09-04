@@ -1,43 +1,44 @@
-
 @()(implicit authentication: Authentication, testLogFeeder: TestLogFeeder)
 
 @main("Test Monitor", "jobQueue", "") {
-  <div class="padabit" style="padding-left: 20px;padding-right: 20px;height:100%;">
-  <script>
-      $ ( function ( ) {
-        var logfeed = $( "#logfeed" )[0];
-        var logarea = $("#logarea")
+  <div class="padabit" style="padding-left: 20px;
+    padding-right: 20px;
+    height: 100%;">
+    <script>
+        $(function () {
+          var logfeed = $("#logfeed")[0];
+          var logarea = $("#logarea")
 
-        new EventSource ( '@controllers.routes.TestLogFeeder.logFeed()' ).onmessage = function ( event ) {
-          var newd  = event.data
-          logarea[0].textContent += "\n" + newd;
-          console.log("Log " + event.data)
-          logarea[0].scrollTop = logarea[0].scrollHeight;
+          new EventSource('@controllers.routes.TestLogFeeder.logFeed()').onmessage = function (event) {
+            var newd = event.data
+            logarea[0].textContent += "\n" + newd;
+            console.log("Log " + event.data)
+            logarea[0].scrollTop = logarea[0].scrollHeight;
+          }
+
+          $(window).resize(function () {
+            if ($(this).width() <= 768) {
+              $("#logDiv").hide();
+            } else {
+              $("#queDiv").show()
+              $("#historyDiv").show()
+              $("#logDiv").show()
+            }
+          });
+        });
+
+        function display(id) {
+          $("#queDiv").hide()
+          $("#historyDiv").hide()
+          $("#logDiv").hide()
+          $("#" + id).show()
         }
 
-        $(window).resize(function() {
-          if ($(this).width() <= 768) {
-            $("#logDiv").hide();
-          } else{
-            $("#queDiv").show()
-            $("#historyDiv").show()
-            $("#logDiv").show()
-          }
-        });
-      });
-
-      function display(id){
-        $("#queDiv").hide()
-        $("#historyDiv").hide()
-        $("#logDiv").hide()
-        $("#"+id).show()
-      }
 
 
+    </script>
 
-  </script>
-
-    <table style="width:100% ;" class="visible-xs"><tr><td class="tabexpand">
+    <table style="width: 100% ;" class="visible-xs"><tr><td class="tabexpand">
       <h3>Test Monitor</h3>
     </td><td class="tabshrink">
         <!-- Single button -->
@@ -55,10 +56,12 @@
 
     <h3 class="hidden-xs">Test Monitor</h3>
 
-    <div class="row" style="height:95%;">
+    <div class="row" style="height: 95%;">
       <div class="col-sm-@{
         utils.Util.feedWidth
-      }" style="overflow:auto; scroll;height:100%;">
+      }" style="overflow: auto;
+        scroll;
+        height: 100%;">
         <div id="queDiv">
         @jobQueueFeed()
         </div>
@@ -69,13 +72,20 @@
       </div>
       <div id="logDiv" class="col-sm-@{
         utils.Util.remaining
-      }" style="height:100%;">
-        <div class="panel panel-info" style="height:97% ; padding: 0px ;">
+      }" style="height: 100%;">
+        <div class="panel panel-info" style="height: 97% ;
+          padding: 0px ;">
           <div class="panel-heading"><span class="fa fa-terminal">&nbsp;</span>Log</div>
-          <div class="panel-body zeropad" style="height:100% ;">
+          <div class="panel-body zeropad" style="height: 100% ;">
 
             <textarea readonly="readonly" id="logarea" class="lightMinderBlue"
-            style="resize: none ; font-family:monospace ; height:calc(100% - 2em) ; width:100% ; border:1px solid #ddeee6 ; border-radius:2px ; overflow:scroll">@testLogFeeder.currentLogString(authentication.getLocalUser)</textarea>
+            style="resize: none ;
+              font-family: monospace ;
+              height: calc(100% - 2em) ;
+              width: 100% ;
+              border: 1px solid #ddeee6 ;
+              border-radius: 2px ;
+              overflow: scroll">@testLogFeeder.currentLogString(authentication.getLocalUser)</textarea>
 
           </div>
         </div>

@@ -13,8 +13,6 @@
 
     new EventSource('@{controllers.routes.TestRunFeeder.jobHistoryFeed()}').onmessage =
         function (event) {
-
-          console.log("History " + event.data)
           var json = JSON.parse(event.data)
 
           var img = successImage
@@ -36,8 +34,6 @@
 
           var newRow = rowTemplate.replace(/Pimage/g, img).replace(/Ptrclass/g, cls).replace(/PtestRunNumber/g, json.no).replace(/PtestRunId/g, json.id).replace(/PjobName/g, json.name).replace(/PjobId/g, json.jobId).replace(/PvisibilityColor/g, visibilityColor).replace(/PvisibilityClass/g, visibilityClass).replace(/Pvisibility/g, json.visibility)
 
-
-          console.log(newRow)
           historyTableBody.prepend(newRow)
         }
   });

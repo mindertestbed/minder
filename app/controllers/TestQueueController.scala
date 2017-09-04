@@ -36,6 +36,7 @@ class TestQueueController @Inject()(implicit testLogFeeder: Provider[TestLogFeed
   //a flag indicating the life of the thread.
   var goon = true;
 
+  val MAX_QUE_SIZE = 100
   /**
     * The main test thread
     */
@@ -50,7 +51,7 @@ class TestQueueController @Inject()(implicit testLogFeeder: Provider[TestLogFeed
     */
   def enqueueJob(id: Long, visibility: String) = Action {
     implicit request =>
-      if (jobQueue.size >= 30) {
+      if (jobQueue.size >= MAX_QUE_SIZE) {
         BadRequest("The job queue is full.")
       } else {
         val job = Job.findById(id)
@@ -75,7 +76,7 @@ class TestQueueController @Inject()(implicit testLogFeeder: Provider[TestLogFeed
     * @return
     */
   def enqueueJobWithUser(id: Long, user: User, replyToUrlAddress: String, visibility: Visibility): TestSession = {
-    if (jobQueue.size >= 30) {
+    if (jobQueue.size >= MAX_QUE_SIZE) {
       throw new IllegalStateException("Test queue is full")
     } else {
       val job = AbstractJob.findById(id)
@@ -253,7 +254,7 @@ class TestQueueController @Inject()(implicit testLogFeeder: Provider[TestLogFeed
       val java_ctx = play.core.j.JavaHelpers.createJavaContext(request)
       val java_session = java_ctx.session()
       val user = Authentication.getLocalUser(java_session)
-      if (jobQueue.size >= 30) {
+      if (jobQueue.size >= MAX_QUE_SIZE) {
         BadRequest("The job queue is full.")
       } else {
         try {

@@ -1,15 +1,15 @@
 package controllers
 
 import java.util
-import java.util.Collections
+import java.util.{Collections, Timer, TimerTask}
 import javax.inject.{Inject, Singleton}
 
-import akka.stream.scaladsl.{Flow, Sink, Source}
+import akka.stream.scaladsl.Source
 import models.{TestRun, User}
 import play.Logger
 import play.api.libs.EventSource
 import play.api.libs.concurrent.Execution.Implicits._
-import play.api.libs.iteratee.{Concurrent, Enumeratee}
+import play.api.libs.iteratee.{Concurrent, Enumeratee, Enumerator, Iteratee}
 import play.api.libs.streams.Streams
 import play.api.mvc._
 
@@ -17,7 +17,8 @@ import scala.collection.JavaConversions._
 
 @Singleton
 class TestLogFeeder @Inject()() extends Controller {
-  val (logEnumerator, logChannel) = Concurrent.broadcast[LogRecord];
+  val timerMap = new util.HashMap[String, (Timer, Enumerator[LogRecord])]
+  val (logEnumerator, firstLevelLogChannel) = Concurrent.broadcast[LogRecord]
 
   val currentLog = Collections.synchronizedList(new util.ArrayList[LogRecord]())
 
@@ -48,26 +49,34 @@ class TestLogFeeder @Inject()() extends Controller {
     implicit request =>
       val java_ctx = play.core.j.JavaHelpers.createJavaContext(request)
       val java_session = java_ctx.session()
-      val user = Authentication.getLocalUser(java_session);
+      val user = Authentication.getLocalUser(java_session)
 
-      val source = Source.fromPublisher(Streams.enumeratorToPublisher(logEnumerator &> logFilter(user)))
-      Ok.chunked(source.map { logRecord => logRecord.log } via EventSource.flow).as("text/event-stream")
+      val enumerator = createTimerForUser(user)
+
+      val toPublisher = Streams.enumeratorToPublisher(enumerator &> logFilter(user))
+      //create
+      val source = Source.fromPublisher(toPublisher)
+
+      Ok.chunked(source.map(lr => lr.log) via EventSource.flow).as("text/event-stream")
   }
 
+  def buffer(logRecord: LogRecord): Unit = {
+    firstLevelLogChannel push logRecord
+  }
 
   def log(logRecord: LogRecord): Unit = {
-    Thread.sleep(5);
+    Thread.sleep(5)
     Logger.debug(logRecord.log)
     currentLog.add(logRecord)
-    logChannel.push(logRecord)
+    buffer(logRecord)
   }
 
   def log(log: String): Unit = {
-    Thread.sleep(5);
+    Thread.sleep(5)
     val logRecord = LogRecord(null, log)
     Logger.debug(log)
     currentLog.add(logRecord)
-    logChannel.push(logRecord)
+    buffer(logRecord)
   }
 
   /**
@@ -88,7 +97,60 @@ class TestLogFeeder @Inject()() extends Controller {
     }
     stringBuilder toString
   }
+  //creating a timer for each request was bad design.
+  // Now we create a timer for each person, no matter how many conncetions she has
+  def createTimerForUser(user: User): Enumerator[LogRecord] = {
+    timerMap.synchronized {
+      if (!timerMap.containsKey(user.email)) {
+        val name = "logTimer-[" + user.email + "]"
 
+
+        val (secondLevelLogEnumerator, secondLevelLogChannel) = Concurrent.broadcast[LogRecord]
+
+        val timer = new Timer(name) {
+          override def finalize(): Unit = {
+            super.finalize()
+            Logger.debug(s"Timer [$name] GCed")
+          }
+        }
+        val task = new TimerTask {
+          Logger.debug(s"Create new timer task for ${user.email}")
+          val logBuffer = new util.LinkedList[LogRecord]()
+
+          val firstLevelConsumer = Iteratee.foreach[LogRecord](m => {
+            logBuffer.synchronized {
+              logBuffer.add(m)
+            }
+          })
+
+          //bind the first level channel to the first level consumer
+          logEnumerator |>>> firstLevelConsumer
+
+          override def run(): Unit = {
+            try {
+              logBuffer.synchronized {
+                if (logBuffer.size() > 0) {
+                  while (!logBuffer.isEmpty) {
+                    secondLevelLogChannel.push(logBuffer.remove(0))
+                  }
+                }
+              }
+            } catch {
+              case th: Throwable => {
+                Logger.error(th.getMessage, th)
+              }
+            }
+          }
+        }
+
+        timer.scheduleAtFixedRate(task, 5000, 5000)
+        timerMap.put(user.email, (timer, secondLevelLogEnumerator))
+        secondLevelLogEnumerator
+      } else {
+        timerMap.get(user.email)._2
+      }
+    }
+  }
 
 }
 

@@ -9,7 +9,6 @@
 
       new EventSource ( '@controllers.routes.TestRunFeeder.jobQueueFeed()'
       ).onmessage = function ( event ) {
-        console.log("QUE " + event.data)
         if (event.data.length == 0){
           activeJobDiv.hide()
           sleepingDiv.show()
