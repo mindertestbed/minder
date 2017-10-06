@@ -1,8 +1,10 @@
 package models;
 
+import com.avaje.ebean.Ebean;
 import com.avaje.ebean.Model;
 
 import javax.persistence.*;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -54,5 +56,13 @@ public class TestCase extends Model {
 
   public static List<TestCase> listByTestAssertion(TestAssertion assertion) {
     return find.where().eq("testAssertion", assertion).findList();
+  }
+
+  public static List<TestCase> findByGroup(TestGroup testGroup, int pageIndex, int pageSize) {
+   return find.where().in("testAssertion", TestAssertion.findByGroup(testGroup)).findPagedList(pageIndex, pageSize).getList();
+  }
+
+  public static int countByGroup(TestGroup testGroup) {
+   return find.where().in("testAssertion", TestAssertion.findByGroup(testGroup)).findRowCount();
   }
 }

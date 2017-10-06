@@ -239,18 +239,15 @@ public class JobController extends Controller {
     if (tr == null)
       return badRequest("A test run with id " + testRunId + " was not found");
 
-
-    System.out.println("Type: " + type);
     final User localUser = authentication.getLocalUser();
     if (Util.canAccess(localUser, tr.runner, tr.visibility)) {
-      response().setContentType("application/x-download");
       String fileName = tr.job.name + "." + tr.number + ".report";
       //
       fileName += ".pdf";
       byte[] data = ReportUtils.toPdf(tr);
 
       response().setHeader("Content-disposition", "attachment; filename=" + fileName);
-      return ok(data);
+      return ok(data).as("application/x-download");
     } else {
       return unauthorized("You don't have permission to modify this resource");
     }
@@ -262,7 +259,6 @@ public class JobController extends Controller {
     if (tr == null)
       return badRequest("A test run with id " + id + " was not found");
 
-    System.out.println(visibility);
     final User localUser = authentication.getLocalUser();
     if (Util.canAccess(localUser, tr.runner, tr.visibility)) {
       tr.visibility = Visibility.valueOf(visibility);

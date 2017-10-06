@@ -2,15 +2,34 @@
 @import views.html.util._
 @(tg: TestGroup)(implicit authentication: Authentication)
 
-<h4>Description</h4>
-<div id="description@{tg.id}"
+
+<h4>Owner</h4>
+<span>
+  @tg.owner.name @tg.owner.email
+</span>
+
+<h4>Short Description</h4>
+<span id="shortDescription@{
+  tg.id
+}"
   @subjectIs(tg.owner) {
-    onclick='showUpdateTextAreaDialog(@tg.id, "description", $(this ).next(), "/doEditGroupField")'
+    onclick='showUpdateInputTextDialog(@tg.id, "shortDescription", $(this).next(), "/doEditGroupField")'
+  } class="editable"></span>
+<input type="hidden" value="@tg.shortDescription"/>
+
+
+<h4>Description</h4>
+<div id="description@{
+  tg.id
+}"
+  @subjectIs(tg.owner) {
+    onclick='showUpdateTextAreaDialog(@tg.id, "description", $(this).next(), "/doEditGroupField")'
   } class="editable"></div>
 <input type="hidden" value="@tg.description"/>
 
 <script>
-$(function(){
-    bindValues($("#description@{tg.id}"))
-})
+    $(function () {
+      bindValues($("#description@{tg.id}"))
+      bindValues($("#shortDescription@{tg.id}"))
+    })
 </script>

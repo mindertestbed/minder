@@ -60,6 +60,14 @@ public class SuiteRun extends Model {
     return find.where().eq("testSuite", testSuite).orderBy("date desc").findList();
   }
 
+  public static List<SuiteRun> findBySuite(TestSuite testSuite, int pageIndex, int pageSize) {
+    return find.where().eq("testSuite", testSuite).orderBy("date desc").findPagedList(pageIndex, pageSize).getList();
+  }
+
+  public static int countBySuite(TestSuite testSuite) {
+    return find.where().eq("testSuite", testSuite).findRowCount();
+  }
+
   public static List<SuiteRun> getRecentRuns(int num) {
     return find.where().orderBy("date desc").findPagedList(0, num).getList();
   }

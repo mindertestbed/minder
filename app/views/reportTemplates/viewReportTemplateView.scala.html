@@ -1,0 +1,111 @@
+@import play.data.validation.ValidationError
+@(reportTemplate: ReportTemplate)(implicit authentication: Authentication)
+
+@main(Messages("minder.navigation.restricted.reportTemplates"), "mainNavigation",
+  Array(("Test Groups", controllers.routes.Application.testGroups().path()),
+    (reportTemplate.testGroup.name, controllers.routes.GroupController.getGroupDetailView(reportTemplate.testGroup.id, "reportTemplates").path()),
+    (reportTemplate.name, ""))){
+
+<div class="padabit">
+  <br />
+  <style>
+      #editor {
+        position: relative ;
+        top: 10px ;
+        right: 0 ;
+        bottom: 0 ;
+        left: 0px ;
+        height: 700px ;
+      }
+  </style>
+  <script type="text/javascript" src="@routes.Assets.versioned("javascripts/ace/ace.js")"></script>
+  <script>
+      $(function () {
+        editor = ace.edit("editor");
+        editor.setTheme("ace/theme/clouds");
+        editor.getSession().setMode("ace/mode/html");
+        editor.setOptions({
+          maxLines: 50,
+          readOnly: true
+        });
+
+        // store it
+        $("#editor").data('AceInstance', editor);
+
+        var content = $("#template");
+
+        editor.getSession().on("change", function () {
+          content.val(editor.getSession().getValue());
+        });
+
+        $("ul.theme-menu li").on('click', function () {
+          var theme = "ace/theme/".concat($(this).text()) ;
+          editor.setTheme(theme);
+        });
+
+        document.onkeydown = function (event) {
+          if (event.which == 27) {
+            $("#macrodiv").hide() ;
+          }
+        };
+      });
+  </script>
+
+  <table style="width: 100% ;">
+    <tr>
+      <td class="tabshrink">
+        <b>Name: </b>
+        <span type="text" name="name">@reportTemplate.name</span>
+      </td>
+      <td class="tabshrink">
+          &nbsp;
+        <b>Type: </b>
+        @if(reportTemplate.isBatchReport) {
+          Batch Report
+        } else {
+          Single Test Report
+        }
+      </td>
+      <td align="right" class="tabexpand">
+          <!-- The part for large screen -->
+        <table>
+          <tr>
+            <td>
+              <div class="dropdown" style="display: inline">
+                <button class="btn btn-default dropdown-toggle" type="button" data-toggle="dropdown" title="Select Theme"><span class="fa fa-tree">&nbsp;</span>&nbsp;<span class="caret"></span></button>
+                <ul class="dropdown-menu theme-menu" role="menu" aria-labelledby="menu1">
+                  <li role="presentation"><a role="menuitem" id='chrome' tabindex="-1" href="#">chrome</a></li>
+                  <li role="presentation"><a role="menuitem" id='eclipse' tabindex="-1" href="#">eclipse</a></li>
+                  <li role="presentation"><a role="menuitem" id='monokai' tabindex="-1" href="#">monokai</a></li>
+                  <li role="presentation"><a role="menuitem" id='sqlserver' tabindex="-1" href="#">sqlserver</a></li>
+                  <li role="presentation"><a role="menuitem" id='clouds' tabindex="-1" href="#">clouds</a></li>
+                  <li role="presentation"><a role="menuitem" id='textmate' tabindex="-1" href="#">textmate</a></li>
+                  <li role="presentation"><a role="menuitem" id='xcode' tabindex="-1" href="#">xcode</a></li>
+                </ul>
+              </div>
+
+                &nbsp;
+                &nbsp;
+
+          <td align="right">
+            <button type="submit" class="btn btn-primary btn-sm" action="edit" title="Edit"><span class='fa fa-edit' onclick="editTemplate()">&nbsp;</span> </button>&nbsp;
+            <a type="cancel" onclick="history.back()" class="btn btn-danger btn-sm" title='Go back'><span class="fa fa-times">&nbsp;</span></a>
+          </td></tr></table>
+        <script>
+            function editTemplate() {
+              window.location = '@routes.ReportTemplateController.editReportTemplateView(reportTemplate.id)'
+            }
+        </script>
+      </td>
+    </tr>
+  </table>
+
+  <div id="editor-container">
+    <pre id="editor">@{
+      new String(utils.Util.gunzip(reportTemplate.html))
+    }</pre>
+  </div>
+
+</div>
+  <!--padabit-->
+} <!-- main -->

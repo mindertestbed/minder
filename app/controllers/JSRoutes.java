@@ -17,6 +17,12 @@ public class JSRoutes extends Controller {
             routes.javascript.GroupController.renderUtilClasses(),
             routes.javascript.GroupController.renderDependencies(),
             routes.javascript.GroupController.renderJobTemplates(),
+            routes.javascript.GroupController.renderReportTemplates(),
+            routes.javascript.ReportTemplateController.doCreateReportTemplate(),
+            routes.javascript.ReportTemplateController.doEditReportTemplate(),
+            routes.javascript.ReportTemplateController.viewReportTemplateView(),
+            routes.javascript.ReportTemplateController.createReportTemplateView(),
+            routes.javascript.ReportTemplateController.editReportTemplateView(),
             routes.javascript.TestAssertionController.renderDetails(),
             routes.javascript.TestAssertionController.renderTestCases(),
             routes.javascript.JobController.changeTestRunVisibility(),
@@ -30,7 +36,21 @@ public class JSRoutes extends Controller {
             routes.javascript.TestSuiteController.getNamesAndAdaptersForTdls(),
             routes.javascript.TestSuiteController.renderStatus(),
             routes.javascript.TestSuiteController.renderDetails(),
-            routes.javascript.TestSuiteController.renderEditor()
+            routes.javascript.TestSuiteController.renderEditor(),
+            routes.javascript.AdvancedReporting.renderMain(),
+            routes.javascript.AdvancedBatchReporting.step1(),
+            routes.javascript.AdvancedBatchReporting.step2(),
+            routes.javascript.AdvancedBatchReporting.step3(),
+            routes.javascript.AdvancedBatchReporting.step4(),
+            routes.javascript.AdvancedBatchReporting.listTestSuites(),
+            routes.javascript.AdvancedBatchReporting.listSuiteRuns(),
+            routes.javascript.AdvancedBatchReporting.listTestRuns(),
+            routes.javascript.AdvancedBatchReporting.listTestCases(),
+            routes.javascript.AdvancedBatchReporting.listJobs(),
+            routes.javascript.AdvancedBatchReporting.listJobTestRuns(),
+            routes.javascript.AdvancedBatchReporting.getReportParameters1(),
+            routes.javascript.AdvancedBatchReporting.getReportParameters2(),
+            routes.javascript.AdvancedBatchReporting.generateReport()
         ))
         .as("text/javascript");
   }

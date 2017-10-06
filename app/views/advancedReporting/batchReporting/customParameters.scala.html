@@ -1,0 +1,46 @@
+@()
+
+
+<div id='customParametersDiv'>
+  <h3>Report Parameters</h3>
+  <div class="bg-info">
+  The parameters are filled in this order:
+    <ol>
+      <li>Values are taken from here</li>
+      <li>Empty values are 'removed' from the final report</li>
+    </ol>
+  </div>
+  <table class="table table-striped">
+    <tbody id="parametersTBODY">
+      <tr><th>Parameter Name</th>
+        <th>Value</th>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+<script>
+    $(function () {
+      jsRoutes.controllers.AdvancedBatchReporting.getReportParameters1(selectedBatchReportId, selectedSingleReportId).ajax({
+        success: renderParameterTable
+      })
+    })
+
+
+    function renderParameterTable(json) {
+      var targetBody = $('#parametersTBODY')
+      for (var row in json) {
+        var tr = createJQElement('tr', targetBody)
+        var td = createJQElement('td', tr)
+        td.text(json[row]['name'])
+        var td = createJQElement('td', tr)
+        var input = createJQElement('input', td)
+        input.attr('type', 'text')
+        input.addClass('customParameterList')
+        input.attr('name', json[row]['name'])
+        input.val(json[row]['value'])
+      }
+    }
+
+
+</script>

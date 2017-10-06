@@ -1,0 +1,83 @@
+@import java.util.concurrent.atomic.AtomicInteger
+@import views.html.util._
+@import authentication._
+@(testGroup: TestGroup)(implicit authentication: Authentication)
+
+<script>
+    $(function () {
+      $(document).tooltip();
+    });
+</script>
+
+@subjectHasRole(security.Role.TEST_DESIGNER) {
+  @createLinkButton(controllers.routes.ReportTemplateController.createReportTemplateView(testGroup.id).url,
+    Messages("reportTemplates.createReportTemplate"))
+  <br />
+  <br />
+}
+
+<div>
+@if(ReportTemplate.findByGroup(testGroup).size() > 0) {
+  <table class="table table-hover table-condensed  table-striped " >
+    @createFirstRow {
+      <th >Name</th>
+      <th >Author</th>
+      <th >Type</th>
+
+    }
+
+    @defining(new AtomicInteger(1)) { index =>
+      @defining(ReportTemplate.findByGroup(testGroup)) { reportTemplates =>
+        @for(reportTemplate <- reportTemplates) {
+          <tr id='reportTemplate_@{reportTemplate.id}'>
+            <td class='tabshrink'>@index.getAndIncrement</td>
+            <td class='tabshrink'><a href="@routes.ReportTemplateController.viewReportTemplateView(reportTemplate.id)">@reportTemplate.name</a></td>
+            <td class='tabshrink'>@reportTemplate.owner</td>
+            <td class='tabshrink'>@if(reportTemplate.isBatchReport){
+              Batch report
+            } else {
+              Single test report
+            }</td>
+
+            <td class='tabshrink' align='center' width="100px">
+              <table><tr>
+              @subjectIs(testGroup.owner) {
+                <td>
+                  <button type="button" class="btn btn-xs btn-default"
+                      onClick='delWD@{reportTemplate.id}()'
+                  style="padding-left: 15px;padding-right: 15px;">
+                    <span class="glyphicon glyphicon-trash"></span>
+                  </button>
+
+                  <script>
+                    function delWD@{reportTemplate.id}() {
+                      deleteWithDialog(
+                        '@routes.ReportTemplateController.deleteReportTemplate(reportTemplate.id).url',
+                        $("#dialog-confirm"),
+                        'Delete Report Template', 'reportTemplate', '@reportTemplate.name',
+                        function(){
+                          deleteRow('reportTemplate_@{reportTemplate.id}')
+                        }
+                      )
+                    }
+                  </script>
+
+                </td>
+              }
+              </tr>
+              </table>
+
+            </td>
+          </tr>
+        }
+      </table>
+    }
+  }
+}
+
+  <script>
+    function deleteRow(rowId){
+      $('#'+rowId).remove()
+    }
+  </script>
+</div>

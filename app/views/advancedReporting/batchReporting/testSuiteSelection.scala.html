@@ -1,0 +1,94 @@
+@(testGroup: TestGroup)
+
+@testSuites = @{
+  TestSuite.findByGroup(testGroup)
+}
+
+<style>
+    .vertical-text {
+      writing-mode: tb-rl;
+      white-space: nowrap;
+      display: block;
+      bottom: 0;
+      width: 25px;
+      height: auto;
+      text-align: center;
+      font-weight: bold;
+      font-size: larger;
+      vertical-align: middle;
+    }
+</style>
+
+<div id='testSuiteList'>
+
+</div>
+
+<script>
+
+    var dataTabl = new DataTable($('#testSuiteList'), @testGroup.id, levels = [
+      {
+        updateFunction: jsRoutes.controllers.AdvancedBatchReporting.listTestSuites,
+        title: 'Test Suites',
+        pageSize: 10,
+        renderDownButtons: true,
+        renderRefreshButton: false,
+        columns: [{field: 'id', label: 'ID'}, {field: 'name', label: 'Name'}]
+      },
+      {
+        updateFunction: jsRoutes.controllers.AdvancedBatchReporting.listSuiteRuns,
+        title: 'Suite Runs',
+        pageSize: 10,
+        renderCheckBoxes: true,
+        renderDownButtons: true,
+        renderRefreshButton: true,
+        backgroundColor: '#dfffc0',
+        columns: [{field: 'id', label: 'ID'}, {field: 'date', label: 'Date'}]
+      },
+      {
+        updateFunction: jsRoutes.controllers.AdvancedBatchReporting.listTestRuns,
+        title: 'Test Runs',
+        pageSize: 10,
+        renderCheckBoxes: true,
+        renderDownButtons: false,
+        renderRefreshButton: true,
+        backgroundColor: '#c9ffee',
+        columns: [{field: 'id', label: 'ID'}, {field: 'date', label: 'Date'}, {field: 'runner', label: 'Runner'}, {
+          field: 'number',
+          label: 'Number'
+        }, {
+          field: 'result',
+          label: ' ',
+          formatFunction: function (value) {
+            if (value == true) {
+              return '<span class="fa fa-check" style="color:green"></span>'
+            } else {
+              return '<span class="fa fa-cross" style="color:red"></span>'
+            }
+          }
+        }]
+      },
+    ])
+
+    dataTabl.updateTable()
+
+
+    var levelTypMap = {
+      0: 'TestSuite',
+      1: 'SuiteRun', 2: 'TestRun'
+    }
+
+    dataTabl.$.on('itemClicked', function (evt, level, itemId) {
+      var collection = reportItems[levelTypMap[level]]
+      if (collection === undefined)
+        collection = {}
+
+      collection[itemId] = "1"
+      reportItems[levelTypMap[level]] = collection
+
+      updateSelectedItems()
+    })
+
+</script>
+
+
+

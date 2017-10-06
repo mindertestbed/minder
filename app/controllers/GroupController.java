@@ -365,6 +365,12 @@ public class GroupController extends Controller {
   public Result renderJobTemplates(long id) {
     return ok(jobTemplatesList.render(TestGroup.findById(id), authentication));
   }
+
+
+  @AllowedRoles({Role.TEST_DESIGNER, Role.TEST_OBSERVER})
+  public Result renderReportTemplates(long id) {
+    return ok(reportTemplatesList.render(TestGroup.findById(id), authentication));
+  }
 }
 
 

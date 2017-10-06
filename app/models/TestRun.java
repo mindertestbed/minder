@@ -8,6 +8,7 @@ import play.Logger;
 import javax.persistence.*;
 import java.util.Date;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * Created by yerlibilgin on 30/12/14.
@@ -92,11 +93,29 @@ public class TestRun extends Model {
   public static List<TestRun> findBySuiteRun(SuiteRun suiteRun) {
     return find.where().eq("suiteRun", suiteRun).isNotNull("date").orderBy("date desc").findList();
   }
+  public static List<TestRun> findBySuiteRunId(long suiteRunID) {
+    return find.where().eq("suite_run_id", suiteRunID).isNotNull("date").orderBy("date desc").findList();
+  }
+
+  public static List<TestRun> findBySuiteRun(SuiteRun suiteRun, int pageIndex, int pageSize) {
+    return find.where().eq("suiteRun", suiteRun).isNotNull("date").orderBy("date desc").findPagedList(pageIndex, pageSize).getList();
+  }
+
+  public static int countBySuiteRun(SuiteRun suiteRun) {
+    return find.where().eq("suiteRun", suiteRun).isNotNull("date").findRowCount();
+  }
 
   public static List<TestRun> findByJob(Long id) {
     return find.where().eq("job_id", id).isNotNull("date").orderBy("date desc").findList();
   }
 
+  public static List<TestRun> findByJob(AbstractJob job, int pageIndex, int pageSize) {
+    return find.where().eq("job", job).isNotNull("date").orderBy("date desc").findPagedList(pageIndex, pageSize).getList();
+  }
+
+  public static int countByJob(AbstractJob job) {
+    return find.where().eq("job", job).isNotNull("date").orderBy("date desc").findRowCount();
+  }
 
   public static List<TestRun> getRecentRuns(int num) {
     List<TestRun> list = find.where().isNotNull("date").orderBy("date desc").findPagedList(0, num).getList();
@@ -121,5 +140,19 @@ public class TestRun extends Model {
     com.avaje.ebean.SqlQuery qu = Ebean.createSqlQuery("Select count(id) from TestRun where job_id=" + job.id);
     Object count = qu.findUnique().get("count");
     return Integer.parseInt(count.toString());
+  }
+
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) return true;
+    if (o == null || getClass() != o.getClass()) return false;
+    TestRun testRun = (TestRun) o;
+    return number == testRun.number &&
+        Objects.equals(id, testRun.id);
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(id, number);
   }
 }

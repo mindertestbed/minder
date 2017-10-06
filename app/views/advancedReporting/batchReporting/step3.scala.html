@@ -1,0 +1,38 @@
+@(testGroup: TestGroup)(implicit authentication: Authentication)
+@{
+  /*
+  The template for listing and allowing the user to select a single run report template
+  */
+}
+
+<div class="container">
+  <div class="row">
+    <div class="col-xs-12 col-sm-6">
+      <div style="margin-top: 10px; margin-bottom: 10px;" align="center">
+        <button class="btn btn-sm btn-primary" onclick="switchSelectors()" id="s1">
+          Show single test runs
+        </button>
+        <button class="btn btn-sm btn-primary" onclick="switchSelectors()" id="s2" style="display: none">
+          Show test suites
+        </button></div>
+      <div id="suiteSelectionDiv">
+      @testSuiteSelection(testGroup)
+      </div>
+      <div id="runSelectionDiv" style="display: none">
+      @testRunSelection(testGroup)
+      </div>
+    </div>
+    <div class="col-xs-12 col-sm-6">
+      @selectedItems()
+    </div>
+  </div>
+</div>
+
+<script>
+    function switchSelectors() {
+      $('#suiteSelectionDiv').toggle()
+      $('#runSelectionDiv').toggle()
+      $('#s1').toggle()
+      $('#s2').toggle()
+    }
+</script>

@@ -23,26 +23,9 @@
 
     <hr />
 
-    <h4>Owner</h4>
-    <span>
-      @tg.owner.name @tg.owner.email
-    </span>
-
-    <h4>Short Description</h4>
-    <span id="shortDescription@{
-      tg.id
-    }"
-      @subjectIs(tg.owner) {
-        onclick='showUpdateInputTextDialog(@tg.id, "shortDescription", $(this).next(), "/doEditGroupField")'
-      } class="editable"></span>
-    <input type="hidden" value="@tg.shortDescription"/>
-
-    @putSpace()
-
     <script>
         $(function () {
           bindValues($("#name@{tg.id}"))
-          bindValues($("#shortDescription@{tg.id}"))
         })
     </script>
 
@@ -69,6 +52,12 @@
         function showJobTemplates() {
           ajaxRouteGet(jsRoutes.controllers.GroupController.renderJobTemplates, @tg.id, $("#groupSubItems"))
         }
+        function showReportTemplates() {
+          ajaxRouteGet(jsRoutes.controllers.GroupController.renderReportTemplates, @tg.id, $("#groupSubItems"))
+        }
+        function showAdvancedReporting() {
+          ajaxRouteGet(jsRoutes.controllers.AdvancedReporting.renderMain, @tg.id, $("#groupSubItems"))
+        }
     </script>
 
     @ajaxDisplaySelector(display,
@@ -78,7 +67,9 @@
       "assets" -> ("Test Assets", "showAssets"),
       "utils" -> ("Utility Classes", "showUtils"),
       "deps" -> ("Dependencies", "showDependencies"),
-      "jobTemplates" -> ("Job Templates", "showJobTemplates")
+      //"jobTemplates" -> ("Job Templates", "showJobTemplates"),
+      "reportTemplates" -> ("Report Templates", "showReportTemplates"),
+      "advancedReporting" -> ("Advanced Reporting", "showAdvancedReporting")
     )
 
 

@@ -3,9 +3,7 @@ package utils;
 import com.itextpdf.text.Document;
 import com.itextpdf.text.pdf.PdfWriter;
 import com.itextpdf.tool.xml.XMLWorkerHelper;
-import models.TestAssertion;
-import models.TestRun;
-import models.TestRunStatus;
+import models.*;
 import play.Logger;
 
 import java.io.ByteArrayInputStream;
@@ -84,9 +82,13 @@ public class ReportUtils {
   }
 
   private static String fillTestRun(TestRun tr, String targetString) {
+    return fillTestRun(tr, targetString, null);
+  }
+
+  private static String fillTestRun(TestRun tr, String reportTemplate, Map<String, String> customParameters) {
     TestAssertion testAssertion = TestAssertion.findById(tr.job.tdl.testCase.testAssertion.id);
     boolean isSuccess = tr.status == TestRunStatus.SUCCESS;
-    return targetString
+    reportTemplate = reportTemplate
         .replace("${taID}", testAssertion.taId)
         .replace("${testGroup}", testAssertion.testGroup.name)
         .replace("${testCase}", tr.job.tdl.testCase.name)
@@ -108,6 +110,17 @@ public class ReportUtils {
             ).replace("\n\r", "<br/>")
                 .replace("\n", "<br/>")
         );
+
+    if (customParameters != null && customParameters.size() > 0) {
+      for (Map.Entry<String, String> entry : customParameters.entrySet()) {
+        reportTemplate = reportTemplate.replace("${" + entry.getKey() + "}", entry.getValue());
+      }
+    }
+
+    //check if we still have a parameter like ${param} and remove them
+    reportTemplate.replaceAll("\\$\\{(\\w|_)+(\\w|\\d|_)*\\}", "");
+
+    return reportTemplate;
   }
 
   private static String getNonNullString(byte[] errorMessage) {
@@ -175,6 +188,78 @@ public class ReportUtils {
     PdfWriter writer = PdfWriter.getInstance(document, baos);
     document.open();
     XMLWorkerHelper.getInstance().parseXHtml(writer, document, new ByteArrayInputStream(html.getBytes()));
+    document.close();
+    return baos.toByteArray();
+  }
+
+  public static byte[] toPdf(long groupId, long selectedBatchReportId, long selectedSingleReportId, Collection<TestRun> testRuns, Map<String, String> customParameterMap) throws Exception {
+
+    /**
+     * Replacement
+     */
+
+    StringBuilder builder = new StringBuilder();
+    StringBuilder tocBuilder = new StringBuilder();
+
+    String testGroup = TestGroup.findById(groupId).name;
+    String batchTemplateHTML = reportTemplate;
+    if (selectedBatchReportId != -1) {
+      ReportTemplate batchTemplate = ReportTemplate.byId(selectedBatchReportId);
+
+      if (batchTemplate == null)
+        throw new Exception("No such report with id [" + selectedBatchReportId + "]");
+
+      batchTemplateHTML = new String(Util.gunzip(batchTemplate.html));
+    }
+
+    String singleTemplate = singleTestRunTemplate;
+    if (selectedSingleReportId != -1) {
+      ReportTemplate testRunTemplate = ReportTemplate.byId(selectedSingleReportId);
+      if (testRunTemplate == null)
+        throw new Exception("No such report with id [" + selectedSingleReportId + "]");
+      singleTemplate = new String(Util.gunzip(testRunTemplate.html));
+    }
+
+    for (TestRun testRun : testRuns) {
+
+      builder.append(fillTestRun(testRun, new String(singleTemplate), customParameterMap));
+
+      tocBuilder
+          .append("<tr")
+          .append(testRun.status == TestRunStatus.SUCCESS ? (" style='background-color:" + successColor + ";'") : (" style='background-color:" + failColor + "'"))
+          .append("><td><a href='#")
+          .append(testRun.job.tdl.testCase.testAssertion.taId)
+          .append("'>")
+          .append(testRun.job.tdl.testCase.testAssertion.taId)
+          .append("&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</a></td><td>")
+          .append((testRun.status == TestRunStatus.SUCCESS ? checkString : crossString))
+          .append("</td></tr>\n");
+    }
+
+
+    batchTemplateHTML = batchTemplateHTML
+        .replace("${testRuns}", builder.toString())
+        .replace("${toc}", tocBuilder.toString())
+        .replace("${testGroup}", testGroup)
+        .replace("${date}", Util.formatDate(new Date()))
+        .replace("${subTitle}", "");
+
+    if (customParameterMap != null && customParameterMap.size() > 0) {
+      for (Map.Entry<String, String> entry : customParameterMap.entrySet()) {
+        batchTemplateHTML = batchTemplateHTML.replace("${" + entry.getKey() + "}", entry.getValue());
+      }
+    }
+
+    //check if we still have a parameter like ${param} and remove them
+    batchTemplateHTML.replaceAll("\\$\\{(\\w|_)+(\\w|\\d|_)*\\}", "");
+
+
+    Document document = new Document();
+    ByteArrayOutputStream baos = new ByteArrayOutputStream();
+
+    PdfWriter writer = PdfWriter.getInstance(document, baos);
+    document.open();
+    XMLWorkerHelper.getInstance().parseXHtml(writer, document, new ByteArrayInputStream(batchTemplateHTML.getBytes()));
     document.close();
     return baos.toByteArray();
   }

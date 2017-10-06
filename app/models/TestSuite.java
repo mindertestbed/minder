@@ -20,11 +20,9 @@ public class TestSuite extends Model {
   public long id;
 
 
-
   @ManyToOne
   @Column(nullable = false)
   public TestGroup testGroup;
-
 
 
   @Column(nullable = false)
@@ -59,12 +57,20 @@ public class TestSuite extends Model {
 
   private static final Finder<Long, TestSuite> find = new Finder<>(TestSuite.class);
 
-  public static TestSuite findById(Long id){
+  public static TestSuite findById(Long id) {
     return find.byId(id);
   }
 
   public static List<TestSuite> findByGroup(TestGroup group) {
     return find.where().eq("testGroup", group).setOrderBy("id").findList();
+  }
+
+  public static List<TestSuite> findByGroup(TestGroup group, int pageIndex, int pageSize) {
+    return find.where().eq("testGroup", group).setOrderBy("id").findPagedList(pageIndex, pageSize).getList();
+  }
+
+  public static int countByGroup(TestGroup group) {
+    return find.where().eq("testGroup", group).findRowCount();
   }
 
   public static TestSuite findByGroupAndName(TestGroup tg, String name) {

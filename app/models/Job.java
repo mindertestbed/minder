@@ -1,6 +1,7 @@
 package models;
 
 import com.avaje.ebean.ExpressionList;
+import scala.Int;
 
 import javax.persistence.DiscriminatorValue;
 import javax.persistence.Entity;
@@ -26,6 +27,15 @@ public class Job extends AbstractJob {
   }
 
 
+  public static List<Job> findByTestCase(TestCase testCase, int pageIndex, int pageSize) {
+    return find.where().in("tdl", Tdl.findByTestCase(testCase)).orderBy("id desc").findPagedList(pageIndex, pageSize).getList();
+  }
+
+  public static int countByTestCase(TestCase testCase) {
+    return find.where().in("tdl", Tdl.findByTestCase(testCase)).findRowCount();
+  }
+
+
   public static List<Job> getAllByTestSuite(TestSuite testSuite) {
     return find.where().eq("testSuite", testSuite).orderBy("id").findList();
   }
@@ -43,7 +53,7 @@ public class Job extends AbstractJob {
   }
 
   public static List<Job> findByTestSuite(TestSuite testSuite) {
-    return find.where().eq("testSuite", testSuite).setOrderBy("name").findList();
+    return find.where().eq("testSuite", testSuite).orderBy("name").findList();
   }
 
   public static Job findByName(String name) {

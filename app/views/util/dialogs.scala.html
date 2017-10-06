@@ -99,6 +99,39 @@ function showInfoDialog(title, body, onClose) {
 }
 
 
+function showConfirmation(title, info, accept, reject){
+  $('#myQuestionDialog .modal-title').html(title)
+
+  $('#myQuestionDialog .modal-body').html(info)
+
+  $('#myQuestionDialog .btn-success').on('click', function () {
+    dialog.accepted = true;
+  })
+
+  $('#myQuestionDialog .btn-warning').on('click', function () {
+    dialog.accepted = false;
+  })
+
+  var dialog = $('#myQuestionDialog');
+  dialog.accepted = false
+  dialog.on('hidden.bs.modal', function (e) {
+    if (dialog.accepted) {
+      if (accept !== undefined) {
+          accept()
+      }
+    } else {
+      if (reject !== undefined)
+        reject()
+    }
+
+    $('#myQuestionDialog .btn-success').off()
+    $('#myQuestionDialog .btn-warning').off()
+    dialog.off()
+  })
+
+  dialog.modal({keyboard: true})
+}
+
 function showInputDialog(title, data, initial, accept, reject) {
   $('#myQuestionDialog .modal-title').html(title)
 

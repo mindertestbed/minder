@@ -36,8 +36,6 @@ public class ReportGenerator extends BuiltInAdapter {
   public void setReportTemplate(byte[] template) {
     if (!isRunning)
       throw new MinderException(MinderException.E_SUT_NOT_RUNNING);
-
-    System.out.println("Template: " + new String(template));
     rmg.setReportTemplate(template);
 
   }

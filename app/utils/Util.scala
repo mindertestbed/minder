@@ -22,6 +22,29 @@ import scala.collection.JavaConversions._
   */
 object Util {
 
+  val keywords = new util.LinkedHashMap[String, String]()
+
+  keywords.put("${date}", "Date")
+  keywords.put("${log}", "Log for each test")
+  keywords.put("${result}", "Test Run Result")
+  keywords.put("${resultCharacter}", "Check or Cross")
+  keywords.put("${resultColor}", "Check or Cross color")
+  keywords.put("${subTitle}", "Batch Report Subtitle")
+  keywords.put("${systemsTested}", "SUT's tested")
+  keywords.put("${testCase}", "Test case name")
+  keywords.put("${testGroup}", "Test group name")
+  keywords.put("${testRuns}", "The LIST of test runs")
+  keywords.put("${toc}", "Table of contents")
+  keywords.put("${user}", "User ID")
+  keywords.put("${normativeSource}", "TA Normative Source")
+  keywords.put("${predicate}", "TA Predicate")
+  keywords.put("${prerequisite}", "TA prerequisite")
+  keywords.put("${prescriptionLevel}", "TA presc. level")
+  keywords.put("${taID}", "TA ID")
+  keywords.put("${tag}", "TA Tag")
+  keywords.put("${target}", "TA target")
+  keywords.put("${variables}", "TA variables")
+
   def fixLineNumbers(value: String, firstLineNumber: Int) = {
     //currently hard code, in the future get it from TDL Compiler
     //its a -9

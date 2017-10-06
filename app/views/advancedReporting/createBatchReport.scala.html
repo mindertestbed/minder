@@ -1,0 +1,293 @@
+@import views.html.main
+@import play.api.mvc._
+@(group: TestGroup)(implicit session: Session, authentication: Authentication)
+@main(Messages("minder.navigation.restricted.testdesigner"), "testGroups",
+  Array(("Test Groups", controllers.routes.Application.testGroups().path()),
+    ("Create Batch Report", ""))) {
+
+
+  @{
+    /*
+    TODO:
+    STEP.1
+    ok 1 - List the existing batch report templates
+    ok 2 - Allow the user to select only one
+    ok 3 - Allow him to skip (and use the defualt one)
+    ok 4 - Allow him to click and see a preview of the template
+    STEP.2
+    ok 5 - Display single run templates
+    ok 6 - Allow the user to select only one
+    ok 7 - Allow him to skip (and use the default one)
+    ok 8 - Allow him to click and see a preview of the template (combined with the batch template
+    STEP.3
+    9 - Display a button to 'select runs from test suite'
+    10 - Display another button to select a single test run (or multiple ones)
+    11 - Accumulate test runs from the previous two steps.
+    STEP.4
+    12 - Display a button to generate the report
+    */
+  }
+
+  @views.html.util.dialogs()
+
+  <br/>
+  <div class="container-fluid">
+    <div class="row">
+      <div class="col-xs-12" id='stepDiv'>
+      </div>
+    </div>
+
+
+      <!-- Controls -->
+    <div class="row" align="center" style="margin-top: 20px">
+      <div class="col-xs-12 col-sm-6" align="right">
+        <button class="btn" onclick="prevStep()" id='prevButton'><span class="fa fa-backward"></span>
+          Back
+        </button>
+      </div>
+      <div class="col-xs-12 col-sm-6" align="left">
+        <button class="btn" onclick="nextStep()" id='nextButton'><span class="fa fa-forward"></span> Next</button>
+        <button style="display: none" class="btn btn-info" onclick="generateReport()" id='generateReport'><span class="fa fa-forward"></span>
+          Generate Report
+        </button>
+      </div>
+    </div>
+
+  </div>
+
+
+  <script>
+
+
+      //report items are collected here
+      var reportItems = {}
+      //selected item table rows are collected here
+      var currentCollection = []
+
+      var selectedBatchReportId = null
+      var selectedSingleReportId = null
+      var step1 = function (successCallBack) {
+        ajaxRouteGet(jsRoutes.controllers.AdvancedBatchReporting.step1, @group.id, successCallBack, failFunction
+        )
+      }
+
+      var step2 = function (successCallBack) {
+        //check if the user has selected a report. Otherwhise confirm that the default one will be used
+        if (selectedBatchReportId == null) {
+          showConfirmation('Info', 'The default template will be used', function () {
+            selectedBatchReportId = -1;
+            confirmStep2(successCallBack)
+          })
+        } else {
+          confirmStep2(successCallBack)
+        }
+      }
+
+      function confirmStep2(successCallBack) {
+        ajaxRouteGet(jsRoutes.controllers.AdvancedBatchReporting.step2, @group.id, successCallBack, failFunction
+        )
+      }
+
+      var step3 = function (successCallBack) {
+        //check if the user has selected a report. Otherwhise confirm that the default one will be used
+        if (selectedSingleReportId == null) {
+          showConfirmation('Info', 'The default single template will be used', function () {
+            selectedSingleReportId = -1
+            confirmStep3(successCallBack)
+          })
+        } else {
+          confirmStep3(successCallBack)
+        }
+      }
+
+      function confirmStep3(successCallback) {
+        ajaxRouteGet(jsRoutes.controllers.AdvancedBatchReporting.step3, @group.id, function (data) {
+              successCallback(data)
+              //as this is the last step, set next button to finish (generate report)
+              $('#nextButton').show()
+              $('#generateReport').hide();
+            }, failFunction
+        )
+      }
+
+      var step4 = function (successCallback) {
+        if (currentCollection.length == 0) {
+          showError('Please select at least one test run')
+          return
+        }
+
+        ajaxRouteGet(jsRoutes.controllers.AdvancedBatchReporting.step4, @group.id, function (data) {
+              successCallback(data)
+              //as this is the last step, set next button to finish (generate report)
+              $('#nextButton').hide()
+              $('#generateReport').show();
+            }, failFunction
+        )
+      }
+
+
+      step1.next = step2
+      step1.prev = null;
+
+      step2.next = step3
+      step2.prev = step1;
+
+      step3.next = step4
+      step3.prev = step2;
+
+      step4.next = null
+      step4.prev = step3;
+
+      var currentStep = step1
+
+      function nextStep() {
+        if (currentStep.next != null) {
+          currentStep.next(function (data) {
+            $('#stepDiv').html(data)
+            currentStep = currentStep.next;
+            updateButtons()
+          })
+        }
+      }
+
+      function refresh() {
+        if (currentStep != null) {
+          currentStep(function (data) {
+            $('#stepDiv').html(data)
+            updateButtons()
+          })
+        }
+      }
+
+      function prevStep() {
+        if (currentStep.prev != null) {
+          currentStep.prev(function (data) {
+            $('#stepDiv').html(data)
+            currentStep = currentStep.prev;
+            updateButtons()
+          })
+        }
+      }
+
+      function updateButtons() {
+        if (currentStep.next == null) {
+          $('#nextButton').attr('disabled', 'disabled')
+          $('#nextButton').removeClass('btn-primary')
+          $('#nextButton').addClass('btn-default')
+        } else {
+          $('#nextButton').removeAttr('disabled')
+          $('#nextButton').removeClass('btn-default')
+          $('#nextButton').addClass('btn-primary')
+        }
+
+        if (currentStep.prev == null) {
+          $('#prevButton').attr('disabled', 'disabled')
+          $('#prevButton').removeClass('btn-primary')
+          $('#prevButton').addClass('btn-default')
+        } else {
+          $('#prevButton').removeAttr('disabled')
+          $('#prevButton').removeClass('btn-default')
+          $('#prevButton').addClass('btn-primary')
+        }
+      }
+
+      function failFunction(data) {
+        showError(data)
+      }
+
+      function selectBatchReport(id) {
+        selectedBatchReportId = id
+        nextStep()
+        console.log('Selected batch report id ' + selectedBatchReportId)
+      }
+
+      function selectSingleReport(id) {
+        selectedSingleReportId = id;
+        nextStep()
+        console.log('Selected single report id ' + selectedSingleReportId)
+      }
+
+      $(function () {
+        currentStep(function (data) {
+          $('#stepDiv').html(data)
+          updateButtons()
+        })
+      })
+
+
+      //when the PLUS button is clicked on an item, this method is triggered
+      function updateSelectedItems() {
+        for (var row in currentCollection) {
+          //remove from the table
+          currentCollection[row].remove()
+        }
+        currentCollection.length = 0
+        var target = $('#selectedItemsTBody')
+        for (var key in reportItems) {
+          var coll = reportItems[key]
+          for (var itemID in coll) {
+            var tr = createJQElement('tr', target)
+            currentCollection.push(tr)
+            tr.key = key
+            tr.itemID = itemID
+            var td = createJQElement('td', tr)
+            td.text(key)
+            var td = createJQElement('td', tr)
+            td.text(itemID)
+            var td = createJQElement('td', tr)
+            var btn = createJQElement('button', td)
+            createJQElement('span', btn).addClass('fa fa-minus')
+            btn.addClass('btn btn-xs btn-danger')
+            btn.css('padding', '2px 4px 2px 4px')
+            btn.css('line-height', '1.1')
+            btn.on('click', function () {
+              this.remove()
+              delete reportItems[this.key][this.itemID]
+              currentCollection.splice(currentCollection.indexOf(this), 1)
+            }.bind(tr))
+          }
+        }
+      }
+
+
+      function generateReport() {
+        //finally
+
+        var json = {}
+        json['reportItems'] = reportItems
+        json['selectedBatchReportId'] = selectedBatchReportId
+        json['selectedSingleReportId'] = selectedSingleReportId
+        json['groupId'] = @group.id
+
+        var customParameters = {}
+        var cpJQ = $('.customParameterList')
+        var index = 0;
+        var max = cpJQ.length
+
+        while (index < max) {
+          var onecpJQ = $(cpJQ[index])
+          customParameters[onecpJQ.attr('name')] = onecpJQ.val()
+          index++
+        }
+        json['customParameterList'] = customParameters
+
+        jsRoutes.controllers.AdvancedBatchReporting.generateReport().ajax({
+          type: "POST",
+          data: JSON.stringify(json),
+          contentType: "application/json; charset=utf-8",
+          //dataType: "json",
+          success: function (data) {
+            console.log(data)
+            window.location = '/downloadReport?temporaryReportId=' + data
+          },
+          error: function (err) {
+            alert(err)
+          }
+        }).done = function (donee) {
+          alert("Done " + donee)
+        }
+      }
+
+  </script>
+
+}

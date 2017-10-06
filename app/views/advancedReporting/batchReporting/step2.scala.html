@@ -1,0 +1,29 @@
+@(testGroup: TestGroup)(implicit authentication: Authentication)
+@{/*
+The template for listing and allowing the user to select a single run report template
+*/}
+
+@reports = @{
+  ReportTemplate.findByGroupAndType(testGroup, false)
+}
+
+<div align="center">
+  <h3>Reports for each test run <span class="badge badge-red">@reports.size()</span> </h3>
+
+  <span>Click on the report name to select.</span>
+
+  <table class="table table-striped table-bordered paddedTable" style="width: 400px !important;">
+    <tr><th>Report Name</th><th>Preview</th></tr>
+    @for(report <- reports) {
+      <tr>
+        <td>
+          <a href="#" onclick="selectSingleReport(@report.id)">@report.name</a>
+        </td>
+        <td>
+          <a href="@routes.AdvancedBatchReporting.previewReport(report.id)" target="_blank">Click</a>
+        </td>
+      </tr>
+    }
+  </table>
+
+</div>

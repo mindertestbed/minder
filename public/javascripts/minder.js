@@ -139,7 +139,11 @@ function deleteWithDialog(action, dialog, title, category, item, target) {
           url: action,
           success: function (data) {
             if (target !== undefined) {
-              target.html(data);
+              if(isFunction(target)){
+                target()
+              } else if(isJQuery(target)) {
+                target.html(data);
+              }
             } else {
               location.reload()
             }

@@ -1,0 +1,16 @@
+@import play.api.mvc._
+
+@(group: TestGroup)(implicit session: Session)
+
+<br />
+<div class="container-fluid" align="center">
+  <div class="row">
+    <div class="cols-xs-12">
+      <div class="alert alert-info">
+        <span style="font-size: 16px;">
+          <a href='@routes.AdvancedReporting.createBatchReport(group.id)'>Create Report</a>
+        </span>
+      </div>
+    </div>
+  </div>
+</div>

@@ -2,10 +2,7 @@
 Author=Author
 Name=Name
 Date=Date
-
-
 # Override default Play's validation messages
-
 # --- Constraints
 constraint.required=Required
 constraint.min=Minimum value: {0}
@@ -13,15 +10,13 @@ constraint.max=Maximum value: {0}
 constraint.minLength=Minimum length: {0}
 constraint.maxLength=Maximum length: {0}
 constraint.email=Email
-
 # --- Formats
 format.date=Date (''{0}'')
 format.numeric=Numeric
 format.real=Real
-
 # --- Errors
 error.invalid=Invalid value
-error.required=This field is required
+error.required=Invalid {0} value. This field is required
 error.number=Numeric value expected
 error.real=Real number value expected
 error.min=Must be greater or equal to {0}
@@ -30,48 +25,38 @@ error.minLength=Minimum length is {0}
 error.maxLength=Maximum length is {0}
 error.email=Valid email required
 error.pattern=Must satisfy {0}
-
 ### --- play-authenticate START
-
 # play-authenticate: Initial translations
-
-authenticate.title = Login
-authenticate.login = Login
-authenticate.logout = Logout
-authenticate.password = Password
-authenticate.changePassword = Change Password
-authenticate.profile.title = Profile
-authenticate.profile = Profile
-
-
+authenticate.title=Login
+authenticate.login=Login
+authenticate.logout=Logout
+authenticate.password=Password
+authenticate.changePassword=Change Password
+authenticate.profile.title=Profile
+authenticate.profile=Profile
 # play-authenticate - sample: Restricted page
-minder.restricted.testdesigner= Test Designers are responsible to create test scenarios according to the test assertions, which are supposed to be provided by WP6 and WP5. Test assertion document state the testable logics of a system under test. eSENS test assertion template is compatible with OASIS Test Assertions Guidelines. After creating test scenarios, Test Designers can also run the test cases. Test Designer can communicate with Minder Server via a web interface.
+minder.restricted.testdesigner=Test Designers are responsible to create test scenarios according to the test assertions, which are supposed to be provided by WP6 and WP5. Test assertion document state the testable logics of a system under test. eSENS test assertion template is compatible with OASIS Test Assertions Guidelines. After creating test scenarios, Test Designers can also run the test cases. Test Designer can communicate with Minder Server via a web interface.
 minder.restricted.testdeveloper=Test Developers are domain experts who know the system under test. A Test Developer is responsible to implement the wrapper interface provided by Minder. 
 minder.restricted.testobserver=Test Observer can see the results of test runs and gather test reports.
 authenticate.root=Only Root
-authenticate.login.forgot.password = Forgot Password
+authenticate.login.forgot.password=Forgot Password
 minder.password_change=Change Password
 minder.login.password.placeholder=Password
 minder.login.password.repeat=Repeat Password
 minder.user.role=Role
-
-minder.roles.signup.error.chooseatleastonerole = You must choose at least one role.
-
+minder.roles.signup.error.chooseatleastonerole=You must choose at least one role.
 ### --- play-authenticate END
-
 #restricted test page
-restrictedTestPage.createTestGroup= Create New Test Group
-restrictedTestPage.createTestAssertion= Create New Test Assertion
-restrictedTestPage.createTestSuite= Create New Test Suite
-restrictedTestPage.createTestCase= Create New Test Case
-restrictedTestPage.create= Create
-restrictedTestPage.createJob = Create New Job
-restrictedTestPage.createWrapper= Create New Wrapper
-restrictedTestPage.createAsset= Create New Asset
-restrictedTestPage.importGroup= Import a Test Group
-restrictedTestPage.createJobTemplate= Create New Job Template
-
-
+restrictedTestPage.createTestGroup=Create New Test Group
+restrictedTestPage.createTestAssertion=Create New Test Assertion
+restrictedTestPage.createTestSuite=Create New Test Suite
+restrictedTestPage.createTestCase=Create New Test Case
+restrictedTestPage.create=Create
+restrictedTestPage.createJob=Create New Job
+restrictedTestPage.createWrapper=Create New Wrapper
+restrictedTestPage.createAsset=Create New Asset
+restrictedTestPage.importGroup=Import a Test Group
+restrictedTestPage.createJobTemplate=Create New Job Template
 minder.index.title=Minder (Test Bed)
 minder.index.intro=MiNDER - eSENS Test Bed
 minder.index.intro_2=Minder performs conformance and interoperability tests of developed modules in WP6.1, WP6.2, WP6.3 and WP5 piloting packages of eSENS.
@@ -80,23 +65,20 @@ minder.index.heading.to=Test Observers
 minder.index.heading.ts=Test Designers
 minder.index.heading.td=Test Developers
 minder.index.details=Go to page
-
-
 minder.navigation.profile=Profile
 minder.navigation.link_more=Link more providers
 minder.navigation.logout=Sign out
 minder.navigation.login=Log in
 minder.navigation.restricted.observer=Test Observers
 minder.navigation.restricted.root=Root
-minder.navigation.restricted.testdesigner=Test Designers
-minder.navigation.restricted.testdeveloper=Test Developers
+minder.navigation.restricted.testdesigner=Minder
+minder.navigation.restricted.reportTemplates=Report Templates
 minder.navigation.testdesigner.createtestcase=Create a Test Case
 minder.navigation.signup=Sign up
-
 testSuite.noTestSuiteYet=No Test Suite Yet
 testSuite.testSuiteName=Test Suite Name
 testSuite.shortDescription=Short Description
 testSuite.Delete=Delete Test Suite
 testSuite.testSuite=test suite
 testSuite.TestSuite=Test Suite
-
+reportTemplates.createReportTemplate=Create Report Template
