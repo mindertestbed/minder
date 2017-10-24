@@ -261,3 +261,15 @@ GET         /getReportParameters2                       controllers.AdvancedBatc
 POST        /generateReport                             controllers.AdvancedBatchReporting.generateReport()
 GET         /downloadReport                             controllers.AdvancedBatchReporting.downloadReport(temporaryReportId: Long)
 
+
+#job scheduling
+
+GET         /schedulingMain                             controllers.Scheduling.renderMain(groupId: Long)
+
+
+GET         /scheduling/list                            controllers.Scheduling.listScheduledJobs(groupId: Long)
+GET         /scheduling/add                             controllers.Scheduling.addScheduledJob(groupId: Long)
+POST        /scheduling/doAdd                           controllers.Scheduling.doAddScheduledJob()
+GET         /scheduling/edit                            controllers.Scheduling.editScheduledJob(scheduledJobId: Long)
+POST        /scheduling/doEdit                          controllers.Scheduling.doEditScheduledJob()
+GET         /scheduling/delete                          controllers.Scheduling.deleteScheduledJob(scheduledJobId: Long)

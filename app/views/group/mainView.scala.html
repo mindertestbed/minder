@@ -10,7 +10,7 @@
   <div class="padabit">
     @dialogs()
 
-    <h3 class="inline">Test Group
+    <h3 class="mytitle">Test Group
       <span id="name@{
         tg.id
       }"
@@ -20,8 +20,6 @@
       class="hl editable"></span>
       <input type="hidden" value="@tg.name"/>
     </h3>
-
-    <hr />
 
     <script>
         $(function () {
@@ -49,14 +47,14 @@
         function showDependencies() {
           ajaxRouteGet(jsRoutes.controllers.GroupController.renderDependencies, @tg.id, $("#groupSubItems"))
         }
-        function showJobTemplates() {
-          ajaxRouteGet(jsRoutes.controllers.GroupController.renderJobTemplates, @tg.id, $("#groupSubItems"))
-        }
         function showReportTemplates() {
           ajaxRouteGet(jsRoutes.controllers.GroupController.renderReportTemplates, @tg.id, $("#groupSubItems"))
         }
         function showAdvancedReporting() {
           ajaxRouteGet(jsRoutes.controllers.AdvancedReporting.renderMain, @tg.id, $("#groupSubItems"))
+        }
+        function showScheduling() {
+          ajaxRouteGet(jsRoutes.controllers.Scheduling.renderMain, @tg.id, $("#groupSubItems"))
         }
     </script>
 
@@ -64,12 +62,12 @@
       "assertions" -> ("Test Assertions", "showAssertions"),
       "details" -> ("Details", "showDetails"),
       "suites" -> ("Test Suites", "showSuites"),
-      "assets" -> ("Test Assets", "showAssets"),
-      "utils" -> ("Utility Classes", "showUtils"),
-      "deps" -> ("Dependencies", "showDependencies"),
-      //"jobTemplates" -> ("Job Templates", "showJobTemplates"),
+      "assets" -> ("Assets", "showAssets"),
+      "utils" -> ("Utilities", "showUtils"),
+      "deps" -> ("Libs", "showDependencies"),
       "reportTemplates" -> ("Report Templates", "showReportTemplates"),
-      "advancedReporting" -> ("Advanced Reporting", "showAdvancedReporting")
+      "advancedReporting" -> ("Advanced Reporting", "showAdvancedReporting"),
+      "sched" -> ("Scheduling", "showScheduling")
     )
 
 

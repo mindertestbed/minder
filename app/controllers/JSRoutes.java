@@ -50,7 +50,14 @@ public class JSRoutes extends Controller {
             routes.javascript.AdvancedBatchReporting.listJobTestRuns(),
             routes.javascript.AdvancedBatchReporting.getReportParameters1(),
             routes.javascript.AdvancedBatchReporting.getReportParameters2(),
-            routes.javascript.AdvancedBatchReporting.generateReport()
+            routes.javascript.AdvancedBatchReporting.generateReport(),
+            routes.javascript.Scheduling.renderMain(),
+            routes.javascript.Scheduling.listScheduledJobs(),
+            routes.javascript.Scheduling.addScheduledJob(),
+            routes.javascript.Scheduling.doAddScheduledJob(),
+            routes.javascript.Scheduling.editScheduledJob(),
+            routes.javascript.Scheduling.doEditScheduledJob(),
+            routes.javascript.Scheduling.deleteScheduledJob()
         ))
         .as("text/javascript");
   }

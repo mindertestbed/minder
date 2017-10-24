@@ -8,7 +8,6 @@ CREATE TABLE report_template (
   number          INTEGER,
   is_batch_report BOOLEAN,
   test_group_id   BIGINT,
-  CONSTRAINT uq_report_template_name UNIQUE (name),
   CONSTRAINT uq_report_template_1 UNIQUE (name, test_group_id),
   CONSTRAINT pk_report_template PRIMARY KEY (id)
 );
