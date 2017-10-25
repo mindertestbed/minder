@@ -117,7 +117,7 @@ public class ReportTemplateController extends Controller {
       return badRequest(views.html.reportTemplates.createReportTemplateView.render(form, batchTemplate, singleTemplate, authentication));
     }
 
-    return redirect(routes.GroupController.getGroupDetailView(1, "reportTemplates"));
+    return redirect(routes.GroupController.getGroupDetailView(group.id, "reportTemplates"));
   }
 
   @AllowedRoles({Role.TEST_DESIGNER})
@@ -171,7 +171,7 @@ public class ReportTemplateController extends Controller {
       return badRequest(views.html.reportTemplates.editReportTemplateView.render(form, batchTemplate, singleTemplate, authentication));
     }
 
-    return redirect(routes.GroupController.getGroupDetailView(1, "reportTemplates"));
+    return redirect(routes.GroupController.getGroupDetailView(reportTemplate.testGroup.id, "reportTemplates"));
   }
 
   @AllowedRoles({Role.TEST_DESIGNER, Role.TEST_OBSERVER})
