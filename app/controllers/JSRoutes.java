@@ -57,7 +57,8 @@ public class JSRoutes extends Controller {
             routes.javascript.Scheduling.editScheduledJob(),
             routes.javascript.Scheduling.doEditScheduledJob(),
             routes.javascript.Scheduling.deleteScheduledJob(),
-            routes.javascript.Scheduling.removeJobFromSchedule()
+            routes.javascript.Scheduling.removeJobFromSchedule(),
+            routes.javascript.Scheduling.deleteNextJob()
         ))
         .as("text/javascript");
   }

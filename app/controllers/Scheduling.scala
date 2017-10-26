@@ -49,7 +49,7 @@ class Scheduling @Inject()(implicit authentication: Authentication) extends Cont
   def deleteScheduledJob(scheduledJobId: Long) = JavaAction {
     val schedule = JobSchedule.findById(scheduledJobId);
 
-    if(schedule.owner.id == authentication.getLocalUser.id) {
+    if (schedule.owner.id == authentication.getLocalUser.id) {
       if (schedule != null) {
         schedule.delete()
       }
@@ -69,6 +69,18 @@ class Scheduling @Inject()(implicit authentication: Authentication) extends Cont
       schedule.jobs.remove(job)
       schedule.save()
       Ok
+    }
+  }
+
+  def deleteNextJob(scheduleId: Long) = JavaAction {
+    val schedule = JobSchedule.findById(scheduleId)
+
+    if (schedule == null) {
+      BadRequest(s"No such job schedule with id $scheduleId")
+    } else {
+      schedule.nextJob = null
+      schedule.save()
+      Ok(views.html.jobSchedules.util.nextJobSchedule(schedule))
     }
   }
 

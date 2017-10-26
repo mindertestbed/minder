@@ -4,7 +4,7 @@
 
 @main(Messages("minder.navigation.restricted.reportTemplates"), "mainNavigation",
   Array(("Test Groups", controllers.routes.Application.testGroups().path()),
-    (schedule.testGroup.name, controllers.routes.GroupController.getGroupDetailView(schedule.testGroup.id, "reportTemplates").path()),
+    (schedule.testGroup.name, controllers.routes.GroupController.getGroupDetailView(schedule.testGroup.id, "sched").path()),
     (schedule.name, ""))) {
 
   <div class="padabit" style="padding: 10px">
@@ -13,9 +13,9 @@
     <div class="container-fluid">
       <div class="row">
         <div class="col-xs-12">
-
+          <div id="nextJobEditor">
           @views.html.jobSchedules.util.nextJobSchedule(schedule)
-
+          </div>
           <br/>
         </div>
       </div>
