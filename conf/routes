@@ -264,13 +264,11 @@ GET         /downloadReport                             controllers.AdvancedBatc
 
 #job scheduling
 
-GET         /schedulingMain                             controllers.Scheduling.renderMain(groupId: Long)
-
-
 GET         /scheduling/list                            controllers.Scheduling.listScheduledJobs(groupId: Long)
+GET         /scheduling/viewSchedule                    controllers.Scheduling.viewSchedule(id: Long)
 GET         /scheduling/add                             controllers.Scheduling.addScheduledJob(groupId: Long)
 POST        /scheduling/doAdd                           controllers.Scheduling.doAddScheduledJob()
 GET         /scheduling/edit                            controllers.Scheduling.editScheduledJob(scheduledJobId: Long)
 POST        /scheduling/doEdit                          controllers.Scheduling.doEditScheduledJob()
 GET         /scheduling/delete                          controllers.Scheduling.deleteScheduledJob(scheduledJobId: Long)
-GET         /scheduling/viewSchedule                    controllers.Scheduling.viewSchedule(id: Long)
+GET         /scheduling/removeJobFromSchedule           controllers.Scheduling.removeJobFromSchedule(scheduledJobId: Long, jobId: Long)

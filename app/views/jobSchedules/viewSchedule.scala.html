@@ -1,0 +1,74 @@
+@import play.data.validation.ValidationError
+@import java.util.Collections
+@(schedule: JobSchedule)(implicit authentication: Authentication)
+
+@main(Messages("minder.navigation.restricted.reportTemplates"), "mainNavigation",
+  Array(("Test Groups", controllers.routes.Application.testGroups().path()),
+    (schedule.testGroup.name, controllers.routes.GroupController.getGroupDetailView(schedule.testGroup.id, "reportTemplates").path()),
+    (schedule.name, ""))) {
+
+  <div class="padabit" style="padding: 10px">
+
+
+    <div class="container-fluid">
+      <div class="row">
+        <div class="col-xs-12">
+
+          @views.html.jobSchedules.util.nextJobSchedule(schedule)
+
+          <br/>
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="col-xs-12">
+
+          <table class="table table-striped">
+            <tbody>
+              <tr>
+                <th>#</th>
+                <th>ID</th>
+                <th>Name</th>
+                <th>Owner</th>
+                <th></th>
+              </tr>
+
+              @for(job <- utils.Util.sortSet(schedule.jobs)){
+                <tr id="row_@{job.id}">
+                  <td></td>
+                  <td>@job.id</td>
+                  <td>@job.name</td>
+                  <td>@job.owner</td>
+                  <td><button class="btn btn-default btn-xs" title="Remove" onclick="removeJob(@schedule.id, @job.id)"><span class="fa fa-minus"></span></button></td>
+                </tr>
+              }
+
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-xs-12">
+          <div align="center">
+            <button class="btn btn-info btn-sm"><span class="fa fa-plus"></span> Add Job(s)</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+
+    <script>
+
+      function removeJob(scheduleId, jobId){
+        jsRoutes.controllers.Scheduling.removeJobFromSchedule(scheduleId, jobId).ajax({
+          success: function(data){
+            $('#row_'+jobId).remove()
+          }
+        })
+      }
+
+    </script>
+
+  </div>
+
+} <!-- main -->

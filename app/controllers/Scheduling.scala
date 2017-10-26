@@ -2,7 +2,7 @@ package controllers
 
 import javax.inject.Inject
 
-import models.{JobSchedule, TestGroup}
+import models.{Job, JobSchedule, TestGroup}
 import play.api.mvc.Controller
 import utils.JavaAction
 
@@ -10,7 +10,7 @@ import utils.JavaAction
   * @author Yerlibilgin
   */
 class Scheduling @Inject()(implicit authentication: Authentication) extends Controller {
-  def renderMain(groupId: Long) = JavaAction {
+  def listScheduledJobs(groupId: Long) = JavaAction {
     val group = TestGroup.findById(groupId)
     if (group == null) {
       BadRequest(s"No such group with id $group")
@@ -19,8 +19,14 @@ class Scheduling @Inject()(implicit authentication: Authentication) extends Cont
     }
   }
 
-  def listScheduledJobs(groupId: Long) = JavaAction {
-    Ok(views.html.group.childViews.schedules(TestGroup.findById(groupId)))
+  def viewSchedule(scheduledJobId: Long) = JavaAction {
+    val schedule = JobSchedule.findById(scheduledJobId)
+
+    if (schedule == null) {
+      BadRequest(s"No such job schedule with id $scheduledJobId")
+    } else {
+      Ok(views.html.jobSchedules.viewSchedule(schedule))
+    }
   }
 
   def addScheduledJob(groupId: Long) = JavaAction {
@@ -53,7 +59,17 @@ class Scheduling @Inject()(implicit authentication: Authentication) extends Cont
     }
   }
 
-  def viewSchedule(scheduledJobId: Long) = JavaAction {
-    Ok
+  def removeJobFromSchedule(scheduledJobId: Long, jobId: Long) = JavaAction {
+    val schedule = JobSchedule.findById(scheduledJobId)
+
+    if (schedule == null) {
+      BadRequest(s"No such job schedule with id $scheduledJobId")
+    } else {
+      val job = Job.findById(jobId)
+      schedule.jobs.remove(job)
+      schedule.save()
+      Ok
+    }
   }
+
 }

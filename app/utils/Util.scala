@@ -439,4 +439,19 @@ object Util {
       }
     }
   }
+
+
+  def sortSet(jobSet: util.Set[Job]): util.List[Job] = {
+    if (jobSet == null || jobSet.isEmpty) {
+      util.Collections.EMPTY_LIST.asInstanceOf[List[Job]]
+    } else {
+      val list = new util.ArrayList[Job](jobSet.size())
+      list.addAll(jobSet)
+      Collections.sort(list, new Comparator[Job] {
+        def compare(o1: Job, o2: Job) = (o1.id - o2.id).toInt
+      })
+
+      list
+    }
+  }
 }

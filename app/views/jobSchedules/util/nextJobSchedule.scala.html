@@ -1,0 +1,10 @@
+@(jobSchedule: JobSchedule)
+
+<div id="nextJobEditor">
+  @if(jobSchedule.nextJob != null) {
+    @jobSchedule.nextJob.name : @jobSchedule.nextJob.id
+  } else {
+    <btn class="btn btn-info btn-sm"><span class="fa fa-plus"></span> Set Next Job</btn>
+  }
+</div>
+
