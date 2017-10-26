@@ -1,0 +1,82 @@
+@import java.util.concurrent.atomic.AtomicInteger
+@import views.html.util._
+@import authentication._
+@(testGroup: TestGroup)(implicit authentication: Authentication)
+
+<script>
+    $(function () {
+      $(document).tooltip();
+    });
+</script>
+
+@subjectHasRole(security.Role.TEST_DESIGNER) {
+  @createLinkButton(controllers.routes.Scheduling.addScheduledJob(testGroup.id).url,
+    Messages("schedules.createNewSchedule"))
+  <br />
+  <br />
+}
+
+
+<div>
+
+  @list = @{
+    JobSchedule.findByGroup(testGroup)
+  }
+
+
+  <h3>Schedules <span class="badge">@list.size()</span></h3>
+
+  @if(list.size() > 0) {
+    <table class="table table-hover table-condensed  table-striped " >
+      @createFirstRow {
+        <th >Name</th>
+        <th >Author</th>
+      }
+
+      @defining(new AtomicInteger(1)){rowIndex=>
+      @for(schedule <- list) {
+        <tr id='schedule_@{schedule.id}'>
+          <td class='tabshrink'>@rowIndex.getAndIncrement</td>
+          <td class='tabshrink'><a href="@routes.Scheduling.viewSchedule(schedule.id)">@schedule.name</a></td>
+          <td class='tabshrink'>@schedule.owner</td>
+          <td class='tabshrink' align='center' width="100px">
+            <table><tr>
+            @subjectIs(testGroup.owner) {
+              <td>
+                <button type="button" class="btn btn-xs btn-default"
+                onClick='delWD@{schedule.id}()'
+                style="padding-left: 15px;
+                  padding-right: 15px;">
+                  <span class="glyphicon glyphicon-trash"></span>
+                </button>
+
+                <script>
+                    function delWD@{schedule.id}() {
+                      deleteWithDialog(
+                          '@routes.Scheduling.deleteScheduledJob(schedule.id).url',
+                          $("#dialog-confirm"),
+                          'Delete Job Schedule', 'schedule', '@schedule.name',
+                          function () {
+                            deleteRow('schedule_@{schedule.id}')
+                          }
+                      )
+                    }
+                </script>
+
+              </td>
+            }
+            </tr>
+            </table>
+
+          </td>
+        </tr>
+      }}
+    </table>
+  }
+
+  <script>
+      function deleteRow(rowId) {
+        $('#' + rowId).remove()
+      }
+  </script>
+</div>

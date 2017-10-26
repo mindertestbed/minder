@@ -273,3 +273,4 @@ POST        /scheduling/doAdd                           controllers.Scheduling.d
 GET         /scheduling/edit                            controllers.Scheduling.editScheduledJob(scheduledJobId: Long)
 POST        /scheduling/doEdit                          controllers.Scheduling.doEditScheduledJob()
 GET         /scheduling/delete                          controllers.Scheduling.deleteScheduledJob(scheduledJobId: Long)
+GET         /scheduling/viewSchedule                    controllers.Scheduling.viewSchedule(id: Long)

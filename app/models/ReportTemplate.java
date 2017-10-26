@@ -10,13 +10,16 @@ import java.util.List;
 /**
  * Created by yerlibilgin
  */
-@UniqueConstraint(columnNames = {"name", "test_group_id"})
+
 @Entity
+@Table(uniqueConstraints = {
+    @UniqueConstraint(columnNames = {"test_group_id", "name"})
+})
 public class ReportTemplate extends Model {
   @Id
   public Long id;
 
-  @Column(unique = true, nullable = false)
+  @Column(nullable = false)
   public String name;
 
   @ManyToOne

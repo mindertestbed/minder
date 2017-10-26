@@ -82,3 +82,4 @@ testSuite.Delete=Delete Test Suite
 testSuite.testSuite=test suite
 testSuite.TestSuite=Test Suite
 reportTemplates.createReportTemplate=Create Report Template
+schedules.createNewSchedule=Create New Schedule

@@ -5,8 +5,10 @@ import scala.Int;
 
 import javax.persistence.DiscriminatorValue;
 import javax.persistence.Entity;
+import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import java.util.List;
+import java.util.Set;
 
 /**
  * Created by yerlibilgin on 30/12/14.
@@ -17,6 +19,10 @@ public class Job extends AbstractJob {
 
   private static final Finder<Long, Job> find = new Finder<>(
       Job.class);
+
+
+  @ManyToMany(targetEntity = JobSchedule.class, mappedBy = "jobs")
+  public Set<JobSchedule> schedules;
 
   @ManyToOne
   public TestSuite testSuite;

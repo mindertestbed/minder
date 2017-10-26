@@ -16,8 +16,7 @@ import java.util.List;
 @Inheritance
 @DiscriminatorColumn(name = "_type", discriminatorType = DiscriminatorType.INTEGER)
 public abstract class AbstractJob extends Model {
-  private static final Finder<Long, AbstractJob> find = new Finder<>(
-      AbstractJob.class);
+  private static final Finder<Long, AbstractJob> find = new Finder<>(AbstractJob.class);
 
   public static AbstractJob findById(Long id) {
     AbstractJob byId = find.byId(id);
@@ -44,7 +43,6 @@ public abstract class AbstractJob extends Model {
 
   @Column(length = ModelConstants.DESCRIPTION_LENGTH, columnDefinition = "TEXT")
   public String mtdlParameters;
-
 
   @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, mappedBy = "job")
   public List<MappedWrapper> mappedWrappers;
