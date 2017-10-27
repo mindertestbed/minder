@@ -16,13 +16,11 @@
   <br />
 }
 
-
 <div>
 
   @list = @{
     JobSchedule.findByGroup(testGroup)
   }
-
 
   <h3>Schedules <span class="badge">@list.size()</span></h3>
 
@@ -30,7 +28,9 @@
     <table class="table table-hover table-condensed  table-striped " >
       @createFirstRow {
         <th >Name</th>
+        <th >Next</th>
         <th >Author</th>
+        <th >Period <a class="badge" style="font-size:8px" href="https://crontab.guru" target="_blank"><span class="fa fa-question-circle" ></span></a></th>
       }
 
       @defining(new AtomicInteger(1)){rowIndex=>
@@ -38,7 +38,13 @@
         <tr id='schedule_@{schedule.id}'>
           <td class='tabshrink'>@rowIndex.getAndIncrement</td>
           <td class='tabshrink'><a href="@routes.Scheduling.viewSchedule(schedule.id)">@schedule.name</a></td>
+          <td class='tabshrink'>
+            @if(schedule.nextJob != null) {
+              <a href="@routes.Scheduling.viewSchedule(schedule.nextJob.id)">@schedule.nextJob.name</a>
+            }
+          </td>
           <td class='tabshrink'>@schedule.owner</td>
+          <td class='tabshrink'><a target="_blank" href='https://crontab.guru/#@{schedule.cronExpression.replace(" ", "_")}'>@schedule.cronExpression</a></td>
           <td class='tabshrink' align='center' width="100px">
             <table><tr>
             @subjectIs(testGroup.owner) {

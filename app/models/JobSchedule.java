@@ -15,7 +15,7 @@ import java.util.Set;
 @Table(uniqueConstraints = {
     @UniqueConstraint(columnNames = {"test_group_id", "name"})
 })
-public class JobSchedule extends Model{
+public class JobSchedule extends Model {
   private static final Finder<Long, JobSchedule> find = new Finder<>(JobSchedule.class);
 
   @Id
@@ -27,6 +27,9 @@ public class JobSchedule extends Model{
 
   @Column(nullable = false)
   public String name;
+
+  @Column(nullable = false)
+  public String cronExpression;
 
   @Column(length = ModelConstants.SHORT_DESC_LENGTH, columnDefinition = "TEXT")
   public String shortDescription;
@@ -40,10 +43,10 @@ public class JobSchedule extends Model{
   @Column(nullable = false)
   public User owner;
 
-  @OneToOne
+  @ManyToOne
   public JobSchedule nextJob;
 
-  public static List<JobSchedule> findByGroup(TestGroup testGroup){
+  public static List<JobSchedule> findByGroup(TestGroup testGroup) {
     return find.where().eq("testGroup", testGroup).orderBy("id").findList();
   }
 
@@ -54,4 +57,14 @@ public class JobSchedule extends Model{
   public static JobSchedule findById(Long id) {
     return find.byId(id);
   }
+
+
+  public static List<JobSchedule> findByTestGroup(TestGroup testGroup, int pageIndex, int pageSize) {
+    return find.where().eq("testGroup", testGroup).orderBy("id asc").findPagedList(pageIndex, pageSize).getList();
+  }
+
+  public static int countByTestGroup(TestGroup testGroup) {
+    return find.where().eq("testGroup", testGroup).findRowCount();
+  }
+
 }

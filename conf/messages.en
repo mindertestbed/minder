@@ -73,6 +73,7 @@ minder.navigation.restricted.observer=Test Observers
 minder.navigation.restricted.root=Root
 minder.navigation.restricted.testdesigner=Minder
 minder.navigation.restricted.reportTemplates=Report Templates
+minder.navigation.restricted.schedules=Schedules
 minder.navigation.testdesigner.createtestcase=Create a Test Case
 minder.navigation.signup=Sign up
 testSuite.noTestSuiteYet=No Test Suite Yet

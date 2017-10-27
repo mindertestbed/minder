@@ -4,10 +4,10 @@ create table job_schedule (
   id                        bigserial not null,
   test_group_id             bigint,
   name                      varchar(255) not null,
+  cron_expression          TEXT not null,
   short_description         TEXT,
   owner_id                  bigint,
   next_job_id               bigint,
-  constraint uq_job_schedule_next_job_id unique (next_job_id),
   constraint uq_job_schedule_1 unique (test_group_id,name),
   constraint pk_job_schedule primary key (id))
 ;

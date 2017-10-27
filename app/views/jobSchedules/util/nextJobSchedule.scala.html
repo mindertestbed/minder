@@ -1,28 +1,79 @@
 @(jobSchedule: JobSchedule)
 
   @if(jobSchedule.nextJob != null) {
-    @jobSchedule.nextJob.name <btn class="btn btn-info btn-xs" onclick='deleteNextJob(@jobSchedule.id)'><span class="fa fa-trash"></span>
-      Remove</btn>
+    <b>Next JOB:</b>
+    @jobSchedule.nextJob.name &nbsp;&nbsp;
+    <btn class="btn btn-danger btn-xs" onclick='deleteNextJob(@jobSchedule.id)'><span class="fa fa-trash"></span></btn>
   } else {
     <btn class="btn btn-info btn-xs" onclick='setNextJob(@jobSchedule.id)'><span class="fa fa-plus"></span> Set Next Job</btn>
   }
 
+    <!-- Modal -->
+  <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+          <h4 class="modal-title" id="myModalLabel">Modal title</h4>
+        </div>
+        <div class="modal-body">
+
+          <div id="schedList">
+
+          </div>
+
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+          <button type="button" class="btn btn-primary">Save changes</button>
+        </div>
+      </div>
+    </div>
+  </div>
 
   <script>
 
-    function deleteNextJob(id) {
-      jsRoutes.controllers.Scheduling.deleteNextJob(id).ajax({
+  var schedList = null
+
+  function deleteNextJob(id) {
+    jsRoutes.controllers.Scheduling.deleteNextJob(id).ajax({
+      success: function (data) {
+        $('#nextJobEditor').html(data)
+      }
+    })
+  }
+
+  function setNextJob(id) {
+    schedList.updateTable()
+    $('#myModal').modal({keyboard: true})
+  }
+
+  $(function () {
+    schedList = new DataTable($('#schedList'), @jobSchedule.testGroup.id, levels = [{
+      updateFunction: jsRoutes.controllers.Scheduling.listSchedulesJSON,
+      title: 'Job schedules',
+      pageSize: 10,
+      renderDownButtons: false,
+      renderCheckBoxes: true,
+      checkBoxIcon: 'fa-arrow-right',
+      renderRefreshButton: false,
+      columns: [{field: 'id', label: 'ID'}, {field: 'name', label: 'Name'}]
+    }])
+
+    schedList.$.on('itemClicked', function (evt, level, itemId) {
+      jsRoutes.controllers.Scheduling.setNextJob(@jobSchedule.id, itemId).ajax({
         success: function (data) {
           $('#nextJobEditor').html(data)
+          $('#myModal').modal('hide')
+          $('.modal-backdrop').remove();
+        },
+        error: function (err) {
+          $('#myModal').modal('hide')
+          $('.modal-backdrop').remove();
+          showError(err.responseText)
         }
       })
-    }
+    })
+  })
 
-
-    function setNextJob() {
-
-    }
-
-
-  </script>
-
+</script>

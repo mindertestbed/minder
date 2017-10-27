@@ -1,261 +1,87 @@
 @import play.data.validation.ValidationError
 @import utils.Util
-@(form: Form[_], batchTemplate: String, singleTemplate: String)(implicit authentication: Authentication)
+@(form: play.api.data.Form[_])(implicit authentication: Authentication)
 
-@testGroupId = @{
-  java.lang.Long.parseLong(form("groupId").value)
-}
+  @testGroupId = @{
+    java.lang.Long.parseLong(form("groupId").value.get)
+  }
 
-@main(Messages("minder.navigation.restricted.reportTemplates"), "mainNavigation",
-  Array(("Test Groups", controllers.routes.Application.testGroups().path()),
-    (TestGroup.findById(testGroupId).name, controllers.routes.GroupController.getGroupDetailView(testGroupId, "details").path()))) {
+  @testGroup = @{
+    TestGroup.findById(testGroupId)
+  }
 
-  <div class="padabit">
-    <br />
-    @util.dialogs()
-    <style>
-        #editor {
-          position: relative ;
-          top: 10px ;
-          right: 0 ;
-          bottom: 0 ;
-          left: 0px ;
-          height: 700px ;
-        }
-
-    </style>
-    <script type="text/javascript" src="@routes.Assets.versioned("javascripts/ace/ace.js")"></script>
-    <script>
-
-        $(function () {
-          editor = ace.edit("editor");
-          editor.setTheme("ace/theme/clouds");
-          editor.getSession().setMode("ace/mode/html");
-          editor.setOptions({
-            maxLines: 50
-          });
-
-          // store it
-          $("#editor").data('AceInstance', editor);
-
-          var content = $("#template");
+  @main(Messages("minder.navigation.restricted.schedules"), "mainNavigation",
+    Array(("Test Groups", controllers.routes.Application.testGroups().path()),
+      (testGroup.name, controllers.routes.GroupController.getGroupDetailView(testGroup.id, "sched").path()),
+      ("New Schedule", ""))) {
 
 
-          editor.getSession().on("change", function () {
-            content.val(editor.getSession().getValue());
-          });
+    <div class="padabit">
 
-          //content.val(editor.getSession().getValue());
 
-          $("ul.theme-menu li").on('click', function () {
-            var theme = "ace/theme/".concat($(this).text()) ;
-            editor.setTheme(theme);
-          });
+      <h3>Create new schedule</h3>
 
-          document.onkeydown = function (event) {
-            if (event.which == 27) {
-              $("#macrodiv").hide() ;
-            }
-          };
-
-          @if(form("template").value == null){
-          editor.setValue($('#batchTemplate').text(), 1);
-          }else{
-          editor.setValue($('#template').val(), 1);
-          }
-          editor.getSession().foldAll(3, 59)
-        });
-    </script>
-
-    @if(form.hasGlobalErrors) {
-      <div class="alert alert-warning">
-        <ul>
-        @for(error <- form.globalErrors) {
-          <li>@error.message()</li>
-        }
-        </ul>
-      </div>
-    }
-
-    @if(form.hasErrors) {
-      <div class="alert alert-danger">
-        <ul>
-        @for(errors <- form.errors) {
-          <li>@errors._1:
+      @if(form.hasGlobalErrors) {
+        <div class="alert alert-warning">
           <ul>
-          @for(error <- errors._2) {
-            <li>@Messages(error.message(), errors._1)</li>
+          @for(error <- form.globalErrors) {
+            <li>@error.message</li>
           }
           </ul>
-          </li>
-        }
-        </ul>
-      </div>
-    }
+        </div>
+      }
 
-    <style>
-
-        .inputError {
-          background-color: rgba(255, 179, 176, 0.25);
-          border: 1px solid #ff715a;
-          border-radius: 2px;
-        }
-
-        .inputNormal {
-        }
-
-    </style>
-    <form id="editorform" method="post" action='@routes.ReportTemplateController.doCreateReportTemplate()'>
-      <table style="width: 100% ;">
-        <tr>
-          <td class="tabshrink">
-            <b>Name: </b>
-            <input type="text" name="name" value='@form("name").value'
-              @{
-                Option(form.error("name")).map { valEr =>
-                  Html(s"class='inputError'")
-                }
-              }
-            style="width: 150px ;"
-            />
-          </td>
-          <td class="tabshrink">
-              &nbsp;
-            <b>Type: </b>
-            <div class="dropdown" style="display: inline">
-              <button class="btn btn-default dropdown-toggle" type="button" id="reportTypeBtn" data-toggle="dropdown">Batch Report
-                <span class="caret"></span></button>
-              <ul class="dropdown-menu" role="menu" aria-labelledby="menu1">
-                <li role="presentation"><a role="menuitem" id='batchA' tabindex="-1" href="#">Batch Report</a></li>
-                <li role="presentation"><a role="menuitem" id='singleA' tabindex="-1" href="#">Single Run Report</a></li>
-              </ul>
-            </div>
-            <script>
-                $(function () {
-                  $('#batchA').on('click', function () {
-                    $('#reportTypeBtn').text($('#batchA').text())
-                    $('#reportType').val('true')
-                  })
-                  $('#singleA').on('click', function () {
-                    $('#reportTypeBtn').text($('#singleA').text())
-                    $('#reportType').val('false')
-                  })
-                })
-
-            </script>
-          </td>
-          <td align="right" class="tabexpand">
-              <!-- The part for large screen -->
-            <table>
-              <tr>
-                  <!-- Insert template -->
-                <td>
-                  <div class="dropdown" style="display: inline">
-                    <button class="btn btn-default dropdown-toggle" type="button" id="menu1" data-toggle="dropdown" title="Insert template"><span class="fa fa-file-text-o">&nbsp;</span>&nbsp;<span class="caret"></span></button>
-                    <ul class="dropdown-menu" role="menu" aria-labelledby="menu1">
-                      <li role="presentation"><a role="menuitem" id='batchA1' tabindex="-1" href="#">Batch Report</a></li>
-                      <li role="presentation"><a role="menuitem" id='singleA1' tabindex="-1" href="#">Single Run Report</a></li>
-                    </ul>
-                  </div>
-
-                  <script>
-                      $(function () {
-                        $('#batchA1').on('click', function () {
-                          editor.setValue($('#batchTemplate').text(), 1);
-                          editor.getSession().foldAll(3, 59)
-                        })
-                        $('#singleA1').on('click', function () {
-                          editor.setValue($('#singleTemplate').text(), 1);
-                          editor.getSession().foldAll(3, 59)
-                        })
-                      })
-                  </script>
-                </td>
-
-                <td>
-                  <div class="dropdown" style="display: inline">
-                    <button class="btn btn-default dropdown-toggle" type="button" data-toggle="dropdown" title="Select Theme"><span class="fa fa-tree">&nbsp;</span>&nbsp;<span class="caret"></span></button>
-                    <ul class="dropdown-menu theme-menu" role="menu" aria-labelledby="menu1">
-                      <li role="presentation"><a role="menuitem" id='chrome' tabindex="-1" href="#">chrome</a></li>
-                      <li role="presentation"><a role="menuitem" id='eclipse' tabindex="-1" href="#">eclipse</a></li>
-                      <li role="presentation"><a role="menuitem" id='monokai' tabindex="-1" href="#">monokai</a></li>
-                      <li role="presentation"><a role="menuitem" id='sqlserver' tabindex="-1" href="#">sqlserver</a></li>
-                      <li role="presentation"><a role="menuitem" id='clouds' tabindex="-1" href="#">clouds</a></li>
-                      <li role="presentation"><a role="menuitem" id='textmate' tabindex="-1" href="#">textmate</a></li>
-                      <li role="presentation"><a role="menuitem" id='xcode' tabindex="-1" href="#">xcode</a></li>
-                    </ul>
-                  </div>
-
-
-                  <a onclick='$("#macrodiv").show();' class="btn btn-primary btn-sm" title="Insert Macro"><span class="fa fa-chevron-circle-right"></span></a>
-                    &nbsp;
-              <td align="right">
-                <button type="submit" class="btn btn-primary btn-sm" action="save" title="Save"><span class='fa fa-save'>&nbsp;</span> </button>&nbsp;
-                <a type="cancel" onclick="history.back()" class="btn btn-danger btn-sm" title='Go back'><span class="fa fa-times">&nbsp;</span></a>
-              </td></tr></table>
-          </td>
-        </tr>
-      </table>
-
-      <div id="editor-container">
-        <pre id="editor"
-          @{
-            Option(form.error("template")).map { valEr =>
-              Html(s"class='inputError'")
+      @if(form.hasErrors) {
+        <div class="alert alert-danger">
+          <ul>
+          @for(errors <- form.errors) {
+            <li>@errors.key:
+            <ul>
+            @for(error <- errors.messages) {
+              <li>@Messages(error, errors.args)</li>
             }
+            </ul>
+            </li>
           }
-        ></pre>
-      </div>
+          </ul>
+        </div>
+      }
 
-      <div class="bevel2"
-      style="z-index: 10000000 ;
-        position: fixed ;
-        width: 30% ;
-        height: 40% ;
-        padding: 20px ;
-        top: 30% ;
-        left: 35% ;
-        display: none ;
-        overflow: scroll ;
-        border: 1px solid gray ;
-        background-color: #ffffff" id="macrodiv">
+      <form id="editorform" method="post" action='@routes.Scheduling.doAddScheduledJob()'>
+        <table class="table table-condensed">
+          <tr>
+            <td class="tabshrink">
+              <b>Name: </b></td><td>
+              <input type="text" name="name" value='@form("name").value'
+                @{
+                  form.error("name").map { valEr =>
+                    Html(s"class='inputError'")
+                  }
+                }
+              style="width: 150px ;"
+              />
+            </td>
+          </tr>
+          <tr>
+            <td class="tabshrink">
+              <b>Period: </b></td><td>
+              <input type="text" name="cronExpression" value='@form("cronExpression").value'
+                @{
+                  form.error("cronExpression").map { valEr =>
+                    Html(s"class='inputError'")
+                  }
+                }
+              style="width: 150px ;"
+              />
+            </td>
+          </tr>
+        </table>
 
-        <h3>Insert A predefined macro</h3>
-
-        <script>
-            function insertMacro() {
-              // get it
-
-              var macroText = $("#macroName").val()
-
-              editor.insert(macroText);
-
-              $("#macrodiv").hide() ;
-            }
-
-        </script>
-
-        <select id="macroName">
-        @for(key <- Util.keywords.keySet()) {
-          <option value="@key">@{key}: @{Util.keywords.get(key)}</option>
-        }
-        </select>
+        <input type="hidden" name="id" value='@form("id").value.getOrElse("")'/>
+        <input type="hidden" name="groupId" value='@form("groupId").value.getOrElse("")'/>
         <br />
-        <br />
-        <br />
-        <button type="button" onclick="insertMacro()">Insert</button>
-      </div>
-
-      <input type="hidden" name="groupId" value='@testGroupId' />
-      <input type="hidden" name="template" id="template" value='@form("template").value' />
-      <input type="hidden" name="newNumber" id="newNumber" value='@form("newNumber").value' />
-      <input type="hidden" name='isBatchReport' id='reportType' value='@form("isBatchReport").value'/>
-    </form>
-
-    <pre id="batchTemplate" style="display: none">@batchTemplate
-    </pre>
-    <pre id="singleTemplate" style="display: none">@singleTemplate
-    </pre>
-  </div>
-    <!--padabit-->
+        <button class="btn btn-info btn-xs" type="submit"><span class="fa fa-save"></span> Add</button>
+        <button class="btn btn-info btn-xs" type="reset"><span class="fa fa-times"></span> Cancel</button>
+      </form>
+    </div>
   } <!-- main -->

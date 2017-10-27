@@ -1,21 +1,49 @@
 package controllers
 
+import java.util
 import javax.inject.Inject
 
-import models.{Job, JobSchedule, TestGroup}
+import editormodels.ScheduleEditorModel
+import models.{Job, JobSchedule, TestCase, TestGroup}
+import play.api.data._
+import play.api.data.Forms._
+import play.api.libs.json.{JsArray, Json, Writes}
 import play.api.mvc.Controller
 import utils.JavaAction
+import scala.collection.JavaConversions._
 
 /**
   * @author Yerlibilgin
   */
 class Scheduling @Inject()(implicit authentication: Authentication) extends Controller {
+
+  implicit val jsWrites = new Writes[JobSchedule] {
+    def writes(o: JobSchedule) = Json.obj(
+      "id" -> o.id.longValue(),
+      "name" -> o.name
+    )
+  }
+
+  implicit val jsListWrites = new Writes[java.util.List[JobSchedule]] {
+    def writes(list: util.List[models.JobSchedule]) = JsArray(list.map(elem => Json.toJson(elem)))
+  }
+
+
+  val scheduleForm = Form(
+    mapping(
+      "id" -> longNumber,
+      "name" -> nonEmptyText(minLength = 3),
+      "groupId" -> longNumber,
+      "cronExpression" -> nonEmptyText
+    )(ScheduleEditorModel.apply)(ScheduleEditorModel.unapply)
+  )
+
   def listScheduledJobs(groupId: Long) = JavaAction {
     val group = TestGroup.findById(groupId)
     if (group == null) {
       BadRequest(s"No such group with id $group")
     } else {
-      Ok(views.html.group.childViews.schedules(group))
+      Ok(views.html.jobSchedules.schedulesFragment(group))
     }
   }
 
@@ -30,11 +58,30 @@ class Scheduling @Inject()(implicit authentication: Authentication) extends Cont
   }
 
   def addScheduledJob(groupId: Long) = JavaAction {
-    Ok
+    Ok(views.html.jobSchedules.createSchedule(scheduleForm.fill(ScheduleEditorModel(0, "NAME", groupId, "0 * * * *"))))
   }
 
-  def doAddScheduledJob() = JavaAction {
-    Ok
+  def doAddScheduledJob() = JavaAction { implicit request =>
+
+    val form = scheduleForm.bindFromRequest()
+
+    if (form.hasErrors || form.hasGlobalErrors) {
+      BadRequest(views.html.jobSchedules.createSchedule(form))
+    } else {
+      val value = form.get
+      try {
+        val jobSchedule = new JobSchedule
+        jobSchedule.testGroup = TestGroup.findById(value.groupId)
+        jobSchedule.name = value.name
+        jobSchedule.cronExpression = value.cronExpression
+        jobSchedule.save();
+        Redirect(controllers.routes.GroupController.getGroupDetailView(value.groupId, "sched"))
+      } catch {
+        case th: Throwable => {
+          BadRequest(views.html.jobSchedules.createSchedule(form.withError("Persistence Error", s"Cannot save job schedule ${th.getMessage}")))
+        }
+      }
+    }
   }
 
   def editScheduledJob(scheduledJobId: Long) = JavaAction {
@@ -83,5 +130,43 @@ class Scheduling @Inject()(implicit authentication: Authentication) extends Cont
       Ok(views.html.jobSchedules.util.nextJobSchedule(schedule))
     }
   }
+
+  def setNextJob(scheduleId: Long, nextId: Long) = JavaAction {
+
+    if (scheduleId == nextId){
+      BadRequest(s"Please do not set next schedule to itself")
+    } else {
+      val schedule = JobSchedule.findById(scheduleId)
+
+      if (schedule == null) {
+        BadRequest(s"No such job schedule with id $scheduleId")
+      } else {
+        var nextJob = JobSchedule.findById(nextId)
+
+        if (nextJob == null) {
+          BadRequest(s"No such job schedule with id $scheduleId")
+        } else {
+          schedule.nextJob = nextJob
+          schedule.save()
+          Ok(views.html.jobSchedules.util.nextJobSchedule(schedule))
+        }
+      }
+    }
+  }
+
+
+  def listSchedulesJSON(groupId: Long, pageIndex: Int, pageSize: Int) = JavaAction {
+    implicit request => {
+
+      var testGroup = TestGroup.findById(groupId)
+
+      if (testGroup == null)
+        BadRequest(s"No such test group with id $testGroup")
+      else
+        Ok(Json.obj("count" -> JobSchedule.countByTestGroup(testGroup),
+          "content" -> Json.toJson(JobSchedule.findByTestGroup(testGroup, pageIndex, pageSize))))
+    }
+  }
+
 
 }

@@ -134,7 +134,14 @@ function DataTable(targetDiv, initialItemId, levels, levInd, rootTable) {
         var addButton = createJQElement('button', td)
         addButton.level = levelIndex
         addButton.itemId = content[i]['id']
-        addButton.addClass('btn btn-xs btn-primary fa fa-plus')
+        addButton.addClass('btn btn-xs btn-primary fa')
+        
+        if (level.checkBoxIcon !== undefined) {
+          addButton.addClass(level.checkBoxIcon)
+        } else {
+          addButton.addClass('fa-plus')
+        }
+        
         addButton.css('font-size', '10px')
         addButton.css('padding', '2px 4px 2px 4px')
         addButton.css('line-height', '1.1')

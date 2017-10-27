@@ -2,13 +2,18 @@
 @import java.util.Collections
 @(schedule: JobSchedule)(implicit authentication: Authentication)
 
-@main(Messages("minder.navigation.restricted.reportTemplates"), "mainNavigation",
+@main(Messages("minder.navigation.restricted.schedules"), "mainNavigation",
   Array(("Test Groups", controllers.routes.Application.testGroups().path()),
     (schedule.testGroup.name, controllers.routes.GroupController.getGroupDetailView(schedule.testGroup.id, "sched").path()),
     (schedule.name, ""))) {
 
+  @util.dialogs()
+
   <div class="padabit" style="padding: 10px">
 
+    <h3 class="mytitle">Schedule @schedule.name</h3>
+
+    <br/>
 
     <div class="container-fluid">
       <div class="row">
