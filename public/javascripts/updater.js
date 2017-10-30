@@ -6,20 +6,20 @@ function showUpdateTextAreaDialog(elemId, targetField, targetElem, action) {
   showUpdateDialog(elemId, targetField, targetElem, editor, dialogSelector, action)
 }
 
-function showUpdateOptionDialog(elemId, targetField, targetElem, action, converter, options){
+function showUpdateOptionDialog(elemId, targetField, targetElem, action, converter, options) {
   var editor = $("#updateOptionDialog > select");
-
+  
   editor.find('option').remove().end()
-
-  for (option in options){
+  
+  for (option in options) {
     editor.append(new Option(option, options[option]));
   }
-
+  
   var dialogSelector = $("#updateOptionDialog");
   //target elem is a hidden input
   editor.val(targetElem.val());
   showUpdateDialog(elemId, targetField, targetElem, editor, dialogSelector, action, converter)
-
+  
 }
 
 function showUpdateInputTextDialog(elemId, targetField, targetElem, action) {
@@ -32,12 +32,12 @@ function showUpdateInputTextDialog(elemId, targetField, targetElem, action) {
 function showUpdateDialog(elemId, targetField, targetElem, editor, dialogSelector, action, converterName) {
   var wid = targetElem.width();
   var hei = targetElem.height();
-
+  
   if (wid < 550)
     wid = 550;
   if (hei < 400)
     hei = 400;
-
+  
   var dialog = dialogSelector.dialog({
     autoOpen: true,
     width: "" + wid,
@@ -58,7 +58,10 @@ function showUpdateDialog(elemId, targetField, targetElem, editor, dialogSelecto
           contentType: 'application/json; charset=UTF-8', // This is the money shot
           data: JSON.stringify(jsn),
           success: function (data) {
-            var kk = JSON.parse(data)
+            if (typeof(data) == "string")
+              var kk = JSON.parse(data)
+            else
+              var kk = data
             targetElem.val(kk.value)
             targetElem.text(kk.value)
             targetElem.trigger('change')

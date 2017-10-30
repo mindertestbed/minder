@@ -268,10 +268,9 @@ GET         /scheduling/list                            controllers.Scheduling.l
 GET         /scheduling/viewSchedule                    controllers.Scheduling.viewSchedule(id: Long)
 GET         /scheduling/add                             controllers.Scheduling.addScheduledJob(groupId: Long)
 POST        /scheduling/doAdd                           controllers.Scheduling.doAddScheduledJob()
-GET         /scheduling/edit                            controllers.Scheduling.editScheduledJob(scheduledJobId: Long)
-POST        /scheduling/doEdit                          controllers.Scheduling.doEditScheduledJob()
 GET         /scheduling/delete                          controllers.Scheduling.deleteScheduledJob(scheduledJobId: Long)
 GET         /scheduling/removeJobFromSchedule           controllers.Scheduling.removeJobFromSchedule(scheduledJobId: Long, jobId: Long)
 GET         /scheduling/deleteNextJob                   controllers.Scheduling.deleteNextJob(scheduleId: Long)
 GET         /scheduling/setNextJob                      controllers.Scheduling.setNextJob(scheduleId: Long, nextId: Long)
 GET         /scheduling/listSchedulesJSON               controllers.Scheduling.listSchedulesJSON(groupId: Long, pageIndex: Int, pageSize: Int)
+POST        /scheduling/doEditScheduleField             controllers.Scheduling.doEditScheduleField

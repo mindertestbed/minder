@@ -3,13 +3,23 @@ package controllers
 import java.util
 import javax.inject.Inject
 
-import editormodels.ScheduleEditorModel
+import com.avaje.ebean.Ebean
+import com.fasterxml.jackson.core.json.UTF8StreamJsonParser
+import com.fasterxml.jackson.databind.JsonNode
+import controllers.common.{FieldUpdateDto, Utils}
+import dependencyutils.DependencyClassLoaderCache
+import editormodels.{GroupEditorModel, ScheduleEditorModel}
 import models.{Job, JobSchedule, TestCase, TestGroup}
+import org.eclipse.aether.resolution.DependencyResolutionException
+import play.Logger
 import play.api.data._
 import play.api.data.Forms._
 import play.api.libs.json.{JsArray, Json, Writes}
 import play.api.mvc.Controller
+import play.mvc.Result
+import security.{AllowedRoles, Role}
 import utils.JavaAction
+
 import scala.collection.JavaConversions._
 
 /**
@@ -84,15 +94,6 @@ class Scheduling @Inject()(implicit authentication: Authentication) extends Cont
     }
   }
 
-  def editScheduledJob(scheduledJobId: Long) = JavaAction {
-    Ok
-  }
-
-  def doEditScheduledJob() = JavaAction {
-    Ok
-  }
-
-
   def deleteScheduledJob(scheduledJobId: Long) = JavaAction {
     val schedule = JobSchedule.findById(scheduledJobId);
 
@@ -133,7 +134,7 @@ class Scheduling @Inject()(implicit authentication: Authentication) extends Cont
 
   def setNextJob(scheduleId: Long, nextId: Long) = JavaAction {
 
-    if (scheduleId == nextId){
+    if (scheduleId == nextId) {
       BadRequest(s"Please do not set next schedule to itself")
     } else {
       val schedule = JobSchedule.findById(scheduleId)
@@ -168,5 +169,25 @@ class Scheduling @Inject()(implicit authentication: Authentication) extends Cont
     }
   }
 
+
+  //@AllowedRoles(Array(Role.TEST_DESIGNER))
+  def doEditScheduleField = JavaAction(parse.json) { implicit request =>
+    val jsonNode = request.body
+    val dto = new FieldUpdateDto
+    dto.id = (jsonNode \ "id").as[Long]
+    dto.field = (jsonNode \\ "field").mkString
+    dto.newValue = (jsonNode \ "newValue").as[String]
+    dto.converter = (jsonNode \\ "converter").mkString
+
+    val jobSchedule = JobSchedule.findById(dto.id)
+
+    if (jobSchedule == null) {
+      BadRequest(s"A job schedule with id ${dto.id} not found")
+    } else {
+      jobSchedule.name = dto.newValue;
+      jobSchedule.save()
+      Ok(Json.obj("value" -> dto.newValue)).as("application/json")
+    }
+  }
 
 }

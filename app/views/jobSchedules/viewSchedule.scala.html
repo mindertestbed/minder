@@ -11,7 +11,19 @@
 
   <div class="padabit" style="padding: 10px">
 
-    <h3 class="mytitle">Schedule @schedule.name</h3>
+    <h3 class="mytitle">Schedule <span id="name@{
+      schedule.id
+    }"
+        onclick='showUpdateInputTextDialog(@schedule.id, "name", $(this).next(), "@controllers.routes.Scheduling.doEditScheduleField")'
+    class="hl editable"></span>
+      <input type="hidden" value="@schedule.name"/></h3>
+
+    <script>
+        $(function () {
+          bindValues($("#name@{schedule.id}"))
+        })
+    </script>
+
 
     <br/>
 
