@@ -42,15 +42,16 @@ public class JSRoutes extends Controller {
             routes.javascript.AdvancedBatchReporting.step2(),
             routes.javascript.AdvancedBatchReporting.step3(),
             routes.javascript.AdvancedBatchReporting.step4(),
-            routes.javascript.AdvancedBatchReporting.listTestSuites(),
-            routes.javascript.AdvancedBatchReporting.listSuiteRuns(),
-            routes.javascript.AdvancedBatchReporting.listTestRuns(),
-            routes.javascript.AdvancedBatchReporting.listTestCases(),
-            routes.javascript.AdvancedBatchReporting.listJobs(),
-            routes.javascript.AdvancedBatchReporting.listJobTestRuns(),
-            routes.javascript.AdvancedBatchReporting.getReportParameters1(),
-            routes.javascript.AdvancedBatchReporting.getReportParameters2(),
             routes.javascript.AdvancedBatchReporting.generateReport(),
+            routes.javascript.ModelJSONLister.listTestSuites(),
+            routes.javascript.ModelJSONLister.listSuiteJobs(),
+            routes.javascript.ModelJSONLister.listSuiteRuns(),
+            routes.javascript.ModelJSONLister.listTestRuns(),
+            routes.javascript.ModelJSONLister.listTestCases(),
+            routes.javascript.ModelJSONLister.listJobs(),
+            routes.javascript.ModelJSONLister.listJobTestRuns(),
+            routes.javascript.ModelJSONLister.listReportParameters(),
+            routes.javascript.ModelJSONLister.listSchedulesJSON(),
             routes.javascript.Scheduling.listScheduledJobs(),
             routes.javascript.Scheduling.addScheduledJob(),
             routes.javascript.Scheduling.doAddScheduledJob(),
@@ -58,7 +59,11 @@ public class JSRoutes extends Controller {
             routes.javascript.Scheduling.removeJobFromSchedule(),
             routes.javascript.Scheduling.deleteNextJob(),
             routes.javascript.Scheduling.setNextJob(),
-            routes.javascript.Scheduling.listSchedulesJSON()
+            routes.javascript.Scheduling.renderCandidateSuiteJobList(),
+            routes.javascript.Scheduling.renderCandidateJobList(),
+            routes.javascript.Scheduling.renderCandidateSuiteList(),
+            routes.javascript.Scheduling.addTestSuiteToSchedule(),
+            routes.javascript.Scheduling.addJobToSchedule()
         ))
         .as("text/javascript");
   }

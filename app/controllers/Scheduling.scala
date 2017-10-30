@@ -1,43 +1,20 @@
 package controllers
 
-import java.util
 import javax.inject.Inject
 
-import com.avaje.ebean.Ebean
-import com.fasterxml.jackson.core.json.UTF8StreamJsonParser
-import com.fasterxml.jackson.databind.JsonNode
-import controllers.common.{FieldUpdateDto, Utils}
-import dependencyutils.DependencyClassLoaderCache
-import editormodels.{GroupEditorModel, ScheduleEditorModel}
-import models.{Job, JobSchedule, TestCase, TestGroup}
-import org.eclipse.aether.resolution.DependencyResolutionException
-import play.Logger
-import play.api.data._
+import controllers.common.FieldUpdateDto
+import editormodels.ScheduleEditorModel
+import models.{Job, JobSchedule, TestGroup}
 import play.api.data.Forms._
-import play.api.libs.json.{JsArray, Json, Writes}
+import play.api.data._
+import play.api.libs.json.Json
 import play.api.mvc.Controller
-import play.mvc.Result
-import security.{AllowedRoles, Role}
 import utils.JavaAction
-
-import scala.collection.JavaConversions._
 
 /**
   * @author Yerlibilgin
   */
 class Scheduling @Inject()(implicit authentication: Authentication) extends Controller {
-
-  implicit val jsWrites = new Writes[JobSchedule] {
-    def writes(o: JobSchedule) = Json.obj(
-      "id" -> o.id.longValue(),
-      "name" -> o.name
-    )
-  }
-
-  implicit val jsListWrites = new Writes[java.util.List[JobSchedule]] {
-    def writes(list: util.List[models.JobSchedule]) = JsArray(list.map(elem => Json.toJson(elem)))
-  }
-
 
   val scheduleForm = Form(
     mapping(
@@ -109,7 +86,6 @@ class Scheduling @Inject()(implicit authentication: Authentication) extends Cont
 
   def removeJobFromSchedule(scheduledJobId: Long, jobId: Long) = JavaAction {
     val schedule = JobSchedule.findById(scheduledJobId)
-
     if (schedule == null) {
       BadRequest(s"No such job schedule with id $scheduledJobId")
     } else {
@@ -122,7 +98,6 @@ class Scheduling @Inject()(implicit authentication: Authentication) extends Cont
 
   def deleteNextJob(scheduleId: Long) = JavaAction {
     val schedule = JobSchedule.findById(scheduleId)
-
     if (schedule == null) {
       BadRequest(s"No such job schedule with id $scheduleId")
     } else {
@@ -133,7 +108,6 @@ class Scheduling @Inject()(implicit authentication: Authentication) extends Cont
   }
 
   def setNextJob(scheduleId: Long, nextId: Long) = JavaAction {
-
     if (scheduleId == nextId) {
       BadRequest(s"Please do not set next schedule to itself")
     } else {
@@ -155,21 +129,6 @@ class Scheduling @Inject()(implicit authentication: Authentication) extends Cont
     }
   }
 
-
-  def listSchedulesJSON(groupId: Long, pageIndex: Int, pageSize: Int) = JavaAction {
-    implicit request => {
-
-      var testGroup = TestGroup.findById(groupId)
-
-      if (testGroup == null)
-        BadRequest(s"No such test group with id $testGroup")
-      else
-        Ok(Json.obj("count" -> JobSchedule.countByTestGroup(testGroup),
-          "content" -> Json.toJson(JobSchedule.findByTestGroup(testGroup, pageIndex, pageSize))))
-    }
-  }
-
-
   //@AllowedRoles(Array(Role.TEST_DESIGNER))
   def doEditScheduleField = JavaAction(parse.json) { implicit request =>
     val jsonNode = request.body
@@ -188,6 +147,28 @@ class Scheduling @Inject()(implicit authentication: Authentication) extends Cont
       jobSchedule.save()
       Ok(Json.obj("value" -> dto.newValue)).as("application/json")
     }
+  }
+
+  def renderCandidateJobList(scheduleId: Long) = JavaAction { implicit request =>
+    Ok(views.html.jobSchedules.viewScheduleFragments.candidates.candidateJobList(JobSchedule.findById(scheduleId)))
+  }
+
+  def renderCandidateSuiteJobList(scheduleId: Long) = JavaAction { implicit request =>
+    Ok(views.html.jobSchedules.viewScheduleFragments.candidates.candidateSuiteJobList(JobSchedule.findById(scheduleId)))
+  }
+
+  def renderCandidateSuiteList(scheduleId: Long) = JavaAction { implicit request =>
+    Ok(views.html.jobSchedules.viewScheduleFragments.candidates.candidateSuiteList(JobSchedule.findById(scheduleId)))
+  }
+
+  def addTestSuiteToSchedule(scheduleId: Long, testSuiteId: Long) = JavaAction { implicit request =>
+    println("add suite")
+    Ok
+  }
+
+  def addJobToSchedule(scheduleId: Long, jobId: Long) = JavaAction { implicit request =>
+    println("add job")
+    Ok
   }
 
 }

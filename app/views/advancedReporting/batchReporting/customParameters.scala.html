@@ -21,7 +21,7 @@
 
 <script>
     $(function () {
-      jsRoutes.controllers.AdvancedBatchReporting.getReportParameters1(selectedBatchReportId, selectedSingleReportId).ajax({
+      jsRoutes.controllers.ModelJSONLister.listReportParameters(selectedBatchReportId, selectedSingleReportId).ajax({
         success: renderParameterTable
       })
     })
@@ -41,6 +41,4 @@
         input.val(json[row]['value'])
       }
     }
-
-
 </script>

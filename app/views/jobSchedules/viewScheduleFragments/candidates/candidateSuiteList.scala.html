@@ -1,0 +1,43 @@
+@(jobSchedule: JobSchedule)(implicit authentication: Authentication)
+
+
+<div id="candidateTsDiv">
+
+</div>
+
+
+
+<script>
+
+    var tsTable = new DataTable($('#candidateTsDiv'), @jobSchedule.testGroup.id, levels = [
+      {
+        updateFunction: jsRoutes.controllers.ModelJSONLister.listTestSuites,
+        title: 'Test Suites',
+        pageSize: 10,
+        renderDownButtons: false,
+        renderCheckBoxes: true,
+        renderRefreshButton: false,
+        columns: [{field: 'id', label: 'ID'}, {field: 'name', label: 'Name'}]
+      }
+    ])
+
+
+    tsTable.$.on('itemClicked', function (evt, level, itemId) {
+      var ajax;
+      ajax = jsRoutes.controllers.Scheduling.addTestSuiteToSchedule(@jobSchedule.id, itemId)
+
+
+      ajax.ajax({
+        success: function (data) {
+          $('#schedule_suites_tbody').append(data)
+        }
+      })
+    })
+
+
+    $(function () {
+      tsTable.updateTable()
+    })
+
+</script>
+

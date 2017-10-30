@@ -69,5 +69,15 @@ public class Job extends AbstractJob {
   public static List<Job> findAll() {
     return find.where().setOrderBy("id").findList();
   }
+
+
+  public static List<Job> findBySuite(TestSuite testSuite, int pageIndex, int pageSize) {
+    return find.where().eq("testSuite", testSuite).orderBy("id desc").findPagedList(pageIndex, pageSize).getList();
+  }
+
+  public static int countBySuite(TestSuite testSuite) {
+    return find.where().eq("testSuite", testSuite).findRowCount();
+  }
+
 }
 

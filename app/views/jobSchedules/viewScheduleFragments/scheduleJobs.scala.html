@@ -1,0 +1,81 @@
+@(schedule: JobSchedule)
+
+
+
+<table class="table table-striped">
+  <tbody id="schedule_jobs_tbody">
+    <tr>
+      <th>#</th>
+      <th>ID</th>
+      <th>Name</th>
+      <th>Owner</th>
+      <th></th>
+    </tr>
+
+    @for(job <- utils.Util.sortSet(schedule.jobs)) {
+      <tr id="row_@{
+        job.id
+      }">
+        <td></td>
+        <td>@job.id</td>
+        <td>@job.name</td>
+        <td>@job.owner</td>
+        <td><button class="btn btn-default btn-xs" title="Remove" onclick="removeJob(@schedule.id, @job.id)"
+          <span class="fa fa-minus"></span>
+          </button>
+        </td>
+      </tr>
+    }
+
+    </tbody>
+</table>
+
+
+<div class="row">
+  <div class="col-xs-12">
+    <div align="center">
+      <br />
+      <button class="btn btn-info btn-sm" onclick="displaySuiteJobsToAdd()"><span class="fa fa-plus"></span>
+        Add Suite Job(s)</button> &nbsp;
+      &nbsp;
+      <button class="btn btn-info btn-sm" onclick="displayJobsToAdd()"><span class="fa fa-plus"></span> Add Job(s)</button>
+    </div>
+  </div>
+</div>
+
+<script>
+
+    function removeJob(scheduleId, jobId) {
+      jsRoutes.controllers.Scheduling.removeJobFromSchedule(scheduleId, jobId).ajax({
+        success: function (data) {
+          $('#row_' + jobId).remove()
+        }
+      })
+    }
+
+    function displayJobsToAdd() {
+      var dialog = $('#addJobDialog')
+      jsRoutes.controllers.Scheduling.renderCandidateJobList(@schedule.id).ajax({
+        success: function (data) {
+          dialog.find('.modal-body').html(data)
+          dialog.modal({
+            keyboard: true
+          })
+        }
+      })
+    }
+
+    function displaySuiteJobsToAdd() {
+      var dialog = $('#addJobDialog')
+      jsRoutes.controllers.Scheduling.renderCandidateSuiteJobList(@schedule.id).ajax({
+        success: function (data) {
+          dialog.find('.modal-body').html(data)
+          dialog.modal({
+            keyboard: true
+          })
+        }
+      })
+    }
+
+
+</script>

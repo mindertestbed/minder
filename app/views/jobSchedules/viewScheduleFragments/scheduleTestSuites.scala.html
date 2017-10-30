@@ -1,0 +1,67 @@
+@(schedule: JobSchedule)
+
+@(schedule: JobSchedule)
+
+
+<table class="table table-striped">
+  <tbody id="schedule_suites_tbody">
+    <tr>
+      <th>#</th>
+      <th>ID</th>
+      <th>Name</th>
+      <th>Owner</th>
+      <th></th>
+    </tr>
+
+    @for(testSuite <- schedule.testSuites) {
+      <tr id="srow_@{
+        testSuite.id
+      }">
+        <td></td>
+        <td>@testSuite.id</td>
+        <td>@testSuite.name</td>
+        <td>@testSuite.owner</td>
+        <td>
+             <button class="btn btn-default btn-xs" title="Remove"
+        onclick='removeJob(@schedule.id, @testSuite.id)'
+          <span class="fa fa-minus"></span>
+          </button>
+        </td>
+      </tr>
+    }
+
+  </tbody>
+</table>
+
+
+<div class="row">
+  <div class="col-xs-12">
+    <div align="center">
+      <br />
+      <button class="btn btn-info btn-sm" onclick="displaySuitesToAdd()"><span class="fa fa-plus"></span> Add Test Suite</button> &nbsp;
+    </div>
+  </div>
+</div>
+
+<script>
+    function removeSuite(scheduleId, suiteId) {
+      jsRoutes.controllers.Scheduling.removeSuiteFromSchedule(scheduleId, suiteId).ajax({
+        success: function (data) {
+          $('#srow_' + jobId).remove()
+        }
+      })
+    }
+
+    function displaySuitesToAdd() {
+      var dialog = $('#addJobDialog')
+      jsRoutes.controllers.Scheduling.renderCandidateSuiteList(@schedule.id).ajax({
+        success: function (data) {
+          dialog.find('.modal-body').html(data)
+          dialog.modal({
+            keyboard: true
+          })
+        }
+      })
+    }
+
+</script>

@@ -27,7 +27,7 @@
 
     var dataTabl = new DataTable($('#testSuiteList'), @testGroup.id, levels = [
       {
-        updateFunction: jsRoutes.controllers.AdvancedBatchReporting.listTestSuites,
+        updateFunction: jsRoutes.controllers.ModelJSONLister.listTestSuites,
         title: 'Test Suites',
         pageSize: 10,
         renderDownButtons: true,
@@ -35,7 +35,7 @@
         columns: [{field: 'id', label: 'ID'}, {field: 'name', label: 'Name'}]
       },
       {
-        updateFunction: jsRoutes.controllers.AdvancedBatchReporting.listSuiteRuns,
+        updateFunction: jsRoutes.controllers.ModelJSONLister.listSuiteRuns,
         title: 'Suite Runs',
         pageSize: 10,
         renderCheckBoxes: true,
@@ -45,7 +45,7 @@
         columns: [{field: 'id', label: 'ID'}, {field: 'date', label: 'Date'}]
       },
       {
-        updateFunction: jsRoutes.controllers.AdvancedBatchReporting.listTestRuns,
+        updateFunction: jsRoutes.controllers.ModelJSONLister.listTestRuns,
         title: 'Test Runs',
         pageSize: 10,
         renderCheckBoxes: true,

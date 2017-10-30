@@ -50,7 +50,7 @@
 
   $(function () {
     schedList = new DataTable($('#schedList'), @jobSchedule.testGroup.id, levels = [{
-      updateFunction: jsRoutes.controllers.Scheduling.listSchedulesJSON,
+      updateFunction: jsRoutes.controllers.ModelJSONLister.listSchedulesJSON,
       title: 'Job schedules',
       pageSize: 10,
       renderDownButtons: false,

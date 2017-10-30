@@ -2,90 +2,90 @@
 @import java.util.Collections
 @(schedule: JobSchedule)(implicit authentication: Authentication)
 
-@main(Messages("minder.navigation.restricted.schedules"), "mainNavigation",
-  Array(("Test Groups", controllers.routes.Application.testGroups().path()),
-    (schedule.testGroup.name, controllers.routes.GroupController.getGroupDetailView(schedule.testGroup.id, "sched").path()),
-    (schedule.name, ""))) {
+  @main(Messages("minder.navigation.restricted.schedules"), "mainNavigation",
+    Array(("Test Groups", controllers.routes.Application.testGroups().path()),
+      (schedule.testGroup.name, controllers.routes.GroupController.getGroupDetailView(schedule.testGroup.id, "sched").path()),
+      (schedule.name, ""))) {
 
-  @util.dialogs()
+    @util.dialogs()
 
-  <div class="padabit" style="padding: 10px">
+    <div class="padabit" style="padding: 10px">
 
-    <h3 class="mytitle">Schedule <span id="name@{
-      schedule.id
-    }"
-        onclick='showUpdateInputTextDialog(@schedule.id, "name", $(this).next(), "@controllers.routes.Scheduling.doEditScheduleField")'
-    class="hl editable"></span>
-      <input type="hidden" value="@schedule.name"/></h3>
+      <h3 class="mytitle">Schedule <span id="name@{
+        schedule.id
+      }"
+      onclick='showUpdateInputTextDialog(@schedule.id, "name", $(this).next(), "@controllers.routes.Scheduling.doEditScheduleField")'
+      class="hl editable"></span>
+        <input type="hidden" value="@schedule.name"/></h3>
 
-    <script>
-        $(function () {
-          bindValues($("#name@{schedule.id}"))
-        })
-    </script>
+      <script>
+          $(function () {
+            bindValues($("#name@{schedule.id}"))
+          })
+      </script>
 
 
-    <br/>
+      <br/>
 
-    <div class="container-fluid">
-      <div class="row">
-        <div class="col-xs-12">
-          <div id="nextJobEditor">
-          @views.html.jobSchedules.util.nextJobSchedule(schedule)
+      <div class="container-fluid">
+        <div class="row">
+          <div class="col-xs-12">
+            <div id="nextJobEditor">
+            @views.html.jobSchedules.util.nextJobSchedule(schedule)
+            </div>
+            <br/>
           </div>
-          <br/>
+        </div>
+
+        <div class="row">
+          <div class="col-xs-12">
+
+            <div>
+                <!-- Nav tabs -->
+              <ul class="nav nav-tabs" role="tablist">
+                <li role="presentation" class="active"><a href="#home" aria-controls="home" role="tab" data-toggle="tab">Test Suites</a></li>
+                <li role="presentation"><a href="#profile" aria-controls="profile" role="tab" data-toggle="tab">Jobs</a></li>
+              </ul>
+
+                <!-- Tab panes -->
+              <div class="tab-content">
+                <div role="tabpanel" class="tab-pane active" id="home">
+
+                @viewScheduleFragments.scheduleTestSuites(schedule)
+
+                </div>
+                <div role="tabpanel" class="tab-pane" id="profile">
+
+                @viewScheduleFragments.scheduleJobs(schedule)
+
+                </div>
+              </div>
+
+            </div>
+
+          </div>
         </div>
       </div>
 
-      <div class="row">
-        <div class="col-xs-12">
+    </div>
 
-          <table class="table table-striped">
-            <tbody>
-              <tr>
-                <th>#</th>
-                <th>ID</th>
-                <th>Name</th>
-                <th>Owner</th>
-                <th></th>
-              </tr>
 
-              @for(job <- utils.Util.sortSet(schedule.jobs)){
-                <tr id="row_@{job.id}">
-                  <td></td>
-                  <td>@job.id</td>
-                  <td>@job.name</td>
-                  <td>@job.owner</td>
-                  <td><button class="btn btn-default btn-xs" title="Remove" onclick="removeJob(@schedule.id, @job.id)"><span class="fa fa-minus"></span></button></td>
-                </tr>
-              }
+      <!-- Modal -->
+    <div class="modal fade" id="addJobDialog" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+            <h4 class="modal-title" id="myModalLabel">Modal title</h4>
+          </div>
+          <div class="modal-body">
 
-            </tbody>
-          </table>
-        </div>
-      </div>
-      <div class="row">
-        <div class="col-xs-12">
-          <div align="center">
-            <button class="btn btn-info btn-sm"><span class="fa fa-plus"></span> Add Job(s)</button>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+            <button type="button" class="btn btn-primary">Save changes</button>
           </div>
         </div>
       </div>
     </div>
-
-
-    <script>
-
-      function removeJob(scheduleId, jobId){
-        jsRoutes.controllers.Scheduling.removeJobFromSchedule(scheduleId, jobId).ajax({
-          success: function(data){
-            $('#row_'+jobId).remove()
-          }
-        })
-      }
-
-    </script>
-
-  </div>
-
-} <!-- main -->
+  } <!-- main -->

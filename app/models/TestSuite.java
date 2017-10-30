@@ -6,6 +6,7 @@ import minderengine.Visibility;
 
 import javax.persistence.*;
 import java.util.List;
+import java.util.Set;
 
 /**
  * @author: yerlibilgin
@@ -23,6 +24,10 @@ public class TestSuite extends Model {
   @ManyToOne
   @Column(nullable = false)
   public TestGroup testGroup;
+
+
+  @ManyToMany(targetEntity = JobSchedule.class, mappedBy = "testSuites")
+  public Set<JobSchedule> schedules;
 
 
   @Column(nullable = false)

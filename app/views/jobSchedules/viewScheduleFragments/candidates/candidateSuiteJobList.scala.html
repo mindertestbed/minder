@@ -1,0 +1,59 @@
+@(jobSchedule: JobSchedule)(implicit authentication: Authentication)
+
+
+<div id="candidateTsJobsDiv">
+
+</div>
+
+
+
+<script>
+
+    var sjTable = new DataTable($('#candidateTsJobsDiv'), @jobSchedule.testGroup.id, levels = [
+      {
+        updateFunction: jsRoutes.controllers.ModelJSONLister.listTestSuites,
+        title: 'Test Suites',
+        pageSize: 10,
+        renderDownButtons: true,
+        renderCheckBoxes: false,
+        renderRefreshButton: false,
+        columns: [{field: 'id', label: 'ID'}, {field: 'name', label: 'Name'}]
+      },
+      {
+        updateFunction: jsRoutes.controllers.ModelJSONLister.listSuiteJobs,
+        title: 'Jobs',
+        pageSize: 10,
+        renderCheckBoxes: true,
+        renderDownButtons: false,
+        renderRefreshButton: true,
+        backgroundColor: '#c9ffee',
+        columns: [{field: 'id', label: 'ID'}, {field: 'name', label: 'Name'}, {
+          field: 'owner', label: 'Owner', formatFunction: function (value) {
+            console.info(value)
+            return value
+          }
+        }]
+      },
+    ])
+
+
+    sjTable.$.on('itemClicked', function (evt, level, itemId) {
+      var ajax;
+      //   ajax = jsRoutes.controllers.Scheduling.addTestSuiteToSchedule(@jobSchedule.id, itemId)
+      ajax = jsRoutes.controllers.Scheduling.addJobToSchedule(@jobSchedule.id, itemId)
+
+
+      ajax.ajax({
+        success: function (data) {
+          $('#schedule_jobs_tbody').append(data)
+        }
+      })
+    })
+
+
+    $(function () {
+      sjTable.updateTable()
+    })
+
+</script>
+

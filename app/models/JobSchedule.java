@@ -38,6 +38,9 @@ public class JobSchedule extends Model {
   @ManyToMany(targetEntity = Job.class, cascade = CascadeType.REMOVE)
   public Set<Job> jobs;
 
+  @ManyToMany(targetEntity = TestSuite.class, cascade = CascadeType.REMOVE)
+  public Set<TestSuite> testSuites;
+
 
   @ManyToOne
   @Column(nullable = false)
