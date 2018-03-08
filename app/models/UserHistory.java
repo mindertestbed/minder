@@ -10,6 +10,7 @@ import java.io.UnsupportedEncodingException;
 @Entity
 @Table(name = "UserHistory")
 public class UserHistory extends Model {
+
   @Id
   public Long id;
 
@@ -22,6 +23,9 @@ public class UserHistory extends Model {
   public byte[] systemOutputLog;
 
   public String extractSystemOutputLog() {
+    if (systemOutputLog == null)
+      return "";
+
     return new String(utils.Util.gunzip(systemOutputLog));
   }
 

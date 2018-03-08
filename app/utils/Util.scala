@@ -7,10 +7,12 @@ import java.util
 import java.util._
 import java.util.regex.Pattern
 import java.util.zip.{GZIPInputStream, GZIPOutputStream}
+import javax.annotation.Nonnull
 
 import controllers.MappedWrapperModel
 import minderengine.Visibility
 import models._
+import org.apache.commons.lang3.Validate
 import play.Logger
 import play.data.Form
 import play.data.validation.{Constraints, ValidationError}
@@ -188,6 +190,14 @@ object Util {
     localUser.email == "root@minder" || localUser.email == owner.email
   }
 
+  /**
+    * Verify that the <code>subject</code> can access a resource that belongs to
+    * <code>owner</code> with respect to the <code>visibility</code>
+    * @param subject
+    * @param owner
+    * @param visibility
+    * @return
+    */
   def canAccess(subject: User, owner: User, visibility: Visibility): Boolean = {
     if (subject != null && owner != null) {
       if ((subject.email == "root@minder") || (subject.email == owner.email) ||
@@ -201,10 +211,11 @@ object Util {
   /**
     * compress the given byte array
     *
-    * @param plain
+    * @param plain nonnull
     * @return
     */
-  def gzip(plain: Array[Byte]): Array[Byte] = {
+  def gzip(@Nonnull plain: Array[Byte]): Array[Byte] = {
+    Validate.notNull(plain, "Input cannot be null")
     val bais: ByteArrayInputStream = new ByteArrayInputStream(plain)
     val baos: ByteArrayOutputStream = new ByteArrayOutputStream
     gzip(bais, baos)
@@ -212,6 +223,7 @@ object Util {
   }
 
   def gunzip(compressed: Array[Byte]): Array[Byte] = {
+    Validate.notNull(compressed, "Input cannot be null")
     val bais: ByteArrayInputStream = new ByteArrayInputStream(compressed)
     val baos: ByteArrayOutputStream = new ByteArrayOutputStream
     gunzip(bais, baos)

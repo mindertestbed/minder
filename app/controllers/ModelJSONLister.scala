@@ -5,6 +5,7 @@ import java.util.regex.Pattern
 import javax.inject.Inject
 
 import models._
+import play.Logger
 import play.api.libs.json._
 import play.api.mvc._
 import utils.{JavaAction, Util}
@@ -15,6 +16,7 @@ import scala.collection.JavaConversions._
 
 
 object ModelJSONLister {
+  val LOGGER = Logger.of(classOf[ModelJSONLister])
 
   implicit val testSuiteWrites = new Writes[models.TestSuite] {
     def writes(o: models.TestSuite) = Json.obj(
@@ -106,12 +108,12 @@ class ModelJSONLister @Inject()(implicit authentication: Authentication) extends
       if (testGroup == null)
         BadRequest(s"No such test group with id $groupId")
       else {
-        val howMant = TestSuite.countByGroup(testGroup)
+        val countSuiteByGroup = TestSuite.countByGroup(testGroup)
 
-        println(s"How many: $howMant")
+        LOGGER.debug(s"Number of test suites for test group: $groupId is $countSuiteByGroup")
 
         Ok(Json.obj(
-          "count" -> howMant,
+          "count" -> countSuiteByGroup,
           "content" -> Json.toJson(TestSuite.findByGroup(testGroup, pageIndex, pageSize))))
       }
     }
@@ -149,7 +151,6 @@ class ModelJSONLister @Inject()(implicit authentication: Authentication) extends
           "content" -> Json.toJson(TestRun.findBySuiteRun(suiteRun, pageIndex, pageSize))))
     }
   }
-
 
   def listTestCases(testGroupId: Long, pageIndex: Int, pageSize: Int) = JavaAction {
     implicit request => {

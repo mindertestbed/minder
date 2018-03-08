@@ -280,12 +280,10 @@
             console.log(data)
             window.location = '/downloadReport?temporaryReportId=' + data
           },
-          error: function (err) {
-            alert(err)
+          error: function (jqXHR, textStatus, errorMessage) {
+            showError(jqXHR.responseText)
           }
-        }).done = function (donee) {
-          alert("Done " + donee)
-        }
+        })
       }
 
   </script>

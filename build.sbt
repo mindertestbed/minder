@@ -34,8 +34,8 @@ libraryDependencies ++= Seq(
   "org.webjars" % "bootstrap" % "3.3.6",
   "org.codehaus.groovy" % "groovy" % "2.3.9",
   "gov.tubitak.minder" % "minder-gitb-bridge-common" % "0.1",
-  "com.itextpdf" % "itextpdf" % "5.5.8",
-  "com.itextpdf.tool" % "xmlworker" % "5.5.8",
+  "com.itextpdf" % "itextpdf" % "5.5.13",
+  "com.itextpdf.tool" % "xmlworker" % "5.5.13",
   specs2 % Test,
   "junit" % "junit" % "4.12" % Test
 ).map(_.excludeAll(

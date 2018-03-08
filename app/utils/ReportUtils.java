@@ -1,15 +1,44 @@
 package utils;
 
 import com.itextpdf.text.Document;
+import com.itextpdf.text.FontProvider;
+import com.itextpdf.text.Image;
 import com.itextpdf.text.pdf.PdfWriter;
+import com.itextpdf.tool.xml.Pipeline;
+import com.itextpdf.tool.xml.XMLWorker;
+import com.itextpdf.tool.xml.XMLWorkerFontProvider;
 import com.itextpdf.tool.xml.XMLWorkerHelper;
-import models.*;
-import play.Logger;
-
+import com.itextpdf.tool.xml.css.CssFiles;
+import com.itextpdf.tool.xml.css.CssFilesImpl;
+import com.itextpdf.tool.xml.css.StyleAttrCSSResolver;
+import com.itextpdf.tool.xml.html.CssAppliersImpl;
+import com.itextpdf.tool.xml.html.Tags;
+import com.itextpdf.tool.xml.parser.XMLParser;
+import com.itextpdf.tool.xml.pipeline.css.CssResolverPipeline;
+import com.itextpdf.tool.xml.pipeline.end.PdfWriterPipeline;
+import com.itextpdf.tool.xml.pipeline.html.AbstractImageProvider;
+import com.itextpdf.tool.xml.pipeline.html.HtmlPipeline;
+import com.itextpdf.tool.xml.pipeline.html.HtmlPipelineContext;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.FileInputStream;
-import java.util.*;
+import java.io.InputStream;
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
+import java.util.Base64;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
+import models.ReportTemplate;
+import models.TestAssertion;
+import models.TestGroup;
+import models.TestRun;
+import models.TestRunStatus;
+import play.Logger;
+import play.Logger.ALogger;
 
 
 /**
@@ -17,6 +46,8 @@ import java.util.*;
  * @date: 03/03/16.
  */
 public class ReportUtils {
+
+  private static final ALogger LOGGER = Logger.of(ReportUtils.class);
   static String reportTemplate;
   static String testRunTemplate;
   static String singleTestRunTemplate;
@@ -32,7 +63,6 @@ public class ReportUtils {
 
     try {
 
-
       FileInputStream stream = new FileInputStream("conf/reportTemplate.html");
       ByteArrayOutputStream baos = new ByteArrayOutputStream();
       while ((read = stream.read(buff, 0, 1024)) > 0) {
@@ -41,7 +71,6 @@ public class ReportUtils {
       reportTemplate = new String(baos.toByteArray());
       stream.close();
 
-
       stream = new FileInputStream("conf/testRunTemplate.html");
       baos = new ByteArrayOutputStream();
       while ((read = stream.read(buff, 0, 1024)) > 0) {
@@ -49,7 +78,6 @@ public class ReportUtils {
       }
       testRunTemplate = new String(baos.toByteArray());
       stream.close();
-
 
       stream = new FileInputStream("conf/singleTestRunTemplate.html");
       baos = new ByteArrayOutputStream();
@@ -66,17 +94,18 @@ public class ReportUtils {
   }
 
   public static byte[] toPdf(TestRun tr) {
+    LOGGER.debug("Create PDF from test run " + tr.id);
     try {
       String html = fillTestRun(tr, singleTestRunTemplate);
       ByteArrayOutputStream baos = new ByteArrayOutputStream();
       Document document = new Document();
       PdfWriter writer = PdfWriter.getInstance(document, baos);
       document.open();
-      XMLWorkerHelper.getInstance().parseXHtml(writer, document, new ByteArrayInputStream(html.getBytes()));
+      parseXHtml(writer, document, new ByteArrayInputStream(html.getBytes()));
       document.close();
       return baos.toByteArray();
     } catch (Exception ex) {
-      ex.printStackTrace();
+      LOGGER.error(ex.getMessage(), ex);
       return "Invalid".getBytes();
     }
   }
@@ -86,6 +115,7 @@ public class ReportUtils {
   }
 
   private static String fillTestRun(TestRun tr, String reportTemplate, Map<String, String> customParameters) {
+    LOGGER.debug("Fill the report template with the test run " + +tr.id + " details.");
     TestAssertion testAssertion = TestAssertion.findById(tr.job.tdl.testCase.testAssertion.id);
     boolean isSuccess = tr.status == TestRunStatus.SUCCESS;
     reportTemplate = reportTemplate
@@ -155,7 +185,6 @@ public class ReportUtils {
     StringBuilder builder = new StringBuilder();
     StringBuilder tocBuilder = new StringBuilder();
 
-
     Collections.sort(testRuns, comparator);
 
     String testGroup = "";
@@ -163,7 +192,8 @@ public class ReportUtils {
       builder.append(fillTestRun(testRun, testRunTemplate)).append('\n');
       tocBuilder
           .append("<tr")
-          .append(testRun.status == TestRunStatus.SUCCESS ? (" style='background-color:" + successColor + ";'") : (" style='background-color:" + failColor + "'"))
+          .append(testRun.status == TestRunStatus.SUCCESS ? (" style='background-color:" + successColor + ";'")
+              : (" style='background-color:" + failColor + "'"))
           .append("><td><a href='#")
           .append(testRun.job.tdl.testCase.testAssertion.taId)
           .append("'>")
@@ -181,18 +211,18 @@ public class ReportUtils {
         .replace("${date}", Util.formatDate(new Date()))
         .replace("${subTitle}", subTitle);
 
-
     Document document = new Document();
     ByteArrayOutputStream baos = new ByteArrayOutputStream();
 
     PdfWriter writer = PdfWriter.getInstance(document, baos);
     document.open();
-    XMLWorkerHelper.getInstance().parseXHtml(writer, document, new ByteArrayInputStream(html.getBytes()));
+    parseXHtml(writer, document, new ByteArrayInputStream(html.getBytes()));
     document.close();
     return baos.toByteArray();
   }
 
-  public static byte[] toPdf(long groupId, long selectedBatchReportId, long selectedSingleReportId, Collection<TestRun> testRuns, Map<String, String> customParameterMap) throws Exception {
+  public static byte[] toPdf(long groupId, long selectedBatchReportId, long selectedSingleReportId, Collection<TestRun> testRuns,
+      Map<String, String> customParameterMap) throws Exception {
 
     /**
      * Replacement
@@ -206,8 +236,9 @@ public class ReportUtils {
     if (selectedBatchReportId != -1) {
       ReportTemplate batchTemplate = ReportTemplate.byId(selectedBatchReportId);
 
-      if (batchTemplate == null)
+      if (batchTemplate == null) {
         throw new Exception("No such report with id [" + selectedBatchReportId + "]");
+      }
 
       batchTemplateHTML = new String(Util.gunzip(batchTemplate.html));
     }
@@ -215,8 +246,9 @@ public class ReportUtils {
     String singleTemplate = singleTestRunTemplate;
     if (selectedSingleReportId != -1) {
       ReportTemplate testRunTemplate = ReportTemplate.byId(selectedSingleReportId);
-      if (testRunTemplate == null)
+      if (testRunTemplate == null) {
         throw new Exception("No such report with id [" + selectedSingleReportId + "]");
+      }
       singleTemplate = new String(Util.gunzip(testRunTemplate.html));
     }
 
@@ -226,7 +258,8 @@ public class ReportUtils {
 
       tocBuilder
           .append("<tr")
-          .append(testRun.status == TestRunStatus.SUCCESS ? (" style='background-color:" + successColor + ";'") : (" style='background-color:" + failColor + "'"))
+          .append(testRun.status == TestRunStatus.SUCCESS ? (" style='background-color:" + successColor + ";'")
+              : (" style='background-color:" + failColor + "'"))
           .append("><td><a href='#")
           .append(testRun.job.tdl.testCase.testAssertion.taId)
           .append("'>")
@@ -235,7 +268,6 @@ public class ReportUtils {
           .append((testRun.status == TestRunStatus.SUCCESS ? checkString : crossString))
           .append("</td></tr>\n");
     }
-
 
     batchTemplateHTML = batchTemplateHTML
         .replace("${testRuns}", builder.toString())
@@ -253,15 +285,76 @@ public class ReportUtils {
     //check if we still have a parameter like ${param} and remove them
     batchTemplateHTML.replaceAll("\\$\\{(\\w|_)+(\\w|\\d|_)*\\}", "");
 
-
     Document document = new Document();
     ByteArrayOutputStream baos = new ByteArrayOutputStream();
 
     PdfWriter writer = PdfWriter.getInstance(document, baos);
     document.open();
-    XMLWorkerHelper.getInstance().parseXHtml(writer, document, new ByteArrayInputStream(batchTemplateHTML.getBytes()));
+
+    parseXHtml(writer, document, new ByteArrayInputStream(batchTemplateHTML.getBytes()),
+        XMLWorkerHelper.class.getResourceAsStream("/default.css"),
+        StandardCharsets.UTF_8, new XMLWorkerFontProvider()
+    );
     document.close();
     return baos.toByteArray();
   }
 
+
+  private static void parseXHtml(PdfWriter writer, Document document, ByteArrayInputStream byteArrayInputStream) {
+    parseXHtml(writer, document, byteArrayInputStream, XMLWorkerHelper.class.getResourceAsStream("/default.css"),
+        StandardCharsets.UTF_8, new XMLWorkerFontProvider());
+  }
+
+  /**
+   * @param writer the writer to use
+   * @param doc the document to use
+   * @param in the {@link InputStream} of the XHTML source.
+   * @param in the {@link CssFiles} of the css files.
+   * @param charset the charset to use
+   * @throws IllegalStateException if the {@link InputStream} could not be read.
+   */
+  public static void parseXHtml(final PdfWriter writer, final Document doc, final InputStream in, final InputStream inCssFile,
+      final Charset charset, final FontProvider fontProvider) {
+    CssFilesImpl cssFiles = new CssFilesImpl();
+    cssFiles.add(XMLWorkerHelper.getCSS(inCssFile));
+    StyleAttrCSSResolver cssResolver = new StyleAttrCSSResolver(cssFiles);
+    HtmlPipelineContext hpc = new HtmlPipelineContext(new CssAppliersImpl(fontProvider));
+    hpc.setImageProvider(new Base64ImageProvider());
+    hpc.setAcceptUnknown(true).autoBookmark(true).setTagFactory(Tags.getHtmlTagProcessorFactory());
+    HtmlPipeline htmlPipeline = new HtmlPipeline(hpc, new PdfWriterPipeline(doc, writer));
+    Pipeline<?> pipeline = new CssResolverPipeline(cssResolver, htmlPipeline);
+    XMLWorker worker = new XMLWorker(pipeline, true);
+    XMLParser p = new XMLParser(true, worker, charset);
+    try {
+      p.parse(in, charset);
+    } catch (Exception ex) {
+      throw new IllegalStateException(ex.getMessage(), ex);
+    }
+  }
+
+  static class Base64ImageProvider extends AbstractImageProvider {
+    @Override
+    public Image retrieve(String src) {
+      int pos = src.indexOf("base64,");
+      try {
+        Image image;
+        if (src.startsWith("data") && pos > 0) {
+          byte[] img = Base64.getDecoder().decode(src.substring(pos + 7));
+          image = Image.getInstance(img);
+        } else {
+          image = Image.getInstance(src);
+        }
+
+        return image;
+      } catch (Exception ex) {
+        LOGGER.error(ex.getMessage(), ex);
+        throw new IllegalStateException(ex);
+      }
+    }
+
+    @Override
+    public String getImageRootPath() {
+      return null;
+    }
+  }
 }
