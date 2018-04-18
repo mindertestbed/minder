@@ -6,36 +6,46 @@
     height: 100%;">
     <script>
         $(function () {
-          var logfeed = $("#logfeed")[0];
-          var logarea = $("#logarea")
+              var logfeed = $("#logfeed")[0];
+              var logarea = $("#logarea")
 
-          new EventSource('@controllers.routes.TestLogFeeder.logFeed()').onmessage = function (event) {
-            var newd = event.data
-            logarea[0].textContent += "\n" + newd;
-            console.log("Log " + event.data)
-            logarea[0].scrollTop = logarea[0].scrollHeight;
-          }
+              new EventSource('@controllers.routes.TestLogFeeder.logFeed()').onmessage = function (event) {
+                var newd = event.data
+                logarea[0].textContent += "\n" + newd;
+                console.log("Log " + event.data)
+                logarea[0].scrollTop = logarea[0].scrollHeight;
+              }
 
-        });
+              if (sessionStorage.getItem('lastOpenState') !== null) {
+                var vals = sessionStorage.getItem(('lastOpenState'))
+                if (vals.indexOf(",") !== -1) {
+                  var partsOfStr = vals.split(',');
+                  display(partsOfStr)
+                } else {
+                  display(vals)
+                }
+              }
+            }
+        );
 
         function display(id) {
-
           console.log("type of " + isArray(id))
-
           $('#queDiv').addClass('hidden-xs')
           $('#historyDiv').addClass('hidden-xs')
           $('#parentOfQueAndHistory').addClass('hidden-xs')
           $('#logDiv').addClass('hidden-xs')
 
           console.log('id: ' + id)
-          if(isArray(id)) {
-            for(var index in id) {
+          if (isArray(id)) {
+            for (var index in id) {
               var obj = id[index];
               $('#' + obj).removeClass('hidden-xs')
             }
           } else {
             $('#' + id).removeClass('hidden-xs')
           }
+
+          sessionStorage.setItem('lastOpenState', id)
         }
 
 
