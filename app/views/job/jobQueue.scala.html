@@ -16,22 +16,26 @@
             logarea[0].scrollTop = logarea[0].scrollHeight;
           }
 
-          $(window).resize(function () {
-            if ($(this).width() <= 768) {
-              $("#logDiv").hide();
-            } else {
-              $("#queDiv").show()
-              $("#historyDiv").show()
-              $("#logDiv").show()
-            }
-          });
         });
 
         function display(id) {
-          $("#queDiv").hide()
-          $("#historyDiv").hide()
-          $("#logDiv").hide()
-          $("#" + id).show()
+
+          console.log("type of " + isArray(id))
+
+          $('#queDiv').addClass('hidden-xs')
+          $('#historyDiv').addClass('hidden-xs')
+          $('#parentOfQueAndHistory').addClass('hidden-xs')
+          $('#logDiv').addClass('hidden-xs')
+
+          console.log('id: ' + id)
+          if(isArray(id)) {
+            for(var index in id) {
+              var obj = id[index];
+              $('#' + obj).removeClass('hidden-xs')
+            }
+          } else {
+            $('#' + id).removeClass('hidden-xs')
+          }
         }
 
 
@@ -46,20 +50,22 @@
         <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
           Select View <span class="caret"></span>
         </button>
-        <ul class="dropdown-menu">
-          <li><a onclick='display("queDiv")'>Job Queue</a></li>
-          <li><a onclick='display("historyDiv")'>History</a></li>
+        <ul class="dropdown-menu dropdown-menu-right">
+          <li><a onclick='display(["parentOfQueAndHistory", "queDiv"])'>Job Queue</a></li>
+          <li><a onclick='display(["parentOfQueAndHistory", "historyDiv"])'>History</a></li>
           <li><a onclick='display("logDiv")'>Log</a></li>
+          <li><a onclick='display(["parentOfQueAndHistory", "queDiv", "historyDiv"])'>Job Queue and History</a></li>
+          <li><a onclick='display(["parentOfQueAndHistory", "historyDiv", "queDiv", "logDiv"])'>All</a></li>
         </ul>
       </div>
     </td></tr></table>
 
-    <h3 class="hidden-xs">Test Monitor</h3>
+    <h3 class='hidden-xs'>Test Monitor</h3>
 
     <div class="row" style="height: 95%;">
       <div class="col-sm-@{
         utils.Util.feedWidth
-      }" style="overflow: auto;
+      }" id="parentOfQueAndHistory" style="overflow: auto;
         scroll;
         height: 100%;">
         <div id="queDiv">
@@ -72,7 +78,7 @@
       </div>
       <div id="logDiv" class="col-sm-@{
         utils.Util.remaining
-      }" style="height: 100%;">
+      } hidden-xs" style="height: 100%;">
         <div class="panel panel-info" style="height: 97% ;
           padding: 0px ;">
           <div class="panel-heading"><span class="fa fa-terminal">&nbsp;</span>Log</div>
