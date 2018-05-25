@@ -27,3 +27,4 @@ release
 /dependencies
 *.7z
 samplequeries.sql
+*.db

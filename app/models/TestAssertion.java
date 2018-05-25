@@ -57,7 +57,6 @@ public class TestAssertion extends Model {
 
   private static final Finder<Long, TestAssertion> find = new Finder<>(TestAssertion.class);
 
-
   public static List<TestAssertion> findByGroup(TestGroup group) {
     return find.where().eq("testGroup", group).setOrderBy("taId").findList();
   }

@@ -182,6 +182,7 @@ create table TestRun (
   number                    integer,
   error_message             TEXT,
   visibility                integer,
+  metadata                  TEXT,
   constraint ck_TestRun_status check (status in (0,1,2,3,4)),
   constraint ck_TestRun_visibility check (visibility in (0,1,2)),
   constraint uq_TestRun_history_id unique (history_id),
