@@ -38,7 +38,7 @@ public class Tdl extends Model {
 
 
     @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    public List<WrapperParam> parameters;
+    public List<AdapterParam> parameters;
 
     private static final Finder<Long, Tdl> find = new Finder<>(Tdl.class);
 
@@ -60,7 +60,7 @@ public class Tdl extends Model {
     }
 
     public static List<Tdl> getAllUnparametricTdls() {
-        RawSql rawSql = RawSqlBuilder.unparsed("SELECT t.* FROM tdl t LEFT JOIN wrapperparam w ON t.id = w.tdl_id WHERE w.tdl_id IS NULL")
+        RawSql rawSql = RawSqlBuilder.unparsed("SELECT t.* FROM tdl t LEFT JOIN adapterparam w ON t.id = w.tdl_id WHERE w.tdl_id IS NULL")
                 .columnMapping("id", "id")
                 .columnMapping("test_case_id","testCase.id")
                 .columnMapping("tdl","tdl")
@@ -78,7 +78,7 @@ public class Tdl extends Model {
     public static Tdl findByTestCaseAndVersion(TestCase testCase, String version) {
         return find.where().eq("testCase", testCase).eq("version",version).findUnique();
     }
-	
+
 	public static List<Tdl>  listByTestCase(TestCase testCase) {
     return find.where().eq("testCase", testCase).orderBy().desc("creationDate").findList();
     }

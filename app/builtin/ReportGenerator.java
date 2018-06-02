@@ -29,7 +29,7 @@ public class ReportGenerator extends BuiltInAdapter {
 
   @Override
   public String getShortDescription() {
-    return "The minder built-in xml report generator wrapper";
+    return "The minder built-in xml report generator adapter";
   }
 
   @Slot

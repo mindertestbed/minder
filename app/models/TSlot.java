@@ -6,7 +6,6 @@ import com.avaje.ebean.Model;
 
 import javax.persistence.Entity;
 import javax.persistence.Id;
-import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import java.util.List;
@@ -21,7 +20,7 @@ public class TSlot extends Model {
   public Long id;
 
   @ManyToOne
-  public WrapperVersion wrapperVersion;
+  public AdapterVersion adapterVersion;
 
   public String signature;
 
@@ -31,14 +30,14 @@ public class TSlot extends Model {
     return find.where().eq("signature", signature).findList();
   }
 
-  public static void deleteByVersion(WrapperVersion wrapperVersion) {
-    SqlUpdate tangoDown = Ebean.createSqlUpdate("DELETE FROM TSlot WHERE wrapper_version_id = " + wrapperVersion.id);
+  public static void deleteByVersion(AdapterVersion adapterVersion) {
+    SqlUpdate tangoDown = Ebean.createSqlUpdate("DELETE FROM TSlot WHERE adapter_version_id = " + adapterVersion.id);
     tangoDown.execute();
   }
 
-  public static TSlot createNew(WrapperVersion wrapperVersion, String methodKey) {
+  public static TSlot createNew(AdapterVersion adapterVersion, String methodKey) {
     TSlot ts = new TSlot();
-    ts.wrapperVersion = wrapperVersion;
+    ts.adapterVersion = adapterVersion;
     ts.signature = methodKey;
     ts.save();
     return ts;

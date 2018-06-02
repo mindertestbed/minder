@@ -6,7 +6,7 @@ import java.util.Date
 import builtin.ReportGenerator
 import controllers.common.Utils
 import minderengine._
-import models.{Wrapper, _}
+import models.{Adapter, _}
 import mtdl._
 import play.Logger
 
@@ -20,8 +20,8 @@ import scala.io.Source
   */
 class TestRunContext(val testRun: TestRun, testRunFeeder: TestRunFeeder, testLogFeeder: TestLogFeeder, testEngine: TestEngine) extends Runnable with TestProcessWatcher {
   var suspended = false;
-  val variableWrapperMapping = collection.mutable.Map[String, MappedWrapper]();
-  val mappedWrappers = MappedWrapper.findByJob(testRun.job)
+  val variableAdapterMapping = collection.mutable.Map[String, MappedAdapter]();
+  val mappedAdapters = MappedAdapter.findByJob(testRun.job)
   var sutNames: java.util.Set[String] = null;
   var error = ""
   var job: AbstractJob = AbstractJob.findById(testRun.job.id)
@@ -67,11 +67,11 @@ class TestRunContext(val testRun: TestRun, testRunFeeder: TestRunFeeder, testLog
 
   var gitbReplyToUrlAddress = "";
 
-  for (mappedWrapper: MappedWrapper <- mappedWrappers) {
-    mappedWrapper.parameter = WrapperParam.findById(mappedWrapper.parameter.id);
-    mappedWrapper.wrapperVersion = WrapperVersion.findById(mappedWrapper.wrapperVersion.id);
-    mappedWrapper.wrapperVersion.wrapper = Wrapper.findById(mappedWrapper.wrapperVersion.wrapper.id);
-    variableWrapperMapping.put(mappedWrapper.parameter.name, mappedWrapper)
+  for (mappedAdapter: MappedAdapter <- mappedAdapters) {
+    mappedAdapter.parameter = AdapterParam.findById(mappedAdapter.parameter.id);
+    mappedAdapter.adapterVersion = AdapterVersion.findById(mappedAdapter.adapterVersion.id);
+    mappedAdapter.adapterVersion.adapter = Adapter.findById(mappedAdapter.adapterVersion.adapter.id);
+    variableAdapterMapping.put(mappedAdapter.parameter.name, mappedAdapter)
   }
 
 
@@ -90,7 +90,7 @@ class TestRunContext(val testRun: TestRun, testRunFeeder: TestRunFeeder, testLog
   override def run(): Unit = {
     testRun.status = TestRunStatus.IN_PROGRESS
     testRun.save()
-    testEngine.runTest(sessionID, user.email, cls, variableWrapperMapping, TestRunContext.this, job.mtdlParameters)
+    testEngine.runTest(sessionID, user.email, cls, variableAdapterMapping, TestRunContext.this, job.mtdlParameters)
   }
 
   /**

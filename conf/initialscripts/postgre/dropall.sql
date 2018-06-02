@@ -7,7 +7,7 @@ drop table if exists GitbEndpoint cascade;
 
 drop table if exists GitbParameter cascade;
 
-drop table if exists MappedWrapper cascade;
+drop table if exists MappedAdapter cascade;
 
 drop table if exists ParamSignature cascade;
 
@@ -39,9 +39,9 @@ drop table if exists UserHistory cascade;
 
 drop table if exists UtilClass cascade;
 
-drop table if exists Wrapper cascade;
+drop table if exists Adapter cascade;
 
-drop table if exists WrapperParam cascade;
+drop table if exists AdapterParam cascade;
 
-drop table if exists WrapperVersion cascade;
+drop table if exists AdapterVersion cascade;
 

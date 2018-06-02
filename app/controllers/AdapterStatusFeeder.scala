@@ -4,10 +4,9 @@ import java.util
 import java.util.{Observable, Observer}
 import javax.inject.Inject
 
-import akka.actor.ActorSystem
 import akka.stream.scaladsl.Source
-import minderengine.MinderWrapperRegistry
-import models.{Job, TestRun, WrapperVersion}
+import minderengine.MinderAdapterRegistry
+import models.{AdapterVersion, Job}
 import play.api.libs.EventSource
 import play.api.libs.concurrent.Execution.Implicits._
 import play.api.libs.iteratee.{Concurrent, Enumeratee}
@@ -20,49 +19,49 @@ import scala.collection.JavaConversions._
 class AdapterStatusFeeder @Inject()() extends Controller {
 
   val (wsOut, wsChannel) = Concurrent.broadcast[JsValue];
-  val (adapterStatusOut, adapterStatusChannel) = Concurrent.broadcast[(WrapperVersion, Boolean)];
+  val (adapterStatusOut, adapterStatusChannel) = Concurrent.broadcast[(AdapterVersion, Boolean)];
 
-  MinderWrapperRegistry.get().addObserver(new Observer {
+  MinderAdapterRegistry.get().addObserver(new Observer {
     override def update(o: Observable, arg: scala.Any): Unit = {
-      val wrapperVersionId = arg.asInstanceOf[Long];
-      val wrapperVersion = WrapperVersion.findById(wrapperVersionId);
-      updateAdapterStatusOld(wrapperVersion, MinderWrapperRegistry.get().isWrapperAvailable(wrapperVersion))
+      val adapterVersionId = arg.asInstanceOf[Long];
+      val adapterVersion = AdapterVersion.findById(adapterVersionId);
+      updateAdapterStatusOld(adapterVersion, MinderAdapterRegistry.get().isAdapterAvailable(adapterVersion))
 
-      updateAdapterStatus(wrapperVersion, MinderWrapperRegistry.get().isWrapperAvailable(wrapperVersion))
+      updateAdapterStatus(adapterVersion, MinderAdapterRegistry.get().isAdapterAvailable(adapterVersion))
     }
   })
 
   /**
     * Obsolete, remove it in the future
     *
-    * @param wrapperVersion
+    * @param adapterVersion
     * @param online
     */
-  def updateAdapterStatusOld(wrapperVersion: WrapperVersion, online: Boolean): Unit = {
+  def updateAdapterStatusOld(adapterVersion: AdapterVersion, online: Boolean): Unit = {
     val json = JsObject(Seq(
-      "id" -> JsString(wrapperVersion.id + ""),
+      "id" -> JsString(adapterVersion.id + ""),
       "online" -> JsBoolean(online)))
     wsChannel.push(json);
 
   }
 
-  def updateAdapterStatus(wrapperVersion: WrapperVersion, online: Boolean): Unit = {
-    adapterStatusChannel.push((wrapperVersion, online))
+  def updateAdapterStatus(adapterVersion: AdapterVersion, online: Boolean): Unit = {
+    adapterStatusChannel.push((adapterVersion, online))
   }
 
-  def filterWS(labelMap: util.HashMap[String, models.WrapperVersion]) = Enumeratee.filter[JsValue] {
+  def filterWS(labelMap: util.HashMap[String, AdapterVersion]) = Enumeratee.filter[JsValue] {
     tpl: JsValue => {
       labelMap.containsKey((tpl \ "id").as[String])
     }
   }
 
 
-  class AdapterStatusRunnable(val labelMap: util.HashMap[String, models.WrapperVersion]) extends Runnable {
+  class AdapterStatusRunnable(val labelMap: util.HashMap[String, AdapterVersion]) extends Runnable {
     override def run(): Unit = {
       if (labelMap != null) {
         Thread.sleep(2000)
         labelMap.foreach(wrp => {
-          val online = MinderWrapperRegistry.get().isWrapperAvailable(wrp._2);
+          val online = MinderAdapterRegistry.get().isAdapterAvailable(wrp._2);
           val json = JsObject(Seq(
             "id" -> JsString(wrp._1 + ""),
             "online" -> JsBoolean(online)))
@@ -81,11 +80,11 @@ class AdapterStatusFeeder @Inject()() extends Controller {
     * @return
     */
   def adapterJobStatusFeed(jobId: Long) = Action {
-    val labelMap = new util.HashMap[String, models.WrapperVersion]()
+    val labelMap = new util.HashMap[String, AdapterVersion]()
     val job = Job.findById(jobId);
-    job.mappedWrappers.foreach(mw => {
-      mw.wrapperVersion = WrapperVersion.findById(mw.wrapperVersion.id);
-      labelMap.put(mw.wrapperVersion.id + "", mw.wrapperVersion);
+    job.mappedAdapters.foreach(mw => {
+      mw.adapterVersion = AdapterVersion.findById(mw.adapterVersion.id);
+      labelMap.put(mw.adapterVersion.id + "", mw.adapterVersion);
     })
     threadPool.submit(new AdapterStatusRunnable(labelMap))
     val source = Source.fromPublisher(Streams.enumeratorToPublisher(wsOut &> filterWS(labelMap)));
@@ -93,16 +92,16 @@ class AdapterStatusFeeder @Inject()() extends Controller {
   }
 
 
-  def filterAdapterId(id: Long) = Enumeratee.filter[(WrapperVersion, Boolean)] {
+  def filterAdapterId(id: Long) = Enumeratee.filter[(AdapterVersion, Boolean)] {
     tpl => true
   }
 
-  def renderAdapterStatus(): Enumeratee[(WrapperVersion, Boolean), JsValue] = Enumeratee.map[(WrapperVersion, Boolean)] {
+  def renderAdapterStatus(): Enumeratee[(AdapterVersion, Boolean), JsValue] = Enumeratee.map[(AdapterVersion, Boolean)] {
     tpl => {
       JsObject(Seq(
         "versionId" -> JsString(tpl._1.id + ""),
-        "wrapperId" -> JsString(tpl._1.wrapper.id + ""),
-        "name" -> JsString(tpl._1.wrapper.name + ""),
+        "adapterId" -> JsString(tpl._1.adapter.id + ""),
+        "name" -> JsString(tpl._1.adapter.name + ""),
         "online" -> JsBoolean(tpl._2)))
     }
   }
@@ -111,10 +110,10 @@ class AdapterStatusFeeder @Inject()() extends Controller {
     new Thread() {
       override def run(): Unit = {
         Thread.sleep(1000)
-        for (wr <- models.Wrapper.getAll()) {
-          val wv: WrapperVersion = WrapperVersion.latestByWrapper(wr)
+        for (wr <- models.Adapter.getAll()) {
+          val wv: AdapterVersion = AdapterVersion.latestByAdapter(wr)
           if (wv != null)
-            adapterStatusChannel.push((wv, MinderWrapperRegistry.get().isWrapperAvailable(wv)))
+            adapterStatusChannel.push((wv, MinderAdapterRegistry.get().isAdapterAvailable(wv)))
         }
       }
     }

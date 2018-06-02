@@ -10,7 +10,7 @@ import minderengine.AdapterIdentifier;
 import minderengine.TestEngine;
 import models.*;
 import mtdl.MinderTdl;
-import mtdl.WrapperFunction;
+import mtdl.AdapterFunction;
 import play.Logger;
 import play.data.Form;
 import play.data.FormFactory;
@@ -229,10 +229,10 @@ public class TestCaseController extends Controller {
    */
   public static void detectAndSaveParameters(Tdl newTdl) {
     Logger.debug("Detect parameters for the newTdl");
-    LinkedHashMap<String, Set<WrapperFunction>> descriptionMap = TestEngine.describeTdl(newTdl);
+    LinkedHashMap<String, Set<AdapterFunction>> descriptionMap = TestEngine.describeTdl(newTdl);
 
-    List<WrapperParam> wrapperParamList = new ArrayList<>();
-    for (Map.Entry<String, Set<WrapperFunction>> entry : descriptionMap.entrySet()) {
+    List<AdapterParam> adapterParamList = new ArrayList<>();
+    for (Map.Entry<String, Set<AdapterFunction>> entry : descriptionMap.entrySet()) {
       //make sure that we are looping on variables.
       final String key = entry.getKey();
       if (!key.startsWith("$")) {
@@ -240,49 +240,49 @@ public class TestCaseController extends Controller {
 
         AdapterIdentifier adapterIdentifier = AdapterIdentifier.parse(key);
 
-        if (adapterIdentifier.getName().equals(MinderTdl.NULL_WRAPPER_NAME())) {
-          //skip null wrapper
+        if (adapterIdentifier.getName().equals(MinderTdl.NULL_ADAPTER_NAME())) {
+          //skip null adapter
           continue;
         }
-        Wrapper wrapper = Wrapper.findByName(adapterIdentifier.getName());
-        if (wrapper == null) {
+        Adapter adapter = Adapter.findByName(adapterIdentifier.getName());
+        if (adapter == null) {
           //oops
           throw new IllegalArgumentException("No adapter with name " + adapterIdentifier.getName());
         }
         //check if a version is used in the name
         if (adapterIdentifier.getVersion() != null) {
           //we have a version, check if the version exists
-          WrapperVersion wrapperVersion = WrapperVersion.findWrapperAndVersion(wrapper, adapterIdentifier.getVersion());
-          if (wrapperVersion == null) {
+          AdapterVersion adapterVersion = AdapterVersion.findAdapterAndVersion(adapter, adapterIdentifier.getVersion());
+          if (adapterVersion == null) {
             throw new IllegalArgumentException("No adapter version " + adapterIdentifier.getVersion() + " for " + adapterIdentifier.getName());
           }
         }
         continue;
       }
 
-      WrapperParam wrapperParam;
-      wrapperParam = new WrapperParam();
-      wrapperParam.name = key;
-      wrapperParam.signatures = new ArrayList<>();
-      wrapperParam.tdl = newTdl;
-      wrapperParamList.add(wrapperParam);
+      AdapterParam adapterParam;
+      adapterParam = new AdapterParam();
+      adapterParam.name = key;
+      adapterParam.signatures = new ArrayList<>();
+      adapterParam.tdl = newTdl;
+      adapterParamList.add(adapterParam);
 
       Logger.debug("\t" + key + " detected");
 
-      for (WrapperFunction signalSlot : entry.getValue()) {
+      for (AdapterFunction signalSlot : entry.getValue()) {
         ParamSignature ps = new ParamSignature();
         ps.signature = signalSlot.signature().replaceAll("\\s", "");
-        ps.wrapperParam = wrapperParam;
-        wrapperParam.signatures.add(ps);
+        ps.adapterParam = adapterParam;
+        adapterParam.signatures.add(ps);
       }
 
-      newTdl.parameters.add(wrapperParam);
+      newTdl.parameters.add(adapterParam);
     }
 
     Logger.debug("Save parameters");
-    for (WrapperParam wrapperParam : wrapperParamList) {
-      wrapperParam.save();
-      for (ParamSignature signature : wrapperParam.signatures) {
+    for (AdapterParam adapterParam : adapterParamList) {
+      adapterParam.save();
+      for (ParamSignature signature : adapterParam.signatures) {
         signature.save();
       }
     }

@@ -24,7 +24,7 @@
      border: solid;
      border-width: thin;
     }
-    
+
     .CellAsHeader
     {
      display: table-cell;
@@ -33,18 +33,18 @@
      border: solid;
      border-width: thin;
     }
-    
+
     #accordion2 {
   		height: 100%;
   	}
-  	
+
   	.myscroll{
 	  overflow:scroll;
 	  width:100%;
-	
+
 	  background: rgb(200,230,255);
 	 }
-	 
+
 	 li:hover {
         opacity: 0.5;
         cursor: pointer;
@@ -66,7 +66,7 @@ $(function() {
 	<div class="Table" style="width:100%;height:100%;">
 		<div class="Heading">
 			<div class="CellAsHeader" style="width:30%;height:5%;">
-	            <p>Wrappers</p>
+	            <p>Adapters</p>
 	        </div>
 	        <div class="CellAsHeader" style="width:70%;height:5%;">
 	            <p>Test Case Editor</p>
@@ -74,10 +74,10 @@ $(function() {
 		</div>
 		<div class="Row">
 	        <div id="accordion2" class="Cell" style="width:30%;height:95%;height:auto;overflow:scroll;">
-		          @defining(Wrapper.getAll()){ allWrappers =>
-			           @for(currentWrapper <- allWrappers){
-						   @defining(WrapperVersion.latestByWrapper(currentWrapper)){ lastVersion =>
-							   <div class="title bevelsmall"><b class="trigger">@currentWrapper.name</b></div>
+		          @defining(Adapter.getAll()){ allAdapters =>
+			           @for(currentAdapter <- allAdapters){
+						   @defining(AdapterVersion.latestByAdapter(currentAdapter)){ lastVersion =>
+							   <div class="title bevelsmall"><b class="trigger">@currentAdapter.name</b></div>
 							   <div class="content" style="height:95%">
 								   <div class="myscroll" style="overflow:auto;">
 									   <div><b>Signals</b></div>
@@ -92,8 +92,8 @@ $(function() {
 										   var start_cursor = editor.getCursor();
 										   var cursorLine = start_cursor.line;
 										   var cursorCh = start_cursor.ch;
-										   editor.replaceRange("\"@currentSignal.signature\" of \"@currentWrapper.name\"", start_cursor);
-										   $("#wrappersDiv" ).hide();
+										   editor.replaceRange("\"@currentSignal.signature\" of \"@currentAdapter.name\"", start_cursor);
+										   $("#adaptersDiv" ).hide();
 										   });
 
 										   </script>
@@ -113,8 +113,8 @@ $(function() {
 											   var start_cursor = editor.getCursor();
 											   var cursorLine = start_cursor.line;
 											   var cursorCh = start_cursor.ch;
-											   editor.replaceRange("\"@currentSlot.signature\" of \"@currentWrapper.name\"", start_cursor);
-											   $("#wrappersDiv" ).hide();
+											   editor.replaceRange("\"@currentSlot.signature\" of \"@currentAdapter.name\"", start_cursor);
+											   $("#adaptersDiv" ).hide();
 											   });
 
 											   </script>

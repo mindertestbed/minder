@@ -55,7 +55,7 @@ public class Application extends Controller {
     if (!session().containsKey("testPageMode")) {
       session().put("testPageMode", "none");
     }
-    return ok(views.html.adapters.wrapperManager.render(authentication));
+    return ok(views.html.adapters.adapterManager.render(authentication));
   }
 
   @AllowedRoles({Role.TEST_DESIGNER, Role.TEST_OBSERVER})

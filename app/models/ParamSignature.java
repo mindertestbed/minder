@@ -15,7 +15,7 @@ public class ParamSignature extends Model {
   public String signature;
 
   @ManyToOne
-  public WrapperParam wrapperParam;
+  public AdapterParam adapterParam;
 
   @Override
   public boolean equals(Object o) {
@@ -41,8 +41,8 @@ public class ParamSignature extends Model {
     return find.all();
   }
 
-  public static List<ParamSignature> getByWrapperParam(WrapperParam wp) {
-    return find.where().eq("wrapperParam", wp).findList();
+  public static List<ParamSignature> getByAdapterParam(AdapterParam wp) {
+    return find.where().eq("adapterParam", wp).findList();
 
   }
 }

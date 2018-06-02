@@ -55,17 +55,17 @@
                 }
                 </select><br /></td></tr>
 
-          @repeat(frm("wrapperMappingList"), min = 0) { field =>
+          @repeat(frm("adapterMappingList"), min = 0) { field =>
             @defining(field.value.get) { str =>
-              @defining(MappedWrapperModel.parse(str)) { entry =>
+              @defining(MappedAdapterModel.parse(str)) { entry =>
                 <tr><td>
-                  <label for="@field.name" class="control-label">@entry.wrapperParam.name</label>:
-                </td><td><select id="@entry.wrapperParam.id" name="@field.name" style="width:200px ;">
-                @for(wrapperVersion <- utils.Util.listCandidateAdapters(entry)) {
-                  <option value="@entry.toJsonWith(wrapperVersion)"
-                    @if(entry.wrapperVersion == wrapperVersion) {
+                  <label for="@field.name" class="control-label">@entry.adapterParam.name</label>:
+                </td><td><select id="@entry.adapterParam.id" name="@field.name" style="width:200px ;">
+                @for(adapterVersion <- utils.Util.listCandidateAdapters(entry)) {
+                  <option value="@entry.toJsonWith(adapterVersion)"
+                    @if(entry.adapterVersion == adapterVersion) {
                       selected="selected" }>@{
-                    wrapperVersion.wrapper.name + " (" + wrapperVersion.version + ")"
+                    adapterVersion.adapter.name + " (" + adapterVersion.version + ")"
                   }</option>
                 }
                 </select><br /></td></tr>
@@ -73,23 +73,23 @@
             }
           }
               <div class="col-md-8">
-                <table id = "wrapperMappingsTable" class="topCells paddedTable noWrap formInput">
+                <table id = "adapterMappingsTable" class="topCells paddedTable noWrap formInput">
                   <tr>
-                    <td>Wrapper Parameter Mappings:<td>
+                    <td>Adapter Parameter Mappings:<td>
                   </tr>
                   <tr>
                     <td>
                       <button id ="add" type="button" class="btn btn-default btn-sm">+</button> &nbsp;
                     </td>
                   </tr>
-                   <tr id ="variableWrapperPair"><td>
+                   <tr id ="variableAdapterPair"><td>
                     Variable: <input type="text" name="variable">
                   </td>
-                  @defining(Wrapper.getAll()) { wrapperList =>
+                  @defining(Adapter.getAll()) { adapterList =>
                   <td>
-                    Wrapper: <select id = 'wrapperlist'> 
-                      @for(wrapper <- wrapperList) { 
-                      <option> @wrapper.name</option> 
+                    Adapter: <select id = 'adapterlist'> 
+                      @for(adapter <- adapterList) { 
+                      <option> @adapter.name</option> 
                     } 
                     </select>
                   </td>
@@ -101,8 +101,8 @@
                               $(function(){
                                 $('#add').on('click',function(e) {
 
-                                  var wmtable = document.getElementById("wrapperMappingsTable");
-                                  var row = document.getElementById("variableWrapperPair");
+                                  var wmtable = document.getElementById("adapterMappingsTable");
+                                  var row = document.getElementById("variableAdapterPair");
                                   var rowCopy = row.cloneNode(true);
 
                                   wmtable.appendChild(rowCopy);

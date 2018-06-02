@@ -34,7 +34,7 @@ public class User extends Model {
   public List<DBRole> roles;
 
   @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.PERSIST)
-  public List<Wrapper> wrappers;
+  public List<Adapter> adapters;
 
   @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.PERSIST, mappedBy = "owner")
   public List<TestGroup> testGroups;

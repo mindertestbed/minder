@@ -27,7 +27,7 @@ create table dbrole (
 
 create table GitbEndpoint (
   id                        bigint not null,
-  wrapper_version_id        bigint not null,
+  adapter_version_id        bigint not null,
   name                      varchar(255) not null,
   description               TEXT,
   constraint pk_GitbEndpoint primary key (id))
@@ -58,18 +58,18 @@ create table job_schedule (
   constraint pk_job_schedule primary key (id))
 ;
 
-create table MappedWrapper (
+create table MappedAdapter (
   id                        bigint not null,
   parameter_id              bigint,
-  wrapper_version_id        bigint,
+  adapter_version_id        bigint,
   job_id                    bigint,
-  constraint pk_MappedWrapper primary key (id))
+  constraint pk_MappedAdapter primary key (id))
 ;
 
 create table ParamSignature (
   id                        bigint not null,
   name                      varchar(255),
-  wrapper_param_id          bigint,
+  adapter_param_id          bigint,
   constraint pk_ParamSignature primary key (id))
 ;
 
@@ -98,14 +98,14 @@ create table SuiteRun (
 
 create table TSignal (
   id                        bigint not null,
-  wrapper_version_id        bigint,
+  adapter_version_id        bigint,
   signature                 varchar(255),
   constraint pk_TSignal primary key (id))
 ;
 
 create table TSlot (
   id                        bigint not null,
-  wrapper_version_id        bigint,
+  adapter_version_id        bigint,
   signature                 varchar(255),
   constraint pk_TSlot primary key (id))
 ;
@@ -246,29 +246,29 @@ create table UtilClass (
   constraint pk_UtilClass primary key (id))
 ;
 
-create table Wrapper (
+create table Adapter (
   id                        bigint not null,
   NAME                      varchar(255),
   short_description         TEXT not null,
   description               TEXT,
   user_id                   bigint,
-  constraint uq_Wrapper_NAME unique (NAME),
-  constraint pk_Wrapper primary key (id))
+  constraint uq_Adapter_NAME unique (NAME),
+  constraint pk_Adapter primary key (id))
 ;
 
-create table WrapperParam (
+create table AdapterParam (
   id                        bigint not null,
   name                      varchar(255) not null,
   tdl_id                    bigint,
-  constraint pk_WrapperParam primary key (id))
+  constraint pk_AdapterParam primary key (id))
 ;
 
-create table WrapperVersion (
+create table AdapterVersion (
   id                        bigint not null,
-  wrapper_id                bigint,
+  adapter_id                bigint,
   version                   varchar(255) not null,
   creation_date             timestamp,
-  constraint pk_WrapperVersion primary key (id))
+  constraint pk_AdapterVersion primary key (id))
 ;
 
 
@@ -293,7 +293,7 @@ create sequence GitbParameter_seq;
 
 create sequence job_schedule_seq;
 
-create sequence MappedWrapper_seq;
+create sequence MappedAdapter_seq;
 
 create sequence ParamSignature_seq;
 
@@ -327,11 +327,11 @@ create sequence UserHistory_seq;
 
 create sequence UtilClass_seq;
 
-create sequence Wrapper_seq;
+create sequence Adapter_seq;
 
-create sequence WrapperParam_seq;
+create sequence AdapterParam_seq;
 
-create sequence WrapperVersion_seq;
+create sequence AdapterVersion_seq;
 
 alter table abstract_job add constraint fk_abstract_job_tdl_1 foreign key (tdl_id) references Tdl (id) on delete restrict on update restrict;
 create index ix_abstract_job_tdl_1 on abstract_job (tdl_id);
@@ -343,8 +343,8 @@ alter table abstract_job add constraint fk_abstract_job_testSuite_4 foreign key 
 create index ix_abstract_job_testSuite_4 on abstract_job (test_suite_id);
 alter table dbrole add constraint fk_dbrole_user_5 foreign key (user_id) references Users (id) on delete restrict on update restrict;
 create index ix_dbrole_user_5 on dbrole (user_id);
-alter table GitbEndpoint add constraint fk_GitbEndpoint_WrapperVersion_6 foreign key (wrapper_version_id) references WrapperVersion (id) on delete restrict on update restrict;
-create index ix_GitbEndpoint_WrapperVersion_6 on GitbEndpoint (wrapper_version_id);
+alter table GitbEndpoint add constraint fk_GitbEndpoint_AdapterVersion_6 foreign key (adapter_version_id) references AdapterVersion (id) on delete restrict on update restrict;
+create index ix_GitbEndpoint_AdapterVersion_6 on GitbEndpoint (adapter_version_id);
 alter table GitbParameter add constraint fk_GitbParameter_GitbEndpoint_7 foreign key (gitb_endpoint_id) references GitbEndpoint (id) on delete restrict on update restrict;
 create index ix_GitbParameter_GitbEndpoint_7 on GitbParameter (gitb_endpoint_id);
 alter table job_schedule add constraint fk_job_schedule_testGroup_8 foreign key (test_group_id) references TestGroup (id) on delete restrict on update restrict;
@@ -353,14 +353,14 @@ alter table job_schedule add constraint fk_job_schedule_owner_9 foreign key (own
 create index ix_job_schedule_owner_9 on job_schedule (owner_id);
 alter table job_schedule add constraint fk_job_schedule_nextJob_10 foreign key (next_job_id) references job_schedule (id) on delete restrict on update restrict;
 create index ix_job_schedule_nextJob_10 on job_schedule (next_job_id);
-alter table MappedWrapper add constraint fk_MappedWrapper_parameter_11 foreign key (parameter_id) references WrapperParam (id) on delete restrict on update restrict;
-create index ix_MappedWrapper_parameter_11 on MappedWrapper (parameter_id);
-alter table MappedWrapper add constraint fk_MappedWrapper_wrapperVersi_12 foreign key (wrapper_version_id) references WrapperVersion (id) on delete restrict on update restrict;
-create index ix_MappedWrapper_wrapperVersi_12 on MappedWrapper (wrapper_version_id);
-alter table MappedWrapper add constraint fk_MappedWrapper_job_13 foreign key (job_id) references abstract_job (id) on delete restrict on update restrict;
-create index ix_MappedWrapper_job_13 on MappedWrapper (job_id);
-alter table ParamSignature add constraint fk_ParamSignature_wrapperPara_14 foreign key (wrapper_param_id) references WrapperParam (id) on delete restrict on update restrict;
-create index ix_ParamSignature_wrapperPara_14 on ParamSignature (wrapper_param_id);
+alter table MappedAdapter add constraint fk_MappedAdapter_parameter_11 foreign key (parameter_id) references AdapterParam (id) on delete restrict on update restrict;
+create index ix_MappedAdapter_parameter_11 on MappedAdapter (parameter_id);
+alter table MappedAdapter add constraint fk_MappedAdapter_adapterVersi_12 foreign key (adapter_version_id) references AdapterVersion (id) on delete restrict on update restrict;
+create index ix_MappedAdapter_adapterVersi_12 on MappedAdapter (adapter_version_id);
+alter table MappedAdapter add constraint fk_MappedAdapter_job_13 foreign key (job_id) references abstract_job (id) on delete restrict on update restrict;
+create index ix_MappedAdapter_job_13 on MappedAdapter (job_id);
+alter table ParamSignature add constraint fk_ParamSignature_adapterPara_14 foreign key (adapter_param_id) references AdapterParam (id) on delete restrict on update restrict;
+create index ix_ParamSignature_adapterPara_14 on ParamSignature (adapter_param_id);
 alter table report_template add constraint fk_report_template_owner_15 foreign key (owner_id) references Users (id) on delete restrict on update restrict;
 create index ix_report_template_owner_15 on report_template (owner_id);
 alter table report_template add constraint fk_report_template_testGroup_16 foreign key (test_group_id) references TestGroup (id) on delete restrict on update restrict;
@@ -369,10 +369,10 @@ alter table SuiteRun add constraint fk_SuiteRun_testSuite_17 foreign key (test_s
 create index ix_SuiteRun_testSuite_17 on SuiteRun (test_suite_id);
 alter table SuiteRun add constraint fk_SuiteRun_runner_18 foreign key (runner_id) references Users (id) on delete restrict on update restrict;
 create index ix_SuiteRun_runner_18 on SuiteRun (runner_id);
-alter table TSignal add constraint fk_TSignal_wrapperVersion_19 foreign key (wrapper_version_id) references WrapperVersion (id) on delete restrict on update restrict;
-create index ix_TSignal_wrapperVersion_19 on TSignal (wrapper_version_id);
-alter table TSlot add constraint fk_TSlot_wrapperVersion_20 foreign key (wrapper_version_id) references WrapperVersion (id) on delete restrict on update restrict;
-create index ix_TSlot_wrapperVersion_20 on TSlot (wrapper_version_id);
+alter table TSignal add constraint fk_TSignal_adapterVersion_19 foreign key (adapter_version_id) references AdapterVersion (id) on delete restrict on update restrict;
+create index ix_TSignal_adapterVersion_19 on TSignal (adapter_version_id);
+alter table TSlot add constraint fk_TSlot_adapterVersion_20 foreign key (adapter_version_id) references AdapterVersion (id) on delete restrict on update restrict;
+create index ix_TSlot_adapterVersion_20 on TSlot (adapter_version_id);
 alter table Tdl add constraint fk_Tdl_testCase_21 foreign key (test_case_id) references TestCase (id) on delete restrict on update restrict;
 create index ix_Tdl_testCase_21 on Tdl (test_case_id);
 alter table TestAssertion add constraint fk_TestAssertion_testGroup_22 foreign key (test_group_id) references TestGroup (id) on delete restrict on update restrict;
@@ -405,12 +405,12 @@ alter table UtilClass add constraint fk_UtilClass_testGroup_35 foreign key (test
 create index ix_UtilClass_testGroup_35 on UtilClass (test_group_id);
 alter table UtilClass add constraint fk_UtilClass_owner_36 foreign key (owner_id) references Users (id) on delete restrict on update restrict;
 create index ix_UtilClass_owner_36 on UtilClass (owner_id);
-alter table Wrapper add constraint fk_Wrapper_user_37 foreign key (user_id) references Users (id) on delete restrict on update restrict;
-create index ix_Wrapper_user_37 on Wrapper (user_id);
-alter table WrapperParam add constraint fk_WrapperParam_tdl_38 foreign key (tdl_id) references Tdl (id) on delete restrict on update restrict;
-create index ix_WrapperParam_tdl_38 on WrapperParam (tdl_id);
-alter table WrapperVersion add constraint fk_WrapperVersion_wrapper_39 foreign key (wrapper_id) references Wrapper (id) on delete restrict on update restrict;
-create index ix_WrapperVersion_wrapper_39 on WrapperVersion (wrapper_id);
+alter table Adapter add constraint fk_Adapter_user_37 foreign key (user_id) references Users (id) on delete restrict on update restrict;
+create index ix_Adapter_user_37 on Adapter (user_id);
+alter table AdapterParam add constraint fk_AdapterParam_tdl_38 foreign key (tdl_id) references Tdl (id) on delete restrict on update restrict;
+create index ix_AdapterParam_tdl_38 on AdapterParam (tdl_id);
+alter table AdapterVersion add constraint fk_AdapterVersion_adapter_39 foreign key (adapter_id) references Adapter (id) on delete restrict on update restrict;
+create index ix_AdapterVersion_adapter_39 on AdapterVersion (adapter_id);
 
 
 
@@ -440,7 +440,7 @@ drop table if exists job_schedule_abstract_job;
 
 drop table if exists job_schedule_TestSuite;
 
-drop table if exists MappedWrapper;
+drop table if exists MappedAdapter;
 
 drop table if exists ParamSignature;
 
@@ -474,11 +474,11 @@ drop table if exists UserHistory;
 
 drop table if exists UtilClass;
 
-drop table if exists Wrapper;
+drop table if exists Adapter;
 
-drop table if exists WrapperParam;
+drop table if exists AdapterParam;
 
-drop table if exists WrapperVersion;
+drop table if exists AdapterVersion;
 
 SET REFERENTIAL_INTEGRITY TRUE;
 
@@ -492,7 +492,7 @@ drop sequence if exists GitbParameter_seq;
 
 drop sequence if exists job_schedule_seq;
 
-drop sequence if exists MappedWrapper_seq;
+drop sequence if exists MappedAdapter_seq;
 
 drop sequence if exists ParamSignature_seq;
 
@@ -526,9 +526,9 @@ drop sequence if exists UserHistory_seq;
 
 drop sequence if exists UtilClass_seq;
 
-drop sequence if exists Wrapper_seq;
+drop sequence if exists Adapter_seq;
 
-drop sequence if exists WrapperParam_seq;
+drop sequence if exists AdapterParam_seq;
 
-drop sequence if exists WrapperVersion_seq;
+drop sequence if exists AdapterVersion_seq;
 

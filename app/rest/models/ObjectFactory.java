@@ -7,18 +7,18 @@ import javax.xml.namespace.QName;
 
 
 /**
- * This object contains factory methods for each 
- * Java content interface and Java element interface 
- * generated in the rest.controllers.xmlmodel.response package. 
- * <p>An ObjectFactory allows you to programatically 
- * construct new instances of the Java representation 
- * for XML content. The Java representation of XML 
- * content can consist of schema derived interfaces 
- * and classes representing the binding of schema 
- * type definitions, element declarations and model 
- * groups.  Factory methods for each of these are 
+ * This object contains factory methods for each
+ * Java content interface and Java element interface
+ * generated in the rest.controllers.xmlmodel.response package.
+ * <p>An ObjectFactory allows you to programatically
+ * construct new instances of the Java representation
+ * for XML content. The Java representation of XML
+ * content can consist of schema derived interfaces
+ * and classes representing the binding of schema
+ * type definitions, element declarations and model
+ * groups.  Factory methods for each of these are
  * provided in this class.
- * 
+ *
  */
 @XmlRegistry
 public class ObjectFactory {
@@ -28,9 +28,9 @@ public class ObjectFactory {
     private final static QName _RestValidationRequest_QNAME = new QName("", "restValidationRequest");
     private final static QName _RestTestGroup_QNAME = new QName("", "restTestGroup");
     private final static QName _RestDependencyString_QNAME = new QName("", "restDependencyString");
-    private final static QName _RestWrapper_QNAME = new QName("", "restWrapper");
-    private final static QName _RestWrapperVersion_QNAME = new QName("", "restWrapperVersion");
-    private final static QName _RestWrapperList_QNAME = new QName("", "restWrapperList");
+    private final static QName _RestAdapter_QNAME = new QName("", "restAdapter");
+    private final static QName _RestAdapterVersion_QNAME = new QName("", "restAdapterVersion");
+    private final static QName _RestAdapterList_QNAME = new QName("", "restAdapterList");
     private final static QName _RestTestAssertion_QNAME = new QName("", "restTestAssertion");
     private final static QName _RestTestCase_QNAME = new QName("", "restTestCase");
     private final static QName _RestTdl_QNAME = new QName("", "restTdl");
@@ -43,20 +43,20 @@ public class ObjectFactory {
     private final static QName _RestUtilClassList_QNAME = new QName("", "restUtilClassList_QNAME");
     private final static QName _RestJob_QNAME = new QName("", "restJob_QNAME");
     private final static QName _RestJobList_QNAME = new QName("", "restJobList_QNAME");
-    private final static QName _RestParametersForWrappers_QNAME = new QName("", "restParametersForWrappers_QNAME");
-    private final static QName _RestTdlWrapperParam_QNAME = new QName("", "restTdlWrapperParam_QNAME");
+    private final static QName _RestParametersForAdapters_QNAME = new QName("", "restParametersForAdapters_QNAME");
+    private final static QName _RestTdlAdapterParam_QNAME = new QName("", "restTdlAdapterParam_QNAME");
 
 
     /**
      * Create a new ObjectFactory that can be used to create new instances of schema derived classes for package: rest.controllers.xmlmodel.response
-     * 
+     *
      */
     public ObjectFactory() {
     }
 
     /**
      * Create an instance of {@link GetTestCaseDefinitions }
-     * 
+     *
      */
     public GetTestCaseDefinitions createGetTestCaseDefinitions() {
         return new GetTestCaseDefinitions();
@@ -64,16 +64,16 @@ public class ObjectFactory {
 
     /**
      * Create an instance of {@link JAXBElement }{@code <}{@link GetTestCaseDefinitions }{@code >}}
-     * 
+     *
      */
     @XmlElementDecl(namespace = "", name = "getTestCaseDefinitions")
     public JAXBElement<GetTestCaseDefinitions> createGetTestCaseDefinitions(GetTestCaseDefinitions value) {
         return new JAXBElement<GetTestCaseDefinitions>(_GetTestCaseDefinitions_QNAME, GetTestCaseDefinitions.class, null, value);
     }
-    
+
     /**
      * Create an instance of {@link RestMinderResponse }
-     * 
+     *
      */
     public RestMinderResponse createRestMinderResponse() {
         return new RestMinderResponse();
@@ -81,16 +81,16 @@ public class ObjectFactory {
 
     /**
      * Create an instance of {@link JAXBElement }{@code <}{@link RestMinderResponse }{@code >}}
-     * 
+     *
      */
     @XmlElementDecl(namespace = "", name = "restMinderResponse")
     public JAXBElement<RestMinderResponse> createRestMinderResponse(RestMinderResponse value) {
         return new JAXBElement<RestMinderResponse>(_RestMinderResponse_QNAME, RestMinderResponse.class, null, value);
     }
-    
+
     /**
      * Create an instance of {@link RestValidationRequest }
-     * 
+     *
      */
     public RestValidationRequest createRestValidationRequest() {
         return new RestValidationRequest();
@@ -98,7 +98,7 @@ public class ObjectFactory {
 
     /**
      * Create an instance of {@link JAXBElement }{@code <}{@link rest.models.RestValidationRequest }{@code >}}
-     * 
+     *
      */
     @XmlElementDecl(namespace = "", name = "validationRequest")
     public JAXBElement<RestValidationRequest> createRestValidationRequest(RestValidationRequest value) {
@@ -140,54 +140,54 @@ public class ObjectFactory {
     }
 
     /**
-     * Create an instance of {@link rest.models.RestWrapper }
+     * Create an instance of {@link RestAdapter }
      *
      */
-    public RestWrapper createRestWrapper() {
-        return new RestWrapper();
+    public RestAdapter createRestAdapter() {
+        return new RestAdapter();
     }
 
     /**
-     * Create an instance of {@link JAXBElement }{@code <}{@link RestWrapper }{@code >}}
+     * Create an instance of {@link JAXBElement }{@code <}{@link RestAdapter }{@code >}}
      *
      */
-    @XmlElementDecl(namespace = "", name = "restWrapper")
-    public JAXBElement<RestWrapper> createRestWrapper(RestWrapper value) {
-        return new JAXBElement<RestWrapper>(_RestWrapper_QNAME, RestWrapper.class, null, value);
+    @XmlElementDecl(namespace = "", name = "restAdapter")
+    public JAXBElement<RestAdapter> createRestAdapter(RestAdapter value) {
+        return new JAXBElement<RestAdapter>(_RestAdapter_QNAME, RestAdapter.class, null, value);
     }
 
     /**
-     * Create an instance of {@link rest.models.RestWrapperVersion }
+     * Create an instance of {@link RestAdapterVersion }
      *
      */
-    public RestWrapperVersion createRestWrapperVersion() {
-        return new RestWrapperVersion();
+    public RestAdapterVersion createRestAdapterVersion() {
+        return new RestAdapterVersion();
     }
 
     /**
-     * Create an instance of {@link JAXBElement }{@code <}{@link RestWrapperVersion }{@code >}}
+     * Create an instance of {@link JAXBElement }{@code <}{@link RestAdapterVersion }{@code >}}
      *
      */
-    @XmlElementDecl(namespace = "", name = "restWrapperVersion")
-    public JAXBElement<RestWrapperVersion> createRestWrapperVersion(RestWrapperVersion value) {
-        return new JAXBElement<RestWrapperVersion>(_RestWrapperVersion_QNAME, RestWrapperVersion.class, null, value);
+    @XmlElementDecl(namespace = "", name = "restAdapterVersion")
+    public JAXBElement<RestAdapterVersion> createRestAdapterVersion(RestAdapterVersion value) {
+        return new JAXBElement<RestAdapterVersion>(_RestAdapterVersion_QNAME, RestAdapterVersion.class, null, value);
     }
 
     /**
-     * Create an instance of {@link rest.models.RestWrapperList }
+     * Create an instance of {@link rest.models.RestAdapterList }
      *
      */
-    public RestWrapperList createRestWrapperList() {
-        return new RestWrapperList();
+    public RestAdapterList createRestAdapterList() {
+        return new RestAdapterList();
     }
 
     /**
-     * Create an instance of {@link JAXBElement }{@code <}{@link RestWrapperList }{@code >}}
+     * Create an instance of {@link JAXBElement }{@code <}{@link RestAdapterList }{@code >}}
      *
      */
-    @XmlElementDecl(namespace = "", name = "restWrapperList")
-    public JAXBElement<RestWrapperList> createRestWrapperList(RestWrapperList value) {
-        return new JAXBElement<RestWrapperList>(_RestWrapperList_QNAME, RestWrapperList.class, null, value);
+    @XmlElementDecl(namespace = "", name = "restAdapterList")
+    public JAXBElement<RestAdapterList> createRestAdapterList(RestAdapterList value) {
+        return new JAXBElement<RestAdapterList>(_RestAdapterList_QNAME, RestAdapterList.class, null, value);
     }
 
     /**
@@ -399,37 +399,37 @@ public class ObjectFactory {
     }
 
     /**
-     * Create an instance of {@link rest.models.RestParametersForWrappers }
+     * Create an instance of {@link rest.models.RestParametersForAdapters }
      *
      */
-    public RestParametersForWrappers createRestParametersForWrappers() {
-        return new RestParametersForWrappers();
+    public RestParametersForAdapters createRestParametersForAdapters() {
+        return new RestParametersForAdapters();
     }
 
     /**
-     * Create an instance of {@link JAXBElement }{@code <}{@link RestParametersForWrappers }{@code >}}
+     * Create an instance of {@link JAXBElement }{@code <}{@link RestParametersForAdapters }{@code >}}
      *
      */
-    @XmlElementDecl(namespace = "", name = "restParametersForWrappers")
-    public JAXBElement<RestParametersForWrappers> createRestParametersForWrappers(RestParametersForWrappers value) {
-        return new JAXBElement<RestParametersForWrappers>(_RestParametersForWrappers_QNAME, RestParametersForWrappers.class, null, value);
+    @XmlElementDecl(namespace = "", name = "restParametersForAdapters")
+    public JAXBElement<RestParametersForAdapters> createRestParametersForAdapters(RestParametersForAdapters value) {
+        return new JAXBElement<RestParametersForAdapters>(_RestParametersForAdapters_QNAME, RestParametersForAdapters.class, null, value);
     }
 
 
     /**
-     * Create an instance of {@link rest.models.RestTdlWrapperParam }
+     * Create an instance of {@link rest.models.RestTdlAdapterParam }
      *
      */
-    public RestTdlWrapperParam createRestTdlWrapperParam() {
-        return new RestTdlWrapperParam();
+    public RestTdlAdapterParam createRestTdlAdapterParam() {
+        return new RestTdlAdapterParam();
     }
 
     /**
-     * Create an instance of {@link JAXBElement }{@code <}{@link RestTdlWrapperParam }{@code >}}
+     * Create an instance of {@link JAXBElement }{@code <}{@link RestTdlAdapterParam }{@code >}}
      *
      */
-    @XmlElementDecl(namespace = "", name = "restTdlWrapperParam")
-    public JAXBElement<RestTdlWrapperParam> createRestTdlWrapperParam(RestTdlWrapperParam value) {
-        return new JAXBElement<RestTdlWrapperParam>(_RestTdlWrapperParam_QNAME, RestTdlWrapperParam.class, null, value);
+    @XmlElementDecl(namespace = "", name = "restTdlAdapterParam")
+    public JAXBElement<RestTdlAdapterParam> createRestTdlAdapterParam(RestTdlAdapterParam value) {
+        return new JAXBElement<RestTdlAdapterParam>(_RestTdlAdapterParam_QNAME, RestTdlAdapterParam.class, null, value);
     }
 }

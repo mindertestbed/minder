@@ -1,10 +1,8 @@
 package minderengine;
 
-import org.apache.log4j.PropertyConfigurator;
 import org.interop.xoola.core.*;
 import org.interop.xoola.tcpcom.connmanager.server.ServerRegistry;
 import play.api.Environment;
-import play.api.Play;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
@@ -60,13 +58,13 @@ public class XoolaServer{
           @Override
           public synchronized void connected(XoolaInvocationHandler xoolaInvocationHandler, XoolaChannelState xoolaChannelState) {
             System.out.println("CLIENT: " + xoolaChannelState.remoteId + " connected");
-            MinderWrapperRegistry.get().setWrapperAvailable(xoolaChannelState.remoteId, true);
+            MinderAdapterRegistry.get().setAdapterAvailable(xoolaChannelState.remoteId, true);
           }
 
           @Override
           public void disconnected(XoolaInvocationHandler xoolaInvocationHandler, XoolaChannelState xoolaChannelState) {
             System.out.println("CLIENT: " + xoolaChannelState.remoteId + " disconnected");
-            MinderWrapperRegistry.get().setWrapperAvailable(xoolaChannelState.remoteId, false);
+            MinderAdapterRegistry.get().setAdapterAvailable(xoolaChannelState.remoteId, false);
           }
         });
         System.out.println("Starting server");

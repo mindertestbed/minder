@@ -102,13 +102,13 @@ GET         /downloadAsset                                 controllers.TestAsset
 GET         /listTestRunsForm                              controllers.JobController.listTestRuns(configurationId: Long)
 GET         /viewReport                                    controllers.JobController.viewReport(testRunId: Long, type: String)
 
-#Wrappers
-GET         /createNewAdapterForm                          controllers.WrapperController.createNewAdapterForm
-POST        /doCreateWrapper                               controllers.WrapperController.doCreateWrapper
-GET         /doDeleteWrapper                               controllers.WrapperController.doDeleteWrapper(id: Long)
-GET         /doDeleteWrapperVersion                        controllers.WrapperController.doDeleteWrapperVersion(id: Long)
-GET         /editWrapperForm                               controllers.WrapperController.editWrapperForm(id: Long)
-POST        /doEditWrapper                                 controllers.WrapperController.doEditWrapper
+#Adapters
+GET         /createNewAdapterForm                          controllers.AdapterController.createNewAdapterForm
+POST        /doCreateAdapter                               controllers.AdapterController.doCreateAdapter
+GET         /doDeleteAdapter                               controllers.AdapterController.doDeleteAdapter(id: Long)
+GET         /doDeleteAdapterVersion                        controllers.AdapterController.doDeleteAdapterVersion(id: Long)
+GET         /editAdapterForm                               controllers.AdapterController.editAdapterForm(id: Long)
+POST        /doEditAdapter                                 controllers.AdapterController.doEditAdapter
 
 #SSE Test
 GET         /adapterJobStatusFeed                          controllers.AdapterStatusFeeder.adapterJobStatusFeed(jobId: Long)
@@ -191,13 +191,13 @@ POST        /rest/addTestCase                              rest.controllers.Rest
 POST        /rest/editTestCase                             rest.controllers.RestTestCaseController.editTestCase
 POST        /rest/deleteTestCase                           rest.controllers.RestTestCaseController.deleteTestCase
 
-#Rest wrapper management
-GET         /rest/listWrappers                             rest.controllers.RestWrapperController.listWrappers
-POST        /rest/getWrapperStatus                         rest.controllers.RestWrapperController.getWrapperStatus
-POST        /rest/getWrapper                               rest.controllers.RestWrapperController.getWrapper
-POST        /rest/addWrapper                               rest.controllers.RestWrapperController.addWrapper
-POST        /rest/editWrapper                              rest.controllers.RestWrapperController.editWrapper
-POST        /rest/deleteWrapper                            rest.controllers.RestWrapperController.deleteWrapper
+#Rest adapter management
+GET         /rest/listAdapters                             rest.controllers.RestAdapterController.listAdapters
+POST        /rest/getAdapterStatus                         rest.controllers.RestAdapterController.getAdapterStatus
+POST        /rest/getAdapter                               rest.controllers.RestAdapterController.getAdapter
+POST        /rest/addAdapter                               rest.controllers.RestAdapterController.addAdapter
+POST        /rest/editAdapter                              rest.controllers.RestAdapterController.editAdapter
+POST        /rest/deleteAdapter                            rest.controllers.RestAdapterController.deleteAdapter
 
 #Rest Job management
 GET         /rest/listJobs                                 rest.controllers.RestJobController.listJobs

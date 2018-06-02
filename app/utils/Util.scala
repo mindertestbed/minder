@@ -9,7 +9,7 @@ import java.util.regex.Pattern
 import java.util.zip.{GZIPInputStream, GZIPOutputStream}
 import javax.annotation.Nonnull
 
-import controllers.MappedWrapperModel
+import controllers.MappedAdapterModel
 import minderengine.Visibility
 import models._
 import org.apache.commons.lang3.Validate
@@ -320,37 +320,37 @@ object Util {
   }
 
   /**
-    * List the actual registered wrappers that provide the same
-    * signal and slots with the parametric wrappers provided in the model
+    * List the actual registered adapters that provide the same
+    * signal and slots with the parametric adapters provided in the model
     *
-    * @param mappedWrapperModel
+    * @param mappedAdapterModel
     * @return
     */
-  def listCandidateAdapters(mappedWrapperModel: MappedWrapperModel): util.Set[WrapperVersion] = {
-    val param: WrapperParam = mappedWrapperModel.wrapperParam
+  def listCandidateAdapters(mappedAdapterModel: MappedAdapterModel): util.Set[AdapterVersion] = {
+    val param: AdapterParam = mappedAdapterModel.adapterParam
 
-    val psList: util.List[ParamSignature] = ParamSignature.getByWrapperParam(param)
-    val candidateAdapters: util.Set[WrapperVersion] = listCandidatesForSignatures(psList)
+    val psList: util.List[ParamSignature] = ParamSignature.getByAdapterParam(param)
+    val candidateAdapters: util.Set[AdapterVersion] = listCandidatesForSignatures(psList)
     return candidateAdapters
   }
 
   /**
-    * List the actual registered wrappers that provide the same
+    * List the actual registered adapters that provide the same
     * signal and slots with the tdl provided
     *
     * @param tdls
     * @return
     */
-  def listCandidateAdapters(tdls: util.List[Tdl]): util.LinkedHashMap[String, util.Set[WrapperVersion]] = {
-    val params: List[WrapperParam] = tdls.map(tdl => tdl.parameters).flatten.toList.sortWith((t1, t2) => {
+  def listCandidateAdapters(tdls: util.List[Tdl]): util.LinkedHashMap[String, util.Set[AdapterVersion]] = {
+    val params: List[AdapterParam] = tdls.map(tdl => tdl.parameters).flatten.toList.sortWith((t1, t2) => {
       t1.name < t2.name
     })
 
-    val map = new util.LinkedHashMap[String, util.Set[WrapperVersion]]()
+    val map = new util.LinkedHashMap[String, util.Set[AdapterVersion]]()
 
     params.foreach { param =>
-      val psList: util.List[ParamSignature] = ParamSignature.getByWrapperParam(param)
-      val candidateAdapters: util.Set[WrapperVersion] = listCandidatesForSignatures(psList)
+      val psList: util.List[ParamSignature] = ParamSignature.getByAdapterParam(param)
+      val candidateAdapters: util.Set[AdapterVersion] = listCandidatesForSignatures(psList)
       if (map.containsKey(param.name)) {
         //oops we have the same param for different tdls.
         //in the future we may think of something more nasty, but now lets just merge the two lists
@@ -366,19 +366,19 @@ object Util {
   }
 
 
-  def listCandidatesForSignatures(psList: util.List[ParamSignature]): util.Set[WrapperVersion] = {
-    val candidateAdapters: util.Set[WrapperVersion] = new util.HashSet[WrapperVersion]
+  def listCandidatesForSignatures(psList: util.List[ParamSignature]): util.Set[AdapterVersion] = {
+    val candidateAdapters: util.Set[AdapterVersion] = new util.HashSet[AdapterVersion]
 
     /**
-      * Foreach param signature, query the wrapper versions that provide either a signal
+      * Foreach param signature, query the adapter versions that provide either a signal
       * or a slot that matches the signature. And increase their score by 1
       */
 
-    val scoreMap = new util.HashMap[WrapperVersion, Int]()
+    val scoreMap = new util.HashMap[AdapterVersion, Int]()
     psList.foreach { paramSignature =>
       val signals = TSignal.findBySignature(paramSignature.signature)
       signals.foreach { signal =>
-        val wv: WrapperVersion = signal.wrapperVersion
+        val wv: AdapterVersion = signal.adapterVersion
         if (scoreMap.containsKey(wv)) {
           scoreMap.put(wv, scoreMap(wv) + 1)
         } else {
@@ -387,7 +387,7 @@ object Util {
       }
       val slots = TSlot.findBySignature(paramSignature.signature)
       slots.foreach { slot =>
-        val wv: WrapperVersion = slot.wrapperVersion
+        val wv: AdapterVersion = slot.adapterVersion
         if (scoreMap.containsKey(wv)) {
           scoreMap.put(wv, scoreMap(wv) + 1)
         } else {
@@ -396,26 +396,26 @@ object Util {
       }
     }
 
-    val temporaryList = new util.ArrayList[WrapperVersion]()
+    val temporaryList = new util.ArrayList[AdapterVersion]()
     val size: Int = psList.size()
     //now put the versions with the score == |psList| to the candidate list
     scoreMap.foreach { k =>
       if (k._2 == size) {
-        val wv = WrapperVersion.findById(k._1.id)
-        wv.wrapper = Wrapper.findById(wv.wrapper.id)
+        val wv = AdapterVersion.findById(k._1.id)
+        wv.adapter = Adapter.findById(wv.adapter.id)
         wv.signals = null
         wv.slots = null
-        wv.wrapper.user = null;
-        wv.wrapper.wrapperVersions = null
-        wv.mappedWrappers = null
+        wv.adapter.user = null;
+        wv.adapter.adapterVersions = null
+        wv.mappedAdapters = null
         //wv.version="mami"
         temporaryList.add(wv)
       }
     }
 
 
-    temporaryList.sort(new Comparator[WrapperVersion] {
-      override def compare(o1: WrapperVersion, o2: WrapperVersion): Int = o1.wrapper.name.compareTo(o2.wrapper.name)
+    temporaryList.sort(new Comparator[AdapterVersion] {
+      override def compare(o1: AdapterVersion, o2: AdapterVersion): Int = o1.adapter.name.compareTo(o2.adapter.name)
     })
 
     temporaryList.foreach(f => candidateAdapters.add(f))

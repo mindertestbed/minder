@@ -41,7 +41,7 @@ public class RestJobController extends Controller {
    *            "tdlId":"1",
    *            "owner":"tester@minder",
    *            "mtdlParameters":null,
-   *            "parametersForWrappers":null
+   *            "parametersForAdapters":null
    *        },
    *        {
    *            "id":"3",
@@ -49,7 +49,7 @@ public class RestJobController extends Controller {
    *            "tdlId":"3",
    *            "owner":"tester@minder",
    *            "mtdlParameters":null,
-   *            "parametersForWrappers":null
+   *            "parametersForAdapters":null
    *        }
    *    ]
    *}
@@ -70,7 +70,7 @@ public class RestJobController extends Controller {
       return badRequest(e.getCause().toString());
     }
 
-    //Getting all wrappers
+    //Getting all adapters
     List<Job> jobList = Job.findAll();
     restJobListResponse.setRestJobs(new ArrayList<RestJob>());
 
@@ -114,11 +114,11 @@ public class RestJobController extends Controller {
    *    "tdlId":"4",
    *    "owner":"tester@minder",
    *    "mtdlParameters":"",
-   *    "parametersForWrappers":[
+   *    "parametersForAdapters":[
    *        {
    *            "id":"4",
-   *            "wrapperParamId":"4",
-   *            "wrapperVersionId":"2"
+   *            "adapterParamId":"4",
+   *            "adapterVersionId":"2"
    *        }
    *    ]
    *}
@@ -159,15 +159,15 @@ public class RestJobController extends Controller {
     restJobResponse.setOwner(job.owner.email);
     restJobResponse.setTdlId(String.valueOf(job.tdl.id));
     restJobResponse.setMtdlParameters(job.mtdlParameters);
-    restJobResponse.setParametersForWrappers(new ArrayList<>());
+    restJobResponse.setParametersForAdapters(new ArrayList<>());
 
-    for (MappedWrapper mappedWrapper : job.mappedWrappers) {
-      RestParametersForWrappers restParametersForWrappers = new RestParametersForWrappers();
-      restParametersForWrappers.setId(String.valueOf(mappedWrapper.id));
-      restParametersForWrappers.setWrapperParamId(String.valueOf(mappedWrapper.parameter.id));
-      restParametersForWrappers.setWrapperVersionId(String.valueOf(mappedWrapper.wrapperVersion.id));
+    for (MappedAdapter mappedAdapter : job.mappedAdapters) {
+      RestParametersForAdapters restParametersForAdapters = new RestParametersForAdapters();
+      restParametersForAdapters.setId(String.valueOf(mappedAdapter.id));
+      restParametersForAdapters.setAdapterParamId(String.valueOf(mappedAdapter.parameter.id));
+      restParametersForAdapters.setAdapterVersionId(String.valueOf(mappedAdapter.adapterVersion.id));
 
-      restJobResponse.getParametersForWrappers().add(restParametersForWrappers);
+      restJobResponse.getParametersForAdapters().add(restParametersForAdapters);
     }
 
         /*
@@ -192,10 +192,10 @@ public class RestJobController extends Controller {
    *{"name":"SampleJob_1",
    * "tdlId":"3",
    * "mtdlParameters":"xsdName:books.xsd \n xmlName:sample-book.xml",
-   * "parametersForWrappers":[
+   * "parametersForAdapters":[
    *    {
-   *      "wrapperParamId":"3",
-   *      "wrapperVersionId":"2"
+   *      "adapterParamId":"3",
+   *      "adapterVersionId":"2"
    *    }
    *  ]
    *}
@@ -204,7 +204,7 @@ public class RestJobController extends Controller {
    * The sample produced response by Minder (with the status code 200in the header):
    * {"result":"SUCCESS","description":"Job with Id [2] deleted!"}
    * <p>
-   * name, tdlId are required, whereas, other fields are optional. If the tdl has wrapper parameters then "parametersForWrappers" is also required.
+   * name, tdlId are required, whereas, other fields are optional. If the tdl has adapter parameters then "parametersForAdapters" is also required.
    */
 
   public Result createJob() {
@@ -249,10 +249,10 @@ public class RestJobController extends Controller {
       return badRequest("No tdl found with id [" + restJob.getTdlId() + "]");
     }
     if (tdl.parameters.size() > 0) {
-      if (null == restJob.getParametersForWrappers())
-        return badRequest("You have to provide all parameters for used wrappers [" + restJob.getTdlId() + "]");
-      if (restJob.getParametersForWrappers().size() != tdl.parameters.size())
-        return badRequest("You have to fill all parameters for used wrappers [" + restJob.getTdlId() + "]");
+      if (null == restJob.getParametersForAdapters())
+        return badRequest("You have to provide all parameters for used adapters [" + restJob.getTdlId() + "]");
+      if (restJob.getParametersForAdapters().size() != tdl.parameters.size())
+        return badRequest("You have to fill all parameters for used adapters [" + restJob.getTdlId() + "]");
     }
 
     AbstractJob job = Job.findByTdlAndName(tdl, restJob.getName());
@@ -273,33 +273,33 @@ public class RestJobController extends Controller {
 
     try {
       Ebean.beginTransaction();
-      List<MappedWrapper> mappedWrappers = new ArrayList<>();
+      List<MappedAdapter> mappedAdapters = new ArrayList<>();
 
-      List<WrapperParam> tdlwrapperParams = tdl.parameters;
-      for (RestParametersForWrappers paramForWrappers : restJob.getParametersForWrappers()) {
-        WrapperParam wrapperParam = WrapperParam.findById(Long.parseLong(paramForWrappers.getWrapperParamId()));
-        if (null == wrapperParam)
-          return badRequest("Wrapper Param id [" + paramForWrappers.getWrapperParamId() + "] does not exist");
+      List<AdapterParam> tdladapterParams = tdl.parameters;
+      for (RestParametersForAdapters paramForAdapters : restJob.getParametersForAdapters()) {
+        AdapterParam adapterParam = AdapterParam.findById(Long.parseLong(paramForAdapters.getAdapterParamId()));
+        if (null == adapterParam)
+          return badRequest("Adapter Param id [" + paramForAdapters.getAdapterParamId() + "] does not exist");
 
-        WrapperVersion wrapperVersion = WrapperVersion.findById(Long.parseLong(paramForWrappers.getWrapperVersionId()));
-        if (null == wrapperVersion)
-          return badRequest("Wrapper Version id [" + paramForWrappers.getWrapperVersionId() + "] does not exist");
+        AdapterVersion adapterVersion = AdapterVersion.findById(Long.parseLong(paramForAdapters.getAdapterVersionId()));
+        if (null == adapterVersion)
+          return badRequest("Adapter Version id [" + paramForAdapters.getAdapterVersionId() + "] does not exist");
 
-        tdlwrapperParams.get(0).equals(wrapperParam);
-        if (!tdlwrapperParams.contains(wrapperParam))
-          return badRequest("The provided Wrapper Param with id [" + paramForWrappers.getWrapperParamId() + "] is not a valid parameter");
+        tdladapterParams.get(0).equals(adapterParam);
+        if (!tdladapterParams.contains(adapterParam))
+          return badRequest("The provided Adapter Param with id [" + paramForAdapters.getAdapterParamId() + "] is not a valid parameter");
 
-        tdlwrapperParams.remove(wrapperParam);
-        MappedWrapper mappedWrapper = new MappedWrapper();
-        mappedWrapper.parameter = wrapperParam;
-        mappedWrapper.wrapperVersion = wrapperVersion;
-        mappedWrapper.job = job;
-        mappedWrapper.save();
+        tdladapterParams.remove(adapterParam);
+        MappedAdapter mappedAdapter = new MappedAdapter();
+        mappedAdapter.parameter = adapterParam;
+        mappedAdapter.adapterVersion = adapterVersion;
+        mappedAdapter.job = job;
+        mappedAdapter.save();
 
       }
 
-      if (0 != tdlwrapperParams.size())
-        return badRequest("There are/is [" + tdlwrapperParams.size() + "] wrapper param(s) that you do not provide. Please provide all wrapper params.");
+      if (0 != tdladapterParams.size())
+        return badRequest("There are/is [" + tdladapterParams.size() + "] adapter param(s) that you do not provide. Please provide all adapter params.");
 
       job.save();
 

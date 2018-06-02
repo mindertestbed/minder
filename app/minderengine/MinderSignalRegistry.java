@@ -6,7 +6,7 @@ import java.util.HashMap;
 import java.util.concurrent.TimeUnit;
 
 /**
- * This class has instances per session. It holds the values of signal calls that have occurred on the wrappers' side.
+ * This class has instances per session. It holds the values of signal calls that have occurred on the adapters' side.
  * <p>
  * Created by yerlibilgin on 02/12/14.
  */
@@ -28,7 +28,7 @@ public class MinderSignalRegistry {
   private HashMap<TestSession, AdapterSignalMap> testSessionMap = new HashMap<TestSession, AdapterSignalMap>();
 
   /**
-   * A signal was emitted on the wrapper side. We should put it into the queue until it gets taken by a rivet.
+   * A signal was emitted on the adapter side. We should put it into the queue until it gets taken by a rivet.
    *
    * @param adapterIdentifier
    * @param signature

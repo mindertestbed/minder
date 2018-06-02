@@ -36,9 +36,9 @@ public class RestTdl {
     @XmlElement(required = false)
     protected String creationDate;
 
-    @XmlElementWrapper(name="wrapperParameters")
+    @XmlElementWrapper(name="adapterParameters")
     @XmlElement(required = false)
-    public List<RestTdlWrapperParam> parameters;
+    public List<RestTdlAdapterParam> parameters;
 
     public String getId() {
         return id;
@@ -80,11 +80,11 @@ public class RestTdl {
         this.creationDate = creationDate;
     }
 
-    public List<RestTdlWrapperParam> getParameters() {
+    public List<RestTdlAdapterParam> getParameters() {
         return parameters;
     }
 
-    public void setParameters(List<RestTdlWrapperParam> parameters) {
+    public void setParameters(List<RestTdlAdapterParam> parameters) {
         this.parameters = parameters;
     }
 }

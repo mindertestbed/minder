@@ -712,7 +712,7 @@ var i,
 
 	// Used for iframes
 	// See setDocument()
-	// Removing the function wrapper causes a "Permission Denied"
+	// Removing the function adapter causes a "Permission Denied"
 	// error in IE
 	unloadHandler = function() {
 		setDocument();

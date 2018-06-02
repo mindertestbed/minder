@@ -73,7 +73,7 @@ public class RestTestGroupController extends Controller {
       return badRequest(e.getCause().toString());
     }
 
-    //Getting all wrappers
+    //Getting all adapters
     List<TestGroup> testGroupList = TestGroup.findAll();
     restTestGroupListResponse.setRestTestGroups(new ArrayList<RestTestGroup>());
 

@@ -7,10 +7,10 @@ import com.google.common.io.Files;
 import controllers.common.Utils;
 import dependencyutils.DependencyClassLoaderCache;
 import editormodels.GroupEditorModel;
+import play.mvc.Http.MultipartFormData.FilePart;
 import utils.Util;
 import models.TestGroup;
 import models.User;
-import org.asynchttpclient.request.body.multipart.FilePart;
 import org.eclipse.aether.resolution.DependencyResolutionException;
 import play.Logger;
 import play.data.Form;
@@ -317,7 +317,7 @@ public class GroupController extends Controller {
     File asset = null;
 
     if (body.getFiles() != null && body.getFiles().size() > 0)
-      asset = ((FilePart) body.getFiles().get(0)).getFile();
+      asset = (File)((FilePart) body.getFiles().get(0)).getFile();
 
     if (asset == null) {
       throw new RuntimeException("No asset file was specified!");

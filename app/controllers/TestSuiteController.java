@@ -169,8 +169,8 @@ public class TestSuiteController extends Controller {
     StringBuilder candidateMapBuilder = new StringBuilder("{");
     jobs.forEach(job -> {
       tdlArrayBuilder.append(job.tdl.id).append(',');
-      MappedWrapper.findByJob(job).forEach(mappedWrapper -> {
-        candidateMapBuilder.append('\"').append(mappedWrapper.parameter.name).append("\":").append(mappedWrapper.wrapperVersion.id).append(',');
+      MappedAdapter.findByJob(job).forEach(mappedAdapter -> {
+        candidateMapBuilder.append('\"').append(mappedAdapter.parameter.name).append("\":").append(mappedAdapter.adapterVersion.id).append(',');
       });
     });
     if (tdlArrayBuilder.length() > 1) {
@@ -216,7 +216,7 @@ public class TestSuiteController extends Controller {
   private void updateSuiteJobs(JsonNode tdlArray, JsonNode selectedCandidateMap, TestSuite testSuite) {
     //find and remove all suite jobs for this test suite.
     Job.getAllByTestSuite(testSuite).forEach(suiteJob -> {
-      MappedWrapper.deleteByJob(suiteJob);
+      MappedAdapter.deleteByJob(suiteJob);
 
       //AbstractJob.deleteById(suiteJob.id);
       suiteJob.testSuite = null;
@@ -242,11 +242,11 @@ public class TestSuiteController extends Controller {
       sj.owner = testSuite.owner;
       sj.save();
       tdl.parameters.forEach(param -> {
-        MappedWrapper mw = new MappedWrapper();
+        MappedAdapter mw = new MappedAdapter();
         mw.job = sj;
         mw.parameter = param;
-        long wrapperVersionId = selectedCandidateMap.findPath(param.name).asLong();
-        mw.wrapperVersion = WrapperVersion.findById(wrapperVersionId);
+        long adapterVersionId = selectedCandidateMap.findPath(param.name).asLong();
+        mw.adapterVersion = AdapterVersion.findById(adapterVersionId);
         mw.save();
       });
     });
@@ -287,9 +287,9 @@ public class TestSuiteController extends Controller {
       tdls.add(tdl);
     }
 
-    Map<String, Set<WrapperVersion>> wrapperParamListHashMap = Util.listCandidateAdapters(tdls);
+    Map<String, Set<AdapterVersion>> adapterParamListHashMap = Util.listCandidateAdapters(tdls);
 
-    return ok(Json.toJson(wrapperParamListHashMap));
+    return ok(Json.toJson(adapterParamListHashMap));
   }
 
   public static List<TestAssertion> listAllAssertionsWithTDLS(TestGroup group) {

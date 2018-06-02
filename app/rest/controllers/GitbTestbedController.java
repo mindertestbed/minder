@@ -119,16 +119,16 @@ public class GitbTestbedController extends Controller {
 
     }
 
-    //TODO: check if getting wrapper lazy
-    WrapperVersion wrapperVersion = WrapperVersion.findById(Long.parseLong(actorDefinitionRequest.getActorId()));
-    Wrapper wrapper = Wrapper.findById(wrapperVersion.wrapper.id);
+    //TODO: check if getting adapter lazy
+    AdapterVersion adapterVersion = AdapterVersion.findById(Long.parseLong(actorDefinitionRequest.getActorId()));
+    Adapter adapter = Adapter.findById(adapterVersion.adapter.id);
 
     GetActorDefinitionResponse serviceResponse = new GetActorDefinitionResponse();
     Actor actor = new Actor();
-    actor.setId(wrapperVersion.id.toString());
-    actor.setName(wrapper.name + "_" + wrapperVersion.version);
+    actor.setId(adapterVersion.id.toString());
+    actor.setName(adapter.name + "_" + adapterVersion.version);
 
-    List<GitbEndpoint> gitbEndpoints = wrapperVersion.gitbEndpoints;
+    List<GitbEndpoint> gitbEndpoints = adapterVersion.gitbEndpoints;
     //set all endpoints
     for (GitbEndpoint gitbEndpoint : gitbEndpoints) {
       Endpoint endpoint = new Endpoint();
@@ -204,8 +204,8 @@ public class GitbTestbedController extends Controller {
 
       try {
         Ebean.beginTransaction();
-        List<MappedWrapper> mappedWrappers = new ArrayList<>();
-        gitbJob.mappedWrappers = mappedWrappers;
+        List<MappedAdapter> mappedAdapters = new ArrayList<>();
+        gitbJob.mappedAdapters = mappedAdapters;
         gitbJob.mtdlParameters = "";
         gitbJob.save();
         Ebean.commitTransaction();
@@ -407,9 +407,9 @@ public class GitbTestbedController extends Controller {
   private com.gitb.tpl.v1.TestCase getGitbTestCase(Tdl tdl) throws Exception {
     TestCase minderTestCase = TestCase.findById(tdl.testCase.id);
 
-    //checks $wrapper existence. these wappers are not applicable with gitb
-    List<WrapperParam> wrapperParams = WrapperParam.findByTestCase(tdl);
-    if (wrapperParams != null && !wrapperParams.isEmpty())
+    //checks $adapter existence. these wappers are not applicable with gitb
+    List<AdapterParam> adapterParams = AdapterParam.findByTestCase(tdl);
+    if (adapterParams != null && !adapterParams.isEmpty())
       throw new Exception("This testcase is not compatible with GITB");
 
     com.gitb.tpl.v1.TestCase gitbTestCase = new com.gitb.tpl.v1.TestCase();
@@ -441,28 +441,28 @@ public class GitbTestbedController extends Controller {
       Constructor<MinderTdl> minderConstructor = (Constructor<MinderTdl>) cls.getConstructors()[0];
       minderTdl = minderConstructor.newInstance(java.lang.Boolean.FALSE);
       if (minderTdl == null)
-        throw new Exception("Cannot get wrapperdefs.");
+        throw new Exception("Cannot get adapterdefs.");
     } catch (InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException e1) {
       throw new Exception(e1.toString());
     }
 
-    //get wrappers from tdl. minder wrapper is equal to gitb actor
-    Set<String> wrapperDefs = JavaConversions.setAsJavaSet(minderTdl.wrapperDefs());
+    //get adapters from tdl. minder adapter is equal to gitb actor
+    Set<String> adapterDefs = JavaConversions.setAsJavaSet(minderTdl.adapterDefs());
     Roles actors = new Roles();
 
-    //get wrappers
-    for (String wrapperDef : wrapperDefs) {
-      if (!wrapperDef.contains("$") && !wrapperDef.equals("NULLWRAPPER")) {
-        Wrapper wrapper = Wrapper.findByName(wrapperDef);
-        List<WrapperVersion> wrapperVersions = WrapperVersion.getAllByWrapper(wrapper);
-        //set all wrapper versions as actor
-        for (WrapperVersion wrapperVersion : wrapperVersions) {
+    //get adapters
+    for (String adapterDef : adapterDefs) {
+      if (!adapterDef.contains("$") && !adapterDef.equals("NULLADAPTER")) {
+        Adapter adapter = Adapter.findByName(adapterDef);
+        List<AdapterVersion> adapterVersions = AdapterVersion.getAllByAdapter(adapter);
+        //set all adapter versions as actor
+        for (AdapterVersion adapterVersion : adapterVersions) {
           TestRole testRole = new TestRole();
-          testRole.setId(wrapperVersion.id.toString());
-          testRole.setName(wrapper.name + "_" + wrapperVersion.version);
+          testRole.setId(adapterVersion.id.toString());
+          testRole.setName(adapter.name + "_" + adapterVersion.version);
           testRole.setRole(TestRoleEnumeration.SUT);
 
-          List<GitbEndpoint> gitbEndpoints = wrapperVersion.gitbEndpoints;
+          List<GitbEndpoint> gitbEndpoints = adapterVersion.gitbEndpoints;
           //set all endpoints
           for (GitbEndpoint gitbEndpoint : gitbEndpoints) {
             Endpoint endpoint = new Endpoint();

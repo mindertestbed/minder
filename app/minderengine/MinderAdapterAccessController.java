@@ -1,13 +1,13 @@
 package minderengine;
 
-import models.Wrapper;
+import models.Adapter;
 import org.interop.xoola.tcpcom.connmanager.server.ClientAccessController;
 import play.Logger;
 
 /**
  * This class implements Xoola ClientAccessController and is fed to xoola through application.config file
  * <p>
- * Through this we will make sure that only registered wrappers will be
+ * Through this we will make sure that only registered adapters will be
  * able to connect to our server.
  * Created by yerlibilgin on 04/12/14.
  */
@@ -24,7 +24,7 @@ public class MinderAdapterAccessController implements ClientAccessController {
       return false;
     }
 
-    Wrapper wrp = Wrapper.findByName(identifier.getName());
+    Adapter wrp = Adapter.findByName(identifier.getName());
     if (wrp == null) {
       Logger.error(identifierString + " is not registered");
       Logger.error("DENY [" + identifierString + "]");

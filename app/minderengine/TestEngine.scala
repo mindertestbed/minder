@@ -90,11 +90,11 @@ class TestEngine @Inject()(implicit testQueueController: Provider[TestQueueContr
     *
     * @param userEmail
     * @param clsMinderTDL
-    * @param wrapperMapping
+    * @param adapterMapping
     * @param testRunContext
     */
   def runTest(sessionID: String, userEmail: String, clsMinderTDL: Class[MinderTdl],
-              wrapperMapping: collection.mutable.Map[String, MappedWrapper],
+              adapterMapping: collection.mutable.Map[String, MappedAdapter],
               testRunContext: TestRunContext, params: String): Unit = {
     val lgr: org.apache.log4j.Logger = org.apache.log4j.Logger.getLogger("test");
     val app = new MyAppender(testRunContext);
@@ -118,14 +118,14 @@ class TestEngine @Inject()(implicit testQueueController: Provider[TestQueueContr
 
         minderTDL = testRunContext.initialize();
 
-        identifierMinderClientMap = mapAllTransitiveWrappers(wrapperMapping)
+        identifierMinderClientMap = mapAllTransitiveAdapters(adapterMapping)
 
         initializeFunctionsAndParameters(params, lgr)
 
         if (!testRunContext.isSuspended()) {
           val sutNameSet = new util.HashSet[String]
 
-          //first, call the start methods for all registered wrappers of this test.
+          //first, call the start methods for all registered adapters of this test.
 
           lgr.info("> Initialize the Adapters");
 
@@ -177,9 +177,9 @@ class TestEngine @Inject()(implicit testQueueController: Provider[TestQueueContr
             return
           } else {
 
-            val rivetWrapperId: String = currentRivet.wrapperFunction.wrapperId
-            //resolve the minder client id. This might as well be resolved to a local built-in wrapper or the null slot.
-            val slotPair = findPairOrError(identifierMinderClientMap, AdapterIdentifier.parse(rivetWrapperId))
+            val rivetAdapterId: String = currentRivet.adapterFunction.adapterId
+            //resolve the minder client id. This might as well be resolved to a local built-in adapter or the null slot.
+            val slotPair = findPairOrError(identifierMinderClientMap, AdapterIdentifier.parse(rivetAdapterId))
             val args = Array.ofDim[Object](currentRivet.pipes.length)
 
             //a boolean flag used to see whether a timeout occurred or not
@@ -276,12 +276,12 @@ class TestEngine @Inject()(implicit testQueueController: Provider[TestQueueContr
                 testRunContext.signalEmitted(minderTDL.currentRivetIndex, signalIndex, signalData2)
               }
 
-              msg = "> CALL SLOT " + slotPair.adapterIdentifier + "." + currentRivet.wrapperFunction.signature
+              msg = "> CALL SLOT " + slotPair.adapterIdentifier + "." + currentRivet.adapterFunction.signature
               lgr.info(msg)
               gtb.notifyProcessingInfo(msg, currentRivet)
               testRunContext.rivetInvoked(minderTDL.currentRivetIndex);
-              currentRivet.result = slotPair.minderClient.callSlot(session, currentRivet.wrapperFunction.signature, args)
-              msg = "< SLOT CALLED " + slotPair.adapterIdentifier + "." + currentRivet.wrapperFunction.signature;
+              currentRivet.result = slotPair.minderClient.callSlot(session, currentRivet.adapterFunction.signature, args)
+              msg = "< SLOT CALLED " + slotPair.adapterIdentifier + "." + currentRivet.adapterFunction.signature;
               lgr.info(msg)
               gtb.notifyProcessingInfo(msg, currentRivet)
 
@@ -330,7 +330,7 @@ class TestEngine @Inject()(implicit testQueueController: Provider[TestQueueContr
         if (testRunContext.isSuspended()) {
           lgr.info("> Test Suspended")
         } else {
-          lgr.info("> Send finish message to all wrappers")
+          lgr.info("> Send finish message to all adapters")
           //make sure that we call finish test for all
           val finishTestObject: FinishTestObject = new FinishTestObject
           finishTestObject.setSession(session)
@@ -387,31 +387,31 @@ class TestEngine @Inject()(implicit testQueueController: Provider[TestQueueContr
   }
 
 
-  private def mapAllTransitiveWrappers(wrapperMapping: mutable.Map[String, MappedWrapper]): util.Map[AdapterIdentifier, IdentifierClientPair] = {
-    //map all the variable names to actual wrappers, and resolve everything
+  private def mapAllTransitiveAdapters(adapterMapping: mutable.Map[String, MappedAdapter]): util.Map[AdapterIdentifier, IdentifierClientPair] = {
+    //map all the variable names to actual adapters, and resolve everything
     val identifierMinderClientMap = new util.LinkedHashMap[AdapterIdentifier, IdentifierClientPair];
 
     //create NULLSLOT client
-    val nullIdentifier = AdapterIdentifier.parse(MinderTdl.NULL_WRAPPER_NAME);
+    val nullIdentifier = AdapterIdentifier.parse(MinderTdl.NULL_ADAPTER_NAME);
     identifierMinderClientMap.put(nullIdentifier, IdentifierClientPair(nullIdentifier, new NullClient))
 
-    for (wrapperName <- minderTDL.wrapperDefs) {
-      val adapterIdentifier = AdapterIdentifier.parse(wrapperName)
+    for (adapterName <- minderTDL.adapterDefs) {
+      val adapterIdentifier = AdapterIdentifier.parse(adapterName)
 
       if (adapterIdentifier.getName.startsWith("$")) {
         if (adapterIdentifier.getVersion != null)
           throw new IllegalArgumentException("A variable adapter name cannot have version [" + adapterIdentifier + "]")
         // this is a variable
-        //resolve the variable name from the wrapperMapping
-        if (!wrapperMapping.contains(adapterIdentifier.getName))
+        //resolve the variable name from the adapterMapping
+        if (!adapterMapping.contains(adapterIdentifier.getName))
           throw new IllegalArgumentException(adapterIdentifier.getName + " has not been mapped to a real adapter")
 
-        val mapping: MappedWrapper = wrapperMapping(adapterIdentifier.getName)
+        val mapping: MappedAdapter = adapterMapping(adapterIdentifier.getName)
 
-        val transitiveAdapterIdentifier = AdapterIdentifier.parse(mapping.wrapperVersion.wrapper.name + "|" +
-            mapping.wrapperVersion.version)
-        val client = if (BuiltInWrapperRegistry.get().contains(transitiveAdapterIdentifier)) {
-          BuiltInWrapperRegistry.get().getWrapper(transitiveAdapterIdentifier)
+        val transitiveAdapterIdentifier = AdapterIdentifier.parse(mapping.adapterVersion.adapter.name + "|" +
+            mapping.adapterVersion.version)
+        val client = if (BuiltInAdapterRegistry.get().contains(transitiveAdapterIdentifier)) {
+          BuiltInAdapterRegistry.get().getAdapter(transitiveAdapterIdentifier)
         } else {
           xoolaServer.get().getClient(transitiveAdapterIdentifier);
         }
@@ -421,23 +421,23 @@ class TestEngine @Inject()(implicit testQueueController: Provider[TestQueueContr
         //resolve the version
         val version = if (adapterIdentifier.getVersion() == null) {
           //no version supplied, resolve the latest version
-          val tmp = WrapperVersion.latestByWrapperName(adapterIdentifier.getName)
+          val tmp = AdapterVersion.latestByAdapterName(adapterIdentifier.getName)
           if (tmp == null) {
             throw new IllegalArgumentException(adapterIdentifier.getName + " has not still declared a version")
           }
           tmp
         } else {
-          val tmp = WrapperVersion.findWrapperNameAndVersion(adapterIdentifier.getName, adapterIdentifier.getVersion)
+          val tmp = AdapterVersion.findAdapterNameAndVersion(adapterIdentifier.getName, adapterIdentifier.getVersion)
           if (tmp == null) {
             throw new IllegalArgumentException(adapterIdentifier + " was not found")
           }
           tmp
         }
 
-        val transitiveAdapterIdentifier = AdapterIdentifier.parse(version.wrapper.name + "|" + version.version)
+        val transitiveAdapterIdentifier = AdapterIdentifier.parse(version.adapter.name + "|" + version.version)
 
-        val client = if (BuiltInWrapperRegistry.get().contains(transitiveAdapterIdentifier)) {
-          BuiltInWrapperRegistry.get().getWrapper(transitiveAdapterIdentifier)
+        val client = if (BuiltInAdapterRegistry.get().contains(transitiveAdapterIdentifier)) {
+          BuiltInAdapterRegistry.get().getAdapter(transitiveAdapterIdentifier)
         } else {
           xoolaServer.get().getClient(transitiveAdapterIdentifier);
         }
@@ -448,10 +448,10 @@ class TestEngine @Inject()(implicit testQueueController: Provider[TestQueueContr
     identifierMinderClientMap
   }
 
-  def findPairOrError(identifierMinderClientMap: util.Map[AdapterIdentifier, IdentifierClientPair], rivetWrapperId: AdapterIdentifier): IdentifierClientPair = {
-    if (!identifierMinderClientMap.containsKey(rivetWrapperId))
-      throw new RuntimeException("Minder client with " + rivetWrapperId + " was not found")
-    identifierMinderClientMap(rivetWrapperId)
+  def findPairOrError(identifierMinderClientMap: util.Map[AdapterIdentifier, IdentifierClientPair], rivetAdapterId: AdapterIdentifier): IdentifierClientPair = {
+    if (!identifierMinderClientMap.containsKey(rivetAdapterId))
+      throw new RuntimeException("Minder client with " + rivetAdapterId + " was not found")
+    identifierMinderClientMap(rivetAdapterId)
   }
 
 }
@@ -463,12 +463,12 @@ object TestEngine {
   }
 
   /**
-    * Evaluates the whole test case without running it and creates a list of wrappers and their signals-slots.
+    * Evaluates the whole test case without running it and creates a list of adapters and their signals-slots.
     *
     * @param tdl
     * @return
     */
-  def describeTdl(tdl: Tdl): util.LinkedHashMap[String, util.Set[WrapperFunction]] = {
+  def describeTdl(tdl: Tdl): util.LinkedHashMap[String, util.Set[AdapterFunction]] = {
     val testCase = tdl.testCase;
     testCase.testAssertion = TestAssertion.findById(testCase.testAssertion.id)
     testCase.testAssertion.testGroup = TestGroup.findById(testCase.testAssertion.testGroup.id)
@@ -488,22 +488,22 @@ object TestEngine {
 
     val slotDefs = minderTdl.RivetDefs
 
-    val hm: util.LinkedHashMap[String, util.Set[WrapperFunction]] = new util.LinkedHashMap()
-    val map: collection.mutable.LinkedHashMap[String, util.Set[WrapperFunction]] = collection.mutable.LinkedHashMap()
+    val hm: util.LinkedHashMap[String, util.Set[AdapterFunction]] = new util.LinkedHashMap()
+    val map: collection.mutable.LinkedHashMap[String, util.Set[AdapterFunction]] = collection.mutable.LinkedHashMap()
 
     for (r <- slotDefs) {
       //check the slot
-      val wrapperName = r.wrapperFunction.wrapperId
-      val slotSignature = r.wrapperFunction.signature
+      val adapterName = r.adapterFunction.adapterId
+      val slotSignature = r.adapterFunction.signature
 
-      var set = map.getOrElseUpdate(wrapperName, new util.HashSet[WrapperFunction]())
-      set.add(new WrapperFunction(wrapperId = wrapperName, signature = slotSignature))
-      println(wrapperName + "::" + slotSignature)
+      var set = map.getOrElseUpdate(adapterName, new util.HashSet[AdapterFunction]())
+      set.add(new AdapterFunction(adapterId = adapterName, signature = slotSignature))
+      println(adapterName + "::" + slotSignature)
 
       for (e@(k@(wn, ws), v) <- r.signalPipeMap) {
         println(wn + "::" + ws)
-        set = map.getOrElseUpdate(wn, new util.HashSet[WrapperFunction]())
-        set.add(new WrapperFunction(wn, ws))
+        set = map.getOrElseUpdate(wn, new util.HashSet[AdapterFunction]())
+        set.add(new AdapterFunction(wn, ws))
       }
     }
 

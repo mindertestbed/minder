@@ -4,7 +4,7 @@ import javax.xml.bind.annotation.*;
 import java.util.List;
 
 /**
- * <p>Java class for Wrapper complex type.
+ * <p>Java class for Adapter complex type.
  * </pre>
  *
  * @author: Melis Ozgur Cetinkaya Demir

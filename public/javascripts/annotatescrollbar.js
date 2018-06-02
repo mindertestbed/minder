@@ -19,7 +19,7 @@
     this.cm = cm;
     this.className = className;
     this.annotations = [];
-    this.div = cm.getWrapperElement().appendChild(document.createElement("div"));
+    this.div = cm.getAdapterElement().appendChild(document.createElement("div"));
     this.div.style.cssText = "position: absolute; right: 0; top: 0; z-index: 7; pointer-events: none";
     this.computeScale();
 
@@ -31,7 +31,7 @@
 
   Annotation.prototype.computeScale = function() {
     var cm = this.cm;
-    var hScale = (cm.getWrapperElement().clientHeight - cm.display.barHeight) /
+    var hScale = (cm.getAdapterElement().clientHeight - cm.display.barHeight) /
       cm.heightAtLine(cm.lastLine() + 1, "local");
     if (hScale != this.hScale) {
       this.hScale = hScale;

@@ -12,7 +12,7 @@ import rest.controllers.common.RestUtils;
 import rest.controllers.restbodyprocessor.IRestContentProcessor;
 import rest.models.RestMinderResponse;
 import rest.models.RestTdl;
-import rest.models.RestTdlWrapperParam;
+import rest.models.RestTdlAdapterParam;
 
 import javax.inject.Inject;
 import java.text.ParseException;
@@ -116,14 +116,14 @@ public class RestTdlController extends Controller {
     responseRestTdl.setCreationDate(dateFormat.format(tdl.creationDate));
     responseRestTdl.setTdl(tdl.tdl.getBytes());
     responseRestTdl.setVersion(tdl.version);
-    responseRestTdl.setParameters(new ArrayList<RestTdlWrapperParam>());
+    responseRestTdl.setParameters(new ArrayList<RestTdlAdapterParam>());
 
-    for (WrapperParam wrapperParam : tdl.parameters) {
-      RestTdlWrapperParam restWP = new RestTdlWrapperParam();
-      restWP.setId(String.valueOf(wrapperParam.id));
-      restWP.setName(wrapperParam.name);
+    for (AdapterParam adapterParam : tdl.parameters) {
+      RestTdlAdapterParam restWP = new RestTdlAdapterParam();
+      restWP.setId(String.valueOf(adapterParam.id));
+      restWP.setName(adapterParam.name);
       restWP.setSignatures(new ArrayList<String>());
-      for (ParamSignature ps : wrapperParam.signatures) {
+      for (ParamSignature ps : adapterParam.signatures) {
         restWP.getSignatures().add(ps.signature);
       }
 

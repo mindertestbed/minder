@@ -1,9 +1,9 @@
 package utils;
 
 import com.avaje.ebean.Model;
-import controllers.MappedWrapperModel;
+import controllers.MappedAdapterModel;
 import controllers.TestCaseController;
-import minderengine.BuiltInWrapperRegistry;
+import minderengine.BuiltInAdapterRegistry;
 import minderengine.XoolaServer;
 import models.*;
 import mtdl.TDLClassLoaderProvider;
@@ -43,19 +43,19 @@ public class Startup {
 
     initialData();
 
-    BuiltInWrapperRegistry.get().initiate();
+    BuiltInAdapterRegistry.get().initiate();
     xoolaServer.start();
 
     //TODO: Bad place for this code. Where to put?
-    formatters.register(MappedWrapperModel.class, new Formatters.SimpleFormatter<MappedWrapperModel>() {
+    formatters.register(MappedAdapterModel.class, new Formatters.SimpleFormatter<MappedAdapterModel>() {
       @Override
-      public MappedWrapperModel parse(String jsonString, Locale arg1) throws ParseException {
-        return MappedWrapperModel.parse(jsonString);
+      public MappedAdapterModel parse(String jsonString, Locale arg1) throws ParseException {
+        return MappedAdapterModel.parse(jsonString);
       }
 
       @Override
-      public String print(MappedWrapperModel mappedWrapperModel, Locale arg1) {
-        return mappedWrapperModel.toJson();
+      public String print(MappedAdapterModel mappedAdapterModel, Locale arg1) {
+        return mappedAdapterModel.toJson();
       }
     });
   }
@@ -69,13 +69,13 @@ public class Startup {
         File currentDir = new File(".");
         Logger.debug("Current Directory:" + currentDir.getAbsolutePath());
 
-        File yml = new File(currentDir.getAbsoluteFile() + "/conf/initial-data.yml");
+        File yml = new File(currentDir.getAbsoluteFile() + "/conf/initialdata/initial-data.yml");
         Logger.debug("Yml file: " + yml.getAbsolutePath() + " exists? " + yml.exists());
 
         Map<String, List<Model>> all = (Map<String, List<Model>>) yaml.load(new FileInputStream(yml));
         for (String key : all.keySet()) {
           for (Model model : all.get(key)) {
-            System.out.println(model);
+            Logger.debug(model.getClass().getSimpleName());
             model.save();
 
             if (model instanceof TestGroup) {

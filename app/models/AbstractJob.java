@@ -1,7 +1,5 @@
 package models;
 
-import com.avaje.ebean.Ebean;
-import com.avaje.ebean.ExpressionList;
 import com.avaje.ebean.Model;
 import minderengine.Visibility;
 
@@ -45,7 +43,7 @@ public abstract class AbstractJob extends Model {
   public String mtdlParameters;
 
   @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, mappedBy = "job")
-  public List<MappedWrapper> mappedWrappers;
+  public List<MappedAdapter> mappedAdapters;
 
   @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, mappedBy = "job")
   public List<TestRun> testRuns;

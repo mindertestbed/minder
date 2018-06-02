@@ -72,11 +72,11 @@
             var options = ""
             var current = candidateMap[key]
             for (key2 in current) {
-              wrapperVersion = current[key2]
-              if (selectedCandidateMap[key] === wrapperVersion.id) {
-                options += '<option value="' + wrapperVersion.id + '" selected="selected">' + wrapperVersion.wrapper.name + '|' + wrapperVersion.version + '</option>'
+              adapterVersions = current[key2]
+              if (selectedCandidateMap[key] === adapterVersions.id) {
+                options += '<option value="' + adapterVersions.id + '" selected="selected">' + adapterVersions.adapter.name + '|' + adapterVersions.version + '</option>'
               } else {
-                options += '<option value="' + wrapperVersion.id + '">' + wrapperVersion.wrapper.name + '|' + wrapperVersion.version + '</option>'
+                options += '<option value="' + adapterVersions.id + '">' + adapterVersions.adapter.name + '|' + adapterVersions.version + '</option>'
               }
             }
             if (selectedCandidateMap[key] === undefined) {

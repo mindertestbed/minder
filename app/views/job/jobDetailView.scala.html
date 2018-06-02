@@ -128,22 +128,22 @@
                   </td>
                 </tr>
 
-                @if(job.mappedWrappers != null && job.mappedWrappers.size() > 0) {
+                @if(job.mappedAdapters != null && job.mappedAdapters.size() > 0) {
                   <tr>
                     <th>Adapter Mapping:</th>
                     <td>
                       <table class="table-condensed table-bordered">
-                        <tr><th>Variable</th><th>Actual Wrapper</th><th>Status</th></tr>
-                        @defining(job.mappedWrappers) { lst =>
-                          @for(mw <- job.mappedWrappers) {
+                        <tr><th>Variable</th><th>Actual Adapter</th><th>Status</th></tr>
+                        @defining(job.mappedAdapters) { lst =>
+                          @for(mw <- job.mappedAdapters) {
                             <tr>
-                              <td>@mw.parameter.name</td> <td>@mw.wrapperVersion.wrapper.name</td>
+                              <td>@mw.parameter.name</td> <td>@mw.adapterVersion.adapter.name</td>
                               <td align="center">
                                 <span class="onStatus@{
-                                  mw.wrapperVersion.id
+                                  mw.adapterVersion.id
                                 }" style="display:none" class="bignobold online"> <img src="@routes.Assets.versioned("/images/Pc_Online.png")"/></span>
                                 <span class="offStatus@{
-                                  mw.wrapperVersion.id
+                                  mw.adapterVersion.id
                                 }" style="display:none" class="bignobold offline"> <img src="@routes.Assets.versioned("/images/Pc_Offline.png")"/></span>
                               </td></tr>
                           }

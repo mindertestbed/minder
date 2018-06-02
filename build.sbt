@@ -8,8 +8,6 @@ lazy val minder = (project in file(".")).enablePlugins(PlayJava, PlayEbean)
 
 products in Compile <<= products in Aspectj
 
-resolvers += "Eid public repository" at "http://193.140.74.199:8081/nexus/content/groups/public/"
-
 resolvers += Resolver.mavenLocal
 
 scalaVersion := "2.11.7"
@@ -26,13 +24,13 @@ libraryDependencies ++= Seq(
   "org.scala-lang" % "scala-actors" % "2.11.7",
   "org.scala-lang.modules" % "scala-xml_2.11" % "1.0.5",
   "postgresql" % "postgresql" % "9.1-901-1.jdbc4",
-  "mysql" % "mysql-connector-java" % "5.1.18",
+  //"mysql" % "mysql-connector-java" % "5.1.18",
   "org.beybunproject" % "xoola" % "1.3.0",
-  "gov.tubitak.minder" % "minder-common" % "1.0.0",
-  "gov.tubitak.minder" %% "minder-tdl" % "0.7.1",
+  "com.yerlibilgin.minder" % "minder-common" % "1.1.0",
+  "com.yerlibilgin.minder" %% "minder-tdl" % "1.1.0",
   "org.webjars" % "webjars-play_2.11" % "2.4.0-1",
   "org.webjars" % "bootstrap" % "3.3.6",
-  "org.codehaus.groovy" % "groovy" % "2.3.9",
+  //"org.codehaus.groovy" % "groovy" % "2.3.9",
   "gov.tubitak.minder" % "minder-gitb-bridge-common" % "0.1",
   "com.itextpdf" % "itextpdf" % "5.5.13",
   "com.itextpdf.tool" % "xmlworker" % "5.5.13",
@@ -43,7 +41,6 @@ libraryDependencies ++= Seq(
   ExclusionRule(organization = "org.bouncycastle"),
   ExclusionRule(organization = "org.jboss.logging"),
   ExclusionRule(organization = "org.apache.cxf"),
-  ExclusionRule(organization = "com.h2database", name="h2-1.4.187.jar"),
   ExclusionRule(organization = "commons-logging")))
 
 resolvers ++= Seq(
@@ -54,8 +51,6 @@ resolvers ++= Seq(
   "play-authenticate (release)" at "http://joscha.github.io/play-authenticate/repo/releases/",
   "jasper" at "http://jaspersoft.artifactoryonline.com/jaspersoft/third-party-ce-artifacts/"
 )
-
-includeFilter in(Assets, LessKeys.less) := "ui2.less" | "oldui.less"
 
 import com.typesafe.sbt.SbtAspectj.AspectjKeys.{binaries, inputs}
 import com.typesafe.sbt.SbtAspectj.{Aspectj, aspectjSettings, compiledClasses}

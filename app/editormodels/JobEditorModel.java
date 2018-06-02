@@ -1,6 +1,6 @@
 package editormodels;
 
-import controllers.MappedWrapperModel;
+import controllers.MappedAdapterModel;
 import minderengine.Visibility;
 import play.data.validation.Constraints;
 
@@ -17,7 +17,7 @@ public class JobEditorModel {
 
   public Long tdlID;
 
-  public List<MappedWrapperModel> wrapperMappingList;
+  public List<MappedAdapterModel> adapterMappingList;
 
   public String mtdlParameters;
 

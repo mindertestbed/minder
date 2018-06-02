@@ -36,7 +36,7 @@ authenticate.profile.title=Profile
 authenticate.profile=Profile
 # play-authenticate - sample: Restricted page
 minder.restricted.testdesigner=Test Designers are responsible to create test scenarios according to the test assertions, which are supposed to be provided by WP6 and WP5. Test assertion document state the testable logics of a system under test. eSENS test assertion template is compatible with OASIS Test Assertions Guidelines. After creating test scenarios, Test Designers can also run the test cases. Test Designer can communicate with Minder Server via a web interface.
-minder.restricted.testdeveloper=Test Developers are domain experts who know the system under test. A Test Developer is responsible to implement the wrapper interface provided by Minder. 
+minder.restricted.testdeveloper=Test Developers are domain experts who know the system under test. A Test Developer is responsible to implement the adapter interface provided by Minder. 
 minder.restricted.testobserver=Test Observer can see the results of test runs and gather test reports.
 authenticate.root=Only Root
 authenticate.login.forgot.password=Forgot Password
@@ -53,7 +53,7 @@ restrictedTestPage.createTestSuite=Create New Test Suite
 restrictedTestPage.createTestCase=Create New Test Case
 restrictedTestPage.create=Create
 restrictedTestPage.createJob=Create New Job
-restrictedTestPage.createWrapper=Create New Wrapper
+restrictedTestPage.createAdapter=Create New Adapter
 restrictedTestPage.createAsset=Create New Asset
 restrictedTestPage.importGroup=Import a Test Group
 restrictedTestPage.createJobTemplate=Create New Job Template

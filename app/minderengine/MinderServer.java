@@ -2,9 +2,9 @@ package minderengine;
 
 import controllers.TestQueueController;
 import controllers.TestRunContext;
+import models.Adapter;
 import utils.Util;
 import models.*;
-import models.Wrapper;
 import play.Logger;
 
 import javax.inject.Inject;
@@ -30,7 +30,7 @@ public class MinderServer implements IMinderServer {
    */
   @Override
   public void hello(AdapterIdentifier adapterIdentifier, Set<MethodContainer> methodSet) {
-    MinderWrapperRegistry.get().updateAdapter(adapterIdentifier, methodSet);
+    MinderAdapterRegistry.get().updateAdapter(adapterIdentifier, methodSet);
   }
 
 
@@ -56,8 +56,8 @@ public class MinderServer implements IMinderServer {
     if (signature.equals("trigger(java.lang.Long,minderengine.Visibility)")) {
       Logger.debug("Received trigger signal");
       //this is a trigger signal
-      models.Wrapper wrapper = Wrapper.findByName(adapterIdentifier.getName());
-      if (wrapper == null) {
+      Adapter adapter = Adapter.findByName(adapterIdentifier.getName());
+      if (adapter == null) {
         throw new IllegalArgumentException("Unidentified adapter [" + adapterIdentifier.getName() + "]");
       }
 
@@ -72,7 +72,7 @@ public class MinderServer implements IMinderServer {
       Logger.debug("Trigger job " + jobId);
 
       Visibility vis = (Visibility) Util.readObject(((SignalCallData) signalData).args[1], null);
-      TestSession session = testQueueController.enqueueJobWithUser(jobId, wrapper.user, null, vis);
+      TestSession session = testQueueController.enqueueJobWithUser(jobId, adapter.user, null, vis);
       MinderSignalRegistry.get().initTestSession(session);
       return session;
     } else if (MinderSignalRegistry.get().hasSession(testSession)) {

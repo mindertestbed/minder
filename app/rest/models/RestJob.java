@@ -16,7 +16,7 @@ import java.util.List;
         "tdlId",
         "owner",
         "mtdlParameters",
-        "parametersForWrappers"
+        "parametersForAdapters"
 })
 @XmlRootElement(name = "job")
 public class RestJob {
@@ -35,9 +35,9 @@ public class RestJob {
     @XmlElement(required = false)
     protected String mtdlParameters;
 
-    @XmlElementWrapper(name="parametersForWrappers")
+    @XmlElementWrapper(name="parametersForAdapters")
     @XmlElement(required = false)
-    protected List<RestParametersForWrappers> parametersForWrappers;
+    protected List<RestParametersForAdapters> parametersForAdapters;
 
     public String getId() {
         return id;
@@ -79,11 +79,11 @@ public class RestJob {
         this.mtdlParameters = mtdlParameters;
     }
 
-    public List<RestParametersForWrappers> getParametersForWrappers() {
-        return parametersForWrappers;
+    public List<RestParametersForAdapters> getParametersForAdapters() {
+        return parametersForAdapters;
     }
 
-    public void setParametersForWrappers(List<RestParametersForWrappers> parametersForWrappers) {
-        this.parametersForWrappers = parametersForWrappers;
+    public void setParametersForAdapters(List<RestParametersForAdapters> parametersForAdapters) {
+        this.parametersForAdapters = parametersForAdapters;
     }
 }

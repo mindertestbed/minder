@@ -62,7 +62,7 @@ public abstract class BuiltInAdapter extends Adapter implements IMinderClient, I
   }
 
   /**
-   * Built in wrappers won't fire signals. Instead, their results will be got through slot calls.
+   * Built in adapters won't fire signals. Instead, their results will be got through slot calls.
    *
    * @param obj
    * @param signalMethod

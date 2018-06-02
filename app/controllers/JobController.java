@@ -86,23 +86,23 @@ public class JobController extends Controller {
     model.visibility = Visibility.PROTECTED;
 
     //
-    initWrapperListForModel(tdl, model);
+    initAdapterListForModel(tdl, model);
 
     return ok(jobEditor.render(JOB_FORM.fill(model), authentication));
   }
 
   @AllowedRoles(Role.TEST_DESIGNER)
-  private void initWrapperListForModel(Tdl tdl, JobEditorModel model) {
-    model.wrapperMappingList = new ArrayList<>();
+  private void initAdapterListForModel(Tdl tdl, JobEditorModel model) {
+    model.adapterMappingList = new ArrayList<>();
 
-    for (WrapperParam parameter : tdl.parameters) {
-      model.wrapperMappingList.add(new MappedWrapperModel(null, parameter, null));
+    for (AdapterParam parameter : tdl.parameters) {
+      model.adapterMappingList.add(new MappedAdapterModel(null, parameter, null));
     }
 
-    Collections.sort(model.wrapperMappingList, new Comparator<MappedWrapperModel>() {
+    Collections.sort(model.adapterMappingList, new Comparator<MappedAdapterModel>() {
       @Override
-      public int compare(MappedWrapperModel o1, MappedWrapperModel o2) {
-        return o1.wrapperParam.name.compareTo(o2.wrapperParam.name);
+      public int compare(MappedAdapterModel o1, MappedAdapterModel o2) {
+        return o1.adapterParam.name.compareTo(o2.adapterParam.name);
       }
     });
   }
@@ -128,16 +128,16 @@ public class JobController extends Controller {
     }
 
     // check the parameters.
-    if (model.wrapperMappingList != null) {
-      for (MappedWrapperModel mappedWrapper : model.wrapperMappingList) {
-        if (mappedWrapper.wrapperVersion == null) {
+    if (model.adapterMappingList != null) {
+      for (MappedAdapterModel mappedAdapter : model.adapterMappingList) {
+        if (mappedAdapter.adapterVersion == null) {
           form.reject("You have to fill all parameters");
           return badRequest(jobEditor.render(form, authentication));
         }
       }
     } else {
       if (tdl.parameters.size() > 0) {
-        initWrapperListForModel(tdl, model);
+        initAdapterListForModel(tdl, model);
         form.reject("You have to fill all parameters");
         return badRequest(jobEditor.render(form, authentication));
       }
@@ -152,11 +152,11 @@ public class JobController extends Controller {
 
     try {
       Ebean.beginTransaction();
-      if (model.wrapperMappingList != null) {
-        for (MappedWrapperModel mappedWrapperModel : model.wrapperMappingList) {
-          MappedWrapper mw = new MappedWrapper();
-          mw.parameter = mappedWrapperModel.wrapperParam;
-          mw.wrapperVersion = mappedWrapperModel.wrapperVersion;
+      if (model.adapterMappingList != null) {
+        for (MappedAdapterModel mappedAdapterModel : model.adapterMappingList) {
+          MappedAdapter mw = new MappedAdapter();
+          mw.parameter = mappedAdapterModel.adapterParam;
+          mw.adapterVersion = mappedAdapterModel.adapterVersion;
           mw.job = job;
           mw.save();
         }
