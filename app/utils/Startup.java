@@ -98,7 +98,7 @@ public class Startup {
               }
 
               for (TestAsset asset : group.testAssets) {
-                FileInputStream fis = new FileInputStream("conf/initialdata/" + asset.name);
+                FileInputStream fis = new FileInputStream("conf/initialdata/assets/" + asset.name);
                 byte[] assetBytes = Utils.readStream(fis);
                 fis.close();
                 final String groupAssetRoot = "assets/_" + group.id + "/";

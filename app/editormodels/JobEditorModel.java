@@ -22,4 +22,6 @@ public class JobEditorModel {
   public String mtdlParameters;
 
   public Visibility visibility;
+
+  public Long reportTemplate;
 }

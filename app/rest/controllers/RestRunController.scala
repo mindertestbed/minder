@@ -77,7 +77,7 @@ class RestRunController @Inject()(implicit testQueueController: TestQueueControl
   private def createTestRunStatusResponse(testRun: TestRun, isActive: Boolean) = {
     val resp = new TestRunStatusResponse
     resp.setTestRunId(testRun.id);
-    resp.setLog(testRun.report)
+    resp.setLog(testRun.reportMetadata)
     if (testRun.date != null) {
       val c = new GregorianCalendar()
       c.setTime(testRun.date)

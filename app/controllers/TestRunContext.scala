@@ -1,7 +1,12 @@
 package controllers
 
+import java.nio.charset.StandardCharsets
 import java.util
 import java.util.Date
+import javax.xml.parsers.DocumentBuilderFactory
+import javax.xml.transform.{OutputKeys, TransformerFactory}
+import javax.xml.transform.dom.DOMSource
+import javax.xml.transform.stream.StreamResult
 
 import builtin.ReportGenerator
 import controllers.common.Utils
@@ -39,6 +44,7 @@ class TestRunContext(val testRun: TestRun, testRunFeeder: TestRunFeeder, testLog
   var MinderTDL: MinderTdl = null;
   val logStringBuilder = new StringBuilder;
   val reportLogBuilder = new StringBuilder;
+  val metadataMap = new util.LinkedHashMap[String, String]()
 
   /**
     * Assign this runnable in order to do one last job (set labels ...) before finishing this test run
@@ -73,17 +79,6 @@ class TestRunContext(val testRun: TestRun, testRunFeeder: TestRunFeeder, testLog
     mappedAdapter.adapterVersion.adapter = Adapter.findById(mappedAdapter.adapterVersion.adapter.id);
     variableAdapterMapping.put(mappedAdapter.parameter.name, mappedAdapter)
   }
-
-
-  val rg = new ReportGenerator {
-    override def getCurrentTestUserInfo: UserDTO = null
-
-    override def getSUTIdentifiers: SUTIdentifiers = null
-  }
-
-  rg.startTest()
-  rg.setReportTemplate(Source.fromInputStream(this.getClass.getResourceAsStream("/taReport.xml")).mkString.getBytes())
-  rg.setReportAuthor(user.name, user.email);
 
   describe(TestEngine.describe(cls))
 
@@ -147,10 +142,9 @@ class TestRunContext(val testRun: TestRun, testRunFeeder: TestRunFeeder, testLog
   }
 
   def updateRun(): Unit = {
-    rg.setTestDetails(testGroup, testAssertion, testCase, job, sutNames, reportLogBuilder.toString())
     testRun.finishDate = new Date();
     testRun.history.setSystemOutputLog(logStringBuilder.toString());
-    testRun.report = rg.generateReport();
+    testRun.reportMetadata = generateXMLMetadata(testRun.id);
     testRun.errorMessage = error.getBytes("utf-8");
     if (sutNames != null) {
       val sb = new StringBuilder()
@@ -197,5 +191,35 @@ class TestRunContext(val testRun: TestRun, testRunFeeder: TestRunFeeder, testLog
 
   def isSuspended(): Boolean = suspended
 
+
+  def addReportMetadata(key: String, value: String): Unit = {
+    metadataMap.put(key, value);
+  }
+
+  /**
+    * Convert the data in <code>metadataMap</code> to xml
+    */
+  def generateXMLMetadata(testRunId: Long): Array[Byte] = {
+
+    val document = DocumentBuilderFactory.newInstance().newDocumentBuilder().newDocument();
+
+    val root = document.createElement("reportMetadata")
+    root.setAttribute("testRunId", testRunId + "")
+    document.appendChild(root);
+
+    import java.io.StringWriter
+    val domSource = new DOMSource(document)
+    val transformer = TransformerFactory.newInstance.newTransformer
+    transformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "no")
+    transformer.setOutputProperty(OutputKeys.METHOD, "xml")
+    transformer.setOutputProperty(OutputKeys.ENCODING, "utf-8")
+    transformer.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", "2")
+    transformer.setOutputProperty(OutputKeys.INDENT, "yes")
+    val sw = new StringWriter
+    val sr = new StreamResult(sw)
+    transformer.transform(domSource, sr)
+    System.out.println(sw.toString)
+    sw.toString.getBytes(StandardCharsets.UTF_8)
+  }
 
 }

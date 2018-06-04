@@ -27,7 +27,7 @@ public class ReportTemplate extends Model {
   public User owner;
 
 
-  @Column(nullable = false)
+  @Column(nullable = false, length = ModelConstants._100K)
   public byte[] html;
 
 

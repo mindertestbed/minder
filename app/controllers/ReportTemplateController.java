@@ -23,6 +23,7 @@ import java.io.UnsupportedEncodingException;
 
 
 public class ReportTemplateController extends Controller {
+
   private final FormFactory formFactory;
   Authentication authentication;
   static String batchTemplate;
@@ -57,8 +58,9 @@ public class ReportTemplateController extends Controller {
   @AllowedRoles({Role.TEST_DESIGNER})
   public Result deleteReportTemplate(long reportTemplateId) {
     ReportTemplate byId = ReportTemplate.byId(reportTemplateId);
-    if (byId != null)
+    if (byId != null) {
       byId.delete();
+    }
 
     return ok();
   }
@@ -176,15 +178,31 @@ public class ReportTemplateController extends Controller {
 
   @AllowedRoles({Role.TEST_DESIGNER, Role.TEST_OBSERVER})
   public Result viewReportTemplateView(long id) {
-
-
-    ReportTemplate template = ReportTemplate.byId(id);
-
-    if (template == null)
-      return badRequest("Invalid report template id");
-
-    return ok(views.html.reportTemplates.viewReportTemplateView.render(template, authentication));
+    //FIXME: toooo bad practice using -1 for non registered objects
+    if (id == -1) {
+      return ok(singleTemplate).as("text/html");
+    } else {
+      ReportTemplate template = ReportTemplate.byId(id);
+      if (template == null) {
+        return badRequest("Invalid report template id");
+      }
+      return ok(views.html.reportTemplates.viewReportTemplateView.render(template, authentication));
+    }
   }
+
+  public Result preViewReportTemplateView(long id) {
+    //FIXME: toooo bad practice using -1 for non registered objects
+    if (id == -1) {
+      return ok(singleTemplate).as("text/html");
+    } else {
+      ReportTemplate template = ReportTemplate.byId(id);
+      if (template == null) {
+        return badRequest("Invalid report template id");
+      }
+      return ok(Util.gunzip(template.html)).as("text/html");
+    }
+  }
+
 
   @AllowedRoles({Role.TEST_DESIGNER})
   public Result editReportTemplateView(long reportTemplateId) {

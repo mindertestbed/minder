@@ -9,11 +9,13 @@ create table abstract_job (
   name                      varchar(255) not null,
   tdl_id                    bigint,
   owner_id                  bigint,
+  report_template_id        bigint,
   visibility                integer,
   mtdl_parameters           TEXT,
   test_group_id             bigint,
   test_suite_id             bigint,
   constraint ck_abstract_job_visibility check (visibility in (0,1,2)),
+  constraint uq_abstract_job_report_template_ unique (report_template_id),
   constraint pk_abstract_job primary key (id))
 ;
 
@@ -102,7 +104,7 @@ create table report_template (
   id                        bigint not null,
   name                      varchar(255) not null,
   owner_id                  bigint,
-  html                      varbinary(255) not null,
+  html                      varbinary(102400) not null,
   number                    integer,
   is_batch_report           boolean,
   test_group_id             bigint,
@@ -201,7 +203,7 @@ create table TestRun (
   finishdate                timestamp,
   runner_id                 bigint,
   history_id                bigint,
-  report                    varbinary(40960),
+  report_metadata           varbinary(40960),
   sut_names                 TEXT,
   status                    integer not null,
   number                    integer,
@@ -336,80 +338,82 @@ alter table abstract_job add constraint fk_abstract_job_tdl_1 foreign key (tdl_i
 create index ix_abstract_job_tdl_1 on abstract_job (tdl_id);
 alter table abstract_job add constraint fk_abstract_job_owner_2 foreign key (owner_id) references Users (id) on delete restrict on update restrict;
 create index ix_abstract_job_owner_2 on abstract_job (owner_id);
-alter table abstract_job add constraint fk_abstract_job_testGroup_3 foreign key (test_group_id) references TestGroup (id) on delete restrict on update restrict;
-create index ix_abstract_job_testGroup_3 on abstract_job (test_group_id);
-alter table abstract_job add constraint fk_abstract_job_testSuite_4 foreign key (test_suite_id) references TestSuite (id) on delete restrict on update restrict;
-create index ix_abstract_job_testSuite_4 on abstract_job (test_suite_id);
-alter table Adapter add constraint fk_Adapter_user_5 foreign key (user_id) references Users (id) on delete restrict on update restrict;
-create index ix_Adapter_user_5 on Adapter (user_id);
-alter table AdapterParam add constraint fk_AdapterParam_tdl_6 foreign key (tdl_id) references Tdl (id) on delete restrict on update restrict;
-create index ix_AdapterParam_tdl_6 on AdapterParam (tdl_id);
-alter table AdapterVersion add constraint fk_AdapterVersion_adapter_7 foreign key (adapter_id) references Adapter (id) on delete restrict on update restrict;
-create index ix_AdapterVersion_adapter_7 on AdapterVersion (adapter_id);
-alter table dbrole add constraint fk_dbrole_user_8 foreign key (user_id) references Users (id) on delete restrict on update restrict;
-create index ix_dbrole_user_8 on dbrole (user_id);
-alter table GitbEndpoint add constraint fk_GitbEndpoint_AdapterVersion_9 foreign key (adapter_version_id) references AdapterVersion (id) on delete restrict on update restrict;
-create index ix_GitbEndpoint_AdapterVersion_9 on GitbEndpoint (adapter_version_id);
-alter table GitbParameter add constraint fk_GitbParameter_GitbEndpoint_10 foreign key (gitb_endpoint_id) references GitbEndpoint (id) on delete restrict on update restrict;
-create index ix_GitbParameter_GitbEndpoint_10 on GitbParameter (gitb_endpoint_id);
-alter table job_schedule add constraint fk_job_schedule_testGroup_11 foreign key (test_group_id) references TestGroup (id) on delete restrict on update restrict;
-create index ix_job_schedule_testGroup_11 on job_schedule (test_group_id);
-alter table job_schedule add constraint fk_job_schedule_owner_12 foreign key (owner_id) references Users (id) on delete restrict on update restrict;
-create index ix_job_schedule_owner_12 on job_schedule (owner_id);
-alter table job_schedule add constraint fk_job_schedule_nextJob_13 foreign key (next_job_id) references job_schedule (id) on delete restrict on update restrict;
-create index ix_job_schedule_nextJob_13 on job_schedule (next_job_id);
-alter table MappedAdapter add constraint fk_MappedAdapter_parameter_14 foreign key (parameter_id) references AdapterParam (id) on delete restrict on update restrict;
-create index ix_MappedAdapter_parameter_14 on MappedAdapter (parameter_id);
-alter table MappedAdapter add constraint fk_MappedAdapter_adapterVersi_15 foreign key (adapter_version_id) references AdapterVersion (id) on delete restrict on update restrict;
-create index ix_MappedAdapter_adapterVersi_15 on MappedAdapter (adapter_version_id);
-alter table MappedAdapter add constraint fk_MappedAdapter_job_16 foreign key (job_id) references abstract_job (id) on delete restrict on update restrict;
-create index ix_MappedAdapter_job_16 on MappedAdapter (job_id);
-alter table ParamSignature add constraint fk_ParamSignature_adapterPara_17 foreign key (adapter_param_id) references AdapterParam (id) on delete restrict on update restrict;
-create index ix_ParamSignature_adapterPara_17 on ParamSignature (adapter_param_id);
-alter table report_template add constraint fk_report_template_owner_18 foreign key (owner_id) references Users (id) on delete restrict on update restrict;
-create index ix_report_template_owner_18 on report_template (owner_id);
-alter table report_template add constraint fk_report_template_testGroup_19 foreign key (test_group_id) references TestGroup (id) on delete restrict on update restrict;
-create index ix_report_template_testGroup_19 on report_template (test_group_id);
-alter table SuiteRun add constraint fk_SuiteRun_testSuite_20 foreign key (test_suite_id) references TestSuite (id) on delete restrict on update restrict;
-create index ix_SuiteRun_testSuite_20 on SuiteRun (test_suite_id);
-alter table SuiteRun add constraint fk_SuiteRun_runner_21 foreign key (runner_id) references Users (id) on delete restrict on update restrict;
-create index ix_SuiteRun_runner_21 on SuiteRun (runner_id);
-alter table TSignal add constraint fk_TSignal_adapterVersion_22 foreign key (adapter_version_id) references AdapterVersion (id) on delete restrict on update restrict;
-create index ix_TSignal_adapterVersion_22 on TSignal (adapter_version_id);
-alter table TSlot add constraint fk_TSlot_adapterVersion_23 foreign key (adapter_version_id) references AdapterVersion (id) on delete restrict on update restrict;
-create index ix_TSlot_adapterVersion_23 on TSlot (adapter_version_id);
-alter table Tdl add constraint fk_Tdl_testCase_24 foreign key (test_case_id) references TestCase (id) on delete restrict on update restrict;
-create index ix_Tdl_testCase_24 on Tdl (test_case_id);
-alter table TestAssertion add constraint fk_TestAssertion_testGroup_25 foreign key (test_group_id) references TestGroup (id) on delete restrict on update restrict;
-create index ix_TestAssertion_testGroup_25 on TestAssertion (test_group_id);
-alter table TestAssertion add constraint fk_TestAssertion_owner_26 foreign key (owner_id) references Users (id) on delete restrict on update restrict;
-create index ix_TestAssertion_owner_26 on TestAssertion (owner_id);
-alter table TestAsset add constraint fk_TestAsset_testGroup_27 foreign key (test_group_id) references TestGroup (id) on delete restrict on update restrict;
-create index ix_TestAsset_testGroup_27 on TestAsset (test_group_id);
-alter table TestCase add constraint fk_TestCase_testAssertion_28 foreign key (test_assertion_id) references TestAssertion (id) on delete restrict on update restrict;
-create index ix_TestCase_testAssertion_28 on TestCase (test_assertion_id);
-alter table TestCase add constraint fk_TestCase_owner_29 foreign key (owner_id) references Users (id) on delete restrict on update restrict;
-create index ix_TestCase_owner_29 on TestCase (owner_id);
-alter table TestGroup add constraint fk_TestGroup_owner_30 foreign key (owner_id) references Users (id) on delete restrict on update restrict;
-create index ix_TestGroup_owner_30 on TestGroup (owner_id);
-alter table TestRun add constraint fk_TestRun_job_31 foreign key (job_id) references abstract_job (id) on delete restrict on update restrict;
-create index ix_TestRun_job_31 on TestRun (job_id);
-alter table TestRun add constraint fk_TestRun_suiteRun_32 foreign key (suite_run_id) references SuiteRun (id) on delete restrict on update restrict;
-create index ix_TestRun_suiteRun_32 on TestRun (suite_run_id);
-alter table TestRun add constraint fk_TestRun_runner_33 foreign key (runner_id) references Users (id) on delete restrict on update restrict;
-create index ix_TestRun_runner_33 on TestRun (runner_id);
-alter table TestRun add constraint fk_TestRun_history_34 foreign key (history_id) references UserHistory (id) on delete restrict on update restrict;
-create index ix_TestRun_history_34 on TestRun (history_id);
-alter table TestSuite add constraint fk_TestSuite_testGroup_35 foreign key (test_group_id) references TestGroup (id) on delete restrict on update restrict;
-create index ix_TestSuite_testGroup_35 on TestSuite (test_group_id);
-alter table TestSuite add constraint fk_TestSuite_owner_36 foreign key (owner_id) references Users (id) on delete restrict on update restrict;
-create index ix_TestSuite_owner_36 on TestSuite (owner_id);
-alter table UserAuthentication add constraint fk_UserAuthentication_user_37 foreign key (user_id) references Users (id) on delete restrict on update restrict;
-create index ix_UserAuthentication_user_37 on UserAuthentication (user_id);
-alter table UtilClass add constraint fk_UtilClass_testGroup_38 foreign key (test_group_id) references TestGroup (id) on delete restrict on update restrict;
-create index ix_UtilClass_testGroup_38 on UtilClass (test_group_id);
-alter table UtilClass add constraint fk_UtilClass_owner_39 foreign key (owner_id) references Users (id) on delete restrict on update restrict;
-create index ix_UtilClass_owner_39 on UtilClass (owner_id);
+alter table abstract_job add constraint fk_abstract_job_reportTemplate_3 foreign key (report_template_id) references report_template (id) on delete restrict on update restrict;
+create index ix_abstract_job_reportTemplate_3 on abstract_job (report_template_id);
+alter table abstract_job add constraint fk_abstract_job_testGroup_4 foreign key (test_group_id) references TestGroup (id) on delete restrict on update restrict;
+create index ix_abstract_job_testGroup_4 on abstract_job (test_group_id);
+alter table abstract_job add constraint fk_abstract_job_testSuite_5 foreign key (test_suite_id) references TestSuite (id) on delete restrict on update restrict;
+create index ix_abstract_job_testSuite_5 on abstract_job (test_suite_id);
+alter table Adapter add constraint fk_Adapter_user_6 foreign key (user_id) references Users (id) on delete restrict on update restrict;
+create index ix_Adapter_user_6 on Adapter (user_id);
+alter table AdapterParam add constraint fk_AdapterParam_tdl_7 foreign key (tdl_id) references Tdl (id) on delete restrict on update restrict;
+create index ix_AdapterParam_tdl_7 on AdapterParam (tdl_id);
+alter table AdapterVersion add constraint fk_AdapterVersion_adapter_8 foreign key (adapter_id) references Adapter (id) on delete restrict on update restrict;
+create index ix_AdapterVersion_adapter_8 on AdapterVersion (adapter_id);
+alter table dbrole add constraint fk_dbrole_user_9 foreign key (user_id) references Users (id) on delete restrict on update restrict;
+create index ix_dbrole_user_9 on dbrole (user_id);
+alter table GitbEndpoint add constraint fk_GitbEndpoint_AdapterVersio_10 foreign key (adapter_version_id) references AdapterVersion (id) on delete restrict on update restrict;
+create index ix_GitbEndpoint_AdapterVersio_10 on GitbEndpoint (adapter_version_id);
+alter table GitbParameter add constraint fk_GitbParameter_GitbEndpoint_11 foreign key (gitb_endpoint_id) references GitbEndpoint (id) on delete restrict on update restrict;
+create index ix_GitbParameter_GitbEndpoint_11 on GitbParameter (gitb_endpoint_id);
+alter table job_schedule add constraint fk_job_schedule_testGroup_12 foreign key (test_group_id) references TestGroup (id) on delete restrict on update restrict;
+create index ix_job_schedule_testGroup_12 on job_schedule (test_group_id);
+alter table job_schedule add constraint fk_job_schedule_owner_13 foreign key (owner_id) references Users (id) on delete restrict on update restrict;
+create index ix_job_schedule_owner_13 on job_schedule (owner_id);
+alter table job_schedule add constraint fk_job_schedule_nextJob_14 foreign key (next_job_id) references job_schedule (id) on delete restrict on update restrict;
+create index ix_job_schedule_nextJob_14 on job_schedule (next_job_id);
+alter table MappedAdapter add constraint fk_MappedAdapter_parameter_15 foreign key (parameter_id) references AdapterParam (id) on delete restrict on update restrict;
+create index ix_MappedAdapter_parameter_15 on MappedAdapter (parameter_id);
+alter table MappedAdapter add constraint fk_MappedAdapter_adapterVersi_16 foreign key (adapter_version_id) references AdapterVersion (id) on delete restrict on update restrict;
+create index ix_MappedAdapter_adapterVersi_16 on MappedAdapter (adapter_version_id);
+alter table MappedAdapter add constraint fk_MappedAdapter_job_17 foreign key (job_id) references abstract_job (id) on delete restrict on update restrict;
+create index ix_MappedAdapter_job_17 on MappedAdapter (job_id);
+alter table ParamSignature add constraint fk_ParamSignature_adapterPara_18 foreign key (adapter_param_id) references AdapterParam (id) on delete restrict on update restrict;
+create index ix_ParamSignature_adapterPara_18 on ParamSignature (adapter_param_id);
+alter table report_template add constraint fk_report_template_owner_19 foreign key (owner_id) references Users (id) on delete restrict on update restrict;
+create index ix_report_template_owner_19 on report_template (owner_id);
+alter table report_template add constraint fk_report_template_testGroup_20 foreign key (test_group_id) references TestGroup (id) on delete restrict on update restrict;
+create index ix_report_template_testGroup_20 on report_template (test_group_id);
+alter table SuiteRun add constraint fk_SuiteRun_testSuite_21 foreign key (test_suite_id) references TestSuite (id) on delete restrict on update restrict;
+create index ix_SuiteRun_testSuite_21 on SuiteRun (test_suite_id);
+alter table SuiteRun add constraint fk_SuiteRun_runner_22 foreign key (runner_id) references Users (id) on delete restrict on update restrict;
+create index ix_SuiteRun_runner_22 on SuiteRun (runner_id);
+alter table TSignal add constraint fk_TSignal_adapterVersion_23 foreign key (adapter_version_id) references AdapterVersion (id) on delete restrict on update restrict;
+create index ix_TSignal_adapterVersion_23 on TSignal (adapter_version_id);
+alter table TSlot add constraint fk_TSlot_adapterVersion_24 foreign key (adapter_version_id) references AdapterVersion (id) on delete restrict on update restrict;
+create index ix_TSlot_adapterVersion_24 on TSlot (adapter_version_id);
+alter table Tdl add constraint fk_Tdl_testCase_25 foreign key (test_case_id) references TestCase (id) on delete restrict on update restrict;
+create index ix_Tdl_testCase_25 on Tdl (test_case_id);
+alter table TestAssertion add constraint fk_TestAssertion_testGroup_26 foreign key (test_group_id) references TestGroup (id) on delete restrict on update restrict;
+create index ix_TestAssertion_testGroup_26 on TestAssertion (test_group_id);
+alter table TestAssertion add constraint fk_TestAssertion_owner_27 foreign key (owner_id) references Users (id) on delete restrict on update restrict;
+create index ix_TestAssertion_owner_27 on TestAssertion (owner_id);
+alter table TestAsset add constraint fk_TestAsset_testGroup_28 foreign key (test_group_id) references TestGroup (id) on delete restrict on update restrict;
+create index ix_TestAsset_testGroup_28 on TestAsset (test_group_id);
+alter table TestCase add constraint fk_TestCase_testAssertion_29 foreign key (test_assertion_id) references TestAssertion (id) on delete restrict on update restrict;
+create index ix_TestCase_testAssertion_29 on TestCase (test_assertion_id);
+alter table TestCase add constraint fk_TestCase_owner_30 foreign key (owner_id) references Users (id) on delete restrict on update restrict;
+create index ix_TestCase_owner_30 on TestCase (owner_id);
+alter table TestGroup add constraint fk_TestGroup_owner_31 foreign key (owner_id) references Users (id) on delete restrict on update restrict;
+create index ix_TestGroup_owner_31 on TestGroup (owner_id);
+alter table TestRun add constraint fk_TestRun_job_32 foreign key (job_id) references abstract_job (id) on delete restrict on update restrict;
+create index ix_TestRun_job_32 on TestRun (job_id);
+alter table TestRun add constraint fk_TestRun_suiteRun_33 foreign key (suite_run_id) references SuiteRun (id) on delete restrict on update restrict;
+create index ix_TestRun_suiteRun_33 on TestRun (suite_run_id);
+alter table TestRun add constraint fk_TestRun_runner_34 foreign key (runner_id) references Users (id) on delete restrict on update restrict;
+create index ix_TestRun_runner_34 on TestRun (runner_id);
+alter table TestRun add constraint fk_TestRun_history_35 foreign key (history_id) references UserHistory (id) on delete restrict on update restrict;
+create index ix_TestRun_history_35 on TestRun (history_id);
+alter table TestSuite add constraint fk_TestSuite_testGroup_36 foreign key (test_group_id) references TestGroup (id) on delete restrict on update restrict;
+create index ix_TestSuite_testGroup_36 on TestSuite (test_group_id);
+alter table TestSuite add constraint fk_TestSuite_owner_37 foreign key (owner_id) references Users (id) on delete restrict on update restrict;
+create index ix_TestSuite_owner_37 on TestSuite (owner_id);
+alter table UserAuthentication add constraint fk_UserAuthentication_user_38 foreign key (user_id) references Users (id) on delete restrict on update restrict;
+create index ix_UserAuthentication_user_38 on UserAuthentication (user_id);
+alter table UtilClass add constraint fk_UtilClass_testGroup_39 foreign key (test_group_id) references TestGroup (id) on delete restrict on update restrict;
+create index ix_UtilClass_testGroup_39 on UtilClass (test_group_id);
+alter table UtilClass add constraint fk_UtilClass_owner_40 foreign key (owner_id) references Users (id) on delete restrict on update restrict;
+create index ix_UtilClass_owner_40 on UtilClass (owner_id);
 
 
 

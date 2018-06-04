@@ -21,4 +21,6 @@ trait TestProcessWatcher {
   def addReportLog(s: String): Unit
 
   def failed(message: String, t: Throwable): Unit
+
+  def addReportMetadata(key: String, value: String) : Unit
 }

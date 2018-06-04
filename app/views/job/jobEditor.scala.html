@@ -1,12 +1,19 @@
 @import views.html.helper._
 @import views.html.util._
 @import minderengine.Visibility
+@import authentication._
 @(frm: Form[_])(implicit authentication: Authentication)
 
 @implicitFieldConstructor = @{
   FieldConstructor(twitterBootstrapBasic.f)
 }
 
+@tdl = @{
+  Tdl.findById(frm("tdlID").value.toLong)
+}
+@testGroup = @{
+  tdl.testCase.testAssertion.testGroup
+}
 
 @main(Messages("minder.navigation.restricted.testdesigner"), "mainNavigation") {
 
@@ -14,8 +21,8 @@
     @dialogs()
 
     <script>
-        $(function(){
-          $( "#rc1@{frm("id").value}" ).tabs();
+        $(function () {
+          $("#rc1@{frm("id").value}").tabs();
         });
     </script>
 
@@ -36,29 +43,53 @@
                 @formChecker(frm("name"))
               </td>
               </tr>
-              <tr><td>
-                Parameters:</td><td><textarea name="mtdlParameters" rows="5">@frm("mtdlParameters").value()</textarea></td></tr>
+              <tr>
+                <td>Parameters:</td>
+                <td><textarea name="mtdlParameters" rows="5">@frm("mtdlParameters").value()</textarea></td>
+              </tr>
+              <tr>
+                <td>Associated Report Template:</td>
+                <td>
+                @defining(ReportTemplate.findByGroup(testGroup)) { list =>
+                  @if(list.size() == 0) {
+                    @subjectHasRole(security.Role.TEST_DESIGNER) {
+                      @createLinkButton(controllers.routes.ReportTemplateController.createReportTemplateView(testGroup.id).url,
+                        Messages("reportTemplates.createReportTemplate"))
+                      <br />
+                      <br />
+                    }
+                  } else {
+                    <select id="reportTemplate" name="reportTemplate" >
+                      <option value="-1">Default</option>
+                    @for(template <- list) {
+                      <option value="@template.id">@template.name</option>
+                    }
+                    </select>
+                  }
+                }
+                </td>
+              </tr>
             </table>
           </div>
           <div class="col-md-6">
             <table class="topCells paddedTable noWrap formInput">
-                @repeat(frm("adapterMappingList"), min = 0) { field =>
-                  @defining(field.value.get) { str =>
-                    @defining(MappedAdapterModel.parse(str)) { entry =>
-                      <tr><td>
-                        <label for="@field.name" class="control-label">@entry.adapterParam.name</label>:
-                      </td><td><select id="@entry.adapterParam.id" name="@field.name" style="width:200px ;">
-                      @for(adapterVersion <- utils.Util.listCandidateAdapters(entry)) {
-                        <option value="@entry.toJsonWith(adapterVersion)"
-                          @if(entry.adapterVersion == adapterVersion) {
-                            selected="selected" }>@{
-                          adapterVersion.adapter.name + " (" + adapterVersion.version + ")"
-                        }</option>
-                      }
-                      </select><br /></td></tr>
+              @repeat(frm("adapterMappingList"), min = 0) { field =>
+                @defining(field.value.get) { str =>
+                  @defining(MappedAdapterModel.parse(str)) { entry =>
+                    <tr><td>
+                      <label for="@field.name" class="control-label">@entry.adapterParam.name</label>:
+                    </td><td><select id="@entry.adapterParam.id" name="@field.name" style="width: 200px ;">
+                    @for(adapterVersion <- utils.Util.listCandidateAdapters(entry)) {
+                      <option value="@entry.toJsonWith(adapterVersion)"
+                        @if(entry.adapterVersion == adapterVersion) {
+                          selected="selected" }>@{
+                        adapterVersion.adapter.name + " (" + adapterVersion.version + ")"
+                      }</option>
                     }
+                    </select><br /></td></tr>
                   }
                 }
+              }
               <tr><td>Visibility:</td><td>
                 <select id="visibility" name="visibility" >
                 @for(vis <- Visibility.values()) {
@@ -77,7 +108,7 @@
       <div align="center">
         <button type="submit" class="btn btn-success btn-sm">Create</button> &nbsp;
         <button type="reset" class="btn btn-primary btn-sm">Reset</button> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-        <button type="button" onclick="history.back ( )" class="btn btn-warning btn-sm">Cancel</button>
+        <button type="button" onclick="history.back()" class="btn btn-warning btn-sm">Cancel</button>
 
         <input type="hidden" name="id" id="id" value='@frm("id").value'/>
         <input type="hidden" name="tdlID" id="tdlID" value='@frm("tdlID").value'/>

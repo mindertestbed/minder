@@ -1,8 +1,8 @@
-organization := "gov.tubitak.minder"
+organization := "com.yerlibilgin.minder"
 
 name := """minder"""
 
-version := "2.2.7-Alpha-02"
+version := "2.2.8"
 
 lazy val minder = (project in file(".")).enablePlugins(PlayJava, PlayEbean)
 

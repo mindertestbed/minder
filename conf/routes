@@ -86,6 +86,7 @@ GET         /createJobTemplateForm                         controllers.JobTempla
 POST        /doCreateReportTemplate                        controllers.ReportTemplateController.doCreateReportTemplate()
 POST        /doEditReportTemplate                          controllers.ReportTemplateController.doEditReportTemplate()
 GET         /viewReportTemplateView                        controllers.ReportTemplateController.viewReportTemplateView(id: Long)
+GET         /preViewReportTemplateView                     controllers.ReportTemplateController.preViewReportTemplateView(id: Long)
 GET         /createReportTemplateView                      controllers.ReportTemplateController.createReportTemplateView(groupId: Long)
 GET         /editReportTemplateView                        controllers.ReportTemplateController.editReportTemplateView(reportTemplateId: Long)
 GET         /deleteReportTemplate                          controllers.ReportTemplateController.deleteReportTemplate(reportTemplateId: Long)

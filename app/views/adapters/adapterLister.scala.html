@@ -1,0 +1,100 @@
+@import minderengine.MinderAdapterRegistry
+@import views.html.util._
+@import views.html.authentication._
+
+<script>
+  $(function() {
+    $( document ).tooltip();
+  });
+  </script>
+
+<h3>Adapters</h3>
+
+@subjectHasRole(security.Role.TEST_DESIGNER) {
+  @createButton("Create New Adapter", "glyphicon-plus", "btn-primary") {
+    createFormDialog(
+    "@controllers.routes.AdapterController.createNewAdapterForm()", //form url
+    "/doCreateAdapter", //action url
+    "Create New Adapter",
+    $("#adapterLister"))
+  }
+  <br />
+  <br />
+}
+
+@defining(Authentication.getLocalUser(session())) { localUser =>
+  <table class="table table-hover table-condensed  table-striped ">
+    <tr><th>Adapter Name</th><th>Creator</th><th>Short Description</th><th>Version</th><th>Status</th><th></th></tr>
+    @for(currentAdapter <- Adapter.getAll()) {
+      @defining(AdapterVersion.getAllByAdapter(currentAdapter)) { versionList =>
+        @if(versionList == null || versionList.isEmpty) {
+          <tr>
+            <td>@currentAdapter.name</td>
+            <td>@currentAdapter.user.email</td>
+            <td style="max-width: 200px ;">@currentAdapter.shortDescription</td>
+            <td>NA</td><td style="text-align: center"><img src="@routes.Assets.versioned("/images/Pc_Offline.png")"/></td>
+            @subjectIs(currentAdapter.user) {
+              <td style="width:3% ;" align="center" valign="middle" >
+                <table><tr><td>
+                @createButton("", "glyphicon-pencil", "btn-default") {
+                  createFormDialog(
+                  "@controllers.routes.AdapterController.editAdapterForm(currentAdapter.id)", //form url
+                  "@controllers.routes.AdapterController.doEditAdapter()", //action url
+                  "Edit Adapter",
+                  $("#adapterLister"))
+                }
+                </td><td>
+                @createButton("", "glyphicon-trash", "btn-default") {
+                  deleteWithDialog(
+                  "@controllers.routes.AdapterController.doDeleteAdapter(currentAdapter.id)", //form url
+                  $("#dialog-confirm"),
+                  "Delete Adapter", "adapter", "@currentAdapter.name",
+                  $("#adapterLister"))
+                }
+                </td></tr></table>
+              </td>
+            }
+          </tr>
+        } else {
+          @for(adapterVersion <- versionList) {
+            <tr>
+              <td>@currentAdapter.name</td>
+              <td>@currentAdapter.user.email</td>
+              <td style="max-width: 200px ;">@currentAdapter.shortDescription</td>
+              <td>@adapterVersion.version</td> <td style="text-align: center">
+
+            @if(MinderAdapterRegistry.get().isAdapterAvailable(adapterVersion)) {
+              <img src="@routes.Assets.versioned("/images/Pc_Online.png")"/>
+            } else {
+              <img src="@routes.Assets.versioned("/images/Pc_Offline.png")"/>
+            }
+
+            </td>
+              @subjectIs(currentAdapter.user) {
+                <td style="width:3% ;" align="center" valign="middle" >
+                  <table><tr><td>
+                  @createButton("", "glyphicon-pencil", "btn-default") {
+                    createFormDialog(
+                    "@controllers.routes.AdapterController.editAdapterForm(currentAdapter.id)", //form url
+                    "@controllers.routes.AdapterController.doEditAdapter()", //action url
+                    "Edit Adapter",
+                    $("#adapterLister"))
+                  }
+                  </td><td>
+                  @createButton("", "glyphicon-trash", "btn-default") {
+                    deleteWithDialog(
+                    "@controllers.routes.AdapterController.doDeleteAdapterVersion(adapterVersion.id)", //form url
+                    $("#dialog-confirm"),
+                    "Delete Adapter", "adapter", "@currentAdapter.name",
+                    $("#adapterLister"))
+                  }
+                  </td></tr></table>
+                </td>
+              }
+            </tr>
+          }
+        }
+      }
+    }
+  </table>
+}

@@ -32,6 +32,7 @@ import javax.inject.Inject;
  * Created by yerlibilgin on 03/05/15.
  */
 public class JobController extends Controller {
+
   Authentication authentication;
   public final Form<JobEditorModel> JOB_FORM;
 
@@ -60,8 +61,9 @@ public class JobController extends Controller {
     Tdl tdl = Tdl.findById(tdlId);
     tdl.testCase = TestCase.findById(tdl.testCase.id);
 
-    if (tdl == null)
+    if (tdl == null) {
       return badRequest("No TDL definition found with id " + tdl);
+    }
 
     int max = 0;
 
@@ -73,8 +75,9 @@ public class JobController extends Controller {
               job.name.lastIndexOf('(') + 1,
               job.name.lastIndexOf(')')));
 
-          if (max < val)
+          if (max < val) {
             max = val;
+          }
         }
       }
     }
@@ -149,6 +152,7 @@ public class JobController extends Controller {
     job.tdl = tdl;
     job.visibility = model.visibility;
     job.owner = authentication.getLocalUser();
+    job.reportTemplate = ReportTemplate.byId(model.reportTemplate);
 
     try {
       Ebean.beginTransaction();
@@ -186,10 +190,9 @@ public class JobController extends Controller {
           + " does not exist.");
     }
 
-
-    if (!Util.canAccess(authentication.getLocalUser(), rc.owner))
+    if (!Util.canAccess(authentication.getLocalUser(), rc.owner)) {
       return unauthorized("You don't have permission to modify this resource");
-
+    }
 
     try {
       rc.delete();
@@ -212,10 +215,11 @@ public class JobController extends Controller {
       return badRequest("A Job with id [" + id + "] was not found");
     }
 
-    if (Util.canAccess(localUser, rc.owner, rc.visibility))
+    if (Util.canAccess(localUser, rc.owner, rc.visibility)) {
       return ok(views.html.job.jobDetailView.render(rc, showHistory, localUser, authentication));
-    else
+    } else {
       return unauthorized("You can't see this resource");
+    }
   }
 
   @AllowedRoles({Role.TEST_DESIGNER, Role.TEST_DEVELOPER, Role.TEST_OBSERVER})
@@ -236,8 +240,9 @@ public class JobController extends Controller {
   @AllowedRoles({Role.TEST_DESIGNER, Role.TEST_DEVELOPER, Role.TEST_OBSERVER})
   public Result viewReport(Long testRunId, String type) {
     TestRun tr = TestRun.findById(testRunId);
-    if (tr == null)
+    if (tr == null) {
       return badRequest("A test run with id " + testRunId + " was not found");
+    }
 
     final User localUser = authentication.getLocalUser();
     if (Util.canAccess(localUser, tr.runner, tr.visibility)) {
@@ -256,8 +261,9 @@ public class JobController extends Controller {
   @AllowedRoles(Role.TEST_DESIGNER)
   public Result changeTestRunVisibility(long id, String visibility) {
     TestRun tr = TestRun.findById(id);
-    if (tr == null)
+    if (tr == null) {
       return badRequest("A test run with id " + id + " was not found");
+    }
 
     final User localUser = authentication.getLocalUser();
     if (Util.canAccess(localUser, tr.runner, tr.visibility)) {
@@ -272,8 +278,9 @@ public class JobController extends Controller {
   @AllowedRoles(Role.TEST_DESIGNER)
   public Result changeJobVisibility(long id, String visibility) {
     Job job = Job.findById(id);
-    if (job == null)
+    if (job == null) {
       return badRequest("A job with id " + id + " was not found");
+    }
 
     System.out.println(visibility);
     final User localUser = authentication.getLocalUser();

@@ -1,0 +1,12 @@
+@import views.html.util._
+
+@()(implicit authentication: Authentication)
+
+@main("Adapters", "adapters", "") {
+  <div class="padabit">
+    @dialogs()
+    <div id="adapterLister" style="padding:0px ;">
+    @adapterLister()
+    </div>
+  </div>
+}

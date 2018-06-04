@@ -120,7 +120,7 @@ class TestEngine @Inject()(implicit testQueueController: Provider[TestQueueContr
 
         identifierMinderClientMap = mapAllTransitiveAdapters(adapterMapping)
 
-        initializeFunctionsAndParameters(params, lgr)
+        initializeFunctionsAndParameters(params, lgr, testRunContext)
 
         if (!testRunContext.isSuspended()) {
           val sutNameSet = new util.HashSet[String]
@@ -349,9 +349,13 @@ class TestEngine @Inject()(implicit testQueueController: Provider[TestQueueContr
     }
   }
 
-  private def initializeFunctionsAndParameters(params: String, lgr: org.apache.log4j.Logger): Unit = {
+  private def initializeFunctionsAndParameters(params: String, lgr: org.apache.log4j.Logger, testRunContext: TestRunContext): Unit = {
     lgr.debug("Parameters")
     lgr.debug(params)
+
+    //Redirect all the logging functions to the log4j logger.
+    //fixme: change the logger with SLF4J.
+
     minderTDL.debug = (any: Any) => {
       lgr.debug(any)
     }
@@ -367,8 +371,15 @@ class TestEngine @Inject()(implicit testQueueController: Provider[TestQueueContr
     minderTDL.error = (any: Any) => {
       lgr.error(any)
     }
+
     minderTDL.errorThrowable = (any: Any, th: Throwable) => {
       lgr.error(any, th)
+    }
+
+    //the report metadata provided by the script is redirected
+    //to the test run context which serializes it to the database.
+    minderTDL.addReportMetadata = (key: String, value: String) => {
+      testRunContext.addReportMetadata(key, value)
     }
 
     minderTDL.setParams(params);

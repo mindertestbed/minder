@@ -96,7 +96,16 @@ public class ReportUtils {
   public static byte[] toPdf(TestRun tr) {
     LOGGER.debug("Create PDF from test run " + tr.id);
     try {
-      String html = fillTestRun(tr, singleTestRunTemplate);
+
+      String template;
+      if (tr.job.reportTemplate != null){
+        template = new String(Util.gunzip(tr.job.reportTemplate.html));
+      } else {
+        template = singleTestRunTemplate;
+      }
+
+      System.out.println("TEMPLATE: " + template);
+      String html = fillTestRun(tr, template);
       ByteArrayOutputStream baos = new ByteArrayOutputStream();
       Document document = new Document();
       PdfWriter writer = PdfWriter.getInstance(document, baos);
@@ -169,12 +178,8 @@ public class ReportUtils {
   }
 
 
-  static final Comparator<TestRun> comparator = new Comparator<TestRun>() {
-    @Override
-    public int compare(TestRun o1, TestRun o2) {
-      return o1.job.tdl.testCase.testAssertion.taId.compareToIgnoreCase(o2.job.tdl.testCase.testAssertion.taId);
-    }
-  };
+  static final Comparator<TestRun> comparator = (o1, o2) ->
+      o1.job.tdl.testCase.testAssertion.taId.compareToIgnoreCase(o2.job.tdl.testCase.testAssertion.taId);
 
   public static byte[] toPdf(List<TestRun> testRuns, String subTitle) throws Exception {
 

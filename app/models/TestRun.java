@@ -39,7 +39,7 @@ public class TestRun extends Model {
   public UserHistory history;
 
   @Column(length = ModelConstants.REPORT_LENGTH)
-  public byte[] report;
+  public byte[] reportMetadata;
 
   @Column(length = ModelConstants.LOG_LENGTH, columnDefinition = "TEXT")
   public String sutNames;

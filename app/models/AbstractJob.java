@@ -37,6 +37,9 @@ public abstract class AbstractJob extends Model {
   @Column(nullable = false)
   public User owner;
 
+  @OneToOne
+  public ReportTemplate reportTemplate;
+
   public Visibility visibility;
 
   @Column(length = ModelConstants.DESCRIPTION_LENGTH, columnDefinition = "TEXT")

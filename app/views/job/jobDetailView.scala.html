@@ -2,7 +2,7 @@
 @import views.html.util._
 @(job: Job, showHistory: Boolean = true, localUser: models.User = null)(implicit authentication: Authentication)
 
-  @main(Messages("minder.navigation.restricted.testdesigner"), "testGroups",
+@main(Messages("minder.navigation.restricted.testdesigner"), "testGroups",
   Array(("Test Groups", controllers.routes.Application.testGroups().path()),
     (job.tdl.testCase.testAssertion.testGroup.name, controllers.routes.GroupController.getGroupDetailView(job.tdl.testCase.testAssertion.testGroup.id, "assertions").path()),
     (job.tdl.testCase.testAssertion.taId, controllers.routes.TestAssertionController.getAssertionDetailView(job.tdl.testCase.testAssertion.id, "cases").path()),
@@ -15,16 +15,16 @@
     @jobEnqueueDialog()
 
     <script>
-        $ ( function ( ) {
-          new EventSource ( '@controllers.routes.AdapterStatusFeeder.adapterJobStatusFeed(job.id)'
-          ).onmessage = function ( event ) {
-            var kk = JSON.parse ( event.data )
-            if ( kk.online == true ) {
-              $ ( "span.onStatus" + kk.id ).show ( )
-              $ ( "span.offStatus" + kk.id ).hide ( )
+        $(function () {
+          new EventSource('@controllers.routes.AdapterStatusFeeder.adapterJobStatusFeed(job.id)'
+          ).onmessage = function (event) {
+            var kk = JSON.parse(event.data)
+            if (kk.online == true) {
+              $("span.onStatus" + kk.id).show()
+              $("span.offStatus" + kk.id).hide()
             } else {
-              $ ( "span.onStatus" + kk.id ).hide ( )
-              $ ( "span.offStatus" + kk.id ).show ( )
+              $("span.onStatus" + kk.id).hide()
+              $("span.offStatus" + kk.id).show()
             }
           }
         });
@@ -45,7 +45,7 @@
       <input type="hidden" value="@job.name"/>
     } else {
       Suite Job
-      <span style="color:black">@job.name</span>
+      <span style="color: black">@job.name</span>
     }
     </h3>
 
@@ -73,7 +73,6 @@
                 </tr>
 
 
-
                 @if(job.testSuite != null) {
                   <tr>
                     <th>Test Suite</th><td>
@@ -84,7 +83,6 @@
                   </td>
                   </tr>
                 }
-
 
 
                 <tr>
@@ -109,6 +107,22 @@
                   </td>
                 </tr>
 
+                  <!-- Display the associated report template if not null-->
+                <tr><th>Associated report template:</th>
+                  <td>
+                  @if(job.reportTemplate != null) {
+                    <a href='@routes.ReportTemplateController.viewReportTemplateView(job.reportTemplate.id)'>
+                    @job.reportTemplate.name
+                    </a>
+                  } else {
+                    <a href='@routes.ReportTemplateController.viewReportTemplateView(-1)'>
+                    Default
+                    </a>
+                  }
+                  </td>
+                </tr>
+
+
                 <tr><th>Parameters:</th>
                   <td>
                   @if(job.testSuite == null) {
@@ -117,7 +131,8 @@
                     }"
 
                       @subjectIs(job.owner) {
-                        onclick='showUpdateTextAreaDialog(@job.id, "mtdlParameters", $(this).next(), "@controllers.routes.JobController.doEditJobField()")'
+                        onclick='showUpdateTextAreaDialog(@job.id, "mtdlParameters", $(this).next(),
+                            "@controllers.routes.JobController.doEditJobField()")'
                       }
                     class="hl editable"
                     ></span>
@@ -137,14 +152,15 @@
                         @defining(job.mappedAdapters) { lst =>
                           @for(mw <- job.mappedAdapters) {
                             <tr>
-                              <td>@mw.parameter.name</td> <td>@mw.adapterVersion.adapter.name</td>
+                              <td>@mw.parameter.name</td>
+                              <td>@mw.adapterVersion.adapter.name</td>
                               <td align="center">
                                 <span class="onStatus@{
                                   mw.adapterVersion.id
-                                }" style="display:none" class="bignobold online"> <img src="@routes.Assets.versioned("/images/Pc_Online.png")"/></span>
+                                }" style="display: none" class="bignobold online"> <img src="@routes.Assets.versioned("/images/Pc_Online.png")"/></span>
                                 <span class="offStatus@{
                                   mw.adapterVersion.id
-                                }" style="display:none" class="bignobold offline"> <img src="@routes.Assets.versioned("/images/Pc_Offline.png")"/></span>
+                                }" style="display: none" class="bignobold offline"> <img src="@routes.Assets.versioned("/images/Pc_Offline.png")"/></span>
                               </td></tr>
                           }
                         }
@@ -157,22 +173,24 @@
           </div>
           <div class="row">
             <div class="col-md-12">
-              @if(job.testSuite == null) {
-                @decideOnVisibility(job.visibility, job.owner, security.Role.TEST_DESIGNER) {
-                  <button id="enqueue" type="button" class="btn btn-success btn-sm" onclick='enqueue("@{job.name}", @{job.id}, "@{job.visibility}")' title="Enqueue">
-                    <span class="glyphicon glyphicon-play"></span> Enqueue
-                  </button>
-                }
-
-                <button type="button" class="btn btn-primary btn-sm" onclick='window.location="@controllers.routes.Application.jobQueue()"' title="Test Monitor">
-                  <span class="glyphicon glyphicon-tasks"></span> Test Monitor
+            @if(job.testSuite == null) {
+              @decideOnVisibility(job.visibility, job.owner, security.Role.TEST_DESIGNER) {
+                <button id="enqueue" type="button" class="btn btn-success btn-sm" onclick='enqueue("@{job.name}", @{job.id},
+                    "@{job.visibility}")' title="Enqueue">
+                  <span class="glyphicon glyphicon-play"></span> Enqueue
                 </button>
-              } else{
-                <mark>Please navigate to the test suite <a href='@controllers.routes.TestSuiteController.getTestSuiteDetailView(job.testSuite.id, "status")'>
-                @{
-                  job.testSuite.name
-                }</a> to run this job</mark>
               }
+
+              <button type="button" class="btn btn-primary btn-sm" onclick='window.location = "@controllers.routes.Application.jobQueue()"' title="Test Monitor">
+                <span class="glyphicon glyphicon-tasks"></span> Test Monitor
+              </button>
+            } else {
+              <mark>
+                Please navigate to the test suite <a href='@controllers.routes.TestSuiteController.getTestSuiteDetailView(job.testSuite.id, "status")'>
+              @{
+                job.testSuite.name
+              }</a> to run this job</mark>
+            }
 
             </div>
           </div>
@@ -191,7 +209,7 @@
     }
 
     <script>
-        $(function(){
+        $(function () {
           bindValues($("#name@{job.id}"))
           bindValues($("#params@{job.id}"))
         })
