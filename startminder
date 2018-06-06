@@ -1,2 +1,17 @@
 #!/bin/sh
-./activator  -Dhttps.port=9000 -Dhttp.port=9001 start
+
+if [ ! -f data/db/h2db.mv.db ]
+then
+   mkdir -p data/db/
+   cp initial.h2db.mv.db data/db/h2db.mv.db
+   cp initial.h2db.trace.db data/db/h2db.trace.db
+fi
+
+
+
+if [ ! -f data/maven-settings.xml ]
+then
+   cp conf/maven-settings.xml data/maven-settings.xml
+fi
+
+bin/minder

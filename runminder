@@ -17,19 +17,21 @@ then
 fi
 
 
+export JAVA_OPTS="${JAVA_OPTS} -DmtdlConfig.properties=conf/application.conf"
+
 case $action in
-   cleanrun) 
-      sbt '; set javaOptions += "-DmtdlConfig.properties=conf/application.conf"' clean compile "run $port"
+   cleanrun)
+      sbt clean compile "run $port"
       ;;
    updaterun)
-      sbt '; set javaOptions += "-DmtdlConfig.properties=conf/application.conf"' update compile "run $port"
+      sbt update compile "run $port"
       ;;
    *)
       echo "default"
-      sbt '; set javaOptions += "-DmtdlConfig.properties=conf/application.conf"'  "run $port"
+      sbt "run $port"
       ;;
 esac
 
 
-       
-      
+
+

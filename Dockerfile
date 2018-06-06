@@ -17,12 +17,12 @@ RUN mkdir minder
 
 WORKDIR /minder
 
-COPY target/universal/stage/ ./
-COPY startminder XoolaServer.properties mtdl.jar ./
-COPY h2db.mv.db.first ./h2db.mv.db
-COPY h2db.trace.db.first ./h2db.trace.db
+COPY target/universal/stage/ initial.h2db.mv.db initial.h2db.trace.db startminder ./
+
+
+ENV JAVA_OPTS="${JAVA_OPTS} -DmtdlConfig.properties=conf/application.conf"
+
 
 EXPOSE 9000
-
 
 CMD ["./startminder"]
