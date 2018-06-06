@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+
+<settings xmlns="http://maven.apache.org/SETTINGS/1.0.0"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/SETTINGS/1.0.0 http://maven.apache.org/xsd/settings-1.0.0.xsd">
+
+  <offline>true</offline>
+  <profiles>
+    <profile>
+      <id>repo2</id>
+      <repositories>
+        <repository>
+          <id>repo2</id>
+          <url>http://repo2.maven.org/maven2</url>
+        </repository>
+      </repositories>
+    </profile>
+    <profile>
+      <id>sonatype</id>
+      <repositories>
+        <repository>
+          <id>sonatype</id>
+          <url>https://oss.sonatype.org/content/repositories/public/</url>
+        </repository>
+      </repositories>
+    </profile>
+  </profiles>
+
+  <activeProfiles>
+    <activeProfile>repo2</activeProfile>
+    <activeProfile>sonatype</activeProfile>
+  </activeProfiles>
+</settings>

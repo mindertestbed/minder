@@ -1,2 +1,0 @@
-#!/bin/sh
-./activator  -jvm-debug 9876 -Dapplication.secret="sdf56.hedehodobedebodojkdsfhlgksjdhfglkjsdfhkjsdfg" run

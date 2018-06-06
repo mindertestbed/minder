@@ -10,6 +10,8 @@ products in Compile <<= products in Aspectj
 
 resolvers += Resolver.mavenLocal
 
+fork := true
+
 scalaVersion := "2.11.7"
 
 libraryDependencies ++= Seq(

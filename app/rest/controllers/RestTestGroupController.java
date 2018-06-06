@@ -3,7 +3,7 @@ package rest.controllers;
 import com.avaje.ebean.Ebean;
 import com.fasterxml.jackson.databind.JsonNode;
 import controllers.common.Utils;
-import dependencyutils.DependencyClassLoaderCache;
+import com.yerlibilgin.dependencyutils.DependencyClassLoaderCache;
 import editormodels.GroupEditorModel;
 import utils.Util;
 import models.*;

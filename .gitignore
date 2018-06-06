@@ -28,3 +28,4 @@ release
 *.7z
 samplequeries.sql
 *.db
+data

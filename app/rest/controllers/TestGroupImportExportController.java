@@ -2,8 +2,8 @@ package rest.controllers;
 
 import com.avaje.ebean.Ebean;
 import com.avaje.ebeaninternal.server.lib.util.NotFoundException;
+import com.yerlibilgin.dependencyutils.DependencyClassLoaderCache;
 import controllers.TestCaseController;
-import dependencyutils.DependencyClassLoaderCache;
 import models.*;
 import play.Logger;
 import play.mvc.Controller;

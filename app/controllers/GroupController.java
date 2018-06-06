@@ -1,14 +1,19 @@
 package controllers;
 
+import static play.data.Form.form;
+
 import com.avaje.ebean.Ebean;
 import com.avaje.ebeaninternal.server.lib.util.NotFoundException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.google.common.io.Files;
+import com.yerlibilgin.dependencyutils.DependencyClassLoaderCache;
 import controllers.common.Utils;
-import dependencyutils.DependencyClassLoaderCache;
 import editormodels.GroupEditorModel;
-import play.mvc.Http.MultipartFormData.FilePart;
-import utils.Util;
+import java.io.File;
+import java.io.IOException;
+import java.nio.charset.Charset;
+import java.text.ParseException;
+import javax.inject.Inject;
 import models.TestGroup;
 import models.User;
 import org.eclipse.aether.resolution.DependencyResolutionException;
@@ -17,6 +22,7 @@ import play.data.Form;
 import play.data.FormFactory;
 import play.mvc.Controller;
 import play.mvc.Http;
+import play.mvc.Http.MultipartFormData.FilePart;
 import play.mvc.Result;
 import rest.controllers.TestGroupImportExportController;
 import rest.controllers.common.RestUtils;
@@ -24,23 +30,25 @@ import rest.controllers.restbodyprocessor.IRestContentProcessor;
 import rest.models.RestTestGroup;
 import security.AllowedRoles;
 import security.Role;
-
-import java.io.File;
-import java.io.IOException;
-import java.nio.charset.Charset;
-import java.text.ParseException;
-
-import views.html.group.childViews.*;
-import views.html.group.*;
-
-import javax.inject.Inject;
-
-import static play.data.Form.form;
+import utils.Util;
+import views.html.group.childViews.dependencies;
+import views.html.group.childViews.details;
+import views.html.group.childViews.jobTemplatesList;
+import views.html.group.childViews.reportTemplatesList;
+import views.html.group.childViews.testAssertionList;
+import views.html.group.childViews.testAssetList;
+import views.html.group.childViews.testSuiteList;
+import views.html.group.childViews.utilClassList;
+import views.html.group.mainView;
+import views.html.group.testGroupEditor;
+import views.html.group.testGroupImportEditor;
+import views.html.group.testGroupListView;
 
 /**
  * Created by yerlibilgin on 03/05/15.
  */
 public class GroupController extends Controller {
+
   Authentication authentication;
   TestGroupImportExportController testGroupImportExportController;
 
@@ -48,7 +56,8 @@ public class GroupController extends Controller {
   public final Form<GroupImportModel> TEST_GROUP_IMPORT_FORM;
 
   @Inject
-  public GroupController(FormFactory formFactory, Authentication authentication, TestGroupImportExportController testGroupImportExportController) {
+  public GroupController(FormFactory formFactory, Authentication authentication,
+      TestGroupImportExportController testGroupImportExportController) {
     this.authentication = authentication;
     this.testGroupImportExportController = testGroupImportExportController;
 
@@ -57,6 +66,7 @@ public class GroupController extends Controller {
   }
 
   public static class GroupImportModel {
+
     public String useremail;
   }
 
@@ -102,8 +112,9 @@ public class GroupController extends Controller {
       return badRequest("Test group with id [" + id + "] not found!");
     } else {
 
-      if (!Util.canAccess(authentication.getLocalUser(), tg.owner))
+      if (!Util.canAccess(authentication.getLocalUser(), tg.owner)) {
         return badRequest("You don't have permission to modify this resource");
+      }
 
       GroupEditorModel tgem = new GroupEditorModel();
       tgem.id = tg.id;
@@ -129,22 +140,18 @@ public class GroupController extends Controller {
 
       if (field.equals("dependencyString")) {
         String dependencyString = jsonNode.findPath("newValue").asText();
-        if (dependencyString != null)
+        if (dependencyString != null) {
           dependencyString = dependencyString.trim();
+        }
         if (dependencyString == null || dependencyString.length() == 0) {
           return result; // do nothing
         } else {
           try {
             DependencyClassLoaderCache.getDependencyClassLoader(dependencyString);
             Ebean.commitTransaction();
-          } catch (DependencyResolutionException ex) {
-            Logger.error(ex.getMessage(), ex);
-            return badRequest(ex.getResult().getRoot().getArtifact() + " couldn't be resolved.");
           } catch (Exception ex) {
             Logger.error(ex.getMessage(), ex);
-            return badRequest("There was a problem with the dependency string.<br /> \n" +
-                "Please make sure that the dependencies are in format:<br />\n " +
-                "groupId:artifactId[:extension[:classifier]]:version]]");
+            return badRequest(ex.getMessage());
           }
         }
       } else {
@@ -163,8 +170,9 @@ public class GroupController extends Controller {
     if (tg == null) {
       return badRequest("Test group with id [" + id + "] not found!");
     } else {
-      if (!Util.canAccess(authentication.getLocalUser(), tg.owner))
+      if (!Util.canAccess(authentication.getLocalUser(), tg.owner)) {
         return badRequest("You don't have permission to modify this resource");
+      }
 
       try {
         tg.delete();
@@ -234,8 +242,8 @@ public class GroupController extends Controller {
     }
 
     /*
-    * Preparing response
-    * */
+     * Preparing response
+     * */
     IRestContentProcessor contentProcessor = null;
     try {
       contentProcessor = RestUtils.createContentProcessor("text/json");
@@ -311,20 +319,22 @@ public class GroupController extends Controller {
   private void handleFileUpload(User user) throws IllegalArgumentException, IOException, ParseException, RuntimeException {
     Http.MultipartFormData body = request().body().asMultipartFormData();
 
-    if (body == null)
+    if (body == null) {
       throw new RuntimeException("The form type is not correct");
+    }
 
     File asset = null;
 
-    if (body.getFiles() != null && body.getFiles().size() > 0)
-      asset = (File)((FilePart) body.getFiles().get(0)).getFile();
+    if (body.getFiles() != null && body.getFiles().size() > 0) {
+      asset = (File) ((FilePart) body.getFiles().get(0)).getFile();
+    }
 
     if (asset == null) {
       throw new RuntimeException("No asset file was specified!");
     } else {
       /*
-      * Handling import request
-      * */
+       * Handling import request
+       * */
       String bodyStr = null;
       try {
         bodyStr = Files.toString(asset, Charset.defaultCharset());

@@ -2,6 +2,8 @@ package minderengine;
 
 import org.interop.xoola.core.*;
 import org.interop.xoola.tcpcom.connmanager.server.ServerRegistry;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import play.api.Environment;
 
 import javax.inject.Inject;
@@ -14,15 +16,15 @@ import java.util.Properties;
  * Created by yerlibilgin on 02/12/14.
  */
 @Singleton
-public class XoolaServer{
+public class XoolaServer {
+
+  private static final Logger LOGGER = LoggerFactory.getLogger(XoolaServer.class);
 
   @Inject
   private MinderServer minderServer;
 
   @Inject
   Environment environment;
-
-  private static XoolaServer xoolaServer;
 
   private Xoola server;
   private boolean started = false;
@@ -35,42 +37,42 @@ public class XoolaServer{
 
   public void start() {
     if (started) {
-      System.out.println("Server already started");
+      LOGGER.debug("Server already started");
       return;
     }
 
     started = true;
     synchronized (startLock) {
       try {
-        //load the xoola properties from resource "xoola.properties"
+        LOGGER.debug("Try to load xoola server properties from \"conf/application.conf\"");
         properties = new java.util.Properties();
-        properties.load(new FileInputStream("XoolaServer.properties"));
+        properties.load(new FileInputStream("conf/application.conf"));
         properties.setProperty(XoolaProperty.MODE, XoolaTierMode.SERVER);
 
         ServerRegistry.classLoader = environment.classLoader();
         server = Xoola.init(properties);
-        System.out.println(properties.getProperty("PORT"));
-        System.out.println("Created xoola server");
+        LOGGER.debug(properties.getProperty("PORT"));
+        LOGGER.debug("Created xoola server");
         server.registerObject("minderServer", minderServer);
-        System.out.println("Registered minderServer object");
+        LOGGER.debug("Registered minderServer object");
 
         server.addConnectionListener(new XoolaConnectionListener() {
           @Override
           public synchronized void connected(XoolaInvocationHandler xoolaInvocationHandler, XoolaChannelState xoolaChannelState) {
-            System.out.println("CLIENT: " + xoolaChannelState.remoteId + " connected");
+            LOGGER.debug("CLIENT: " + xoolaChannelState.remoteId + " connected");
             MinderAdapterRegistry.get().setAdapterAvailable(xoolaChannelState.remoteId, true);
           }
 
           @Override
           public void disconnected(XoolaInvocationHandler xoolaInvocationHandler, XoolaChannelState xoolaChannelState) {
-            System.out.println("CLIENT: " + xoolaChannelState.remoteId + " disconnected");
+            LOGGER.debug("CLIENT: " + xoolaChannelState.remoteId + " disconnected");
             MinderAdapterRegistry.get().setAdapterAvailable(xoolaChannelState.remoteId, false);
           }
         });
-        System.out.println("Starting server");
+        LOGGER.debug("Starting server");
         server.start();
 
-        System.out.println("Started server");
+        LOGGER.debug("Started server");
         started = true;
       } catch (IOException e) {
         e.printStackTrace();
@@ -78,7 +80,7 @@ public class XoolaServer{
     }
   }
 
-  public IMinderClient getClient(AdapterIdentifier adapterIdentifier){
+  public IMinderClient getClient(AdapterIdentifier adapterIdentifier) {
     return server.get(IMinderClient.class, adapterIdentifier.toString(), "minderClient");
   }
 }

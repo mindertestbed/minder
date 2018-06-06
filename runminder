@@ -1,0 +1,35 @@
+#!/bin/sh
+
+port=9000
+
+if (( $# > 0 ))
+then
+  port=$1
+fi
+
+echo "Using port $port"
+
+action=1
+
+if (( $# == 2))
+then
+  action=$2
+fi
+
+
+case $action in
+   cleanrun) 
+      sbt '; set javaOptions += "-DmtdlConfig.properties=conf/application.conf"' clean compile "run $port"
+      ;;
+   updaterun)
+      sbt '; set javaOptions += "-DmtdlConfig.properties=conf/application.conf"' update compile "run $port"
+      ;;
+   *)
+      echo "default"
+      sbt '; set javaOptions += "-DmtdlConfig.properties=conf/application.conf"'  "run $port"
+      ;;
+esac
+
+
+       
+      
