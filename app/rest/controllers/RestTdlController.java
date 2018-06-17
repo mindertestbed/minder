@@ -2,6 +2,7 @@ package rest.controllers;
 
 import com.avaje.ebean.Ebean;
 import controllers.TestCaseController;
+import utils.TdlUtils;
 import utils.Util;
 import minderengine.TestEngine;
 import models.*;
@@ -226,7 +227,7 @@ public class RestTdlController extends Controller {
     try {
       Ebean.beginTransaction();
       tdl.save();
-      testCaseController.detectAndSaveParameters(tdl);
+      TdlUtils.detectAndSaveParameters(tdl);
       Ebean.commitTransaction();
     } catch (Exception ex) {
       return internalServerError("An error occurred during tdl save or compile: " + ex.getMessage());

@@ -23,6 +23,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
+import utils.TdlUtils;
 
 /**
  * This class provides importing and exporting functions for a test group including
@@ -420,7 +421,7 @@ public class TestGroupImportExportController extends Controller {
 
             try {
               tdl.save();
-              testCaseController.detectAndSaveParameters(tdl);
+              TdlUtils.detectAndSaveParameters(tdl);
             } catch (Exception e) {
               throw new IOException("An error occurred during save of tdl: " + e.getMessage());
             }

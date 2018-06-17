@@ -24,6 +24,7 @@ import scala.io.Source
   * Created by yerlibilgin on 13/01/15.
   */
 class TestRunContext(val testRun: TestRun, testRunFeeder: TestRunFeeder, testLogFeeder: TestLogFeeder, testEngine: TestEngine) extends Runnable with TestProcessWatcher {
+
   var suspended = false;
   val variableAdapterMapping = collection.mutable.Map[String, MappedAdapter]();
   val mappedAdapters = MappedAdapter.findByJob(testRun.job)
@@ -41,7 +42,7 @@ class TestRunContext(val testRun: TestRun, testRunFeeder: TestRunFeeder, testLog
   val packageRoot = "_" + testGroup.id;
   val packagePath = packageRoot + "/_" + testCase.id;
   val cls = TdlCompiler.compileTdl(packageRoot, packagePath, testGroup.dependencyString, testCase.name, source = tdl.tdl, version = tdl.version);
-  var MinderTDL: MinderTdl = null;
+  var mtdlInstance: MinderTdl = null;
   val logStringBuilder = new StringBuilder;
   val reportLogBuilder = new StringBuilder;
   val metadataMap = new util.LinkedHashMap[String, String]()
@@ -52,6 +53,7 @@ class TestRunContext(val testRun: TestRun, testRunFeeder: TestRunFeeder, testLog
   var finalRunnable: Runnable = null;
 
   var sessionID: String = Utils.getCurrentTimeStamp;
+  var session = new TestSession(sessionID);
 
   /**
     * Number of steps that will be calculated at the beginning for percentage
@@ -85,7 +87,7 @@ class TestRunContext(val testRun: TestRun, testRunFeeder: TestRunFeeder, testLog
   override def run(): Unit = {
     testRun.status = TestRunStatus.IN_PROGRESS
     testRun.save()
-    testEngine.runTest(sessionID, user.email, cls, variableAdapterMapping, TestRunContext.this, job.mtdlParameters)
+    testEngine.runTest(TestRunContext.this, job.mtdlParameters,variableAdapterMapping, user.email)
   }
 
   /**
@@ -174,10 +176,10 @@ class TestRunContext(val testRun: TestRun, testRunFeeder: TestRunFeeder, testLog
   }
 
   def initialize(): MinderTdl = {
-    if (this.MinderTDL == null) {
-      this.MinderTDL = cls.getConstructors()(0).newInstance(java.lang.Boolean.FALSE).asInstanceOf[MinderTdl];
+    if (this.mtdlInstance == null) {
+      this.mtdlInstance = cls.getConstructors()(0).newInstance(java.lang.Boolean.FALSE).asInstanceOf[MinderTdl];
     }
-    MinderTDL;
+    mtdlInstance;
   }
 
 

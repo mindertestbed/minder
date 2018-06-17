@@ -1,16 +1,22 @@
 
 port=9000
 
-if (($# == 1))
+if (($# >= 1))
 then 
    port=$1
+fi
+
+datadir="minderdata"
+if (($# >= 2))
+then
+   datadir=$2
 fi
 
 echo "Exposing port 9000 to $port"
 
 #command to map the containers .m2 repo to the hosts ~/.m2
-#docker run -d -v "$(pwd)/minderdata":/minder/data -v "$(echo $HOME)/.m2/repository":/root/.m2/repository -p $port:9000 --rm --name minder.h2 minder:h2
+#docker run -d -v "$(pwd)/$datadir":/minder/data -v "$(echo $HOME)/.m2/repository":/root/.m2/repository -p $port:9000 --rm --name minder.h2 minder:h2
 
 #command to map the containers .m2 repo to the ./minderdata/repo on the host
-docker run -d -v "$(pwd)/minderdata":/minder/data -v "$(pwd)/minderdata/repo":/root/.m2/repository -p $port:9000 --rm --name minder.h2 minder:h2
+docker run -d  -v "$(pwd)/$datadir":/minder/data -v "$(pwd)/minderdata/repo":/root/.m2/repository -p $port:9000 --rm --name minder.h2 minder:h2
 

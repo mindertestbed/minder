@@ -61,13 +61,17 @@ class TestQueueController @Inject()(implicit testLogFeeder: Provider[TestLogFeed
           val java_ctx = play.core.j.JavaHelpers.createJavaContext(request)
           val java_session = java_ctx.session()
           val user = Authentication.getLocalUser(java_session);
-          jobQueue.synchronized {
-            jobQueue.offer(createTestRunContext(job, user, Visibility.valueOf(visibility)))
-          }
-          testRunFeeder.get().jobQueueUpdate()
+          enqueueJobDirect(job, user, visibility)
           Ok;
         }
       }
+  }
+
+  def enqueueJobDirect(job: AbstractJob, user: User, visibility: String) = {
+    jobQueue.synchronized {
+      jobQueue.offer(createTestRunContext(job, user, Visibility.valueOf(visibility)))
+    }
+    testRunFeeder.get().jobQueueUpdate()
   }
 
   /**
@@ -319,7 +323,6 @@ class TestQueueController @Inject()(implicit testLogFeeder: Provider[TestLogFeed
     jobQueue.offer(testRunContext)
     testRunFeeder.get().jobQueueUpdate()
   }
-
 
   def reset(): Unit = {
     testThread.interrupt();

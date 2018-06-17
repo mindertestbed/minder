@@ -7,12 +7,13 @@ import java.util.Properties
 import javax.inject.{Inject, Provider, Singleton}
 
 import com.gitb.core.v1.StepStatus
-import controllers.{TestQueueController, TestRunContext}
+import controllers.{EPQueueManager, TestQueueController, TestRunContext}
 import utils.Util
 import models._
 import mtdl._
 import org.apache.log4j.spi.LoggingEvent
-import org.apache.log4j.{AppenderSkeleton, EnhancedPatternLayout, Level}
+import org.apache.log4j.{AppenderSkeleton, EnhancedPatternLayout, Level, Logger}
+import play.api
 
 import scala.collection.JavaConversions._
 import scala.collection.mutable;
@@ -22,22 +23,8 @@ import scala.collection.mutable;
   */
 @Singleton
 class TestEngine @Inject()(implicit testQueueController: Provider[TestQueueController],
+                           epQueueManager: Provider[EPQueueManager],
                            xoolaServer: Provider[XoolaServer]) {
-  var minderTDL: MinderTdl = null
-  var suspendedTestsMap = new mutable.HashMap[String, TestRunContext]();
-
-  /**
-    * When Xoola server is initialized, it needs a class loader to deserialize the objects read from the network.
-    * We will provide xoola the minderTDL.getClass.getClassLoader so that it successfully resolves its stuff.
-    * This function will delegate the minderTDL.getClass.getClassLoader to xoola.
-    */
-
-  def getCurrentMTDLClassLoader(): ClassLoader = {
-    if (minderTDL == null)
-      Thread.currentThread().getContextClassLoader;
-    else
-      minderTDL.getClass.getClassLoader
-  }
 
   class MyAppender(testProcessWatcher: TestProcessWatcher) extends AppenderSkeleton {
     override def append(event: LoggingEvent): Unit = {
@@ -89,13 +76,12 @@ class TestEngine @Inject()(implicit testQueueController: Provider[TestQueueContr
     * Runs the provided already compiled tdl class with the given parameter mapping
     *
     * @param userEmail
-    * @param clsMinderTDL
     * @param adapterMapping
     * @param testRunContext
     */
-  def runTest(sessionID: String, userEmail: String, clsMinderTDL: Class[MinderTdl],
+  def runTest(testRunContext: TestRunContext, params: String,
               adapterMapping: collection.mutable.Map[String, MappedAdapter],
-              testRunContext: TestRunContext, params: String): Unit = {
+              userEmail: String): Unit = {
     val lgr: org.apache.log4j.Logger = org.apache.log4j.Logger.getLogger("test");
     val app = new MyAppender(testRunContext);
     val gtb = new GitbWatcher();
@@ -111,14 +97,12 @@ class TestEngine @Inject()(implicit testQueueController: Provider[TestQueueContr
       }
       var identifierMinderClientMap: util.Map[AdapterIdentifier, IdentifierClientPair] = null
 
-      val session = new TestSession(sessionID)
-
       try {
         lgr.info("Initialize test case")
 
-        minderTDL = testRunContext.initialize();
+        val currentMtdl = testRunContext.initialize();
 
-        identifierMinderClientMap = mapAllTransitiveAdapters(adapterMapping)
+        identifierMinderClientMap = mapAllTransitiveAdapters(currentMtdl, adapterMapping)
 
         initializeFunctionsAndParameters(params, lgr, testRunContext)
 
@@ -136,7 +120,7 @@ class TestEngine @Inject()(implicit testQueueController: Provider[TestQueueContr
           properties.load(new ByteArrayInputStream(params.getBytes()))
 
 
-          startTestObject.setSession(session)
+          startTestObject.setSession(testRunContext.session)
           startTestObject.setProperties(properties)
 
 
@@ -159,24 +143,71 @@ class TestEngine @Inject()(implicit testQueueController: Provider[TestQueueContr
 
           //update the SUT names on the watcher
           testRunContext.updateSUTNames(sutNameSet)
+        } else {
+          //it is suspended. Resume
+          testRunContext.resume();
         }
 
-        while (minderTDL.currentRivetIndex < minderTDL.RivetDefs.size()) {
-          val currentRivet = minderTDL.RivetDefs(minderTDL.currentRivetIndex)
+        while (currentMtdl.currentRivetIndex < currentMtdl.RivetDefs.size()) {
+          val currentRivet = currentMtdl.RivetDefs(currentMtdl.currentRivetIndex)
           //for (currentRivet <- minderTDL.RivetDefs) {
-          var msg: String = "> RUN RIVET " + minderTDL.currentRivetIndex;
+          var msg: String = "> RUN RIVET " + currentMtdl.currentRivetIndex;
           lgr.info(msg)
           gtb.notifyProcessingInfo(msg, currentRivet)
 
+          /**
+            * A very bad method that is used by two different blocks.
+            */
+          def logRivetFinished = {
+            msg = "< Rivet finished sucessfully";
+            testRunContext.rivetFinished(currentMtdl.currentRivetIndex)
+            gtb.notifyCompletedInfo(msg, currentRivet)
+            lgr.info(msg)
+            lgr.info("----------\n")
+          }
+
           if (currentRivet.isInstanceOf[Suspend]) {
             //save testRunContext in a map
-            minderTDL.currentRivetIndex += 1;
-            minderengine.ContextContainer.get().addTestContext(session, testRunContext);
-            lgr.info("Suspend Test Case")
-            testRunContext.suspend()
+            lgr.info("Suspend Test Case");
+            suspendTestCase(testRunContext)
             return
-          } else {
+          } else if (currentRivet.isInstanceOf[EndpointRivet]) {
+            api.Logger.debug("Matched an endpoint rivet. If the endpoint is not already enqueued, suspend the test case");
+            //check the signal queue for the matching http endpoint
+            //if no signal is enqueued, then suspend the test case
+            val endpointRivet = currentRivet.asInstanceOf[EndpointRivet]
+            val epAdapterId = AdapterIdentifier.parse(endpointRivet.adapterFunction.adapterId)
+            val httpEndpoint = endpointRivet.method + ":" + testRunContext.mtdlInstance.getParameter(endpointRivet.endPointIdentifier)
 
+            val signalData = MinderSignalRegistry.get().dequeueSignalImmediately(testRunContext.session, epAdapterId, httpEndpoint)
+
+            if (signalData == null) {
+              lgr.info("Suspend Test Case for HTTP Call " + httpEndpoint);
+              suspendForEndpoint(testRunContext)
+              return
+            } else {
+              api.Logger.debug("And http call for " + httpEndpoint + " was discovered. Process it")
+
+              if (!signalData.isInstanceOf[SignalPojoData]) {
+                throw new IllegalStateException("An invalid signal type has been enqueued for " + httpEndpoint)
+              }
+
+              val signalPojoData = signalData.asInstanceOf[SignalPojoData]
+              val ePPacket = signalPojoData.payload.asInstanceOf[EPPacket]
+
+              lgr.info(s"Call handler for $httpEndpoint")
+              endpointRivet.targetFunc(ePPacket);
+              try {
+                ePPacket.httpInputStream.close();
+              } catch {
+                case _ =>
+              }
+
+              lgr.info(s"Handler for $httpEndpoint finished")
+
+              logRivetFinished
+            }
+          } else {
             val rivetAdapterId: String = currentRivet.adapterFunction.adapterId
             //resolve the minder client id. This might as well be resolved to a local built-in adapter or the null slot.
             val slotPair = findPairOrError(identifierMinderClientMap, AdapterIdentifier.parse(rivetAdapterId))
@@ -190,7 +221,7 @@ class TestEngine @Inject()(implicit testQueueController: Provider[TestQueueContr
             try {
               for (tuple@(label, signature) <- currentRivet.signalPipeMap.keySet) {
 
-                if (!MinderSignalRegistry.get().hasSession(session)) {
+                if (!MinderSignalRegistry.get().hasSession(testRunContext.session)) {
                   msg = "No MinderSignalRegistry object defined for session " + userEmail;
                   gtb.notifyErrorInfo(msg, currentRivet)
                   throw new scala.IllegalArgumentException(msg)
@@ -215,7 +246,7 @@ class TestEngine @Inject()(implicit testQueueController: Provider[TestQueueContr
 
 
                 val signalData: SignalData = try {
-                  MinderSignalRegistry.get().dequeueSignal(session, signalAdapterIdentifier, signature, signal.timeout)
+                  MinderSignalRegistry.get().dequeueSignal(testRunContext.session, signalAdapterIdentifier, signature, signal.timeout)
                 } catch {
                   case rte: RuntimeException => {
                     signal.handleTimeout(rte)
@@ -238,12 +269,12 @@ class TestEngine @Inject()(implicit testQueueController: Provider[TestQueueContr
                 }
                 val signalCallData: SignalCallData = signalData.asInstanceOf[SignalCallData]
 
-                testRunContext.signalEmitted(minderTDL.currentRivetIndex, signalIndex, signalCallData)
+                testRunContext.signalEmitted(currentMtdl.currentRivetIndex, signalIndex, signalCallData)
 
                 for (paramPipe <- currentRivet.signalPipeMap(tuple)) {
                   //FIX for BUG-1 : added an if for -1 param
                   if (paramPipe.in != -1) {
-                    val arg = Util.readObject(signalCallData.args(paramPipe.in), getCurrentMTDLClassLoader())
+                    val arg = Util.readObject(signalCallData.args(paramPipe.in), currentMtdl.getClass.getClassLoader)
                     convertParam(paramPipe.out, paramPipe.execute(arg), args)
                   }
                 }
@@ -273,35 +304,29 @@ class TestEngine @Inject()(implicit testQueueController: Provider[TestQueueContr
                   k += 1
                 }
                 val signalData2 = new SignalCallData(freeArgs);
-                testRunContext.signalEmitted(minderTDL.currentRivetIndex, signalIndex, signalData2)
+                testRunContext.signalEmitted(currentMtdl.currentRivetIndex, signalIndex, signalData2)
               }
 
               msg = "> CALL SLOT " + slotPair.adapterIdentifier + "." + currentRivet.adapterFunction.signature
               lgr.info(msg)
               gtb.notifyProcessingInfo(msg, currentRivet)
-              testRunContext.rivetInvoked(minderTDL.currentRivetIndex);
-              currentRivet.result = slotPair.minderClient.callSlot(session, currentRivet.adapterFunction.signature, args)
+              testRunContext.rivetInvoked(currentMtdl.currentRivetIndex);
+              currentRivet.result = slotPair.minderClient.callSlot(testRunContext.session, currentRivet.adapterFunction.signature, args)
               msg = "< SLOT CALLED " + slotPair.adapterIdentifier + "." + currentRivet.adapterFunction.signature;
               lgr.info(msg)
               gtb.notifyProcessingInfo(msg, currentRivet)
 
 
-              msg = "< Rivet finished sucessfully";
-              testRunContext.rivetFinished(minderTDL.currentRivetIndex)
-              gtb.notifyCompletedInfo(msg, currentRivet)
-              lgr.info(msg)
-              lgr.info("----------\n")
+              logRivetFinished
 
             }
-
-
             if (Thread.currentThread().isInterrupted) throw new scala.InterruptedException("Test interrupted")
           }
-          minderTDL.currentRivetIndex += 1;
+          currentMtdl.currentRivetIndex += 1;
         }
 
-        if (minderTDL.exception != null) {
-          throw minderTDL.exception
+        if (currentMtdl.exception != null) {
+          throw currentMtdl.exception
         } else {
           lgr.info(s"Test #${testRunContext.testRun.number} Finished")
           testRunContext.finished()
@@ -333,7 +358,7 @@ class TestEngine @Inject()(implicit testQueueController: Provider[TestQueueContr
           lgr.info("> Send finish message to all adapters")
           //make sure that we call finish test for all
           val finishTestObject: FinishTestObject = new FinishTestObject
-          finishTestObject.setSession(session)
+          finishTestObject.setSession(testRunContext.session)
           try {
             identifierMinderClientMap.values().foreach(pair => {
               pair.minderClient.finishTest(finishTestObject)
@@ -355,34 +380,35 @@ class TestEngine @Inject()(implicit testQueueController: Provider[TestQueueContr
 
     //Redirect all the logging functions to the log4j logger.
     //fixme: change the logger with SLF4J.
+    val mtdl = testRunContext.mtdlInstance;
 
-    minderTDL.debug = (any: Any) => {
+    mtdl.debug = (any: Any) => {
       lgr.debug(any)
     }
-    minderTDL.debugThrowable = (any: Any, th: Throwable) => {
+    mtdl.debugThrowable = (any: Any, th: Throwable) => {
       lgr.debug(any, th)
     }
-    minderTDL.info = (any: Any) => {
+    mtdl.info = (any: Any) => {
       lgr.info(any)
     }
-    minderTDL.infoThrowable = (any: Any, th: Throwable) => {
+    mtdl.infoThrowable = (any: Any, th: Throwable) => {
       lgr.info(any, th)
     }
-    minderTDL.error = (any: Any) => {
+    mtdl.error = (any: Any) => {
       lgr.error(any)
     }
 
-    minderTDL.errorThrowable = (any: Any, th: Throwable) => {
+    mtdl.errorThrowable = (any: Any, th: Throwable) => {
       lgr.error(any, th)
     }
 
     //the report metadata provided by the script is redirected
     //to the test run context which serializes it to the database.
-    minderTDL.addReportMetadata = (key: String, value: String) => {
+    mtdl.addReportMetadata = (key: String, value: String) => {
       testRunContext.addReportMetadata(key, value)
     }
 
-    minderTDL.setParams(params);
+    mtdl.setParams(params);
   }
 
   def convertParam(out: Int, arg: Any, args: Array[Object]) {
@@ -398,7 +424,7 @@ class TestEngine @Inject()(implicit testQueueController: Provider[TestQueueContr
   }
 
 
-  private def mapAllTransitiveAdapters(adapterMapping: mutable.Map[String, MappedAdapter]): util.Map[AdapterIdentifier, IdentifierClientPair] = {
+  private def mapAllTransitiveAdapters(mtdl: MinderTdl, adapterMapping: mutable.Map[String, MappedAdapter]): util.Map[AdapterIdentifier, IdentifierClientPair] = {
     //map all the variable names to actual adapters, and resolve everything
     val identifierMinderClientMap = new util.LinkedHashMap[AdapterIdentifier, IdentifierClientPair];
 
@@ -406,7 +432,7 @@ class TestEngine @Inject()(implicit testQueueController: Provider[TestQueueContr
     val nullIdentifier = AdapterIdentifier.parse(MinderTdl.NULL_ADAPTER_NAME);
     identifierMinderClientMap.put(nullIdentifier, IdentifierClientPair(nullIdentifier, new NullClient))
 
-    for (adapterName <- minderTDL.adapterDefs) {
+    for (adapterName <- mtdl.adapterDefs) {
       val adapterIdentifier = AdapterIdentifier.parse(adapterName)
 
       if (adapterIdentifier.getName.startsWith("$")) {
@@ -420,7 +446,7 @@ class TestEngine @Inject()(implicit testQueueController: Provider[TestQueueContr
         val mapping: MappedAdapter = adapterMapping(adapterIdentifier.getName)
 
         val transitiveAdapterIdentifier = AdapterIdentifier.parse(mapping.adapterVersion.adapter.name + "|" +
-            mapping.adapterVersion.version)
+          mapping.adapterVersion.version)
         val client = if (BuiltInAdapterRegistry.get().contains(transitiveAdapterIdentifier)) {
           BuiltInAdapterRegistry.get().getAdapter(transitiveAdapterIdentifier)
         } else {
@@ -465,6 +491,23 @@ class TestEngine @Inject()(implicit testQueueController: Provider[TestQueueContr
     identifierMinderClientMap(rivetAdapterId)
   }
 
+
+  private def suspendTestCase(testRunContext: TestRunContext) = {
+    testRunContext.mtdlInstance.currentRivetIndex += 1;
+    SuspensionContext.get().addTestContext(testRunContext);
+    testRunContext.suspend()
+  }
+
+  /**
+    * mark the test context as suspended and put it to the HTTP EPQueue
+    *
+    * @param testRunContext
+    */
+  def suspendForEndpoint(testRunContext: TestRunContext): Unit = {
+    testRunContext.suspend()
+    //we are not increasing the rivet index!!! because the endpoint must be called with the HTTP result
+    epQueueManager.get().enqueueTextRunContext(testRunContext)
+  }
 }
 
 object TestEngine {
@@ -529,4 +572,5 @@ object TestEngine {
 
     hm
   }
+
 }

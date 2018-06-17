@@ -3,279 +3,288 @@
 # ~~~~
 
 # Home page
-GET         /                                              controllers.Application.index()
-GET         /root                                          controllers.Application.root(display: String ?= "users")
-GET         /listTestGroups                                controllers.Application.testGroups()
-GET         /jobQueue                                      controllers.Application.jobQueue()
-GET         /adapters                                      controllers.Application.adapters()
-GET         /about                                         controllers.Application.about()
+GET           /                                              controllers.Application.index()
+GET           /root                                          controllers.Application.root(display: String ?= "users")
+GET           /listTestGroups                                controllers.Application.testGroups()
+GET           /jobQueue                                      controllers.Application.jobQueue()
+GET           /adapters                                      controllers.Application.adapters()
+GET           /about                                         controllers.Application.about()
 
 #JSRoutes
-GET         /assets/javascript/routes.js                   controllers.JSRoutes.jsRoutes
+GET           /assets/javascript/routes.js                   controllers.JSRoutes.jsRoutes
 
-GET         /login                                         controllers.Authentication.login
-GET         /loginToTargetURL                              controllers.Authentication.loginToTargetURL(targetURL: String)
-POST        /login                                         controllers.Authentication.doLogin
-GET         /logout                                        controllers.Authentication.doLogout
-GET         /changePassword                                controllers.Authentication.changePassword()
-POST        /changePassword                                controllers.Authentication.doChangePassword()
+GET           /login                                         controllers.Authentication.login
+GET           /loginToTargetURL                              controllers.Authentication.loginToTargetURL(targetURL: String)
+POST          /login                                         controllers.Authentication.doLogin
+GET           /logout                                        controllers.Authentication.doLogout
+GET           /changePassword                                controllers.Authentication.changePassword()
+POST          /changePassword                                controllers.Authentication.doChangePassword()
 
-GET         /getUserEditorView                             controllers.UserController.getUserEditorView
-GET         /editUserForm                                  controllers.UserController.editUserForm(id: Long)
-POST        /doCreateUser                                  controllers.UserController.doCreateUser
-GET         /doDeleteUser                                  controllers.UserController.doDeleteUser(id: Long)
-POST        /doEditUser                                    controllers.UserController.doEditUser()
-GET         /showUsers                                     controllers.UserController.listUsers(display: String)
-GET         /showSettings                                  controllers.UserController.viewSettings(display:String)
+GET           /getUserEditorView                             controllers.UserController.getUserEditorView
+GET           /editUserForm                                  controllers.UserController.editUserForm(id: Long)
+POST          /doCreateUser                                  controllers.UserController.doCreateUser
+GET           /doDeleteUser                                  controllers.UserController.doDeleteUser(id: Long)
+POST          /doEditUser                                    controllers.UserController.doEditUser()
+GET           /showUsers                                     controllers.UserController.listUsers(display: String)
+GET           /showSettings                                  controllers.UserController.viewSettings(display:String)
 
 #test group management
-GET         /getCreateGroupEditorView                      controllers.GroupController.getCreateGroupEditorView
-POST        /doCreateTestGroup                             controllers.GroupController.doCreateTestGroup
-GET         /editGroupForm                                 controllers.GroupController.editGroupForm(id: Long)
-GET         /doDeleteGroup                                 controllers.GroupController.doDeleteGroup(id: Long)
-GET         /getGroupDetailView                            controllers.GroupController.getGroupDetailView(id: Long, display : String ?= "assertions")
-POST        /doEditGroupField                              controllers.GroupController.doEditGroupField()
-GET         /renderDetails                                 controllers.GroupController.renderDetails(id: Long)
-GET         /renderTestAssertionList                       controllers.GroupController.renderTestAssertionList(id: Long)
-GET         /renderTestSuites                              controllers.GroupController.renderTestSuites(id: Long)
-GET         /renderTestAssets                              controllers.GroupController.renderTestAssets(id: Long)
-GET         /renderUtilClasses                             controllers.GroupController.renderUtilClasses(id: Long)
-GET         /renderDependencies                            controllers.GroupController.renderDependencies(id: Long)
-GET         /exportTestGroup                               controllers.GroupController.exportTestGroup(id: Long)
-POST        /importTestGroup                               controllers.GroupController.importTestGroup
-GET         /createNewTestGroupImportForm                  controllers.GroupController.createNewTestGroupImportForm
-GET         /renderJobTemplates                            controllers.GroupController.renderJobTemplates(id: Long)
-GET         /renderReportTemplates                         controllers.GroupController.renderReportTemplates(id: Long)
+GET           /getCreateGroupEditorView                      controllers.GroupController.getCreateGroupEditorView
+POST          /doCreateTestGroup                             controllers.GroupController.doCreateTestGroup
+GET           /editGroupForm                                 controllers.GroupController.editGroupForm(id: Long)
+GET           /doDeleteGroup                                 controllers.GroupController.doDeleteGroup(id: Long)
+GET           /getGroupDetailView                            controllers.GroupController.getGroupDetailView(id: Long, display : String ?= "assertions")
+POST          /doEditGroupField                              controllers.GroupController.doEditGroupField()
+GET           /renderDetails                                 controllers.GroupController.renderDetails(id: Long)
+GET           /renderTestAssertionList                       controllers.GroupController.renderTestAssertionList(id: Long)
+GET           /renderTestSuites                              controllers.GroupController.renderTestSuites(id: Long)
+GET           /renderTestAssets                              controllers.GroupController.renderTestAssets(id: Long)
+GET           /renderUtilClasses                             controllers.GroupController.renderUtilClasses(id: Long)
+GET           /renderDependencies                            controllers.GroupController.renderDependencies(id: Long)
+GET           /exportTestGroup                               controllers.GroupController.exportTestGroup(id: Long)
+POST          /importTestGroup                               controllers.GroupController.importTestGroup
+GET           /createNewTestGroupImportForm                  controllers.GroupController.createNewTestGroupImportForm
+GET           /renderJobTemplates                            controllers.GroupController.renderJobTemplates(id: Long)
+GET           /renderReportTemplates                         controllers.GroupController.renderReportTemplates(id: Long)
 
 
 
 #test assertion management
-GET         /getCreateAssertionEditorView                  controllers.TestAssertionController.getCreateAssertionEditorView(groupId: Long)
-POST        /doCreateAssertion                             controllers.TestAssertionController.doCreateAssertion
-GET         /doDeleteAssertion                             controllers.TestAssertionController.doDeleteAssertion(id: Long)
-GET         /getAssertionDetailView                        controllers.TestAssertionController.getAssertionDetailView(id: Long, display : String ?= "cases")
-POST        /doEditAssertionField                          controllers.TestAssertionController.doEditAssertionField()
-GET         /renderAssertionDetails                        controllers.TestAssertionController.renderDetails(id: Long)
-GET         /renderTestCases                               controllers.TestAssertionController.renderTestCases(id: Long)
+GET           /getCreateAssertionEditorView                  controllers.TestAssertionController.getCreateAssertionEditorView(groupId: Long)
+POST          /doCreateAssertion                             controllers.TestAssertionController.doCreateAssertion
+GET           /doDeleteAssertion                             controllers.TestAssertionController.doDeleteAssertion(id: Long)
+GET           /getAssertionDetailView                        controllers.TestAssertionController.getAssertionDetailView(id: Long, display : String ?= "cases")
+POST          /doEditAssertionField                          controllers.TestAssertionController.doEditAssertionField()
+GET           /renderAssertionDetails                        controllers.TestAssertionController.renderDetails(id: Long)
+GET           /renderTestCases                               controllers.TestAssertionController.renderTestCases(id: Long)
 
 #test case management
-GET         /getCreateCaseEditorView                       controllers.TestCaseController.getCreateCaseEditorView(assertionId: Long)
-POST        /doCreateCase                                  controllers.TestCaseController.doCreateCase
-GET         /getEditCaseEditorView                         controllers.TestCaseController.getEditCaseEditorView(id: Long)
-POST        /doEditCase                                    controllers.TestCaseController.doEditCase
-GET         /doDeleteCase                                  controllers.TestCaseController.doDeleteCase(id: Long)
-GET         /viewTestCase                                  controllers.TestCaseController.viewTestCase(id: Long, display: String ?= "jobs")
-GET         /viewTestCase2                                 controllers.TestCaseController.viewTestCase2(id: Long, tdlId: Long, display: String ?= "jobs")
-POST        /doEditCaseField                               controllers.TestCaseController.doEditCaseField()
+GET           /getCreateCaseEditorView                       controllers.TestCaseController.getCreateCaseEditorView(assertionId: Long)
+POST          /doCreateCase                                  controllers.TestCaseController.doCreateCase
+GET           /getEditCaseEditorView                         controllers.TestCaseController.getEditCaseEditorView(id: Long)
+POST          /doEditCase                                    controllers.TestCaseController.doEditCase
+GET           /doDeleteCase                                  controllers.TestCaseController.doDeleteCase(id: Long)
+GET           /viewTestCase                                  controllers.TestCaseController.viewTestCase(id: Long, display: String ?= "jobs")
+GET           /viewTestCase2                                 controllers.TestCaseController.viewTestCase2(id: Long, tdlId: Long, display: String ?= "jobs")
+POST          /doEditCaseField                               controllers.TestCaseController.doEditCaseField()
 #JOB management
 
-GET         /getCreateJobEditorView                        controllers.JobController.getCreateJobEditorView(tdlID: Long)
-POST        /doCreateJob                                   controllers.JobController.doCreateJob()
-GET         /viewJob                                       controllers.JobController.displayJob(id: Long, showHistory: Boolean)
-GET         /doDeleteJob                                   controllers.JobController.doDeleteJob(id: Long)
-GET         /viewTestRunHistory                            controllers.JobController.viewTestRunHistory(testRunId: Long)
-GET         /changeTestRunVisibility                       controllers.JobController.changeTestRunVisibility(id: Long, visibility : String)
-GET         /changeJobVisibility                           controllers.JobController.changeJobVisibility(id: Long, visibility : String)
-POST        /doEditJobField                                controllers.JobController.doEditJobField()
+GET           /getCreateJobEditorView                        controllers.JobController.getCreateJobEditorView(tdlID: Long)
+POST          /doCreateJob                                   controllers.JobController.doCreateJob()
+GET           /viewJob                                       controllers.JobController.displayJob(id: Long, showHistory: Boolean)
+GET           /doDeleteJob                                   controllers.JobController.doDeleteJob(id: Long)
+GET           /viewTestRunHistory                            controllers.JobController.viewTestRunHistory(testRunId: Long)
+GET           /changeTestRunVisibility                       controllers.JobController.changeTestRunVisibility(id: Long, visibility : String)
+GET           /changeJobVisibility                           controllers.JobController.changeJobVisibility(id: Long, visibility : String)
+POST          /doEditJobField                                controllers.JobController.doEditJobField()
 
 #Job Template
-POST        /doCreateJobTemplate                           controllers.JobTemplateController.doCreateJobTemplate(groupId: Long)
-GET         /createJobTemplateForm                         controllers.JobTemplateController.createJobTemplateForm(groupId: Long)
+POST          /doCreateJobTemplate                           controllers.JobTemplateController.doCreateJobTemplate(groupId: Long)
+GET           /createJobTemplateForm                         controllers.JobTemplateController.createJobTemplateForm(groupId: Long)
 
 
-POST        /doCreateReportTemplate                        controllers.ReportTemplateController.doCreateReportTemplate()
-POST        /doEditReportTemplate                          controllers.ReportTemplateController.doEditReportTemplate()
-GET         /viewReportTemplateView                        controllers.ReportTemplateController.viewReportTemplateView(id: Long)
-GET         /preViewReportTemplateView                     controllers.ReportTemplateController.preViewReportTemplateView(id: Long)
-GET         /createReportTemplateView                      controllers.ReportTemplateController.createReportTemplateView(groupId: Long)
-GET         /editReportTemplateView                        controllers.ReportTemplateController.editReportTemplateView(reportTemplateId: Long)
-GET         /deleteReportTemplate                          controllers.ReportTemplateController.deleteReportTemplate(reportTemplateId: Long)
+POST          /doCreateReportTemplate                        controllers.ReportTemplateController.doCreateReportTemplate()
+POST          /doEditReportTemplate                          controllers.ReportTemplateController.doEditReportTemplate()
+GET           /viewReportTemplateView                        controllers.ReportTemplateController.viewReportTemplateView(id: Long)
+GET           /preViewReportTemplateView                     controllers.ReportTemplateController.preViewReportTemplateView(id: Long)
+GET           /createReportTemplateView                      controllers.ReportTemplateController.createReportTemplateView(groupId: Long)
+GET           /editReportTemplateView                        controllers.ReportTemplateController.editReportTemplateView(reportTemplateId: Long)
+GET           /deleteReportTemplate                          controllers.ReportTemplateController.deleteReportTemplate(reportTemplateId: Long)
 
 #test asset management
-POST        /doCreateTestAsset                             controllers.TestAssetController.doCreateTestAsset(groupId: Long)
-GET         /createNewAssetForm                            controllers.TestAssetController.createNewAssetForm
-GET         /editAssetForm                                 controllers.TestAssetController.editAssetForm(id: Long)
-POST        /doEditAsset                                   controllers.TestAssetController.doEditAsset
-GET         /doDeleteAsset                                 controllers.TestAssetController.doDeleteAsset(id: Long)
-GET         /downloadAsset                                 controllers.TestAssetController.downloadAsset(id: Long)
+POST          /doCreateTestAsset                             controllers.TestAssetController.doCreateTestAsset(groupId: Long)
+GET           /createNewAssetForm                            controllers.TestAssetController.createNewAssetForm
+GET           /editAssetForm                                 controllers.TestAssetController.editAssetForm(id: Long)
+POST          /doEditAsset                                   controllers.TestAssetController.doEditAsset
+GET           /doDeleteAsset                                 controllers.TestAssetController.doDeleteAsset(id: Long)
+GET           /downloadAsset                                 controllers.TestAssetController.downloadAsset(id: Long)
 
 #test run listing
-GET         /listTestRunsForm                              controllers.JobController.listTestRuns(configurationId: Long)
-GET         /viewReport                                    controllers.JobController.viewReport(testRunId: Long, type: String)
+GET           /listTestRunsForm                              controllers.JobController.listTestRuns(configurationId: Long)
+GET           /viewReport                                    controllers.JobController.viewReport(testRunId: Long, type: String)
 
 #Adapters
-GET         /createNewAdapterForm                          controllers.AdapterController.createNewAdapterForm
-POST        /doCreateAdapter                               controllers.AdapterController.doCreateAdapter
-GET         /doDeleteAdapter                               controllers.AdapterController.doDeleteAdapter(id: Long)
-GET         /doDeleteAdapterVersion                        controllers.AdapterController.doDeleteAdapterVersion(id: Long)
-GET         /editAdapterForm                               controllers.AdapterController.editAdapterForm(id: Long)
-POST        /doEditAdapter                                 controllers.AdapterController.doEditAdapter
+GET           /createNewAdapterForm                          controllers.AdapterController.createNewAdapterForm
+POST          /doCreateAdapter                               controllers.AdapterController.doCreateAdapter
+GET           /doDeleteAdapter                               controllers.AdapterController.doDeleteAdapter(id: Long)
+GET           /doDeleteAdapterVersion                        controllers.AdapterController.doDeleteAdapterVersion(id: Long)
+GET           /editAdapterForm                               controllers.AdapterController.editAdapterForm(id: Long)
+POST          /doEditAdapter                                 controllers.AdapterController.doEditAdapter
 
 #SSE Test
-GET         /adapterJobStatusFeed                          controllers.AdapterStatusFeeder.adapterJobStatusFeed(jobId: Long)
-GET         /adapterStatusFeed                             controllers.AdapterStatusFeeder.adapterStatusFeed(id: Long)
-GET         /jobQueueFeed                                  controllers.TestRunFeeder.jobQueueFeed
-GET         /testProgressFeed                              controllers.TestRunFeeder.testProgressFeed
-GET         /historyFeed                                   controllers.TestRunFeeder.jobHistoryFeed
-GET         /logFeed                                       controllers.TestLogFeeder.logFeed
-GET         /cancelJob                                     controllers.TestQueueController.cancelJob(index: Int)
-GET         /cancelActiveJob                               controllers.TestQueueController.cancelActiveJob
-GET         /enqueueJob                                    controllers.TestQueueController.enqueueJob(id: Long, visibility: String)
-GET         /enqueueTestSuite                              controllers.TestQueueController.enqueueTestSuite(id: Long, visibility: String, jobIdList: String)
+GET           /adapterJobStatusFeed                          controllers.AdapterStatusFeeder.adapterJobStatusFeed(jobId: Long)
+GET           /adapterStatusFeed                             controllers.AdapterStatusFeeder.adapterStatusFeed(id: Long)
+GET           /jobQueueFeed                                  controllers.TestRunFeeder.jobQueueFeed
+GET           /testProgressFeed                              controllers.TestRunFeeder.testProgressFeed
+GET           /historyFeed                                   controllers.TestRunFeeder.jobHistoryFeed
+GET           /logFeed                                       controllers.TestLogFeeder.logFeed
+GET           /cancelJob                                     controllers.TestQueueController.cancelJob(index: Int)
+GET           /cancelActiveJob                               controllers.TestQueueController.cancelActiveJob
+GET           /enqueueJob                                    controllers.TestQueueController.enqueueJob(id: Long, visibility: String)
+GET           /enqueueTestSuite                              controllers.TestQueueController.enqueueTestSuite(id: Long, visibility: String, jobIdList: String)
 
 
-POST        /doEditTestSuiteField                          controllers.TestSuiteController.doEditTestSuiteField
-GET         /getTestSuiteDetailView                        controllers.TestSuiteController.getTestSuiteDetailView(id: Long, display: String)
-GET         /createTestSuite                               controllers.TestSuiteController.getCreateTestSuiteView(groupId: Long)
-POST        /createTestSuite                               controllers.TestSuiteController.doCreateTestSuite
-POST        /doEditTestSuite                               controllers.TestSuiteController.doEditTestSuite
-GET         /doDeleteTestSuite                             controllers.TestSuiteController.doDeleteTestSuite(id: Long)
-GET         /renderSuiteDetailView                         controllers.TestSuiteController.renderDetails(id: Long)
-GET         /renderTestStatus                              controllers.TestSuiteController.renderStatus(id: Long)
-GET         /renderTestSuiteEditor                         controllers.TestSuiteController.renderEditor(id: Long)
-POST        /getNamesAndAdaptersForTdls                    controllers.TestSuiteController.getNamesAndAdaptersForTdls()
+POST          /doEditTestSuiteField                          controllers.TestSuiteController.doEditTestSuiteField
+GET           /getTestSuiteDetailView                        controllers.TestSuiteController.getTestSuiteDetailView(id: Long, display: String)
+GET           /createTestSuite                               controllers.TestSuiteController.getCreateTestSuiteView(groupId: Long)
+POST          /createTestSuite                               controllers.TestSuiteController.doCreateTestSuite
+POST          /doEditTestSuite                               controllers.TestSuiteController.doEditTestSuite
+GET           /doDeleteTestSuite                             controllers.TestSuiteController.doDeleteTestSuite(id: Long)
+GET           /renderSuiteDetailView                         controllers.TestSuiteController.renderDetails(id: Long)
+GET           /renderTestStatus                              controllers.TestSuiteController.renderStatus(id: Long)
+GET           /renderTestSuiteEditor                         controllers.TestSuiteController.renderEditor(id: Long)
+POST          /getNamesAndAdaptersForTdls                    controllers.TestSuiteController.getNamesAndAdaptersForTdls()
 
 
-GET         /getSuiteRunDetailView                         controllers.SuiteRunController.getSuiteRunDetailView(id: Long)
-GET         /generateReport                                controllers.SuiteRunController.generateReport(id: Long, testRuns:String, subTitle:String ?= "")
+GET           /getSuiteRunDetailView                         controllers.SuiteRunController.getSuiteRunDetailView(id: Long)
+GET           /generateReport                                controllers.SuiteRunController.generateReport(id: Long, testRuns:String, subTitle:String ?= "")
 
-GET         /getCreateUtilClassEditorView                  controllers.UtilClassController.getCreateUtilClassEditorView(groupId: Long)
-POST        /doCreateUtilClass                             controllers.UtilClassController.doCreateUtilClass
-GET         /getEditUtilClassEditorView                    controllers.UtilClassController.getEditCaseEditorView(id: Long)
-POST        /doEditUtilClass                               controllers.UtilClassController.doEditUtilClass
-GET         /doDeleteUtilClass                             controllers.UtilClassController.doDeleteUtilClass(id: Long)
-GET         /viewUtilClass                                 controllers.UtilClassController.viewUtilClass(id: Long)
-POST        /doEditUtilClassField                          controllers.UtilClassController.doEditUtilClassField()
+GET           /getCreateUtilClassEditorView                  controllers.UtilClassController.getCreateUtilClassEditorView(groupId: Long)
+POST          /doCreateUtilClass                             controllers.UtilClassController.doCreateUtilClass
+GET           /getEditUtilClassEditorView                    controllers.UtilClassController.getEditCaseEditorView(id: Long)
+POST          /doEditUtilClass                               controllers.UtilClassController.doEditUtilClass
+GET           /doDeleteUtilClass                             controllers.UtilClassController.doDeleteUtilClass(id: Long)
+GET           /viewUtilClass                                 controllers.UtilClassController.viewUtilClass(id: Long)
+POST          /doEditUtilClassField                          controllers.UtilClassController.doEditUtilClassField()
 
-POST        /updateSettings                                controllers.SettingsController.updateSettings
+POST          /updateSettings                                controllers.SettingsController.updateSettings
 
 
 ######### REEEEEESSSTTT
-POST        /rest/validatecontent                          rest.controllers.XMLValidationController.validateContent
+POST          /rest/validatecontent                          rest.controllers.XMLValidationController.validateContent
 
 #Rest test group management
-GET         /rest/listTestGroups                           rest.controllers.RestTestGroupController.listTestGroups
-POST        /rest/editdependency                           rest.controllers.RestTestGroupController.editDependency
-POST        /rest/getdependency                            rest.controllers.RestTestGroupController.getDependency
-POST        /rest/addTestGroup                             rest.controllers.RestTestGroupController.addTestGroup
-POST        /rest/editTestGroup                            rest.controllers.RestTestGroupController.editTestGroup
-POST        /rest/deleteTestGroup                          rest.controllers.RestTestGroupController.deleteTestGroup
-POST        /rest/getTestGroup                             rest.controllers.RestTestGroupController.getTestGroup
-POST        /rest/exportTestGroup                          rest.controllers.TestGroupImportExportController.exportTestGroup
-POST        /rest/importTestGroup                          rest.controllers.TestGroupImportExportController.importTestGroup
+GET           /rest/listTestGroups                           rest.controllers.RestTestGroupController.listTestGroups
+POST          /rest/editdependency                           rest.controllers.RestTestGroupController.editDependency
+POST          /rest/getdependency                            rest.controllers.RestTestGroupController.getDependency
+POST          /rest/addTestGroup                             rest.controllers.RestTestGroupController.addTestGroup
+POST          /rest/editTestGroup                            rest.controllers.RestTestGroupController.editTestGroup
+POST          /rest/deleteTestGroup                          rest.controllers.RestTestGroupController.deleteTestGroup
+POST          /rest/getTestGroup                             rest.controllers.RestTestGroupController.getTestGroup
+POST          /rest/exportTestGroup                          rest.controllers.TestGroupImportExportController.exportTestGroup
+POST          /rest/importTestGroup                          rest.controllers.TestGroupImportExportController.importTestGroup
 
 #Rest test assertion management
-POST        /rest/listUtilClasses                          rest.controllers.RestUtilClassController.listUtilClasses
-POST        /rest/getUtilClass                             rest.controllers.RestUtilClassController.getUtilClass
-POST        /rest/addUtilClass                             rest.controllers.RestUtilClassController.addUtilClass
-POST        /rest/editUtilClass                            rest.controllers.RestUtilClassController.editUtilClass
-POST        /rest/deleteUtilClass                          rest.controllers.RestUtilClassController.deleteUtilClass
+POST          /rest/listUtilClasses                          rest.controllers.RestUtilClassController.listUtilClasses
+POST          /rest/getUtilClass                             rest.controllers.RestUtilClassController.getUtilClass
+POST          /rest/addUtilClass                             rest.controllers.RestUtilClassController.addUtilClass
+POST          /rest/editUtilClass                            rest.controllers.RestUtilClassController.editUtilClass
+POST          /rest/deleteUtilClass                          rest.controllers.RestUtilClassController.deleteUtilClass
 
 #Rest test assertion management
-POST        /rest/listTestAssertions                       rest.controllers.RestTestAssertionController.listTestAssertions
-POST        /rest/getTestAssertion                         rest.controllers.RestTestAssertionController.getTestAssertion
-POST        /rest/addTestAssertion                         rest.controllers.RestTestAssertionController.addTestAssertion
-POST        /rest/editTestAssertion                        rest.controllers.RestTestAssertionController.editTestAssertion
-POST        /rest/deleteTestAssertion                      rest.controllers.RestTestAssertionController.deleteTestAssertion
+POST          /rest/listTestAssertions                       rest.controllers.RestTestAssertionController.listTestAssertions
+POST          /rest/getTestAssertion                         rest.controllers.RestTestAssertionController.getTestAssertion
+POST          /rest/addTestAssertion                         rest.controllers.RestTestAssertionController.addTestAssertion
+POST          /rest/editTestAssertion                        rest.controllers.RestTestAssertionController.editTestAssertion
+POST          /rest/deleteTestAssertion                      rest.controllers.RestTestAssertionController.deleteTestAssertion
 
 #Rest test asset management
-POST        /rest/listTestAssets                           rest.controllers.RestTestAssetController.listTestAssets
-POST        /rest/getTestAsset                             rest.controllers.RestTestAssetController.getTestAsset
-POST        /rest/addTestAsset                             rest.controllers.RestTestAssetController.addTestAsset
-POST        /rest/editTestAsset                            rest.controllers.RestTestAssetController.editTestAsset
-POST        /rest/deleteTestAsset                          rest.controllers.RestTestAssetController.deleteTestAsset
+POST          /rest/listTestAssets                           rest.controllers.RestTestAssetController.listTestAssets
+POST          /rest/getTestAsset                             rest.controllers.RestTestAssetController.getTestAsset
+POST          /rest/addTestAsset                             rest.controllers.RestTestAssetController.addTestAsset
+POST          /rest/editTestAsset                            rest.controllers.RestTestAssetController.editTestAsset
+POST          /rest/deleteTestAsset                          rest.controllers.RestTestAssetController.deleteTestAsset
 
 #Rest test case management
-POST        /rest/listTestCases                            rest.controllers.RestTestCaseController.listTestCases
-POST        /rest/getTestCase                              rest.controllers.RestTestCaseController.getTestCase
-POST        /rest/addTestCase                              rest.controllers.RestTestCaseController.addTestCase
-POST        /rest/editTestCase                             rest.controllers.RestTestCaseController.editTestCase
-POST        /rest/deleteTestCase                           rest.controllers.RestTestCaseController.deleteTestCase
+POST          /rest/listTestCases                            rest.controllers.RestTestCaseController.listTestCases
+POST          /rest/getTestCase                              rest.controllers.RestTestCaseController.getTestCase
+POST          /rest/addTestCase                              rest.controllers.RestTestCaseController.addTestCase
+POST          /rest/editTestCase                             rest.controllers.RestTestCaseController.editTestCase
+POST          /rest/deleteTestCase                           rest.controllers.RestTestCaseController.deleteTestCase
 
 #Rest adapter management
-GET         /rest/listAdapters                             rest.controllers.RestAdapterController.listAdapters
-POST        /rest/getAdapterStatus                         rest.controllers.RestAdapterController.getAdapterStatus
-POST        /rest/getAdapter                               rest.controllers.RestAdapterController.getAdapter
-POST        /rest/addAdapter                               rest.controllers.RestAdapterController.addAdapter
-POST        /rest/editAdapter                              rest.controllers.RestAdapterController.editAdapter
-POST        /rest/deleteAdapter                            rest.controllers.RestAdapterController.deleteAdapter
+GET           /rest/listAdapters                             rest.controllers.RestAdapterController.listAdapters
+POST          /rest/getAdapterStatus                         rest.controllers.RestAdapterController.getAdapterStatus
+POST          /rest/getAdapter                               rest.controllers.RestAdapterController.getAdapter
+POST          /rest/addAdapter                               rest.controllers.RestAdapterController.addAdapter
+POST          /rest/editAdapter                              rest.controllers.RestAdapterController.editAdapter
+POST          /rest/deleteAdapter                            rest.controllers.RestAdapterController.deleteAdapter
 
 #Rest Job management
-GET         /rest/listJobs                                 rest.controllers.RestJobController.listJobs
-POST        /rest/getJob                                   rest.controllers.RestJobController.getJob
-POST        /rest/createJob                                rest.controllers.RestJobController.createJob
-POST        /rest/deleteJob                                rest.controllers.RestJobController.deleteJob
+GET           /rest/listJobs                                 rest.controllers.RestJobController.listJobs
+POST          /rest/getJob                                   rest.controllers.RestJobController.getJob
+POST          /rest/createJob                                rest.controllers.RestJobController.createJob
+POST          /rest/deleteJob                                rest.controllers.RestJobController.deleteJob
 
 #Rest TDL management
-POST        /rest/getTdl                                   rest.controllers.RestTdlController.getTdl
-POST        /rest/addTdl                                   rest.controllers.RestTdlController.addTdl
-POST        /rest/editTdl                                  rest.controllers.RestTdlController.editTdl
+POST          /rest/getTdl                                   rest.controllers.RestTdlController.getTdl
+POST          /rest/addTdl                                   rest.controllers.RestTdlController.addTdl
+POST          /rest/editTdl                                  rest.controllers.RestTdlController.editTdl
 
 #GITB Testbed Rest Services
-POST        /rest/testbed/getTestCaseDefinition            rest.controllers.GitbTestbedController.getTestCaseDefinition()
-POST        /rest/testbed/getActorDefinition               rest.controllers.GitbTestbedController.getActorDefinition()
-POST        /rest/testbed/initiate                         rest.controllers.GitbTestbedController.initiate()
-POST        /rest/testbed/configure                        rest.controllers.GitbTestbedController.configure()
-POST        /rest/testbed/start                            rest.controllers.GitbTestbedController.start()
-POST        /rest/testbed/stop                             rest.controllers.GitbTestbedController.stop()
-POST        /rest/testbed/getTestCaseDefinitions           rest.controllers.GitbTestbedController.getGetTestCaseDefinitions()
+POST          /rest/testbed/getTestCaseDefinition            rest.controllers.GitbTestbedController.getTestCaseDefinition()
+POST          /rest/testbed/getActorDefinition               rest.controllers.GitbTestbedController.getActorDefinition()
+POST          /rest/testbed/initiate                         rest.controllers.GitbTestbedController.initiate()
+POST          /rest/testbed/configure                        rest.controllers.GitbTestbedController.configure()
+POST          /rest/testbed/start                            rest.controllers.GitbTestbedController.start()
+POST          /rest/testbed/stop                             rest.controllers.GitbTestbedController.stop()
+POST          /rest/testbed/getTestCaseDefinitions           rest.controllers.GitbTestbedController.getGetTestCaseDefinitions()
 
 
 #REST RUNS
-GET         /rest/hello                                    rest.controllers.RestRunController.hello
-POST        /rest/run/runJob                               rest.controllers.RestRunController.runJob
-POST        /rest/run/testRunStatus                        rest.controllers.RestRunController.testRunStatus
-POST        /rest/run/runSuite                             rest.controllers.RestRunController.runSuite
-POST        /rest/run/suiteRunStatus                       rest.controllers.RestRunController.suiteRunStatus
+GET           /rest/hello                                    rest.controllers.RestRunController.hello
+POST          /rest/run/runJob                               rest.controllers.RestRunController.runJob
+POST          /rest/run/testRunStatus                        rest.controllers.RestRunController.testRunStatus
+POST          /rest/run/runSuite                             rest.controllers.RestRunController.runSuite
+POST          /rest/run/suiteRunStatus                       rest.controllers.RestRunController.suiteRunStatus
 
-GET         /resetQueue                                    controllers.Application.restartQueThread
+GET           /resetQueue                                    controllers.Application.restartQueThread
 
 
 # Map static resources from the /public folder to the /assets URL path
-GET         /assets/*file                                  controllers.Assets.versioned(path="/public", file)
-GET         /webjars/*file                                 controllers.WebJarAssets.at(file)
+GET           /assets/*file                                  controllers.Assets.versioned(path="/public", file)
+GET           /webjars/*file                                 controllers.WebJarAssets.at(file)
 
 
 # advanced reporting
 
-GET         /advrMain                                      controllers.AdvancedReporting.renderMain(groupId: Long)
-GET         /createBatchReport                             controllers.AdvancedReporting.createBatchReport(groupId: Long)
-GET         /createSingleReport                            controllers.AdvancedReporting.createSingleReport(groupId: Long)
+GET           /advrMain                                      controllers.AdvancedReporting.renderMain(groupId: Long)
+GET           /createBatchReport                             controllers.AdvancedReporting.createBatchReport(groupId: Long)
+GET           /createSingleReport                            controllers.AdvancedReporting.createSingleReport(groupId: Long)
 
 
-GET         /batchStep1                                    controllers.AdvancedBatchReporting.step1(groupId: Long)
-GET         /batchStep2                                    controllers.AdvancedBatchReporting.step2(groupId: Long)
-GET         /batchStep3                                    controllers.AdvancedBatchReporting.step3(groupId: Long)
-GET         /batchStep4                                    controllers.AdvancedBatchReporting.step4(groupId: Long)
-GET         /previewReport                                 controllers.AdvancedBatchReporting.previewReport(reportId: Long)
-POST        /generateReport                                controllers.AdvancedBatchReporting.generateReport()
-GET         /downloadReport                                controllers.AdvancedBatchReporting.downloadReport(temporaryReportId: Long)
+GET           /batchStep1                                    controllers.AdvancedBatchReporting.step1(groupId: Long)
+GET           /batchStep2                                    controllers.AdvancedBatchReporting.step2(groupId: Long)
+GET           /batchStep3                                    controllers.AdvancedBatchReporting.step3(groupId: Long)
+GET           /batchStep4                                    controllers.AdvancedBatchReporting.step4(groupId: Long)
+GET           /previewReport                                 controllers.AdvancedBatchReporting.previewReport(reportId: Long)
+POST          /generateReport                                controllers.AdvancedBatchReporting.generateReport()
+GET           /downloadReport                                controllers.AdvancedBatchReporting.downloadReport(temporaryReportId: Long)
 
 
 #job scheduling
 
-GET         /scheduling/list                               controllers.Scheduling.listScheduledJobs(groupId: Long)
-GET         /scheduling/viewSchedule                       controllers.Scheduling.viewSchedule(id: Long)
-GET         /scheduling/add                                controllers.Scheduling.addScheduledJob(groupId: Long)
-POST        /scheduling/doAdd                              controllers.Scheduling.doAddScheduledJob()
-GET         /scheduling/delete                             controllers.Scheduling.deleteScheduledJob(scheduledJobId: Long)
-GET         /scheduling/removeJobFromSchedule              controllers.Scheduling.removeJobFromSchedule(scheduledJobId: Long, jobId: Long)
-GET         /scheduling/deleteNextJob                      controllers.Scheduling.deleteNextJob(scheduleId: Long)
-GET         /scheduling/setNextJob                         controllers.Scheduling.setNextJob(scheduleId: Long, nextId: Long)
-POST        /scheduling/doEditScheduleField                controllers.Scheduling.doEditScheduleField
-POST        /scheduling/renderCandidateJobList             controllers.Scheduling.renderCandidateJobList(scheduleId: Long)
-POST        /scheduling/renderCandidateSuiteJobList        controllers.Scheduling.renderCandidateSuiteJobList(scheduleId: Long)
-POST        /scheduling/renderCandidateSuiteList           controllers.Scheduling.renderCandidateSuiteList(scheduleId: Long)
-POST        /scheduling/addTestSuiteToSchedule             controllers.Scheduling.addTestSuiteToSchedule(schedule: Long, testSuiteId: Long)
-POST        /scheduling/addJobToSchedule                   controllers.Scheduling.addJobToSchedule(schedule: Long, jobId: Long)
+GET           /scheduling/list                               controllers.Scheduling.listScheduledJobs(groupId: Long)
+GET           /scheduling/viewSchedule                       controllers.Scheduling.viewSchedule(id: Long)
+GET           /scheduling/add                                controllers.Scheduling.addScheduledJob(groupId: Long)
+POST          /scheduling/doAdd                              controllers.Scheduling.doAddScheduledJob()
+GET           /scheduling/delete                             controllers.Scheduling.deleteScheduledJob(scheduledJobId: Long)
+GET           /scheduling/removeJobFromSchedule              controllers.Scheduling.removeJobFromSchedule(scheduledJobId: Long, jobId: Long)
+GET           /scheduling/deleteNextJob                      controllers.Scheduling.deleteNextJob(scheduleId: Long)
+GET           /scheduling/setNextJob                         controllers.Scheduling.setNextJob(scheduleId: Long, nextId: Long)
+POST          /scheduling/doEditScheduleField                controllers.Scheduling.doEditScheduleField
+POST          /scheduling/renderCandidateJobList             controllers.Scheduling.renderCandidateJobList(scheduleId: Long)
+POST          /scheduling/renderCandidateSuiteJobList        controllers.Scheduling.renderCandidateSuiteJobList(scheduleId: Long)
+POST          /scheduling/renderCandidateSuiteList           controllers.Scheduling.renderCandidateSuiteList(scheduleId: Long)
+POST          /scheduling/addTestSuiteToSchedule             controllers.Scheduling.addTestSuiteToSchedule(schedule: Long, testSuiteId: Long)
+POST          /scheduling/addJobToSchedule                   controllers.Scheduling.addJobToSchedule(schedule: Long, jobId: Long)
 
 
-GET         /modelJSON/listTestSuites                      controllers.ModelJSONLister.listTestSuites(groupId: Long, pageIndex: Int, pageSize: Int)
-GET         /modelJSON/listSuiteJobs                       controllers.ModelJSONLister.listSuiteJobs(groupId: Long, pageIndex: Int, pageSize: Int)
-GET         /modelJSON/listSuiteRuns                       controllers.ModelJSONLister.listSuiteRuns(suiteId: Long, pageIndex: Int, pageSize: Int)
-GET         /modelJSON/listTestRuns                        controllers.ModelJSONLister.listTestRuns(suiteRunId: Long, pageIndex: Int, pageSize: Int)
-GET         /modelJSON/listTestCases                       controllers.ModelJSONLister.listTestCases(testGroupId: Long, pageIndex: Int, pageSize: Int)
-GET         /modelJSON/listJobs                            controllers.ModelJSONLister.listJobs(testCaseId: Long, pageIndex: Int, pageSize: Int)
-GET         /modelJSON/listJobTestRuns                     controllers.ModelJSONLister.listJobTestRuns(jobId: Long, pageIndex: Int, pageSize: Int)
-GET         /modelJSON/listReportParameters1               controllers.ModelJSONLister.listReportParameters(batchReportId: Long, reportId: Long)
-GET         /modelJSON/listSchedulesJSON                   controllers.ModelJSONLister.listSchedulesJSON(groupId: Long, pageIndex: Int, pageSize: Int)
+GET           /modelJSON/listTestSuites                      controllers.ModelJSONLister.listTestSuites(groupId: Long, pageIndex: Int, pageSize: Int)
+GET           /modelJSON/listSuiteJobs                       controllers.ModelJSONLister.listSuiteJobs(groupId: Long, pageIndex: Int, pageSize: Int)
+GET           /modelJSON/listSuiteRuns                       controllers.ModelJSONLister.listSuiteRuns(suiteId: Long, pageIndex: Int, pageSize: Int)
+GET           /modelJSON/listTestRuns                        controllers.ModelJSONLister.listTestRuns(suiteRunId: Long, pageIndex: Int, pageSize: Int)
+GET           /modelJSON/listTestCases                       controllers.ModelJSONLister.listTestCases(testGroupId: Long, pageIndex: Int, pageSize: Int)
+GET           /modelJSON/listJobs                            controllers.ModelJSONLister.listJobs(testCaseId: Long, pageIndex: Int, pageSize: Int)
+GET           /modelJSON/listJobTestRuns                     controllers.ModelJSONLister.listJobTestRuns(jobId: Long, pageIndex: Int, pageSize: Int)
+GET           /modelJSON/listReportParameters1               controllers.ModelJSONLister.listReportParameters(batchReportId: Long, reportId: Long)
+GET           /modelJSON/listSchedulesJSON                   controllers.ModelJSONLister.listSchedulesJSON(groupId: Long, pageIndex: Int, pageSize: Int)
+
+
+
+
+#this must be the last url
+GET           /*url                                          controllers.EPQueueManager.getEP(url: String)
+POST          /*url                                          controllers.EPQueueManager.postEP(url: String)
+PUT           /*url                                          controllers.EPQueueManager.putEP(url: String)
+DELETE        /*url                                          controllers.EPQueueManager.deleteEP(url: String)

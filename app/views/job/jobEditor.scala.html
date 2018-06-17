@@ -11,6 +11,7 @@
 @tdl = @{
   Tdl.findById(frm("tdlID").value.toLong)
 }
+
 @testGroup = @{
   tdl.testCase.testAssertion.testGroup
 }
@@ -45,27 +46,19 @@
               </tr>
               <tr>
                 <td>Parameters:</td>
-                <td><textarea name="mtdlParameters" rows="5">@frm("mtdlParameters").value()</textarea></td>
+                <td><textarea name="mtdlParameters" rows="5">@frm("mtdlParameters").value()</textarea>
               </tr>
               <tr>
                 <td>Associated Report Template:</td>
                 <td>
                 @defining(ReportTemplate.findByGroup(testGroup)) { list =>
-                  @if(list.size() == 0) {
-                    @subjectHasRole(security.Role.TEST_DESIGNER) {
-                      @createLinkButton(controllers.routes.ReportTemplateController.createReportTemplateView(testGroup.id).url,
-                        Messages("reportTemplates.createReportTemplate"))
-                      <br />
-                      <br />
-                    }
-                  } else {
-                    <select id="reportTemplate" name="reportTemplate" >
-                      <option value="-1">Default</option>
+                  <select id="reportTemplate" name="reportTemplate" >
+                    <option value="-1">Default</option>
                     @for(template <- list) {
                       <option value="@template.id">@template.name</option>
                     }
-                    </select>
-                  }
+                  </select>
+
                 }
                 </td>
               </tr>

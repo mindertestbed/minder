@@ -2,7 +2,6 @@ package utils;
 
 import com.avaje.ebean.Model;
 import controllers.MappedAdapterModel;
-import controllers.TestCaseController;
 import minderengine.BuiltInAdapterRegistry;
 import minderengine.XoolaServer;
 import models.*;
@@ -12,13 +11,11 @@ import org.yaml.snakeyaml.Yaml;
 import org.yaml.snakeyaml.constructor.CustomClassLoaderConstructor;
 import play.Logger;
 import play.api.Environment;
-import play.api.Play;
 import play.data.format.Formatters;
 import scala.io.BufferedSource;
 import scala.io.Source;
 
 import javax.inject.Inject;
-import javax.inject.Provider;
 import javax.inject.Singleton;
 import java.io.File;
 import java.io.FileInputStream;
@@ -92,7 +89,7 @@ public class Startup {
                     tdl.tdl = file.mkString();
                     tdl.testCase = tcase;
                     tdl.save();
-                    TestCaseController.detectAndSaveParameters(tdl);
+                    TdlUtils.detectAndSaveParameters(tdl);
                   }
                 }
               }

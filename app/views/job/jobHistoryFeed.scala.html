@@ -1,70 +1,77 @@
 @import authentication._
 @()(implicit authentication: Authentication)
 <script>
-  $(function () {
+    $(function () {
 
+      var successImage = '<img src="@routes.Assets.versioned("/images/Check-icon.png")" height="12px" alt="G"/>'
+      var failImage = '<img src="@routes.Assets.versioned("/images/Delete-icon.png")" height="12px" alt="B"/>'
 
-    var successImage = '<img src="@routes.Assets.versioned("/images/Check-icon.png")" height="12px" alt="G"/>'
-    var failImage = '<img src="@routes.Assets.versioned("/images/Delete-icon.png")" height="12px" alt="B"/>'
+      var rowTemplate = $("#historyRowTemplate").html()
 
-    var rowTemplate = $("#historyRowTemplate").html()
+      var historyTableBody = $("#historyListDiv")
 
-    var historyTableBody = $("#historyListDiv")
+      new EventSource('@{controllers.routes.TestRunFeeder.jobHistoryFeed()}').onmessage =
+          function (event) {
+            var json = JSON.parse(event.data)
 
-    new EventSource('@{controllers.routes.TestRunFeeder.jobHistoryFeed()}').onmessage =
-        function (event) {
-          var json = JSON.parse(event.data)
+            var img = successImage
+            var cls = 'goodTestRun'
+            if (!json.success) {
+              img = failImage
+              cls = 'badTestRun'
+            }
+            var visibilityColor = 'red'
+            var visibilityClass = "fa fa-lock"
+            if (json.visibility == "PUBLIC") {
+              visibilityClass = 'fa fa-globe'
+              visibilityColor = '#1fc36d'
+            }
+            else if (json.visibility == "PROTECTED") {
+              visibilityClass = 'fa fa-group'
+              visibilityColor = '#7cd8ff'
+            }
 
-          var img = successImage
-          var cls = 'goodTestRun'
-          if (!json.success) {
-            img = failImage
-            cls = 'badTestRun'
+            var newRow = rowTemplate.replace(/Pimage/g, img)
+            .replace(/Ptrclass/g, cls)
+            .replace(/PtestRunNumber/g, json.no)
+            .replace(/PtestRunId/g, json.id)
+            .replace(/PjobName/g, json.name)
+            .replace(/PjobId/g, json.jobId)
+            .replace(/PvisibilityColor/g, visibilityColor)
+            .replace(/PvisibilityClass/g, visibilityClass)
+            .replace(/Pvisibility/g, json.visibility)
+
+            historyTableBody.prepend(newRow)
           }
-          var visibilityColor = 'red'
-          var visibilityClass = "fa fa-lock"
-          if (json.visibility == "PUBLIC") {
-            visibilityClass = 'fa fa-globe'
-            visibilityColor = '#1fc36d'
-          }
-          else if (json.visibility == "PROTECTED") {
-            visibilityClass = 'fa fa-group'
-            visibilityColor = '#7cd8ff'
-          }
-
-          var newRow = rowTemplate.replace(/Pimage/g, img).replace(/Ptrclass/g, cls).replace(/PtestRunNumber/g, json.no).replace(/PtestRunId/g, json.id).replace(/PjobName/g, json.name).replace(/PjobId/g, json.jobId).replace(/PvisibilityColor/g, visibilityColor).replace(/PvisibilityClass/g, visibilityClass).replace(/Pvisibility/g, json.visibility)
-
-          historyTableBody.prepend(newRow)
-        }
-  });
+    });
 </script>
 <style type="text/css">
 
-.ellipsis {
-  overflow: hidden ;
-  text-overflow: ellipsis ;
-  white-space: nowrap ;
-  display: inline-block ;
-  font-size: smaller ;
-}
+    .ellipsis {
+      overflow: hidden ;
+      text-overflow: ellipsis ;
+      white-space: nowrap ;
+      display: inline-block ;
+      font-size: smaller ;
+    }
 
-.templateClass {
-  white-space: nowrap ;
-  display: flex;
-  margin-bottom: 5px;
-  padding-top: 2px;
-}
+    .templateClass {
+      white-space: nowrap ;
+      display: flex;
+      margin-bottom: 5px;
+      padding-top: 2px;
+    }
 
-.templateClass div {
-  padding-right: 5px;
-  vertical-align: text-bottom;
-}
+    .templateClass div {
+      padding-right: 5px;
+      vertical-align: text-bottom;
+    }
 
-.templateClass a {
-  display: block;
-  padding-right: 5px;
-  vertical-align: text-bottom;
-}
+    .templateClass a {
+      display: block;
+      padding-right: 5px;
+      vertical-align: text-bottom;
+    }
 
 </style>
 
@@ -147,7 +154,7 @@
   <div class="templateClass Ptrclass" >
     <div style="display: inline-block ;
       margin-left: 5px ;">
-    Pimage
+      Pimage
     </div>
     <div style="display: inline-block ;
       font-size: smaller">#PtestRunNumber</div>

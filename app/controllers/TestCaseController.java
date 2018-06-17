@@ -5,13 +5,14 @@ import com.avaje.ebean.Ebean;
 import com.fasterxml.jackson.databind.JsonNode;
 import controllers.common.Utils;
 import editormodels.TestCaseEditorModel;
+import java.net.URL;
+import java.net.URLClassLoader;
+import org.slf4j.LoggerFactory;
+import play.api.Play;
+import utils.TdlUtils;
 import utils.Util;
-import minderengine.AdapterIdentifier;
 import minderengine.TestEngine;
 import models.*;
-import mtdl.MinderTdl;
-import mtdl.AdapterFunction;
-import play.Logger;
 import play.data.Form;
 import play.data.FormFactory;
 import play.mvc.Controller;
@@ -29,6 +30,9 @@ import java.util.*;
  * Created by yerlibilgin on 03/05/15.
  */
 public class TestCaseController extends Controller {
+
+  private static final org.slf4j.Logger LOGGER = LoggerFactory.getLogger(TestCaseController.class);
+
   Authentication authentication;
   TestEngine testEngine;
 
@@ -55,11 +59,12 @@ public class TestCaseController extends Controller {
       int max = 0;
       if (list != null) {
         for (TestCase testCase : list) {
-          System.out.println(testCase.name + "------" + ta.taId);
+          LOGGER.debug(testCase.name + "------" + ta.taId);
           if (testCase.name.matches("^" + ta.taId + "_TC\\d+$")) {
             int val = Integer.parseInt(testCase.name.split("_TC")[1]);
-            if (max < val)
+            if (max < val) {
               max = val;
+            }
           }
         }
       }
@@ -117,11 +122,11 @@ public class TestCaseController extends Controller {
         Ebean.beginTransaction();
         tc.save();
         tdl.save();
-        detectAndSaveParameters(tdl);
+        TdlUtils.detectAndSaveParameters(tdl);
         Ebean.commitTransaction();
       } catch (Exception ex) {
         filledForm.reject("Compilation Failed [" + ex.getMessage() + "]");
-        Logger.error(ex.getMessage(), ex);
+        LOGGER.error(ex.getMessage(), ex);
         return badRequest(testCaseEditor.render(filledForm, false, authentication));
 
       } finally {
@@ -130,7 +135,7 @@ public class TestCaseController extends Controller {
 
       tc = TestCase.findByName(tc.name);
 
-      Logger.info("Test Case with name " + tc.id + ":" + tc.name
+      LOGGER.info("Test Case with name " + tc.id + ":" + tc.name
           + " was created");
       return redirect(routes.TestAssertionController.getAssertionDetailView(ta.id, "cases"));
     }
@@ -143,8 +148,9 @@ public class TestCaseController extends Controller {
       return badRequest("TDL with id [" + tdlId + "] not found!");
     } else {
       tdl.testCase = TestCase.findById(tdl.testCase.id);
-      if (!Util.canAccess(authentication.getLocalUser(), tdl.testCase.owner))
+      if (!Util.canAccess(authentication.getLocalUser(), tdl.testCase.owner)) {
         return badRequest("You don't have permission to modify this resource");
+      }
 
       TestCaseEditorModel tcModel = new TestCaseEditorModel();
       tcModel.id = tdlId;
@@ -161,11 +167,20 @@ public class TestCaseController extends Controller {
   @AllowedRoles({Role.TEST_DESIGNER})
   public Result doEditCase() {
 
-    System.out.println("Hello world");
+    final String property = System.getProperty("java.class.path");
+
+    LOGGER.debug("Classpath: " + property);
+
+    final URLClassLoader ldr = (URLClassLoader) Play.current().classloader();
+
+    for(URL url : ldr.getURLs()){
+      LOGGER.debug("Classpath: " + url);
+    }
+
     final Form<TestCaseEditorModel> filledForm = TEST_CASE_FORM
         .bindFromRequest();
 
-    System.out.println(request().body().asFormUrlEncoded());
+    LOGGER.debug(request().body().asFormUrlEncoded().toString());
     if (filledForm.hasErrors()) {
       Util.printFormErrors(filledForm);
       return badRequest(testCaseEditor.render(filledForm, true, authentication));
@@ -181,8 +196,9 @@ public class TestCaseController extends Controller {
         return badRequest(testCaseEditor.render(filledForm, true, authentication));
 
       }
-      if (!Util.canAccess(authentication.getLocalUser(), tc.owner))
+      if (!Util.canAccess(authentication.getLocalUser(), tc.owner)) {
         return badRequest("You don't have permission to modify this resource");
+      }
 
       if (model.version.equals(tdl.version)) {
         //do nothing, just save
@@ -190,7 +206,7 @@ public class TestCaseController extends Controller {
         try {
           testEngine.describeTdl(tdl);
         } catch (Exception ex) {
-          Logger.error(ex.getMessage(), ex);
+          LOGGER.error(ex.getMessage(), ex);
           filledForm.reject(ex.getMessage());
           return badRequest(testCaseEditor.render(filledForm, true, authentication));
 
@@ -207,7 +223,7 @@ public class TestCaseController extends Controller {
           newTdl.testCase = tc;
           newTdl.tdl = model.tdl;
           newTdl.save();
-          detectAndSaveParameters(newTdl);
+          TdlUtils.detectAndSaveParameters(newTdl);
           Ebean.commitTransaction();
         } catch (Exception ex) {
           filledForm.reject(ex.getMessage());
@@ -222,73 +238,6 @@ public class TestCaseController extends Controller {
     }
   }
 
-  /**
-   * TODO: move this method to another class
-   *
-   * @param newTdl
-   */
-  public static void detectAndSaveParameters(Tdl newTdl) {
-    Logger.debug("Detect parameters for the newTdl");
-    LinkedHashMap<String, Set<AdapterFunction>> descriptionMap = TestEngine.describeTdl(newTdl);
-
-    List<AdapterParam> adapterParamList = new ArrayList<>();
-    for (Map.Entry<String, Set<AdapterFunction>> entry : descriptionMap.entrySet()) {
-      //make sure that we are looping on variables.
-      final String key = entry.getKey();
-      if (!key.startsWith("$")) {
-        //make sure that the entry really exists.
-
-        AdapterIdentifier adapterIdentifier = AdapterIdentifier.parse(key);
-
-        if (adapterIdentifier.getName().equals(MinderTdl.NULL_ADAPTER_NAME())) {
-          //skip null adapter
-          continue;
-        }
-        Adapter adapter = Adapter.findByName(adapterIdentifier.getName());
-        if (adapter == null) {
-          //oops
-          throw new IllegalArgumentException("No adapter with name " + adapterIdentifier.getName());
-        }
-        //check if a version is used in the name
-        if (adapterIdentifier.getVersion() != null) {
-          //we have a version, check if the version exists
-          AdapterVersion adapterVersion = AdapterVersion.findAdapterAndVersion(adapter, adapterIdentifier.getVersion());
-          if (adapterVersion == null) {
-            throw new IllegalArgumentException("No adapter version " + adapterIdentifier.getVersion() + " for " + adapterIdentifier.getName());
-          }
-        }
-        continue;
-      }
-
-      AdapterParam adapterParam;
-      adapterParam = new AdapterParam();
-      adapterParam.name = key;
-      adapterParam.signatures = new ArrayList<>();
-      adapterParam.tdl = newTdl;
-      adapterParamList.add(adapterParam);
-
-      Logger.debug("\t" + key + " detected");
-
-      for (AdapterFunction signalSlot : entry.getValue()) {
-        ParamSignature ps = new ParamSignature();
-        ps.signature = signalSlot.signature().replaceAll("\\s", "");
-        ps.adapterParam = adapterParam;
-        adapterParam.signatures.add(ps);
-      }
-
-      newTdl.parameters.add(adapterParam);
-    }
-
-    Logger.debug("Save parameters");
-    for (AdapterParam adapterParam : adapterParamList) {
-      adapterParam.save();
-      for (ParamSignature signature : adapterParam.signatures) {
-        signature.save();
-      }
-    }
-    Logger.debug("Detect parameters done");
-  }
-
 
   @AllowedRoles({Role.TEST_DESIGNER})
   public Result doDeleteCase(Long id) {
@@ -298,15 +247,15 @@ public class TestCaseController extends Controller {
       return badRequest("Test case with id " + id + " does not exist.");
     }
 
-
-    if (!Util.canAccess(authentication.getLocalUser(), tc.owner))
+    if (!Util.canAccess(authentication.getLocalUser(), tc.owner)) {
       return badRequest("You don't have permission to modify this resource");
+    }
 
     try {
       tc.delete();
     } catch (Exception ex) {
       ex.printStackTrace();
-      Logger.error(ex.getMessage(), ex);
+      LOGGER.error(ex.getMessage(), ex);
       return badRequest(ex.getMessage());
     }
     return redirect(routes.TestAssertionController.getAssertionDetailView(tc.testAssertion.id, "testCases"));
@@ -351,7 +300,7 @@ public class TestCaseController extends Controller {
         tc.save();
         return res;
       } catch (Exception ex) {
-        Logger.error(ex.getMessage(), ex);
+        LOGGER.error(ex.getMessage(), ex);
         return badRequest("Failed to save the test case [" + ex.getMessage() + "]");
       }
     }

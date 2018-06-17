@@ -52,7 +52,9 @@
     <logger name="com.yerlibilgin" level="TRACE" />
     <logger name="minderengine" level="DEBUG" />
     <logger name="mtdl" level="TRACE" />
-    <logger name="play" level="info"/>
+    <logger name="play" level="DEBUG"/>
     <logger name="application" level="DEBUG"/>
+    <logger name="utils" level="DEBUG"/>
+    <logger name="controllers" level="DEBUG"/>
 
 </configuration>

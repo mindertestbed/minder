@@ -5,15 +5,16 @@ import controllers.TestRunContext;
 import java.util.HashMap;
 
 /**
+ *
  * @author: yerlibilgin
  * @date: 07/03/16.
  */
-public class ContextContainer {
-  private static ContextContainer instance;
+public class SuspensionContext {
+  private static SuspensionContext instance;
 
-  public static ContextContainer get() {
+  public static SuspensionContext get() {
     if (instance == null) {
-      instance = new ContextContainer();
+      instance = new SuspensionContext();
     }
 
     return instance;
@@ -42,17 +43,16 @@ public class ContextContainer {
     return testContextMap.get(session);
   }
 
-
   public boolean contains(TestSession session) {
     return testContextMap.containsKey(session);
   }
 
-  public void addTestContext(TestSession session, TestRunContext context) {
-    if (testContextMap.containsKey(session)) {
+  public void addTestContext(TestRunContext context) {
+    if (testContextMap.containsKey(context.session())) {
       throw new IllegalArgumentException("Key already exists in the map");
     }
 
-    testContextMap.put(session, context);
+    testContextMap.put(context.session(), context);
   }
 
 

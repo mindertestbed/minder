@@ -1,6 +1,7 @@
 package models;
 
 import com.avaje.ebean.Model;
+import com.yerlibilgin.ValueChecker;
 import minderengine.Visibility;
 
 import javax.persistence.*;
@@ -14,12 +15,14 @@ import java.util.List;
 @Inheritance
 @DiscriminatorColumn(name = "_type", discriminatorType = DiscriminatorType.INTEGER)
 public abstract class AbstractJob extends Model {
+
   private static final Finder<Long, AbstractJob> find = new Finder<>(AbstractJob.class);
 
   public static AbstractJob findById(Long id) {
     AbstractJob byId = find.byId(id);
-    if (byId == null)
+    if (byId == null) {
       return null;
+    }
     byId.owner = User.findById(byId.owner.id);
     return byId;
   }
@@ -42,6 +45,10 @@ public abstract class AbstractJob extends Model {
 
   public Visibility visibility;
 
+  @Column(unique = true)
+  public String httpEndpoint;
+
+
   @Column(length = ModelConstants.DESCRIPTION_LENGTH, columnDefinition = "TEXT")
   public String mtdlParameters;
 
@@ -53,7 +60,13 @@ public abstract class AbstractJob extends Model {
 
   public static void deleteById(Long id) {
     AbstractJob aj = findById(id);
-    if (aj != null)
+    if (aj != null) {
       aj.delete();
+    }
+  }
+
+  public static AbstractJob findByEndpoint(String httpEndpoint) {
+    ValueChecker.notNull(httpEndpoint, "httpEndpoint");
+    return find.where().eq("httpEndpoint", httpEndpoint).findUnique();
   }
 }
