@@ -101,7 +101,7 @@ GET           /downloadAsset                                 controllers.TestAss
 
 #test run listing
 GET           /listTestRunsForm                              controllers.JobController.listTestRuns(configurationId: Long)
-GET           /viewReport                                    controllers.JobController.viewReport(testRunId: Long, type: String)
+GET           /viewReport                                    controllers.JobController.viewReport(testRunId: Long)
 
 #Adapters
 GET           /createNewAdapterForm                          controllers.AdapterController.createNewAdapterForm

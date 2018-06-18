@@ -348,7 +348,7 @@ public class JobController extends Controller {
   }
 
   @AllowedRoles({Role.TEST_DESIGNER, Role.TEST_DEVELOPER, Role.TEST_OBSERVER})
-  public Result viewReport(Long testRunId, String type) {
+  public Result viewReport(Long testRunId) {
     TestRun tr = TestRun.findById(testRunId);
     if (tr == null) {
       return badRequest("A test run with id " + testRunId + " was not found");

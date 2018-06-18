@@ -9,6 +9,7 @@ import javax.xml.transform.stream.StreamResult
 import javax.xml.transform.{OutputKeys, TransformerFactory}
 
 import com.avaje.ebean.Ebean
+import com.yerlibilgin.BinaryUtil
 import controllers.common.Utils
 import minderengine._
 import models.{Adapter, _}
@@ -49,7 +50,9 @@ class TestRunContext(val testRun: TestRun, testRunFeeder: TestRunFeeder, testLog
   var mtdlInstance: MinderTdl = null;
   val logStringBuilder = new StringBuilder;
   val reportLogBuilder = new StringBuilder;
-  val metadataMap = new util.LinkedHashMap[String, String]()
+
+
+  val reportMetadataMap = new util.LinkedHashMap[String, String]()
 
   /**
     * Assign this runnable in order to do one last job (set labels ...) before finishing this test run
@@ -170,11 +173,8 @@ class TestRunContext(val testRun: TestRun, testRunFeeder: TestRunFeeder, testLog
     if (finalRunnable != null)
       finalRunnable.run()
 
-    Ebean.beginTransaction()
+    testRun.reportMetadata = utils.Util.gzip(generateXMLMetadata());
     testRun.save()
-    testRun.reportMetadata = generateXMLMetadata(testRun.id);
-    testRun.save()
-    Ebean.commitTransaction()
   }
 
   override def updateSUTNames(set: scala.collection.Set[String]): Unit = {
@@ -208,19 +208,26 @@ class TestRunContext(val testRun: TestRun, testRunFeeder: TestRunFeeder, testLog
 
 
   def addReportMetadata(key: String, value: String): Unit = {
-    metadataMap.put(key, value);
+    reportMetadataMap.put(key, value);
   }
 
   /**
     * Convert the data in <code>metadataMap</code> to xml
     */
-  def generateXMLMetadata(testRunId: Long): Array[Byte] = {
+  def generateXMLMetadata(): Array[Byte] = {
 
     val document = DocumentBuilderFactory.newInstance().newDocumentBuilder().newDocument();
 
     val root = document.createElement("reportMetadata")
-    root.setAttribute("testRunId", testRunId + "")
     document.appendChild(root);
+
+
+    reportMetadataMap.foreach(kvp => {
+      val element = document.createElement("metadata")
+      element.setAttribute("name", kvp._1);
+      element.setTextContent(BinaryUtil.b2base64(kvp._2.getBytes(StandardCharsets.UTF_8)))
+      root.appendChild(element)
+    })
 
     import java.io.StringWriter
     val domSource = new DOMSource(document)
@@ -233,7 +240,10 @@ class TestRunContext(val testRun: TestRun, testRunFeeder: TestRunFeeder, testLog
     val sw = new StringWriter
     val sr = new StreamResult(sw)
     transformer.transform(domSource, sr)
-    System.out.println(sw.toString)
+
+    println("Report Metadata:")
+    println(sw.toString)
+
     sw.toString.getBytes(StandardCharsets.UTF_8)
   }
 

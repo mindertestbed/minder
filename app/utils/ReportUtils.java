@@ -19,9 +19,13 @@ import com.itextpdf.tool.xml.pipeline.end.PdfWriterPipeline;
 import com.itextpdf.tool.xml.pipeline.html.AbstractImageProvider;
 import com.itextpdf.tool.xml.pipeline.html.HtmlPipeline;
 import com.itextpdf.tool.xml.pipeline.html.HtmlPipelineContext;
+import com.yerlibilgin.BinaryUtil;
+import com.yerlibilgin.XMLUtils;
+import com.yerlibilgin.XPathUtils;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.FileInputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
@@ -32,11 +36,14 @@ import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.zip.GZIPInputStream;
 import models.ReportTemplate;
 import models.TestAssertion;
 import models.TestGroup;
 import models.TestRun;
 import models.TestRunStatus;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
 import play.Logger;
 import play.Logger.ALogger;
 
@@ -98,7 +105,7 @@ public class ReportUtils {
     try {
 
       String template;
-      if (tr.job.reportTemplate != null){
+      if (tr.job.reportTemplate != null) {
         template = new String(Util.gunzip(tr.job.reportTemplate.html));
       } else {
         template = singleTestRunTemplate;
@@ -154,6 +161,32 @@ public class ReportUtils {
       for (Map.Entry<String, String> entry : customParameters.entrySet()) {
         reportTemplate = reportTemplate.replace("${" + entry.getKey() + "}", entry.getValue());
       }
+    }
+
+    //get all the metadata elements, and replace them in the report
+    if (tr.reportMetadata != null && tr.reportMetadata.length != 0) {
+
+      try {
+        final org.w3c.dom.Document document = XMLUtils.parse(new GZIPInputStream(new ByteArrayInputStream(tr.reportMetadata)));
+
+        final List<Node> nodes = XPathUtils.listNodes(document, "//metadata");
+
+        for (Node node : nodes) {
+          Element element = (Element) node;
+
+          String name = element.getAttribute("name");
+          String value = new String(BinaryUtil.base642b(element.getTextContent()), StandardCharsets.UTF_8);
+
+          System.out.println(name);
+          System.out.println(value);
+
+          reportTemplate = reportTemplate.replace("${" + name + "}", value);
+        }
+
+      } catch (IOException e) {
+        throw new IllegalStateException(e);
+      }
+
     }
 
     //check if we still have a parameter like ${param} and remove them
@@ -311,12 +344,18 @@ public class ReportUtils {
   }
 
   /**
-   * @param writer the writer to use
-   * @param doc the document to use
-   * @param in the {@link InputStream} of the XHTML source.
-   * @param in the {@link CssFiles} of the css files.
-   * @param charset the charset to use
-   * @throws IllegalStateException if the {@link InputStream} could not be read.
+   * @param writer
+   *     the writer to use
+   * @param doc
+   *     the document to use
+   * @param in
+   *     the {@link InputStream} of the XHTML source.
+   * @param in
+   *     the {@link CssFiles} of the css files.
+   * @param charset
+   *     the charset to use
+   * @throws IllegalStateException
+   *     if the {@link InputStream} could not be read.
    */
   public static void parseXHtml(final PdfWriter writer, final Document doc, final InputStream in, final InputStream inCssFile,
       final Charset charset, final FontProvider fontProvider) {
@@ -338,6 +377,7 @@ public class ReportUtils {
   }
 
   static class Base64ImageProvider extends AbstractImageProvider {
+
     @Override
     public Image retrieve(String src) {
       int pos = src.indexOf("base64,");
