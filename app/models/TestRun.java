@@ -1,6 +1,8 @@
 package models;
 
 import com.avaje.ebean.Ebean;
+import com.avaje.ebean.Expr;
+import com.avaje.ebean.Expression;
 import com.avaje.ebean.Model;
 import minderengine.Visibility;
 import play.Logger;
@@ -16,6 +18,7 @@ import java.util.Objects;
 @Entity
 @Table(name = "TestRun")
 public class TestRun extends Model {
+
   @Id
   public Long id;
 
@@ -79,7 +82,9 @@ public class TestRun extends Model {
 
   public static TestRun findById(Long id) {
     TestRun byId = find.byId(id);
-    if (null == byId) return null;
+    if (null == byId) {
+      return null;
+    }
 
     byId.runner = User.findById(byId.runner.id);
     return byId;
@@ -93,6 +98,7 @@ public class TestRun extends Model {
   public static List<TestRun> findBySuiteRun(SuiteRun suiteRun) {
     return find.where().eq("suiteRun", suiteRun).isNotNull("date").orderBy("date desc").findList();
   }
+
   public static List<TestRun> findBySuiteRunId(long suiteRunID) {
     return find.where().eq("suite_run_id", suiteRunID).isNotNull("date").orderBy("date desc").findList();
   }
@@ -117,19 +123,23 @@ public class TestRun extends Model {
     return find.where().eq("job", job).isNotNull("date").orderBy("date desc").findRowCount();
   }
 
-  public static List<TestRun> getRecentRuns(int num) {
-    List<TestRun> list = find.where().isNotNull("date").orderBy("date desc").findPagedList(0, num).getList();
+  public static List<TestRun> getRecentPagedRuns(int page, int pageSize) {
+    List<TestRun> list = find.where().isNotNull("date").orderBy("date desc")
+        .findPagedList(page, pageSize).getList();
     return list;
   }
 
-  public static int getMaxNumber() {
-    com.avaje.ebean.SqlQuery qu = Ebean.createSqlQuery("Select max(number) from TestRun");
-    Object max = qu.findUnique().get("max");
-    Logger.debug(max + " is max number");
-    if (max == null)
-      return 1;
+  public static int getRecentPagedRunsCount(int pageSize) {
+    final double count = find.where().isNotNull("date").orderBy("date desc").findRowCount() * 1.0 / pageSize;
+    return (int) Math.ceil(count);
+  }
 
-    return Integer.parseInt(max.toString());
+  public static int getMaxNumber() {
+    final List<TestRun> list = find.setMaxRows(1).orderBy("number desc").findList();
+    if (list.isEmpty()) {
+      return 1;
+    }
+    return list.get(0).number;
   }
 
   public static void updateUser(User user, User localUser) {
@@ -144,8 +154,12 @@ public class TestRun extends Model {
 
   @Override
   public boolean equals(Object o) {
-    if (this == o) return true;
-    if (o == null || getClass() != o.getClass()) return false;
+    if (this == o) {
+      return true;
+    }
+    if (o == null || getClass() != o.getClass()) {
+      return false;
+    }
     TestRun testRun = (TestRun) o;
     return number == testRun.number &&
         Objects.equals(id, testRun.id);

@@ -1,10 +1,14 @@
 @import minderengine.Visibility
 
-@(visibility: Visibility, owner: models.User, role: security.Role = null)(content: => Html)(implicit authentication: Authentication)
-@defining(authentication.getLocalUser()) { subject =>
-  @if(utils.Util.canAccess(subject, owner, visibility)) {
-    @if(role == null || subject.hasRole(role)) {
-      @content
-    }
+@(visibility: Visibility, owner: models.User, role: security.Role = null)(content: => Html)(implicit authentication: Authentication, currentUser: models.User = null)
+@subject = @{
+  if(currentUser != null)
+    currentUser
+  else
+    authentication.getLocalUser()
+}
+@if(utils.Util.canAccess(subject, owner, visibility)) {
+  @if(role == null || subject.hasRole(role)) {
+    @content
   }
 }

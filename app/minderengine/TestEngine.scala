@@ -8,12 +8,12 @@ import javax.inject.{Inject, Provider, Singleton}
 
 import com.gitb.core.v1.StepStatus
 import controllers.{EPQueueManager, TestQueueController, TestRunContext}
-import utils.Util
 import models._
 import mtdl._
 import org.apache.log4j.spi.LoggingEvent
-import org.apache.log4j.{AppenderSkeleton, EnhancedPatternLayout, Level, Logger}
+import org.apache.log4j.{AppenderSkeleton, EnhancedPatternLayout, Level}
 import play.api
+import utils.Util
 
 import scala.collection.JavaConversions._
 import scala.collection.mutable;
@@ -88,25 +88,21 @@ class TestEngine @Inject()(implicit testQueueController: Provider[TestQueueContr
     app.setLayout(new EnhancedPatternLayout("%d{ISO8601}: %-5p - %m%n%throwable"));
     try {
       lgr.addAppender(app);
-
-      lgr.info(s"Minder version ${Util.getVersionInfo()}")
-      if (testRunContext.isSuspended()) {
-        lgr.info("Resume Test")
-      } else {
-        lgr.info("Start Test")
-      }
-      var identifierMinderClientMap: util.Map[AdapterIdentifier, IdentifierClientPair] = null
-
       try {
-        lgr.info("Initialize test case")
 
         val currentMtdl = testRunContext.initialize();
-
-        identifierMinderClientMap = mapAllTransitiveAdapters(currentMtdl, adapterMapping)
-
         initializeFunctionsAndParameters(params, lgr, testRunContext)
 
-        if (!testRunContext.isSuspended()) {
+        if (testRunContext.isSuspended()) {
+          //it is suspended. Resume
+          lgr.info("Resume Test")
+          testRunContext.resume();
+        } else {
+          lgr.info(s"Minder version ${Util.getVersionInfo()}")
+          lgr.info("Start Test")
+          lgr.info("Initialize test case")
+          testRunContext.identifierMinderClientMap = mapAllTransitiveAdapters(currentMtdl, adapterMapping)
+
           val sutNameSet = new util.HashSet[String]
 
           //first, call the start methods for all registered adapters of this test.
@@ -125,7 +121,7 @@ class TestEngine @Inject()(implicit testQueueController: Provider[TestQueueContr
 
 
           //call start test on all adapters and populate the SUT names
-          identifierMinderClientMap.values().foreach(pair => {
+          testRunContext.identifierMinderClientMap.values().foreach(pair => {
             lgr.info("Call start test on " + pair.adapterIdentifier.getName)
             pair.minderClient.startTest(startTestObject)
 
@@ -143,9 +139,6 @@ class TestEngine @Inject()(implicit testQueueController: Provider[TestQueueContr
 
           //update the SUT names on the watcher
           testRunContext.updateSUTNames(sutNameSet)
-        } else {
-          //it is suspended. Resume
-          testRunContext.resume();
         }
 
         while (currentMtdl.currentRivetIndex < currentMtdl.RivetDefs.size()) {
@@ -210,7 +203,7 @@ class TestEngine @Inject()(implicit testQueueController: Provider[TestQueueContr
           } else {
             val rivetAdapterId: String = currentRivet.adapterFunction.adapterId
             //resolve the minder client id. This might as well be resolved to a local built-in adapter or the null slot.
-            val slotPair = findPairOrError(identifierMinderClientMap, AdapterIdentifier.parse(rivetAdapterId))
+            val slotPair = findPairOrError(testRunContext.identifierMinderClientMap, AdapterIdentifier.parse(rivetAdapterId))
             val args = Array.ofDim[Object](currentRivet.pipes.length)
 
             //a boolean flag used to see whether a timeout occurred or not
@@ -237,7 +230,7 @@ class TestEngine @Inject()(implicit testQueueController: Provider[TestQueueContr
 
                 val signal = signalList(0).inRef.source;
 
-                val signalPair = findPairOrError(identifierMinderClientMap, AdapterIdentifier.parse(label));
+                val signalPair = findPairOrError(testRunContext.identifierMinderClientMap, AdapterIdentifier.parse(label));
 
                 val signalAdapterIdentifier = signalPair.adapterIdentifier
                 msg = "> Wait For Signal:" + signalAdapterIdentifier + "." + signature;
@@ -360,7 +353,7 @@ class TestEngine @Inject()(implicit testQueueController: Provider[TestQueueContr
           val finishTestObject: FinishTestObject = new FinishTestObject
           finishTestObject.setSession(testRunContext.session)
           try {
-            identifierMinderClientMap.values().foreach(pair => {
+            testRunContext.identifierMinderClientMap.values().foreach(pair => {
               pair.minderClient.finishTest(finishTestObject)
             })
           } catch {
@@ -368,8 +361,7 @@ class TestEngine @Inject()(implicit testQueueController: Provider[TestQueueContr
           }
         }
       }
-    }
-    finally {
+    } finally {
       lgr.removeAppender(app)
     }
   }

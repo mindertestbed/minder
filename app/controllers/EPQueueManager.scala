@@ -2,9 +2,10 @@ package controllers
 
 import java.io.{File, FileInputStream}
 import java.util
+import java.util.Collections
 import javax.inject.{Inject, Provider, Singleton}
 
-import minderengine.{AdapterIdentifier, MinderSignalRegistry, SignalPojoData, Visibility}
+import minderengine._
 import models.{AbstractJob, User}
 import mtdl.{EPPacket, EndpointRivet}
 import org.slf4j.LoggerFactory
@@ -19,9 +20,13 @@ import scala.tools.nsc.interpreter.InputStream
 @Singleton
 class EPQueueManager @Inject()(testQueueController: Provider[TestQueueController]) extends Controller {
 
+
   val LOGGER = LoggerFactory.getLogger(classOf[EPQueueManager])
 
-  val endpointQueue = new util.HashMap[String, TestRunContext]()
+  val endpointQueueMap = new util.LinkedHashMap[String, util.Queue[TestRunContext]]()
+
+  //this map is used for finding the test run contexts through their session
+  val crossSessionToURLMap = new util.HashMap[TestSession, String]()
 
   var activeRunContext: TestRunContext = null;
 
@@ -62,12 +67,16 @@ class EPQueueManager @Inject()(testQueueController: Provider[TestQueueController
     LOGGER.debug(s"Received end point call: $method:$url")
     val decoratedURL = s"$method:/$url"
 
-    if (endpointQueue.containsKey(decoratedURL)) {
+    if (endpointQueueMap.containsKey(decoratedURL)) {
       LOGGER.debug("A suspended job was found. Enqueue it")
-      val context = endpointQueue.remove(decoratedURL);
-      context.resume();
-      enqueueEPPacket(decoratedURL, context, headers, new FileInputStream(file))
-      Ok
+      val queue = endpointQueueMap.get(decoratedURL);
+      if (!queue.isEmpty) {
+        val context = queue.poll();
+        epPacketArrived(decoratedURL, context, headers, new FileInputStream(file))
+        Ok
+      } else {
+        BadRequest("No registered endpoint for " + url)
+      }
     } else {
       //check if the endpoint is a registered job
 
@@ -84,7 +93,7 @@ class EPQueueManager @Inject()(testQueueController: Provider[TestQueueController
         if (user != null) {
           if (util.Arrays.equals(user.password, UserPasswordUtil.generateHA1(user.email, password))) {
             val context = testQueueController.get().createTestRunContext(job, user, Visibility.PUBLIC);
-            enqueueEPPacket(decoratedURL, context, headers, new FileInputStream(file))
+            epPacketArrived(decoratedURL, context, headers, new FileInputStream(file))
             Ok
           } else {
             BadRequest("User login failed")
@@ -99,12 +108,12 @@ class EPQueueManager @Inject()(testQueueController: Provider[TestQueueController
     }
   }
 
-  private def enqueueEPPacket(decoratedURL: String, context: TestRunContext, headers: Headers, httpInputStream: InputStream) = {
+  private def epPacketArrived(decoratedURL: String, context: TestRunContext, headers: Headers, httpInputStream: InputStream) = {
     val identifier = AdapterIdentifier.parse(EndpointRivet.ADAPTER_NAME);
 
     val map = new util.HashMap[String, String]()
 
-    headers.headers.foreach(key =>{
+    headers.headers.foreach(key => {
       map.put(key._1, key._2)
     })
 
@@ -120,16 +129,55 @@ class EPQueueManager @Inject()(testQueueController: Provider[TestQueueController
     * @param testRunContext
     */
   def enqueueTextRunContext(testRunContext: TestRunContext): Unit = {
-    var rivet = testRunContext.mtdlInstance.RivetDefs.get(testRunContext.mtdlInstance.currentRivetIndex)
-    val endpointRivet = rivet.asInstanceOf[EndpointRivet]
-    var endPointIdentifier = endpointRivet.endPointIdentifier
-    //get the actually assigned http absoluteURL value
-    //an absolute URL is a sub url prefixed with /
-    var absoluteURL = testRunContext.mtdlInstance.getParameter(endPointIdentifier)
-    val decoratedURL = endpointRivet.method + ":" + absoluteURL
-    LOGGER.debug("test run context for job " + testRunContext.job.id + " was suspended for " +
-      endPointIdentifier + " with value " + decoratedURL)
-    endpointQueue.put(decoratedURL, testRunContext)
+
+    this.synchronized {
+      var rivet = testRunContext.mtdlInstance.RivetDefs.get(testRunContext.mtdlInstance.currentRivetIndex)
+      val endpointRivet = rivet.asInstanceOf[EndpointRivet]
+      var endPointIdentifier = endpointRivet.endPointIdentifier
+      //get the actually assigned http absoluteURL value
+      //an absolute URL is a sub url prefixed with /
+      var absoluteURL = testRunContext.mtdlInstance.getParameter(endPointIdentifier)
+      val decoratedURL = endpointRivet.method + ":" + absoluteURL
+      LOGGER.debug("test run context for job " + testRunContext.job.id + " was suspended for " +
+        endPointIdentifier + " with value " + decoratedURL)
+
+      val queue =
+        if (endpointQueueMap.containsKey(decoratedURL)) {
+          endpointQueueMap.get(decoratedURL)
+        } else {
+          val newQueue = new util.LinkedList[TestRunContext]()
+          endpointQueueMap.put(decoratedURL, newQueue)
+          newQueue
+        }
+      queue.offer(testRunContext)
+
+      //make sure that we hold a reference to the queue
+      LOGGER.debug("A new session was enqueued " + testRunContext.session + " " + testRunContext.testRun.number)
+      crossSessionToURLMap.put(testRunContext.session, decoratedURL);
+    }
+  }
+
+
+  def removeTestContext(testRunContext: TestRunContext) = {
+    //find the test run context and remove it from the queue
+
+    this.synchronized {
+      val session = testRunContext.session
+      LOGGER.debug("Remove session " + testRunContext.session + " " + testRunContext.testRun.number + " from the queue")
+      if (crossSessionToURLMap.containsKey(session)) {
+        LOGGER.debug("Session found")
+
+        val url = crossSessionToURLMap.get(session);
+        LOGGER.debug("URL " + url)
+        if (endpointQueueMap.containsKey(url)) {
+          LOGGER.debug("URL found")
+          val queue = endpointQueueMap.get(url);
+          LOGGER.debug("Remove " + queue.remove(testRunContext));
+        }
+
+        crossSessionToURLMap.remove(session)
+      }
+    }
   }
 
 }

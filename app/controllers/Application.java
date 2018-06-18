@@ -63,7 +63,7 @@ public class Application extends Controller {
     if (!session().containsKey("testPageMode")) {
       session().put("testPageMode", "none");
     }
-    return ok(views.html.job.jobQueue.render(authentication, testLogFeeder));
+    return ok(views.html.job.jobMonitor.render(authentication, testLogFeeder, authentication.getLocalUser()));
   }
 
 

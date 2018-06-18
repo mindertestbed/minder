@@ -56,5 +56,6 @@
     <logger name="application" level="DEBUG"/>
     <logger name="utils" level="DEBUG"/>
     <logger name="controllers" level="DEBUG"/>
+    <logger name="models" level="DEBUG"/>
 
 </configuration>

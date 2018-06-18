@@ -1,6 +1,6 @@
 @import minderengine.Visibility
 @import views.html.authentication._
-@(visibility: Visibility, owner: User, renderName: Boolean = false, renderEditLink: Boolean = false)(implicit authentication: Authentication)
+@(visibility: Visibility, owner: User, renderName: Boolean = false, renderEditLink: Boolean = false)(implicit authentication: Authentication, localUser: User = null)
 
 @visibilityClass = @{
   visibility match {

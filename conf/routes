@@ -117,6 +117,9 @@ GET           /adapterStatusFeed                             controllers.Adapter
 GET           /jobQueueFeed                                  controllers.TestRunFeeder.jobQueueFeed
 GET           /testProgressFeed                              controllers.TestRunFeeder.testProgressFeed
 GET           /historyFeed                                   controllers.TestRunFeeder.jobHistoryFeed
+GET           /jobHistorySM                                  controllers.TestRunFeeder.jobHistorySM(page: Int)
+GET           /pagedHistoryList                              controllers.TestRunFeeder.pagedHistoryList(page: Int, maxPages: Int, pageSize: Int)
+GET           /pagedHistoryNav                              controllers.TestRunFeeder.pagedHistoryNav(page: Int, maxPages: Int, pageSize: Int)
 GET           /logFeed                                       controllers.TestLogFeeder.logFeed
 GET           /cancelJob                                     controllers.TestQueueController.cancelJob(index: Int)
 GET           /cancelActiveJob                               controllers.TestQueueController.cancelActiveJob

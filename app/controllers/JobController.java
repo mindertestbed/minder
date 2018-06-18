@@ -379,7 +379,7 @@ public class JobController extends Controller {
     if (Util.canAccess(localUser, tr.runner, tr.visibility)) {
       tr.visibility = Visibility.valueOf(visibility);
       tr.save();
-      return ok(visibilityTagFragment.render(tr.visibility, tr.runner, true, true, authentication));
+      return ok(visibilityTagFragment.render(tr.visibility, tr.runner, true, true, authentication, localUser));
     } else {
       return unauthorized("You don't have permission to modify this resource");
     }
@@ -397,7 +397,7 @@ public class JobController extends Controller {
     if (Util.canAccess(localUser, job.owner, job.visibility)) {
       job.visibility = Visibility.valueOf(visibility);
       job.save();
-      return ok(visibilityTagFragment.render(job.visibility, job.owner, true, true, authentication));
+      return ok(visibilityTagFragment.render(job.visibility, job.owner, true, true, authentication, localUser));
     } else {
       return unauthorized("You don't have permission to modify this resource");
     }

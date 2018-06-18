@@ -1,0 +1,54 @@
+@(page: Int = 0, maxPages: Int, pageSize: Int = 15)
+@visualPage = @{
+  page + 1
+}
+
+<nav style="padding-top: 2px ;">
+  <ul class="pagination pagination-sm" style="margin: 0px ;">
+    <li>
+      <a href="#" aria-label="Previous" onclick="navigatePage(-5)">
+        <span aria-hidden="true">&laquo;</span>
+      </a>
+    </li>
+
+    <li><a href="#" onclick="navigatePage(-2)">@{
+      if(page - 2 >= 0) {
+        visualPage - 2
+      } else {
+        Html("&nbsp")
+      }
+    }</a></li>
+
+
+    <li><a href="#" onclick="navigatePage(-1)">@{
+      if(page - 1 >= 0) {
+        visualPage - 1
+      } else {
+        Html("&nbsp")
+      }
+    }</a></li>
+
+    <li class="active"><a>@visualPage</a></li>
+
+
+    <li><a href="#" onclick="navigatePage(+1)">@{
+      if(page + 1 < maxPages) {
+        visualPage + 1
+      } else {
+        Html("&nbsp")
+      }
+    }</a></li>
+    <li><a href="#" onclick="navigatePage(+2)">@{
+      if(page + 2 < maxPages) {
+        visualPage + 2
+      } else {
+        Html("&nbsp")
+      }
+    }</a></li>
+    <li>
+      <a href="#" aria-label="Next" onclick="navigatePage(+5)">
+        <span aria-hidden="true">&raquo;</span>
+      </a>
+    </li>
+  </ul>
+</nav>

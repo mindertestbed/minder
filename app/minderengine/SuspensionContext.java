@@ -3,6 +3,7 @@ package minderengine;
 import controllers.TestRunContext;
 
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 
 /**
  *
@@ -21,7 +22,11 @@ public class SuspensionContext {
   }
 
 
-  private static final HashMap<TestSession, TestRunContext> testContextMap = new HashMap<>();
+  public HashMap<TestSession, TestRunContext> getTestContextMap() {
+    return testContextMap;
+  }
+
+  private final HashMap<TestSession, TestRunContext> testContextMap = new LinkedHashMap<>();
 
 
   /**

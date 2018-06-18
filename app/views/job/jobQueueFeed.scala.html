@@ -1,5 +1,5 @@
 <script>
-    $ ( function ( ) {
+    $(function () {
       var activeJobTemplate = $("#activeJobTemplate").html()
       var activeJobDiv = $("#activeJobDiv")
       var sleepingDiv = $("#sleepingDiv")
@@ -7,74 +7,99 @@
       var progressDiv = $("#progressDiv")
       var queueItemTemplate = $("#queueTemplate").html()
 
-      new EventSource ( '@controllers.routes.TestRunFeeder.jobQueueFeed()'
-      ).onmessage = function ( event ) {
-        if (event.data.length == 0){
+      new EventSource('@controllers.routes.TestRunFeeder.jobQueueFeed()'
+      ).onmessage = function (event) {
+        if (event.data.length == 0) {
           activeJobDiv.hide()
           sleepingDiv.show()
-        } else{
+        } else {
           //the first item is active run context iff its number is -1
-          var que = JSON.parse(event.data)
-          if(que.length == 0){
+          var queueAsJson = JSON.parse(event.data)
+          if (queueAsJson.length == 0) {
             activeJobDiv.hide()
             sleepingDiv.show()
+            return;
           }
 
           var startIndex = 0
-          if (que[0].index == -1){
+          if (queueAsJson[0].status == "activeJob") {
             //this is the active job
-            var toRep = activeJobTemplate.replace(/\$jobId/g, que[0].jobId).
-            replace(/\$jobName/g, que[0].jobName).
-            replace(/\$email/g, que[0].email).
-            replace(/\$jobName/g, que[0].jobName).
-            replace(/\$progress/g, que[0].progress)
-            activeJobDiv.html(toRep)
+            var activeJobDivContent = activeJobTemplate.replace(/\$jobId/g, queueAsJson[0].jobId).replace(/\$jobName/g,
+                queueAsJson[0].jobName).replace(/\$email/g, queueAsJson[0].email).replace(/\$jobName/g, queueAsJson[0].jobName).replace(
+                /\$progress/g, queueAsJson[0].progress).replace(/\$number/g, queueAsJson[0].number)
+
+            activeJobDiv.html(activeJobDivContent)
             activeJobDiv.show()
             startIndex = 1
             sleepingDiv.hide()
           } else {
             activeJobDiv.hide()
-            sleepingDiv.show()
           }
 
-          var len = que.length
-          var toRep=''
-          for (; startIndex < len; startIndex++){
-            var q = que[startIndex]
-            toRep += queueItemTemplate.replace(/\$jobId/g, q.jobId).
-            replace(/\$jobName/g, q.jobName).
-            replace(/\$email/g, q.email).
-            replace(/\$jobName/g, q.jobName).
-            replace(/\$index/g, q.index)
+          var len = queueAsJson.length
+          var queDivContent = ''
+          for (; startIndex < len; startIndex++) {
+            var q = queueAsJson[startIndex]
+            var temp = queueItemTemplate;
+            queDivContent += temp.replace(/\$jobId/g, q.jobId).replace(/\$jobName/g, q.jobName).replace(/\$email/g, q.email).replace(
+                /\$jobName/g, q.jobName).replace(/\$statusClass/g, q.status).replace(/\$progress/g, q.progress).replace(/\$number/g,
+                q.number)
           }
 
-          queueDiv.html(toRep)
+          queueDiv.html(queDivContent)
         }
         progressDiv = $("#progressDiv")
       }
 
-      var statusfeed = $( "#statusfeed" )[0];
+      var statusfeed = $("#statusfeed")[0];
 
-      new EventSource ( '@controllers.routes.TestRunFeeder.testProgressFeed()' ).onmessage = function ( event ) {
+      new EventSource('@controllers.routes.TestRunFeeder.testProgressFeed()').onmessage = function (event) {
         progressDiv.css('width', event.data + "%")
       }
     });
 </script>
-<div id="canceldiv" style="display:none">
+<div id="canceldiv" style="display: none">
 
 </div>
 
-<td id="queuefeed" style="vertical-align:text-top ;">
-  <div class="panel  panel-info">
+<style>
+
+  td.pendingJob {
+    display: none;
+  }
+
+  td.suspendedJob {
+    display: table-cell !important;
+  }
+
+  .pendingJob {
+    color: darkcyan;
+  }
+
+  .suspendedJob {
+    color: darksalmon !important;
+  }
+
+  div.suspendedJob {
+    background-color: darksalmon !important;
+  }
+
+</style>
+
+<td id="queuefeed" style="vertical-align: text-top">
+  <div class="panel panel-info">
     <div class="panel-heading"><span class="fa fa-list-ol">&nbsp;</span>Job Queue
     </div>
 
     <div id="activeJobDiv" style="display: none">
 
       </div>
-    <div class="panel-body" id="queueDiv">
+    <div class="panel-body" id="queueDiv" style="max-height: 300px;
+      overflow-y: scroll">
       <div id="sleepingDiv" style="display: none ;">
-        <div style="overflow: hidden ; height:50px ;"><img style="position: relative ; top:0" src="@routes.Assets.versioned("/images/sleeping.png")"
+        <div style="overflow: hidden ;
+          height: 50px ;"><img style="position: relative ;
+          top: 0" src="@routes.Assets.versioned("/images/sleeping.png")"
         alt="http://www.cliparthut.com/clip-arts/481/people-sleeping-clip-art-481711.jpeg" height="70" width="250">
         </div>
       </div>
@@ -85,34 +110,56 @@
 
 
 
-<div id="queueTemplate" style="display:none">
-  <div class="fullw bevel2" style="padding:10px ;" title="$jobId $jobName $email">
+<div id="queueTemplate" style="display: none">
+  <div class="fullw bevel2" style="padding: 10px ;" title="$jobId $jobName #$number $email">
     <a href="/viewJob?id=$jobId&showHistory=true" title="View Job">
-      <span class="title">$jobName</span></a>
-    <table class="fullw"><tr><td>
-      <div style="border:1px solid #ccc ; background-color:white ; height:10px ; width:100% ; padding:0">
-        <div style="background-color:lightgreen ; height:8px ; width:0% ; margin:0">&nbsp;</div>
-      </div></td> <td style="width:20px ; vertical-align:text-top ;">
-        &nbsp; <span title="Cancel $jobName" style="cursor:hand" onclick='ajaxCancelJob("$index", "$jobName")'>
-      <img src="@routes.Assets.versioned("/images/Delete-icon.png")" height="12px"/> </span>
-    </td>
+      <span class="title">#$number $jobName</span></a>
+    <table class="fullw"><tr>
+      <td class="$statusClass" title="Suspended" style="width: 20px ;
+        vertical-align: text-top ;"><span class="$statusClass fa fa-hourglass">&nbsp;</span> </td>
+      <td style="width: calc(100% - 40px);">
+        <div style="border: 1px solid #ccc ;
+          background-color: white ;
+          height: 10px ;
+          width: 100%;
+          padding: 0">
+          <div class="$statusClass" style="height: 8px ;
+            width: $progress% ;
+            margin: 0">&nbsp;</div>
+        </div></td>
+      <td style="width: 20px ;
+        vertical-align: text-top ;">
+          &nbsp;
+        <span title="Cancel $jobName #$number " style="cursor: hand" onclick='ajaxCancelJob("$number", "$jobName")'>
+          <img src="@routes.Assets.versioned("/images/Delete-icon.png")" height="12px"/> </span>
+      </td>
     </tr>
     </table> </div>
 </div>
 
-<div id="activeJobTemplate" style="display:none">
-  <div class="fullw" style="padding:10px ;">
-    <div class="fullw bevel2" style="padding:10px ;" title="$jobId $jobName $email $progress">
+<div id="activeJobTemplate" style="display: none">
+  <div class="fullw" style="padding: 10px ;">
+    <div class="fullw bevel2" style="padding: 10px ;" title="$jobId $jobName #$number $email $progress">
       <a href="/viewJob?id=$jobId&showHistory=true" title="View Job">
-        <span class="title">$jobName</span></a>
+        <span class="title">#$number-$jobName</span></a>
       <table class="fullw"><tr><td>
-        <div style="border:1px solid gray ; background-color:white ; height:10px ; width:100% ; padding:0">
-          <div id="progressDiv" style="background-color:lightgreen ; height:8px ; width: $progress% ; margin:0">&nbsp;</div>
-        </div></td> <td style="width:20px ; vertical-align:text-top ;">
-          &nbsp; <span title="Cancel Job $jobName" style="cursor:hand ;"
-      onclick='ajaxCancelActiveJob("$jobName")'>
-        <img src="@routes.Assets.versioned("/images/Delete-icon.png")" height="12px"/></span>
-      </td>
+        <div style="border: 1px solid gray ;
+          background-color: white ;
+          height: 10px ;
+          width: 100% ;
+          padding: 0">
+          <div id="progressDiv" style="background-color: lightgreen ;
+            height: 8px ;
+            width: $progress% ;
+            margin: 0">&nbsp;</div>
+        </div></td>
+        <td style="width: 20px ;
+          vertical-align: text-top ;">
+            &nbsp;
+          <span title="Cancel Job $jobName #$number" style="cursor: hand ;"
+          onclick='ajaxCancelActiveJob("$jobName")'>
+            <img src="@routes.Assets.versioned("/images/Delete-icon.png")" height="12px"/></span>
+        </td>
       </tr>
       </table> </div> </div>
 

@@ -1,0 +1,102 @@
+@import authentication._
+@(page: Int = 0)(implicit authentication: Authentication, localUser: User)
+
+@visualPage = @{
+  page + 1
+}
+
+@pageSize = @{
+  15
+}
+
+@maxPages = @{
+  TestRun.getRecentPagedRunsCount(pageSize);
+}
+
+<style type="text/css">
+
+    .ellipsis {
+      overflow: hidden ;
+      text-overflow: ellipsis ;
+      white-space: nowrap ;
+      display: inline-block ;
+      font-size: smaller ;
+    }
+
+    .templateClass {
+      white-space: nowrap ;
+      display: flex;
+      margin-bottom: 5px;
+      padding-top: 2px;
+    }
+
+    .templateClass div {
+      padding-right: 5px;
+      vertical-align: text-bottom;
+    }
+
+    .templateClass a {
+      display: block;
+      padding-right: 5px;
+      vertical-align: text-bottom;
+    }
+
+</style>
+
+<div class="panel panel-info">
+
+  <div class="panel-heading">
+    <span class="fa fa-history">&nbsp;</span>Job History
+  </div>
+
+  <div class="panel-body zeropad" style="overflow-y: scroll;
+    max-height: 500px;">
+    <script>
+        var currentPage = @page;
+
+        /**
+         * Navigate to the currentPage + delta
+         */
+        function navigatePage(delta) {
+          var newPage = currentPage + delta
+
+          //check the page boundaries
+          if (newPage < 0 || newPage >= @maxPages) {
+            console.error("rejecting to navigate " + delta)
+            return
+          }
+
+          ajaxRouteGet(jsRoutes.controllers.TestRunFeeder.pagedHistoryList, [newPage, @maxPages, @pageSize],
+              function (data) {
+                $("#pagedHistoryList").html(data)
+                currentPage = newPage
+                console.log("Current page " + currentPage)
+              },
+              function (data) {
+                showError(data)
+              })
+
+          ajaxRouteGet(jsRoutes.controllers.TestRunFeeder.pagedHistoryNav, [newPage, @maxPages, @pageSize],
+              function (data) {
+                $("#pagedHistoryNavDiv").html(data)
+                currentPage = newPage
+                console.log("Current page " + currentPage)
+              },
+              function (data) {
+                showError(data)
+              })
+        }
+    </script>
+
+    <div align="center" id="pagedHistoryNavDiv">
+      @pagedHistoryNav(page, maxPages, pageSize)
+    </div>
+
+
+
+    <div id="pagedHistoryList">
+    @pagedHistoryList(page, maxPages, pageSize)
+    </div>
+
+  </div>
+</div>

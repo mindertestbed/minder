@@ -4,19 +4,19 @@ import java.nio.charset.StandardCharsets
 import java.util
 import java.util.Date
 import javax.xml.parsers.DocumentBuilderFactory
-import javax.xml.transform.{OutputKeys, TransformerFactory}
 import javax.xml.transform.dom.DOMSource
 import javax.xml.transform.stream.StreamResult
+import javax.xml.transform.{OutputKeys, TransformerFactory}
 
-import builtin.ReportGenerator
+import com.avaje.ebean.Ebean
 import controllers.common.Utils
 import minderengine._
 import models.{Adapter, _}
 import mtdl._
 import play.Logger
+import utils.TestRunNumberProvider
 
 import scala.collection.JavaConversions._
-import scala.io.Source
 
 /**
   * This class starts a test in a new actor and
@@ -25,6 +25,10 @@ import scala.io.Source
   */
 class TestRunContext(val testRun: TestRun, testRunFeeder: TestRunFeeder, testLogFeeder: TestLogFeeder, testEngine: TestEngine) extends Runnable with TestProcessWatcher {
 
+
+  testRun.number = TestRunNumberProvider.getNextNumber();
+
+  var identifierMinderClientMap: util.Map[AdapterIdentifier, IdentifierClientPair] = null
   var suspended = false;
   val variableAdapterMapping = collection.mutable.Map[String, MappedAdapter]();
   val mappedAdapters = MappedAdapter.findByJob(testRun.job)
@@ -86,8 +90,8 @@ class TestRunContext(val testRun: TestRun, testRunFeeder: TestRunFeeder, testLog
 
   override def run(): Unit = {
     testRun.status = TestRunStatus.IN_PROGRESS
-    testRun.save()
-    testEngine.runTest(TestRunContext.this, job.mtdlParameters,variableAdapterMapping, user.email)
+    //testRun.save()
+    testEngine.runTest(TestRunContext.this, job.mtdlParameters, variableAdapterMapping, user.email)
   }
 
   /**
@@ -101,6 +105,10 @@ class TestRunContext(val testRun: TestRun, testRunFeeder: TestRunFeeder, testLog
 
   def stepUp(): Unit = {
     currentStep += 1
+    updateProgress
+  }
+
+  def updateProgress = {
     progressPercent = currentStep * 100 / totalSteps
     if (progressPercent > 100)
       progressPercent = 100
@@ -123,13 +131,13 @@ class TestRunContext(val testRun: TestRun, testRunFeeder: TestRunFeeder, testLog
 
   override def finished() {
     testRun.status = TestRunStatus.SUCCESS
-    updateRun()
+    finalizeTestRun()
   }
 
   override def failed(err: String, t: Throwable) {
     error = err
     testRun.status = TestRunStatus.FAILED
-    updateRun()
+    finalizeTestRun()
   }
 
   override def addLog(log: String): Unit = {
@@ -143,10 +151,10 @@ class TestRunContext(val testRun: TestRun, testRunFeeder: TestRunFeeder, testLog
     testLogFeeder.log(LogRecord(testRun, log))
   }
 
-  def updateRun(): Unit = {
+  def finalizeTestRun(): Unit = {
     testRun.finishDate = new Date();
     testRun.history.setSystemOutputLog(logStringBuilder.toString());
-    testRun.reportMetadata = generateXMLMetadata(testRun.id);
+
     testRun.errorMessage = error.getBytes("utf-8");
     if (sutNames != null) {
       val sb = new StringBuilder()
@@ -162,7 +170,11 @@ class TestRunContext(val testRun: TestRun, testRunFeeder: TestRunFeeder, testLog
     if (finalRunnable != null)
       finalRunnable.run()
 
+    Ebean.beginTransaction()
     testRun.save()
+    testRun.reportMetadata = generateXMLMetadata(testRun.id);
+    testRun.save()
+    Ebean.commitTransaction()
   }
 
   override def updateSUTNames(set: scala.collection.Set[String]): Unit = {
@@ -170,7 +182,6 @@ class TestRunContext(val testRun: TestRun, testRunFeeder: TestRunFeeder, testLog
   }
 
   def init() = {
-    testRun.number = TestRun.getMaxNumber() + 1
     testRun.status = TestRunStatus.IN_PROGRESS;
     testRun.date = new Date();
   }
@@ -184,10 +195,12 @@ class TestRunContext(val testRun: TestRun, testRunFeeder: TestRunFeeder, testLog
 
 
   def suspend() = {
+    updateProgress
     this.suspended = true
   }
 
   def resume() = {
+    updateProgress
     this.suspended = false
   }
 

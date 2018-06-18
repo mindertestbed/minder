@@ -1,179 +1,24 @@
 @import authentication._
-@()(implicit authentication: Authentication)
+@()(implicit authentication: Authentication, localUser: User)
 <script>
     $(function () {
-
-      var successImage = '<img src="@routes.Assets.versioned("/images/Check-icon.png")" height="12px" alt="G"/>'
-      var failImage = '<img src="@routes.Assets.versioned("/images/Delete-icon.png")" height="12px" alt="B"/>'
-
-      var rowTemplate = $("#historyRowTemplate").html()
-
-      var historyTableBody = $("#historyListDiv")
-
       new EventSource('@{controllers.routes.TestRunFeeder.jobHistoryFeed()}').onmessage =
           function (event) {
-            var json = JSON.parse(event.data)
-
-            var img = successImage
-            var cls = 'goodTestRun'
-            if (!json.success) {
-              img = failImage
-              cls = 'badTestRun'
-            }
-            var visibilityColor = 'red'
-            var visibilityClass = "fa fa-lock"
-            if (json.visibility == "PUBLIC") {
-              visibilityClass = 'fa fa-globe'
-              visibilityColor = '#1fc36d'
-            }
-            else if (json.visibility == "PROTECTED") {
-              visibilityClass = 'fa fa-group'
-              visibilityColor = '#7cd8ff'
-            }
-
-            var newRow = rowTemplate.replace(/Pimage/g, img)
-            .replace(/Ptrclass/g, cls)
-            .replace(/PtestRunNumber/g, json.no)
-            .replace(/PtestRunId/g, json.id)
-            .replace(/PjobName/g, json.name)
-            .replace(/PjobId/g, json.jobId)
-            .replace(/PvisibilityColor/g, visibilityColor)
-            .replace(/PvisibilityClass/g, visibilityClass)
-            .replace(/Pvisibility/g, json.visibility)
-
-            historyTableBody.prepend(newRow)
+            updateSmallHistoryView()
           }
     });
+
+    function updateSmallHistoryView() {
+     ajaxRouteGet(jsRoutes.controllers.TestRunFeeder.jobHistorySM, 0, $("#smallHistoryDiv"),
+     function(data){
+       showError(data)
+     })
+    }
+
 </script>
-<style type="text/css">
 
-    .ellipsis {
-      overflow: hidden ;
-      text-overflow: ellipsis ;
-      white-space: nowrap ;
-      display: inline-block ;
-      font-size: smaller ;
-    }
+  @util.dialogs()
 
-    .templateClass {
-      white-space: nowrap ;
-      display: flex;
-      margin-bottom: 5px;
-      padding-top: 2px;
-    }
-
-    .templateClass div {
-      padding-right: 5px;
-      vertical-align: text-bottom;
-    }
-
-    .templateClass a {
-      display: block;
-      padding-right: 5px;
-      vertical-align: text-bottom;
-    }
-
-</style>
-
-<div class="panel panel-info">
-
-  <div class="panel-heading"><span class="fa fa-history">&nbsp;</span>Job History</div>
-  <div class="panel-body zeropad">
-    <div align="center">
-      <nav style="padding-top: 2px ;">
-        <ul class="pagination pagination-sm" style="margin: 0px ;
-          display: none">
-          <li>
-            <a href="#" aria-label="Previous">
-              <span aria-hidden="true">&laquo;</span>
-            </a>
-          </li>
-          <li><a href="#">1</a></li>
-          <li><a href="#">2</a></li>
-          <li><a href="#">3</a></li>
-          <li><a href="#">4</a></li>
-          <li><a href="#">5</a></li>
-          <li>
-            <a href="#" aria-label="Next">
-              <span aria-hidden="true">&raquo;</span>
-            </a>
-          </li>
-        </ul>
-      </nav>
-    </div>
-
-    <div id="historyListDiv">
-    @defining(TestRun.getRecentRuns(40)) { testRunList =>
-      @for(testRun <- testRunList) {
-        @if(testRun.isFinished()) {
-          @decideOnVisibility(testRun.visibility, testRun.runner) {
-            <div class="templateClass @if(testRun.status == TestRunStatus.SUCCESS) {goodTestRun} else {badTestRun}">
-              <div style="display: inline-block ;
-                margin-left: 5px ;">
-              @if(testRun.status == TestRunStatus.SUCCESS) {
-                <img src="@routes.Assets.versioned("/images/Check-icon.png")" height="12px" alt='G'/>
-              } else {
-                <img src="@routes.Assets.versioned("/images/Delete-icon.png")" height="12px" alt='B'/>
-              }
-              </div>
-              <div style="display: inline-block ;
-                font-size: smaller">#@testRun.number</div>
-              <a title='@testRun.job.name'
-              href='@controllers.routes.JobController.displayJob(testRun.job.id, true)'
-              class='ellipsis' style="width: 100%;">
-              @if(testRun.job != null) {
-                @visibilityTagFragment(testRun.visibility, testRun.runner)
-                @testRun.job.name
-              }</a>
-              <div align="center" style="display: inline-block">
-                <a href="/viewReport?testRunId=@testRun.id&type=pdf" title="View Report" class="celldiv" style="height: 16px ;
-                  width: 16px ;">
-                  <img src="@routes.Assets.versioned("/images/pdf-2-64.png")" height="12px"/>
-                </a>
-              </div>
-              <div align="center" style="display: inline-block">
-                <a href="/viewTestRunHistory?testRunId=@testRun.id" title="View Log" class="celldiv" style="height: 16px ;
-                  width: 16px ;">
-                  <img src="@routes.Assets.versioned("/images/console-64.png")" height="12px"/>
-                </a>
-              </div>
-            </div>
-          }
-        }
-      }
-    }
-    </div>
-
-  </div>
-
-</div>
-
-
-
-<div id="historyRowTemplate" style="display: none">
-  <div class="templateClass Ptrclass" >
-    <div style="display: inline-block ;
-      margin-left: 5px ;">
-      Pimage
-    </div>
-    <div style="display: inline-block ;
-      font-size: smaller">#PtestRunNumber</div>
-
-    <a title='PjobName' href='/viewTestRunHistory?testRunId=PtestRunId' class="ellipsis" style="width: 100%;">
-      <span class="PvisibilityClass" title="Pvisibility" style='color: PvisibilityColor ;'>&nbsp;
-      </span>PjobName
-    </a>
-    <div align="center" style="display: inline-block">
-      <a href="/viewReport?testRunId=PtestRunId&type=pdf" title="View Report" class="celldiv" style="height: 16px ;
-        width: 16px ;">
-        <img src="@routes.Assets.versioned("/images/pdf-2-64.png")" height="12px"/>
-      </a>
-    </div>
-    <div align="center" style="display: inline-block">
-      <a href="/viewTestRunHistory?testRunId=PtestRunId" title="View Log" class="celldiv" style="height: 16px ;
-        width: 16px ;">
-        <img src="@routes.Assets.versioned("/images/console-64.png")" height="12px"/>
-      </a>
-    </div>
-  </div>
+<div id="smallHistoryDiv">
+@jobHistorySM(0)
 </div>

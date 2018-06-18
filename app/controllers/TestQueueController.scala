@@ -8,9 +8,9 @@ import javax.inject.{Inject, Provider, Singleton}
 import com.avaje.ebean.Ebean
 import com.gitb.core.v1.StepStatus
 import controllers.common.enumeration.OperationType
-import minderengine.{MinderSignalRegistry, TestEngine, TestSession, Visibility}
+import minderengine._
 import models._
-import play.Logger
+import org.slf4j.LoggerFactory
 import play.api.mvc._
 import rest.controllers.GitbTestbedController
 
@@ -24,7 +24,10 @@ import scala.collection.JavaConversions._
 class TestQueueController @Inject()(implicit testLogFeeder: Provider[TestLogFeeder],
                                     testRunFeeder: Provider[TestRunFeeder],
                                     gitbTestbedController: Provider[GitbTestbedController],
-                                    testEngine: Provider[TestEngine]) extends Controller {
+                                    testEngine: Provider[TestEngine],
+                                    ePQueueManager: Provider[EPQueueManager]) extends Controller {
+
+  val  LOGGER  = LoggerFactory.getLogger(classOf[TestQueueController])
 
   /**
     * The queue that holds test runs. When a job is started, a test run is created for it.
@@ -42,7 +45,6 @@ class TestQueueController @Inject()(implicit testLogFeeder: Provider[TestLogFeed
     */
   var testThread = createTestThread();
   testThread.start();
-
 
   /**
     * an action for enqueuing a new job for test engine running
@@ -113,7 +115,7 @@ class TestQueueController @Inject()(implicit testLogFeeder: Provider[TestLogFeed
     */
 
   def createTestRunContext(job: AbstractJob, user: User, visibility: Visibility): TestRunContext = {
-    Logger.info("Create Run with visibility " + visibility)
+    LOGGER.info("Create Run with visibility " + visibility)
     val testRun = new TestRun()
     testRun.job = job
     testRun.visibility = visibility
@@ -123,15 +125,15 @@ class TestQueueController @Inject()(implicit testLogFeeder: Provider[TestLogFeed
     testRun.history = userHistory
     testRun.runner = user;
     testRun.status = TestRunStatus.PENDING;
-    testRun.history.save();
-    testRun.save();
-    Logger.info(s"Testrun created, ID: ${testRun.id}")
+    //testRun.history.save();
+    //testRun.save();
+    LOGGER.info(s"Testrun created, ID: ${testRun.number}")
     new TestRunContext(testRun, testRunFeeder.get(), testLogFeeder.get(), testEngine.get())
   }
 
 
   def createTestRunContext(job: AbstractJob, user: User, visibility: Visibility, suiteRun: SuiteRun): TestRunContext = {
-    Logger.info("Create Run with visibility " + visibility)
+    LOGGER.info("Create Run with visibility " + visibility)
     val testRun = new TestRun()
     testRun.job = job
     testRun.visibility = visibility
@@ -142,9 +144,9 @@ class TestQueueController @Inject()(implicit testLogFeeder: Provider[TestLogFeed
     testRun.runner = user
     testRun.suiteRun = suiteRun
     testRun.status = TestRunStatus.PENDING;
-    testRun.history.save();
-    testRun.save();
-    Logger.info(s"Testrun created, ID: ${testRun.id}")
+    //testRun.history.save();
+    //testRun.save();
+    LOGGER.info(s"Testrun created, ID: ${testRun.number}")
     new TestRunContext(testRun, testRunFeeder.get(), testLogFeeder.get(), testEngine.get())
   }
 
@@ -153,12 +155,16 @@ class TestQueueController @Inject()(implicit testLogFeeder: Provider[TestLogFeed
       if (index >= 0 && index < jobQueue.size()) {
         val arr = jobQueue.toArray
 
-        val tr = arr(index).asInstanceOf[TestRunContext]
+        val testRunContext = arr(index).asInstanceOf[TestRunContext]
         jobQueue.synchronized {
-          jobQueue.remove(tr)
-          tr.testRun.number = -1
-          tr.testRun.save()
+          jobQueue.remove(testRunContext)
         }
+        //try to remove it from suspension context
+        SuspensionContext.get().remove(testRunContext.session)
+
+        //try to remove it from the EQQueue
+        ePQueueManager.get().removeTestContext(testRunContext)
+
         testRunFeeder.get().jobQueueUpdate()
       }
       Ok
@@ -278,7 +284,7 @@ class TestQueueController @Inject()(implicit testLogFeeder: Provider[TestLogFeed
             //we are in a transaction, create a list, commit and then enque
             //to avoid optimisticlockingexception.
             val list = new util.ArrayList[TestRunContext]()
-            Logger.debug("Create and enqueue test runs for suite")
+            LOGGER.debug("Create and enqueue test runs for suite")
             jobQueue.synchronized {
               //if the job id list is empty, then enqueue all jobs
               if (jobIdList == null || jobIdList.isEmpty) {
@@ -299,12 +305,12 @@ class TestQueueController @Inject()(implicit testLogFeeder: Provider[TestLogFeed
             //after committing, now enque them
             list.foreach(trc=>jobQueue.offer(trc))
 
-            Logger.debug(s"Done enqueing the jobs. JobQueue Size: ${jobQueue.size()}")
+            LOGGER.debug(s"Done enqueing the jobs. JobQueue Size: ${jobQueue.size()}")
             Ok("")
           }
         } catch {
           case th: Throwable => {
-            Logger.error(th.getMessage, th)
+            LOGGER.error(th.getMessage, th)
             val errMessage = if (th.getMessage == null) {
               "Unknown Error"
             } else {
@@ -338,6 +344,9 @@ class TestQueueController @Inject()(implicit testLogFeeder: Provider[TestLogFeed
       override def run(): Unit = {
         try {
           while (goon) {
+            val maxNumber = TestRun.getMaxNumber;
+
+            LOGGER.debug("MAX NUMBER " + maxNumber)
             testLogFeeder.get().clear()
             var run1: TestRun = null;
             try {
@@ -359,16 +368,16 @@ class TestQueueController @Inject()(implicit testLogFeeder: Provider[TestLogFeed
               activeRunContext.run()
             } finally {
               activeRunContext = null
-              testRunFeeder.get().jobQueueUpdate()
               Thread.sleep(1000)
-              testRunFeeder.get().jobHistoryUpdate(run1)
+              testRunFeeder.get().jobQueueUpdate()
+              testRunFeeder.get().jobHistoryUpdate()
             }
           }
         } catch {
-          case th: Throwable => Logger.error(th.getMessage, th);
+          case th: Throwable => LOGGER.error(th.getMessage, th);
         }
         finally {
-          Logger.info("Test Thread exit")
+          LOGGER.info("Test Thread exit")
         }
       }
     }
