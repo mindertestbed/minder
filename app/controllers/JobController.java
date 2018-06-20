@@ -107,12 +107,10 @@ public class JobController extends Controller {
 
     //if the tdl is an http endpoint, then we need to force the
     //user to enter the names of identifiers
-    if (tdl.isHttpEndpoint) {
-      List<EndPointIdentifier> identifiers = EndPointIdentifier.listByTdl(tdl);
+    List<EndPointIdentifier> identifiers = EndPointIdentifier.listByTdl(tdl);
 
-      for (EndPointIdentifier identifier : identifiers) {
-        model.mtdlParameters += identifier.identifier + "=/sample/path\n";
-      }
+    for (EndPointIdentifier identifier : identifiers) {
+      model.mtdlParameters += identifier.identifier + "=/sample/path\n";
     }
 
     //

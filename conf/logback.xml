@@ -49,9 +49,9 @@
     <logger name="com.avaje.ebeaninternal.server.lib.BackgroundThread" level="OFF"/>
     <logger name="com.gargoylesoftware.htmlunit.javascript" level="OFF"/>
     <logger name="com.jolbox" level="DEBUG" />
-    <logger name="com.yerlibilgin" level="TRACE" />
+    <logger name="com.yerlibilgin" level="DEBUG" />
     <logger name="minderengine" level="DEBUG" />
-    <logger name="mtdl" level="TRACE" />
+    <logger name="mtdl" level="DEBUG" />
     <logger name="play" level="DEBUG"/>
     <logger name="application" level="DEBUG"/>
     <logger name="utils" level="DEBUG"/>

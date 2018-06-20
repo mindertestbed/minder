@@ -24,6 +24,6 @@ public class EndPointIdentifier extends Model {
   }
 
   public static List<EndPointIdentifier> listByTdl(Tdl tdl){
-    return find.where().eq("tdl", tdl).findList();
+    return find.where().eq("tdl", tdl).orderBy("identifier").findList();
   }
 }

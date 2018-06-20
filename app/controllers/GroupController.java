@@ -16,7 +16,6 @@ import java.text.ParseException;
 import javax.inject.Inject;
 import models.TestGroup;
 import models.User;
-import org.eclipse.aether.resolution.DependencyResolutionException;
 import play.Logger;
 import play.data.Form;
 import play.data.FormFactory;
