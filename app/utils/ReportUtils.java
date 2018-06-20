@@ -110,8 +110,6 @@ public class ReportUtils {
       } else {
         template = singleTestRunTemplate;
       }
-
-      System.out.println("TEMPLATE: " + template);
       String html = fillTestRun(tr, template);
       ByteArrayOutputStream baos = new ByteArrayOutputStream();
       Document document = new Document();
@@ -177,9 +175,6 @@ public class ReportUtils {
           String name = element.getAttribute("name");
           String value = new String(BinaryUtil.base642b(element.getTextContent()), StandardCharsets.UTF_8);
 
-          System.out.println(name);
-          System.out.println(value);
-
           reportTemplate = reportTemplate.replace("${" + name + "}", value);
         }
 
@@ -191,6 +186,8 @@ public class ReportUtils {
 
     //check if we still have a parameter like ${param} and remove them
     reportTemplate.replaceAll("\\$\\{(\\w|_)+(\\w|\\d|_)*\\}", "");
+
+    System.out.println(reportTemplate);
 
     return reportTemplate;
   }

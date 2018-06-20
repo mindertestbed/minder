@@ -2,8 +2,9 @@ package minderengine
 
 import java.io.{PipedInputStream, PipedOutputStream}
 
-import ch.qos.logback.classic.{Level, Logger}
+import ch.qos.logback.classic.encoder.PatternLayoutEncoder
 import ch.qos.logback.classic.spi.ILoggingEvent
+import ch.qos.logback.classic.{Level, Logger, LoggerContext}
 import ch.qos.logback.core.OutputStreamAppender
 import ch.qos.logback.core.status.{Status, StatusListener}
 import org.slf4j.LoggerFactory
@@ -19,9 +20,6 @@ class MinderReportAppender(testProcessWatcher: TestProcessWatcher) extends Outpu
 
   LOGGER.debug("Initialize MinderReportAppender")
 
-  import ch.qos.logback.classic.LoggerContext
-  import ch.qos.logback.classic.encoder.PatternLayoutEncoder
-  import org.slf4j.LoggerFactory
 
   val lc: LoggerContext = LoggerFactory.getILoggerFactory.asInstanceOf[LoggerContext]
   val ple = new PatternLayoutEncoder()
@@ -35,6 +33,9 @@ class MinderReportAppender(testProcessWatcher: TestProcessWatcher) extends Outpu
   val pipeOutputStream = new PipedOutputStream();
   val pipeInputStream = new PipedInputStream(pipeOutputStream);
   this.setOutputStream(pipeOutputStream)
+  this.setName(mtdl.Utils.MINDER_REPORT_LOGGER_NAME)
+
+  var targetLogger = LoggerFactory.getLogger(mtdl.Utils.MINDER_REPORT_LOGGER_NAME).asInstanceOf[Logger];
 
   private val appenderThread = new Thread() {
 
@@ -63,6 +64,12 @@ class MinderReportAppender(testProcessWatcher: TestProcessWatcher) extends Outpu
       }
     }
   }
+
+  override def stop(): Unit = {
+    targetLogger.detachAppender(this.getName)
+    super.stop()
+  }
+
   getStatusManager.add(new StatusListener {
     def addStatusEvent(status: Status): Unit = {
       println(status.getMessage)
@@ -72,21 +79,7 @@ class MinderReportAppender(testProcessWatcher: TestProcessWatcher) extends Outpu
   })
 
   appenderThread.start();
-  var logger = LoggerFactory.getLogger(mtdl.Utils.MINDER_REPORT_LOGGER_NAME).asInstanceOf[Logger];
-  logger.setLevel(Level.DEBUG)
-  logger.setAdditive(true)
-  logger.addAppender(this)
-
-
-  override def subAppend(event: ILoggingEvent): Unit = {
-    println("-----------------------------------------------> Subappend " + event.getMessage)
-    println("----------------------------------------------->  " + isStarted)
-    super.subAppend(event)
-  }
-
-  override def writeOut(event: ILoggingEvent): Unit = {
-    super.writeOut(event)
-    println("-----------------------------------------------> Writeout " + event.getMessage)
-    println("----------------------------------------------->  " + isStarted)
-  }
+  targetLogger.setLevel(Level.DEBUG)
+  targetLogger.setAdditive(true)
+  targetLogger.addAppender(this)
 }

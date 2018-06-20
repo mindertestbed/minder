@@ -1,19 +1,16 @@
 package controllers;
 
+import static play.data.Form.form;
+
+import gov.tubitak.xoola.core.XoolaProperty;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import minderengine.XoolaServer;
-import org.interop.xoola.core.XoolaProperty;
-import org.omg.CORBA.portable.OutputStream;
 import play.data.Form;
 import play.mvc.Controller;
 import play.mvc.Result;
-import play.mvc.Security;
 import security.AllowedRoles;
 import security.Role;
-
-import java.io.FileOutputStream;
-import java.io.IOException;
-
-import static play.data.Form.form;
 
 /**
  * Created by yerlibilgin on 03/05/15.

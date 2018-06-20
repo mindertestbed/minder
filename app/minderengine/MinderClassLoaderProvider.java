@@ -1,13 +1,7 @@
 package minderengine;
 
-import mtdl.DefaultTDLClassLoader;
-import org.interop.xoola.tcpcom.connmanager.server.IClassLoaderProvider;
+import gov.tubitak.xoola.tcpcom.connmanager.server.IClassLoaderProvider;
 import play.api.Play;
-
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.net.URLClassLoader;
-import java.net.URLStreamHandlerFactory;
 
 /**
  * @author: yerlibilgin

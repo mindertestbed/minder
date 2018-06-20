@@ -49,8 +49,6 @@ class TestRunContext(val testRun: TestRun, testRunFeeder: TestRunFeeder, testLog
   val cls = TdlCompiler.compileTdl(packageRoot, packagePath, testGroup.dependencyString, testCase.name, source = tdl.tdl, version = tdl.version);
   var mtdlInstance: MinderTdl = null;
   val logStringBuilder = new StringBuilder;
-  val reportLogBuilder = new StringBuilder;
-
 
   val reportMetadataMap = new util.LinkedHashMap[String, String]()
 
@@ -149,8 +147,7 @@ class TestRunContext(val testRun: TestRun, testRunFeeder: TestRunFeeder, testLog
   }
 
   override def addReportLog(log: String): Unit = {
-    reportLogBuilder.append(log + "\n")
-    logStringBuilder.append(log)
+    logStringBuilder.append(log + "\n")
     testLogFeeder.log(LogRecord(testRun, log))
   }
 

@@ -1,7 +1,7 @@
 package minderengine;
 
-import org.interop.xoola.core.*;
-import org.interop.xoola.tcpcom.connmanager.server.ServerRegistry;
+import gov.tubitak.xoola.core.*;
+import gov.tubitak.xoola.tcpcom.connmanager.server.ServerRegistry;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import play.api.Environment;

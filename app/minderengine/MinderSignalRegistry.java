@@ -1,8 +1,7 @@
 package minderengine;
 
 import com.yerlibilgin.ValueChecker;
-import org.interop.xoola.core.XoolaProperty;
-
+import gov.tubitak.xoola.core.XoolaProperty;
 import java.util.HashMap;
 import java.util.concurrent.TimeUnit;
 import org.slf4j.Logger;

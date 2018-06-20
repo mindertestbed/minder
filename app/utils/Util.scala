@@ -182,7 +182,7 @@ object Util {
   }
 
   def getVersionInfo(): String = {
-    "V2.2.6-Alpha-01"
+    "V2.2.8"
   }
 
   def canAccess(localUser: User, owner: User): Boolean = {

@@ -1,7 +1,7 @@
 package minderengine;
 
 import models.Adapter;
-import org.interop.xoola.tcpcom.connmanager.server.ClientAccessController;
+import gov.tubitak.xoola.tcpcom.connmanager.server.ClientAccessController;
 import play.Logger;
 
 /**
