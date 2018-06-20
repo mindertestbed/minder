@@ -17,11 +17,9 @@ RUN mkdir minder
 
 WORKDIR /minder
 
-COPY target/universal/stage/ initial.h2db.mv.db initial.h2db.trace.db startminder ./
-
+COPY target/universal/stage/ startminder ./
 
 ENV JAVA_OPTS="${JAVA_OPTS} -DmtdlConfig.properties=conf/application.conf"
-
 
 EXPOSE 9000
 
