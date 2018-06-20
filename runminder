@@ -1,32 +1,32 @@
 #!/bin/bash
 
+action="run"
 port=9000
 
-if (( $# > 0 ))
+if (( $# == 1 ))
 then
   port=$1
-fi
-
-echo "Using port $port"
-
-action=1
-
-if (( $# == 2))
+elif(( $# == 2))
 then
-  action=$2
+  action=$1
+  port=$2
 fi
 
+echo "Using port $action $port"
 
 export JAVA_OPTS="${JAVA_OPTS} -DmtdlConfig.properties=conf/application.conf"
 
 case $action in
-   cleanrun)
+   clean)
       sbt clean compile "run $port"
       ;;
-   updaterun)
+   update)
       sbt update compile "run $port"
       ;;
-   *)
+   compile)
+      sbt compile "run $port"
+      ;;
+    *)
       echo "default"
       sbt "run $port"
       ;;

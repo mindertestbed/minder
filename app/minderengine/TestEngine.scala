@@ -10,8 +10,7 @@ import com.gitb.core.v1.StepStatus
 import controllers.{EPQueueManager, TestQueueController, TestRunContext}
 import models._
 import mtdl._
-import org.apache.log4j.spi.LoggingEvent
-import org.apache.log4j.{AppenderSkeleton, EnhancedPatternLayout, Level}
+import org.slf4j.LoggerFactory
 import play.api
 import utils.Util
 
@@ -25,26 +24,6 @@ import scala.collection.mutable;
 class TestEngine @Inject()(implicit testQueueController: Provider[TestQueueController],
                            epQueueManager: Provider[EPQueueManager],
                            xoolaServer: Provider[XoolaServer]) {
-
-  class MyAppender(testProcessWatcher: TestProcessWatcher) extends AppenderSkeleton {
-    override def append(event: LoggingEvent): Unit = {
-      if (this.getLayout != null) {
-        val formatted = this.getLayout.format(event);
-
-        if (event.getLevel.toInt == Level.INFO.toInt || event.getLevel.toInt == Level.ERROR.toInt) {
-          testProcessWatcher.addReportLog(formatted);
-        } else {
-          testProcessWatcher.addLog(formatted);
-        }
-      }
-    }
-
-    def close() {}
-
-    def requiresLayout(): Boolean = {
-      false;
-    }
-  }
 
   class GitbWatcher() extends GitbRivetWatcher {
     override def notifyProcessingInfo(log: String, rivet: Rivet): Unit = {
@@ -82,16 +61,20 @@ class TestEngine @Inject()(implicit testQueueController: Provider[TestQueueContr
   def runTest(testRunContext: TestRunContext, params: String,
               adapterMapping: collection.mutable.Map[String, MappedAdapter],
               userEmail: String): Unit = {
-    val lgr: org.apache.log4j.Logger = org.apache.log4j.Logger.getLogger("test");
-    val app = new MyAppender(testRunContext);
+
+    val minderReportAppender = new MinderReportAppender(testRunContext)
+    minderReportAppender.start();
+
+    val lgr = LoggerFactory.getLogger(mtdl.Utils.MINDER_REPORT_LOGGER_NAME);
+
+    println("test engine ===================> " + lgr.hashCode())
+
     val gtb = new GitbWatcher();
-    app.setLayout(new EnhancedPatternLayout("%d{ISO8601}: %-5p - %m%n%throwable"));
     try {
-      lgr.addAppender(app);
       try {
 
         val currentMtdl = testRunContext.initialize();
-        initializeFunctionsAndParameters(params, lgr, testRunContext)
+        initializeFunctionsAndParameters(params, testRunContext)
 
         if (testRunContext.isSuspended()) {
           //it is suspended. Resume
@@ -361,38 +344,15 @@ class TestEngine @Inject()(implicit testQueueController: Provider[TestQueueContr
           }
         }
       }
-    } finally {
-      lgr.removeAppender(app)
+    }finally {
+      minderReportAppender.stop();
     }
   }
 
-  private def initializeFunctionsAndParameters(params: String, lgr: org.apache.log4j.Logger, testRunContext: TestRunContext): Unit = {
-    lgr.debug("Parameters")
-    lgr.debug(params)
-
+  private def initializeFunctionsAndParameters(params: String, testRunContext: TestRunContext): Unit = {
     //Redirect all the logging functions to the log4j logger.
     //fixme: change the logger with SLF4J.
     val mtdl = testRunContext.mtdlInstance;
-
-    mtdl.debug = (any: Any) => {
-      lgr.debug(any)
-    }
-    mtdl.debugThrowable = (any: Any, th: Throwable) => {
-      lgr.debug(any, th)
-    }
-    mtdl.info = (any: Any) => {
-      lgr.info(any)
-    }
-    mtdl.infoThrowable = (any: Any, th: Throwable) => {
-      lgr.info(any, th)
-    }
-    mtdl.error = (any: Any) => {
-      lgr.error(any)
-    }
-
-    mtdl.errorThrowable = (any: Any, th: Throwable) => {
-      lgr.error(any, th)
-    }
 
     //the report metadata provided by the script is redirected
     //to the test run context which serializes it to the database.

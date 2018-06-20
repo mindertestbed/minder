@@ -57,5 +57,6 @@
     <logger name="utils" level="DEBUG"/>
     <logger name="controllers" level="DEBUG"/>
     <logger name="models" level="DEBUG"/>
+    <logger name="mtdl.report.logger" level="DEBUG"/>
 
 </configuration>

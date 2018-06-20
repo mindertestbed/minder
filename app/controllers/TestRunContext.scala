@@ -149,7 +149,7 @@ class TestRunContext(val testRun: TestRun, testRunFeeder: TestRunFeeder, testLog
   }
 
   override def addReportLog(log: String): Unit = {
-    reportLogBuilder.append(log)
+    reportLogBuilder.append(log + "\n")
     logStringBuilder.append(log)
     testLogFeeder.log(LogRecord(testRun, log))
   }
