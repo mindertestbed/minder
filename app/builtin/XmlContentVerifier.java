@@ -15,7 +15,6 @@ import java.util.Properties;
  */
 public class XmlContentVerifier extends BuiltInAdapter {
   public XmlContentVerifier() {
-    System.err.println("Created XML CONTENT VERIFIER");
   }
 
   @Override

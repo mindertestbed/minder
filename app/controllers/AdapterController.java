@@ -71,7 +71,6 @@ public class AdapterController extends Controller {
   public Result doDeleteAdapterVersion(Long id) {
     try {
       Ebean.beginTransaction();
-      System.out.println("Adapter version id:" + id);
       AdapterVersion adapterVersion = AdapterVersion.findById(id);
       if (adapterVersion == null) {
         // it does not exist. error
@@ -100,7 +99,6 @@ public class AdapterController extends Controller {
 
   @AllowedRoles({Role.TEST_DEVELOPER})
   public Result doDeleteAdapter(Long id) {
-    System.out.println("Adapter id:" + id);
     Adapter adapter = Adapter.findById(id);
     if (adapter == null) {
       // it does not exist. errort
@@ -108,7 +106,6 @@ public class AdapterController extends Controller {
     }
 
     try {
-      System.out.println("Adapter delete");
       adapter.delete();
     } catch (Exception ex) {
       ex.printStackTrace();

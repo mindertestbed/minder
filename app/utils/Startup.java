@@ -7,9 +7,10 @@ import minderengine.XoolaServer;
 import models.*;
 import mtdl.TDLClassLoaderProvider;
 import org.beybunproject.xmlContentVerifier.utils.Utils;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 import org.yaml.snakeyaml.Yaml;
 import org.yaml.snakeyaml.constructor.CustomClassLoaderConstructor;
-import play.Logger;
 import play.api.Environment;
 import play.data.format.Formatters;
 import scala.io.BufferedSource;
@@ -28,12 +29,12 @@ import java.util.Map;
 
 @Singleton
 public class Startup {
+  private static final Logger LOGGER = LoggerFactory.getLogger(Startup.class);
   private final Environment environment;
 
   @Inject
   public Startup(Environment environment, XoolaServer xoolaServer, Formatters formatters) {
     this.environment = environment;
-    System.out.println(xoolaServer);
 
     TDLClassLoaderProvider.appendExternalClassLoader(environment.classLoader());
     TDLClassLoaderProvider.appendExternalClassLoader(ClassLoader.getSystemClassLoader());
@@ -59,26 +60,26 @@ public class Startup {
 
   private void initialData() {
     if (User.findRowCount() == 0) {
-      System.out.println("Adding sample data");
+      LOGGER.debug("Adding sample data");
       try {
         Yaml yaml = new Yaml(new CustomClassLoaderConstructor(environment.classLoader()));
 
         File currentDir = new File(".");
-        Logger.debug("Current Directory:" + currentDir.getAbsolutePath());
+        LOGGER.debug("Current Directory:" + currentDir.getAbsolutePath());
 
         File yml = new File(currentDir.getAbsoluteFile() + "/conf/initialdata/initial-data.yml");
-        Logger.debug("Yml file: " + yml.getAbsolutePath() + " exists? " + yml.exists());
+        LOGGER.debug("Yml file: " + yml.getAbsolutePath() + " exists? " + yml.exists());
 
         Map<String, List<Model>> all = (Map<String, List<Model>>) yaml.load(new FileInputStream(yml));
         for (String key : all.keySet()) {
           for (Model model : all.get(key)) {
-            Logger.debug(model.getClass().getSimpleName());
+            LOGGER.debug(model.getClass().getSimpleName());
             model.save();
 
             if (model instanceof TestGroup) {
               TestGroup group = (TestGroup) model;
 
-              System.out.println("ID: " + group.id);
+              LOGGER.debug("ID: " + group.id);
               for (TestAssertion assertion : group.testAssertions) {
                 assertion.save();
                 for (TestCase tcase : assertion.testCases) {
@@ -108,7 +109,7 @@ public class Startup {
           }
         }
       } catch (Throwable th) {
-        th.printStackTrace();
+        LOGGER.error(th.getMessage(), th);
       }
     }
   }

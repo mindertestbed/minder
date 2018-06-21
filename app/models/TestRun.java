@@ -4,6 +4,7 @@ import com.avaje.ebean.Ebean;
 import com.avaje.ebean.Expr;
 import com.avaje.ebean.Expression;
 import com.avaje.ebean.Model;
+import com.avaje.ebean.Query;
 import minderengine.Visibility;
 import play.Logger;
 
@@ -135,7 +136,9 @@ public class TestRun extends Model {
   }
 
   public static int getMaxNumber() {
-    final List<TestRun> list = find.setMaxRows(1).orderBy("number desc").findList();
+    final Query<TestRun> testRunQuery = find.setMaxRows(1);
+    final Query<TestRun> query = testRunQuery.orderBy("number desc");
+    final List<TestRun> list = query.findList();
     if (list.isEmpty()) {
       return 1;
     }

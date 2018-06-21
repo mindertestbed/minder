@@ -35,7 +35,6 @@ public class TestCase extends Model {
 
   public static TestCase findById(Long id) {
     TestCase byId = find.byId(id);
-    System.out.println(byId);
     if (null == byId) return null;
 
     byId.owner = User.findById(byId.owner.id);

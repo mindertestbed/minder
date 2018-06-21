@@ -256,7 +256,6 @@ public class GroupController extends Controller {
     } catch (ParseException e) {
       return internalServerError(e.getMessage());
     }
-    System.out.println("responseValue:" + responseValue);
 
     response().setContentType("application/x-download");
     response().setHeader("Content-disposition", "attachment; filename=" + responseRestTestGroup.getGroupName() + ".json");

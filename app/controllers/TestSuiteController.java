@@ -271,10 +271,7 @@ public class TestSuiteController extends Controller {
 
   @AllowedRoles(Role.TEST_DESIGNER)
   public Result getNamesAndAdaptersForTdls() {
-    System.out.println(request().body().asJson());
     JsonNode json = request().body().asJson();
-    System.out.println(json);
-    System.out.println(json.isArray());
 
     List<Tdl> tdls = new ArrayList<>();
     if (json.isArray()) {

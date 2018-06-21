@@ -10,7 +10,6 @@ import play.api.Play;
 public class MinderClassLoaderProvider implements IClassLoaderProvider {
 
   public MinderClassLoaderProvider() {
-    System.out.println("MinderClassLoaderProvider initialized");
   }
 
   @Override

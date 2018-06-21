@@ -162,12 +162,10 @@ class Scheduling @Inject()(implicit authentication: Authentication) extends Cont
   }
 
   def addTestSuiteToSchedule(scheduleId: Long, testSuiteId: Long) = JavaAction { implicit request =>
-    println("add suite")
     Ok
   }
 
   def addJobToSchedule(scheduleId: Long, jobId: Long) = JavaAction { implicit request =>
-    println("add job")
     Ok
   }
 

@@ -141,20 +141,14 @@ class TestRunContext(val testRun: TestRun, testRunFeeder: TestRunFeeder, testLog
     finalizeTestRun()
   }
 
-  override def addLog(log: String): Unit = {
-    logStringBuilder.append(log)
-    testLogFeeder.log(LogRecord(testRun, log))
-  }
-
   override def addReportLog(log: String): Unit = {
-    logStringBuilder.append(log + "\n")
+    logStringBuilder.append(log)
     testLogFeeder.log(LogRecord(testRun, log))
   }
 
   def finalizeTestRun(): Unit = {
     testRun.finishDate = new Date();
-    testRun.history.setSystemOutputLog(logStringBuilder.toString());
-
+    testRun.history.setSystemOutputLog(logStringBuilder.mkString);
     testRun.errorMessage = error.getBytes("utf-8");
     if (sutNames != null) {
       val sb = new StringBuilder()
@@ -237,9 +231,6 @@ class TestRunContext(val testRun: TestRun, testRunFeeder: TestRunFeeder, testLog
     val sw = new StringWriter
     val sr = new StreamResult(sw)
     transformer.transform(domSource, sr)
-
-    println("Report Metadata:")
-    println(sw.toString)
 
     sw.toString.getBytes(StandardCharsets.UTF_8)
   }

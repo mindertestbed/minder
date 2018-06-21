@@ -16,8 +16,6 @@ trait TestProcessWatcher {
 
   def finished(): Unit
 
-  def addLog(log: String): Unit
-
   def addReportLog(s: String): Unit
 
   def failed(message: String, t: Throwable): Unit

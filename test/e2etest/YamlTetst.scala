@@ -35,7 +35,6 @@ class YamlTetst extends Specification {
         val set: java.util.Set[String] = all.keySet()
 
         for (key <- set) {
-          println("KEY: " + key)
           val lst = all.get(key)
           println("Value:")
           for (obj <- lst) {

@@ -25,7 +25,6 @@ public class SettingsController extends Controller {
   public Result updateSettings() {
     Form<SettingsModel> form = form(SettingsModel.class).bindFromRequest();
     SettingsModel model = form.get();
-    System.out.println(model.timeout);
 
     XoolaServer.properties.setProperty(XoolaProperty.NETWORK_RESPONSE_TIMEOUT, model.timeout +"");
     java.io.OutputStream out= null;

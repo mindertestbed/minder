@@ -55,7 +55,6 @@ class TestRunFeeder @Inject()(implicit testQueueController: TestQueueController,
           sb.append(",")
           index = index + 1
         }
-        Logger.debug(" size " + ePQueueManager.endpointQueueMap.size())
         //list the suspended tests
         for (queue <- ePQueueManager.endpointQueueMap.values()) {
           for (context <- queue) {
@@ -70,7 +69,6 @@ class TestRunFeeder @Inject()(implicit testQueueController: TestQueueController,
           }
         }
         //list the suspended tests
-        Logger.debug(" size " + SuspensionContext.get().getTestContextMap().size())
         for (context <- SuspensionContext.get().getTestContextMap().values()) {
           sb.append("{\"jobId\":\"").append(context.testRun.job.id).append("\",").
             append("\"jobName\":\"").append(context.testRun.job.name).append("\",").

@@ -187,8 +187,6 @@ public class ReportUtils {
     //check if we still have a parameter like ${param} and remove them
     reportTemplate.replaceAll("\\$\\{(\\w|_)+(\\w|\\d|_)*\\}", "");
 
-    System.out.println(reportTemplate);
-
     return reportTemplate;
   }
 

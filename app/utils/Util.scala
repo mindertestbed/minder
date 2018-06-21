@@ -103,8 +103,6 @@ object Util {
 
 
   def checkField(cls: Class[_], fieldName: String, newValue: String): Unit = {
-    System.out.println("Class Name" + cls);
-    System.out.println("Field Name" + fieldName);
     val fld: Field = cls.getDeclaredField(fieldName)
     val required: Boolean = fld.getAnnotation(classOf[Constraints.Required]) != null
 
@@ -122,9 +120,6 @@ object Util {
     if (maxLenAnnotation != null) {
       maxLength = maxLenAnnotation.value
     }
-
-
-    println(required + " " + minLength + " " + maxLength + " [" + newValue + "]")
 
     if (required && (newValue == null || newValue.isEmpty)) {
       throw new IllegalArgumentException(fieldName + " is required. Cannot be empty!.")
@@ -186,7 +181,6 @@ object Util {
   }
 
   def canAccess(localUser: User, owner: User): Boolean = {
-    println(localUser.email + " vs. " + owner.email)
     localUser.email == "root@minder" || localUser.email == owner.email
   }
 

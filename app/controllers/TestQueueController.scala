@@ -11,6 +11,7 @@ import controllers.common.enumeration.OperationType
 import minderengine._
 import models._
 import org.slf4j.LoggerFactory
+import play.api.Environment
 import play.api.mvc._
 import rest.controllers.GitbTestbedController
 
@@ -22,6 +23,7 @@ import scala.collection.JavaConversions._
   */
 @Singleton
 class TestQueueController @Inject()(implicit testLogFeeder: Provider[TestLogFeeder],
+                                    environment: Environment,
                                     testRunFeeder: Provider[TestRunFeeder],
                                     gitbTestbedController: Provider[GitbTestbedController],
                                     testEngine: Provider[TestEngine],
@@ -208,7 +210,7 @@ class TestQueueController @Inject()(implicit testLogFeeder: Provider[TestLogFeed
   def cancelGitbJob(id: Long, user: User) {
     val job = GitbJob.findById(id)
     if (job == null) {
-      println("A job with id [" + id + "] was not found!")
+      LOGGER.warn("A job with id [" + id + "] was not found!")
       return
     }
 
@@ -226,7 +228,7 @@ class TestQueueController @Inject()(implicit testLogFeeder: Provider[TestLogFeed
         return
       }
       else {
-        println(user.email + " not permitted for" + " job with id [" + id + "]")
+        LOGGER.warn(user.email + " not permitted for" + " job with id [" + id + "]")
         return
       }
     }
@@ -235,7 +237,7 @@ class TestQueueController @Inject()(implicit testLogFeeder: Provider[TestLogFeed
     var index = 0;
     val arr = jobQueue.toArray
     if (arr == null || arr.size == 0) {
-      println("A waiting job with id [" + id + "] was not found!")
+      LOGGER.warn("A waiting job with id [" + id + "] was not found!")
       return
     }
 
@@ -344,9 +346,6 @@ class TestQueueController @Inject()(implicit testLogFeeder: Provider[TestLogFeed
       override def run(): Unit = {
         try {
           while (goon) {
-            val maxNumber = TestRun.getMaxNumber;
-
-            LOGGER.debug("MAX NUMBER " + maxNumber)
             testLogFeeder.get().clear()
             var run1: TestRun = null;
             try {

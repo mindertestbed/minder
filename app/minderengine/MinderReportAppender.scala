@@ -1,11 +1,8 @@
 package minderengine
 
-import java.io.{PipedInputStream, PipedOutputStream}
-
-import ch.qos.logback.classic.encoder.PatternLayoutEncoder
 import ch.qos.logback.classic.spi.ILoggingEvent
-import ch.qos.logback.classic.{Level, Logger, LoggerContext}
-import ch.qos.logback.core.OutputStreamAppender
+import ch.qos.logback.classic.{Level, Logger, LoggerContext, PatternLayout}
+import ch.qos.logback.core.AppenderBase
 import ch.qos.logback.core.status.{Status, StatusListener}
 import org.slf4j.LoggerFactory
 
@@ -14,72 +11,46 @@ import org.slf4j.LoggerFactory
   *
   * @author yerlibilgin
   */
-class MinderReportAppender(testProcessWatcher: TestProcessWatcher) extends OutputStreamAppender[ILoggingEvent] {
+class MinderReportAppender(testProcessWatcher: TestProcessWatcher) extends AppenderBase[ILoggingEvent] {
 
   val LOGGER = LoggerFactory.getLogger(this.getClass)
-
   LOGGER.debug("Initialize MinderReportAppender")
 
-
-  val lc: LoggerContext = LoggerFactory.getILoggerFactory.asInstanceOf[LoggerContext]
-  val ple = new PatternLayoutEncoder()
-
-  ple.setPattern("%date %level %msg%n")
-  ple.setContext(lc)
-  ple.start();
-  this.setEncoder(ple)
-  this.setContext(lc)
-
-  val pipeOutputStream = new PipedOutputStream();
-  val pipeInputStream = new PipedInputStream(pipeOutputStream);
-  this.setOutputStream(pipeOutputStream)
-  this.setName(mtdl.Utils.MINDER_REPORT_LOGGER_NAME)
-
+  val loggerContext = LoggerFactory.getILoggerFactory.asInstanceOf[LoggerContext]
+  val patternLayout = new PatternLayout()
   var targetLogger = LoggerFactory.getLogger(mtdl.Utils.MINDER_REPORT_LOGGER_NAME).asInstanceOf[Logger];
 
-  private val appenderThread = new Thread() {
+  this.setContext(loggerContext)
+  this.setName(mtdl.Utils.MINDER_REPORT_LOGGER_NAME)
 
-    import java.io._
+  patternLayout.setPattern("%date %level %msg%n")
+  patternLayout.setContext(loggerContext);
+  targetLogger.setLevel(Level.DEBUG)
+  targetLogger.setAdditive(true)
 
-    override def run(): Unit = {
-      try {
-        LOGGER.debug("Start reading the report pipe")
-        val reader = new BufferedReader(new InputStreamReader(pipeInputStream))
-        while (true) {
-          val line = reader.readLine();
-          if (line == null) {
-            return;
-          }
-          testProcessWatcher.addReportLog(line)
-        }
-      } catch {
-        case _ =>
-      } finally {
-        try {
-          pipeInputStream.close();
-        } catch {
-          case _ =>
-        }
-        LOGGER.debug("Report thread exit")
-      }
-    }
-  }
-
-  override def stop(): Unit = {
-    targetLogger.detachAppender(this.getName)
-    super.stop()
-  }
 
   getStatusManager.add(new StatusListener {
     def addStatusEvent(status: Status): Unit = {
-      println(status.getMessage)
-      if (status.getThrowable != null)
-        status.getThrowable.printStackTrace()
+      if (status.getThrowable != null) {
+        LOGGER.error(status.getThrowable.getMessage, status.getThrowable)
+      }
     }
   })
 
-  appenderThread.start();
-  targetLogger.setLevel(Level.DEBUG)
-  targetLogger.setAdditive(true)
-  targetLogger.addAppender(this)
+  override def start(): Unit = {
+    super.start()
+    patternLayout.start()
+    targetLogger.addAppender(this)
+  }
+
+  override def stop(): Unit = {
+    super.stop()
+    patternLayout.stop()
+    targetLogger.detachAppender(this.getName)
+  }
+
+  def append(eventObject: ILoggingEvent): Unit = {
+    val str = patternLayout.doLayout(eventObject)
+    testProcessWatcher.addReportLog(str)
+  }
 }

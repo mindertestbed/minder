@@ -67,8 +67,6 @@ class TestEngine @Inject()(implicit testQueueController: Provider[TestQueueContr
 
     val lgr = LoggerFactory.getLogger(mtdl.Utils.MINDER_REPORT_LOGGER_NAME);
 
-    println("test engine ===================> " + lgr.hashCode())
-
     val gtb = new GitbWatcher();
     try {
       try {
@@ -504,21 +502,14 @@ object TestEngine {
 
       var set = map.getOrElseUpdate(adapterName, new util.HashSet[AdapterFunction]())
       set.add(new AdapterFunction(adapterId = adapterName, signature = slotSignature))
-      println(adapterName + "::" + slotSignature)
 
       for (e@(k@(wn, ws), v) <- r.signalPipeMap) {
-        println(wn + "::" + ws)
         set = map.getOrElseUpdate(wn, new util.HashSet[AdapterFunction]())
         set.add(new AdapterFunction(wn, ws))
       }
     }
 
     for ((k, v) <- map) {
-      println("---------")
-      println(k)
-      for (ss <- v) {
-        println("\t" + ss.signature)
-      }
       hm.put(k, v)
     }
 
