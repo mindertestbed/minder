@@ -25,6 +25,9 @@ class TestEngine @Inject()(implicit testQueueController: Provider[TestQueueContr
                            epQueueManager: Provider[EPQueueManager],
                            xoolaServer: Provider[XoolaServer]) {
 
+
+  val LOGGER = LoggerFactory.getLogger(getClass)
+
   class GitbWatcher() extends GitbRivetWatcher {
     override def notifyProcessingInfo(log: String, rivet: Rivet): Unit = {
       notify(log, StepStatus.PROCESSING, rivet)
@@ -125,7 +128,7 @@ class TestEngine @Inject()(implicit testQueueController: Provider[TestQueueContr
         while (currentMtdl.currentRivetIndex < currentMtdl.RivetDefs.size()) {
           val currentRivet = currentMtdl.RivetDefs(currentMtdl.currentRivetIndex)
           //for (currentRivet <- minderTDL.RivetDefs) {
-          var msg: String = "> RUN RIVET " + currentMtdl.currentRivetIndex;
+          var msg: String = "--> RUN RIVET " + currentMtdl.currentRivetIndex;
           lgr.info(msg)
           gtb.notifyProcessingInfo(msg, currentRivet)
 
@@ -133,11 +136,10 @@ class TestEngine @Inject()(implicit testQueueController: Provider[TestQueueContr
             * A very bad method that is used by two different blocks.
             */
           def logRivetFinished = {
-            msg = "< Rivet finished sucessfully";
+            msg = "<-- Rivet finished sucessfully";
             testRunContext.rivetFinished(currentMtdl.currentRivetIndex)
             gtb.notifyCompletedInfo(msg, currentRivet)
             lgr.info(msg)
-            lgr.info("----------\n")
           }
 
           if (currentRivet.isInstanceOf[Suspend]) {
@@ -146,7 +148,7 @@ class TestEngine @Inject()(implicit testQueueController: Provider[TestQueueContr
             suspendTestCase(testRunContext)
             return
           } else if (currentRivet.isInstanceOf[EndpointRivet]) {
-            api.Logger.debug("Matched an endpoint rivet. If the endpoint is not already enqueued, suspend the test case");
+            LOGGER.debug("Matched an endpoint rivet. If the endpoint is not already enqueued, suspend the test case");
             //check the signal queue for the matching http endpoint
             //if no signal is enqueued, then suspend the test case
             val endpointRivet = currentRivet.asInstanceOf[EndpointRivet]
@@ -160,7 +162,7 @@ class TestEngine @Inject()(implicit testQueueController: Provider[TestQueueContr
               suspendForEndpoint(testRunContext)
               return
             } else {
-              api.Logger.debug("And http call for " + httpEndpoint + " was discovered. Process it")
+              LOGGER.debug("And http call for " + httpEndpoint + " was discovered. Process it")
 
               if (!signalData.isInstanceOf[SignalPojoData]) {
                 throw new IllegalStateException("An invalid signal type has been enqueued for " + httpEndpoint)

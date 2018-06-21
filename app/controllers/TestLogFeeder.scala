@@ -66,7 +66,6 @@ class TestLogFeeder @Inject()() extends Controller {
 
   def log(logRecord: LogRecord): Unit = {
     Thread.sleep(5)
-    Logger.debug(logRecord.log)
     currentLog.add(logRecord)
     buffer(logRecord)
   }
@@ -74,7 +73,6 @@ class TestLogFeeder @Inject()() extends Controller {
   def log(log: String): Unit = {
     Thread.sleep(5)
     val logRecord = LogRecord(null, log)
-    Logger.debug(log)
     currentLog.add(logRecord)
     buffer(logRecord)
   }
