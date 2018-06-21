@@ -11,7 +11,6 @@ import scala.concurrent.ExecutionContext
 import scala.concurrent.duration._
 
 /**
-  * @author Bulut
   */
 @Singleton
 class RestKeyRenewer @Inject()(implicit configuration: Configuration,

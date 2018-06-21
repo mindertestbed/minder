@@ -7,7 +7,6 @@ import javax.xml.bind.DatatypeConverter
 import javax.xml.datatype.{DatatypeFactory, XMLGregorianCalendar}
 
 /**
-  * @author Bulut
   */
 object MinderRestUtil {
 

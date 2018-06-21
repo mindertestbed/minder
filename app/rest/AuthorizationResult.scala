@@ -1,7 +1,6 @@
 package rest
 
 /**
-  * @author Bulut
   */
 trait AuthorizationResult
 

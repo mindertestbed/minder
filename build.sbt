@@ -66,6 +66,7 @@ binaries in Aspectj <++= update map { report =>
   )
 }
 
+//add asspectj plugin
 products in Compile <<= products in Aspectj
 
 products in Runtime <<= products in Compile
