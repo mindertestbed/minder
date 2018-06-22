@@ -27,9 +27,9 @@ class TestQueueController @Inject()(implicit testLogFeeder: Provider[TestLogFeed
                                     testRunFeeder: Provider[TestRunFeeder],
                                     gitbTestbedController: Provider[GitbTestbedController],
                                     testEngine: Provider[TestEngine],
-                                    ePQueueManager: Provider[EPQueueManager]) extends Controller {
+                                    ePQueueManagerProvider: Provider[EPQueueManager]) extends Controller {
 
-  val  LOGGER  = LoggerFactory.getLogger(classOf[TestQueueController])
+  val LOGGER = LoggerFactory.getLogger(classOf[TestQueueController])
 
   /**
     * The queue that holds test runs. When a job is started, a test run is created for it.
@@ -152,24 +152,52 @@ class TestQueueController @Inject()(implicit testLogFeeder: Provider[TestLogFeed
     new TestRunContext(testRun, testRunFeeder.get(), testLogFeeder.get(), testEngine.get())
   }
 
-  def cancelJob(index: Int) = Action {
-    implicit request =>
-      if (index >= 0 && index < jobQueue.size()) {
-        val arr = jobQueue.toArray
+  /**
+    * Search the test run with the given number in the queue, when found, remove it.
+    *
+    * @param testRunNumber
+    * @return
+    */
+  def removeTestRunByNumber(testRunNumber: Int): Boolean = {
+    if (jobQueue.size() > 0) {
+      var found: TestRunContext = null
 
-        val testRunContext = arr(index).asInstanceOf[TestRunContext]
-        jobQueue.synchronized {
-          jobQueue.remove(testRunContext)
+      for (testRunContext <- jobQueue) {
+        if (testRunContext.testRun.number == testRunNumber) {
+          found = testRunContext;
         }
-        //try to remove it from suspension context
-        SuspensionContext.get().remove(testRunContext.session)
-
-        //try to remove it from the EQQueue
-        ePQueueManager.get().removeTestContext(testRunContext)
-
-        testRunFeeder.get().jobQueueUpdate()
       }
-      Ok
+
+      jobQueue.synchronized {
+        jobQueue.remove(found)
+      }
+      if (found != null)
+        return true
+    }
+
+    false
+  }
+
+  def cancelJob(testRunNumber: Int) = Action {
+    implicit request =>
+      LOGGER.debug(s"Received cancel request for test run number $testRunNumber")
+
+      if (removeTestRunByNumber(testRunNumber)) {
+        jobQueueUpdate()
+        Ok
+      } else if (SuspensionContext.get().removeTestRunByNumber(testRunNumber)) {
+        jobQueueUpdate()
+        Ok
+      } else if (ePQueueManagerProvider.get().removeTestRunByNumber(testRunNumber)) {
+        jobQueueUpdate()
+        Ok
+      } else {
+        val errorText = s"No such test run with number $testRunNumber"
+        LOGGER.warn(errorText)
+        BadRequest(errorText)
+      }
+
+
   }
 
   def cancelActiveJob() = Action {
@@ -305,7 +333,7 @@ class TestQueueController @Inject()(implicit testLogFeeder: Provider[TestLogFeed
             Ebean.commitTransaction()
 
             //after committing, now enque them
-            list.foreach(trc=>jobQueue.offer(trc))
+            list.foreach(trc => jobQueue.offer(trc))
 
             LOGGER.debug(s"Done enqueing the jobs. JobQueue Size: ${jobQueue.size()}")
             Ok("")

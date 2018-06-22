@@ -1,16 +1,18 @@
 package minderengine;
 
 import controllers.TestRunContext;
-
 import java.util.HashMap;
 import java.util.LinkedHashMap;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
- *
  * @author: yerlibilgin
  * @date: 07/03/16.
  */
 public class SuspensionContext {
+
+  private static final Logger LOGGER = LoggerFactory.getLogger(SuspensionContext.class);
   private static SuspensionContext instance;
 
   public static SuspensionContext get() {
@@ -31,9 +33,6 @@ public class SuspensionContext {
 
   /**
    * Resolves and removes the value from the map
-   *
-   * @param session
-   * @return
    */
   public TestRunContext findAndPurge(TestSession session) {
     try {
@@ -63,6 +62,32 @@ public class SuspensionContext {
 
   public void remove(TestSession session) {
     testContextMap.remove(session);
+  }
+
+
+  public boolean removeTestRunByNumber(int number) {
+    LOGGER.debug("Try to remove test run with number " + number + " from the suspension context");
+
+    TestSession targetKey = null;
+
+    for (TestSession key : testContextMap.keySet()) {
+      int targetNumber = testContextMap.get(key).testRun().number;
+
+      if (targetNumber == number) {
+        targetKey = key;
+
+        break;
+      }
+    }
+
+    if (targetKey != null) {
+      LOGGER.debug("Test run number " + number + " corresponds to " + targetKey.getSession() + ". Removing it from the suspension queue");
+      testContextMap.remove(targetKey);
+      return true;
+    }
+
+    LOGGER.debug("Test run number " + number + " not found in the suspension queue");
+    return false;
   }
 
 }

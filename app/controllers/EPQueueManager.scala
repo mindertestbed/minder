@@ -2,7 +2,6 @@ package controllers
 
 import java.io.{File, FileInputStream}
 import java.util
-import java.util.Collections
 import javax.inject.{Inject, Provider, Singleton}
 
 import minderengine._
@@ -11,6 +10,7 @@ import mtdl.{EPPacket, EndpointRivet}
 import org.slf4j.LoggerFactory
 import play.api.mvc._
 import utils.UserPasswordUtil
+import scala.collection.JavaConversions._
 
 import scala.tools.nsc.interpreter.InputStream
 
@@ -25,8 +25,11 @@ class EPQueueManager @Inject()(testQueueController: Provider[TestQueueController
 
   val endpointQueueMap = new util.LinkedHashMap[String, util.Queue[TestRunContext]]()
 
-  //this map is used for finding the test run contexts through their session
+  //this map is used for finding the test run contexts through their session id
   val crossSessionToURLMap = new util.HashMap[TestSession, String]()
+
+  //this map is used for finding the test run contexts through their number
+  val crossNumberToURLMap = new util.HashMap[Integer, String]()
 
   var activeRunContext: TestRunContext = null;
 
@@ -154,6 +157,7 @@ class EPQueueManager @Inject()(testQueueController: Provider[TestQueueController
       //make sure that we hold a reference to the queue
       LOGGER.debug("A new session was enqueued " + testRunContext.session + " " + testRunContext.testRun.number)
       crossSessionToURLMap.put(testRunContext.session, decoratedURL);
+      crossNumberToURLMap.put(testRunContext.testRun.number, decoratedURL)
     }
   }
 
@@ -176,8 +180,42 @@ class EPQueueManager @Inject()(testQueueController: Provider[TestQueueController
         }
 
         crossSessionToURLMap.remove(session)
+        crossNumberToURLMap.remove(testRunContext.testRun.number)
       }
     }
+  }
+
+  def removeTestRunByNumber(number: Int): Boolean = {
+    LOGGER.debug("Try to remove test run with number " + number + " from the end point queue")
+
+    this.synchronized {
+      if (crossNumberToURLMap.containsKey(number)) {
+        LOGGER.debug("Test run was found in the ep queue")
+        val url = crossNumberToURLMap.remove(number);
+        LOGGER.debug("URL " + url)
+        if (endpointQueueMap.containsKey(url)) {
+          LOGGER.debug("URL found")
+          val queue = endpointQueueMap.get(url);
+
+          var found: TestRunContext = null;
+
+          queue.foreach(testRunContext => {
+            if (testRunContext.testRun.number == number) {
+              found = testRunContext;
+            }
+          })
+
+          if (found != null) {
+            queue.remove(found);
+            LOGGER.debug(s"discovered test run ${found.session.getSession} and removed")
+            crossSessionToURLMap.remove(found.session)
+            return true;
+          }
+        }
+      }
+    }
+    LOGGER.debug("Test run number " + number + " not found in the end point queue")
+    return false;
   }
 
 }
