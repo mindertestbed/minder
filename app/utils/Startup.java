@@ -11,6 +11,7 @@ import org.slf4j.LoggerFactory;
 import org.slf4j.Logger;
 import org.yaml.snakeyaml.Yaml;
 import org.yaml.snakeyaml.constructor.CustomClassLoaderConstructor;
+import play.Configuration;
 import play.api.Environment;
 import play.data.format.Formatters;
 import scala.io.BufferedSource;
@@ -29,12 +30,15 @@ import java.util.Map;
 
 @Singleton
 public class Startup {
+
   private static final Logger LOGGER = LoggerFactory.getLogger(Startup.class);
   private final Environment environment;
+  private final Configuration configuration;
 
   @Inject
-  public Startup(Environment environment, XoolaServer xoolaServer, Formatters formatters) {
+  public Startup(Environment environment, XoolaServer xoolaServer, Formatters formatters, Configuration configuration) {
     this.environment = environment;
+    this.configuration = configuration;
 
     TDLClassLoaderProvider.appendExternalClassLoader(environment.classLoader());
     TDLClassLoaderProvider.appendExternalClassLoader(ClassLoader.getSystemClassLoader());
@@ -60,6 +64,9 @@ public class Startup {
 
   private void initialData() {
     if (User.findRowCount() == 0) {
+
+      final String assetsDir = configuration.getString("minder.data.dir", "./data") + "/assets";
+
       LOGGER.debug("Adding sample data");
       try {
         Yaml yaml = new Yaml(new CustomClassLoaderConstructor(environment.classLoader()));
@@ -99,7 +106,7 @@ public class Startup {
                 FileInputStream fis = new FileInputStream("conf/initialdata/assets/" + asset.name);
                 byte[] assetBytes = Utils.readStream(fis);
                 fis.close();
-                final String groupAssetRoot = "assets/_" + group.id + "/";
+                final String groupAssetRoot = assetsDir + "/_" + group.id + "/";
                 new File(groupAssetRoot).mkdirs();
                 FileOutputStream fos = new FileOutputStream(groupAssetRoot + asset.name);
                 fos.write(assetBytes);

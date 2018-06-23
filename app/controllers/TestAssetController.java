@@ -1,5 +1,7 @@
 package controllers;
 
+import play.Configuration;
+import play.Environment;
 import utils.Util;
 import models.ModelConstants;
 import models.TestAsset;
@@ -27,14 +29,17 @@ import static play.data.Form.form;
  * Created by yerlibilgin on 31/12/14.
  */
 public class TestAssetController extends Controller {
+
+  private final String ASSETS_DIR;
   Authentication authentication;
 
   public final Form<TestAssetModel> TEST_ASSET_FORM;
 
   @Inject
-  public TestAssetController(FormFactory formFactory, Authentication authentication) {
+  public TestAssetController(FormFactory formFactory, Authentication authentication, Configuration configuration) {
     this.authentication = authentication;
     TEST_ASSET_FORM = formFactory.form(TestAssetModel.class);
+    ASSETS_DIR = configuration.getString("minder.data.dir", "./data") + "/assets";
   }
 
   public static class TestAssetModel {
@@ -184,7 +189,7 @@ public class TestAssetController extends Controller {
       }
       User user = authentication.getLocalUser();
 
-      new File("assets/_" + ta.testGroup.id + "/" + ta.name).delete();
+      new File(ASSETS_DIR + "/_" + ta.testGroup.id + "/" + ta.name).delete();
 
       return redirect(controllers.routes.GroupController.getGroupDetailView(ta.testGroup.id, "assets"));
     }
@@ -198,7 +203,7 @@ public class TestAssetController extends Controller {
     } else {
       response().setContentType("application/x-download");
       response().setHeader("Content-disposition", "attachment; filename=" + ta.name);
-      return ok(new File("assets/_" + ta.testGroup.id + "/" + ta.name));
+      return ok(new File(ASSETS_DIR + "/_" + ta.testGroup.id + "/" + ta.name));
     }
   }
 
@@ -265,8 +270,8 @@ public class TestAssetController extends Controller {
       asset = (File) files.get(0).getFile();
     }
 
-    new File("assets/_" + groupId).mkdirs();
-    File fl = new File("assets/_" + groupId + "/" + name);
+    new File(ASSETS_DIR + "/_" + groupId).mkdirs();
+    File fl = new File(ASSETS_DIR + "/_" + groupId + "/" + name);
     if (asset == null) {
       //no asset defined check if a file already exists? (edit mode)
       if (fl.exists())

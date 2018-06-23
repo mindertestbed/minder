@@ -36,7 +36,9 @@
             editor.setTheme("ace/theme/clouds");
             editor.getSession().setMode("ace/mode/scala");
             editor.setOptions({
-              maxLines: 50
+              maxLines: 50,
+              tabSize: 2,
+              useSoftTabs: true
             });
 
             // store it
@@ -59,6 +61,13 @@
 
               });
             });
+
+            document.addEventListener("keydown", function(e) {
+              if (e.keyCode == 83 && (navigator.platform.match("Mac") ? e.metaKey : e.ctrlKey)) {
+                e.preventDefault();
+                $("#editorform").submit();
+              }
+            }, false);
           });
       </script>
 

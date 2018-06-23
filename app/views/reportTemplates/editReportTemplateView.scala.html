@@ -32,7 +32,9 @@
             editor.setTheme("ace/theme/clouds");
             editor.getSession().setMode("ace/mode/html");
             editor.setOptions({
-              maxLines: 50
+              maxLines: 50,
+              tabSize: 2,
+              useSoftTabs: true
             });
 
             // store it
@@ -58,11 +60,17 @@
             };
 
             @if(form("template").value == null){
-            editor.setValue($('#batchTemplate').text(), 1);
+              editor.setValue($('#batchTemplate').text(), 1);
             }else{
-            editor.setValue($('#template').val(), 1);
+              editor.setValue($('#template').val(), 1);
             }
             editor.getSession().foldAll(3, 59)
+            document.addEventListener("keydown", function(e) {
+              if (e.keyCode == 83 && (navigator.platform.match("Mac") ? e.metaKey : e.ctrlKey)) {
+                e.preventDefault();
+                $("#editorform").submit();
+              }
+            }, false);
           });
       </script>
 
