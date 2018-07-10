@@ -65,7 +65,7 @@ public class Startup {
   private void initialData() {
     if (User.findRowCount() == 0) {
 
-      final String assetsDir = configuration.getString("minder.data.dir", "./data") + "/assets";
+      final String assetsDir = configuration.getString("minder.assets.dir", "./data/assets");
 
       LOGGER.debug("Adding sample data");
       try {

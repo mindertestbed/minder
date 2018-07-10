@@ -39,10 +39,11 @@ public class TestAssetController extends Controller {
   public TestAssetController(FormFactory formFactory, Authentication authentication, Configuration configuration) {
     this.authentication = authentication;
     TEST_ASSET_FORM = formFactory.form(TestAssetModel.class);
-    ASSETS_DIR = configuration.getString("minder.data.dir", "./data") + "/assets";
+    ASSETS_DIR = configuration.getString("minder.assets.dir", "./data/assets");
   }
 
   public static class TestAssetModel {
+
     public Long id;
 
     @Constraints.Required
@@ -55,7 +56,7 @@ public class TestAssetController extends Controller {
 
     public String description;
 
-    public TestAssetModel(){
+    public TestAssetModel() {
 
     }
   }
@@ -128,7 +129,6 @@ public class TestAssetController extends Controller {
     if (ta == null) {
       return badRequest("Test asset with id [" + id + "] not found!");
     } else {
-
 
       TestAssetModel tgem = new TestAssetModel();
       tgem.id = ta.id;
@@ -211,10 +211,6 @@ public class TestAssetController extends Controller {
   /**
    * Opens the asset identified by the user <code>email</code> and asset name <code>name</code>
    * as an input stream. Its the callers' responsibility to close the stream.
-   *
-   * @param tgId
-   * @param name
-   * @return
    */
   public InputStream getAssetAsStream(long tgId, String name) {
     try {
@@ -228,10 +224,6 @@ public class TestAssetController extends Controller {
   /**
    * Reads the asset identified by the user <code>email</code> and asset name <code>name</code>
    * and returns it in a byte array.
-   *
-   * @param groupId
-   * @param name
-   * @return
    */
   public byte[] getAssetAsByteArray(long groupId, String name) {
     int read = -1;
@@ -253,15 +245,13 @@ public class TestAssetController extends Controller {
 
   /**
    * Reads the file uploaded with the current request (if any)
-   *
-   * @param groupId
-   * @param name
    */
   private void handleFileUpload(long groupId, String name) {
     Http.MultipartFormData body = request().body().asMultipartFormData();
 
-    if (body == null)
+    if (body == null) {
       throw new RuntimeException("The form type is not correct");
+    }
 
     File asset = null;
 
@@ -274,8 +264,9 @@ public class TestAssetController extends Controller {
     File fl = new File(ASSETS_DIR + "/_" + groupId + "/" + name);
     if (asset == null) {
       //no asset defined check if a file already exists? (edit mode)
-      if (fl.exists())
+      if (fl.exists()) {
         return; //its ok.
+      }
       throw new RuntimeException("No asset file was specified!");
     } else {
       FileOutputStream fos;

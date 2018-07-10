@@ -216,6 +216,7 @@ class TestRunContext(val testRun: TestRun, testRunFeeder: TestRunFeeder, testLog
     reportMetadataMap.foreach(kvp => {
       val element = document.createElement("metadata")
       element.setAttribute("name", kvp._1);
+
       element.setTextContent(BinaryUtil.b2base64(kvp._2.getBytes(StandardCharsets.UTF_8)))
       root.appendChild(element)
     })

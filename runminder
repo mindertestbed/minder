@@ -14,7 +14,8 @@ fi
 
 echo "Using port $action $port"
 
-export JAVA_OPTS="${JAVA_OPTS} -DmtdlConfig.properties=conf/application.conf"
+MINDER_DATA_DIR=${HOME}/minder_data_lightest
+export MINDER_DATA_DIR
 
 case $action in
    clean)
@@ -26,12 +27,11 @@ case $action in
    compile)
       sbt compile "run $port"
       ;;
+   start)
+      sbt compile "start $port"
+      ;;
     *)
       echo "default"
       sbt "run $port"
       ;;
 esac
-
-
-
-

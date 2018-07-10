@@ -92,20 +92,20 @@ public class TestRun extends Model {
   }
 
   public static List<TestRun> findByJob(AbstractJob rc) {
-    return find.where().eq("job", rc).isNotNull("date").orderBy("date desc").findList();
+    return find.where().eq("job", rc).isNotNull("date").orderBy("number desc").findList();
   }
 
 
   public static List<TestRun> findBySuiteRun(SuiteRun suiteRun) {
-    return find.where().eq("suiteRun", suiteRun).isNotNull("date").orderBy("date desc").findList();
+    return find.where().eq("suiteRun", suiteRun).isNotNull("date").orderBy("number desc").findList();
   }
 
   public static List<TestRun> findBySuiteRunId(long suiteRunID) {
-    return find.where().eq("suite_run_id", suiteRunID).isNotNull("date").orderBy("date desc").findList();
+    return find.where().eq("suite_run_id", suiteRunID).isNotNull("date").orderBy("number desc").findList();
   }
 
   public static List<TestRun> findBySuiteRun(SuiteRun suiteRun, int pageIndex, int pageSize) {
-    return find.where().eq("suiteRun", suiteRun).isNotNull("date").orderBy("date desc").findPagedList(pageIndex, pageSize).getList();
+    return find.where().eq("suiteRun", suiteRun).isNotNull("date").orderBy("number desc").findPagedList(pageIndex, pageSize).getList();
   }
 
   public static int countBySuiteRun(SuiteRun suiteRun) {
@@ -113,25 +113,25 @@ public class TestRun extends Model {
   }
 
   public static List<TestRun> findByJob(Long id) {
-    return find.where().eq("job_id", id).isNotNull("date").orderBy("date desc").findList();
+    return find.where().eq("job_id", id).isNotNull("date").orderBy("number desc").findList();
   }
 
   public static List<TestRun> findByJob(AbstractJob job, int pageIndex, int pageSize) {
-    return find.where().eq("job", job).isNotNull("date").orderBy("date desc").findPagedList(pageIndex, pageSize).getList();
+    return find.where().eq("job", job).isNotNull("date").orderBy("number desc").findPagedList(pageIndex, pageSize).getList();
   }
 
   public static int countByJob(AbstractJob job) {
-    return find.where().eq("job", job).isNotNull("date").orderBy("date desc").findRowCount();
+    return find.where().eq("job", job).isNotNull("date").orderBy("number desc").findRowCount();
   }
 
   public static List<TestRun> getRecentPagedRuns(int page, int pageSize) {
-    List<TestRun> list = find.where().isNotNull("date").orderBy("date desc")
+    List<TestRun> list = find.where().isNotNull("date").orderBy("number desc")
         .findPagedList(page, pageSize).getList();
     return list;
   }
 
   public static int getRecentPagedRunsCount(int pageSize) {
-    final double count = find.where().isNotNull("date").orderBy("date desc").findRowCount() * 1.0 / pageSize;
+    final double count = find.where().isNotNull("date").orderBy("number desc").findRowCount() * 1.0 / pageSize;
     return (int) Math.ceil(count);
   }
 
