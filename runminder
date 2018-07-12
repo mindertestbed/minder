@@ -17,7 +17,7 @@ echo "Using port $action $port"
 MINDER_DATA_DIR=./data
 export MINDER_DATA_DIR
 
-if [[ "$DB_CONF" == "h2" ]]
+if [[ "$DB_CONF" == "psql" ]]
 then
    configFile="application.psql"
 else
