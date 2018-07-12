@@ -17,21 +17,30 @@ echo "Using port $action $port"
 MINDER_DATA_DIR=${HOME}/minder_data_lightest
 export MINDER_DATA_DIR
 
+if [[ "$DB_CONF" == "psql" ]]
+then
+   configFile="application.psql"
+else 
+   configFile="application.h2"
+fi
+
+echo "Config file $configFile"
+
 case $action in
    clean)
-      sbt clean compile "run $port"
+      sbt clean compile "run -Dconfig.resource=$configFile.conf $port"
       ;;
    update)
-      sbt update compile "run $port"
+      sbt update compile "run -Dconfig.resource=$configFile.conf $port"
       ;;
    compile)
-      sbt compile "run $port"
+      sbt compile "run -Dconfig.resource=$configFile.conf $port"
       ;;
    start)
-      sbt compile "start $port"
+      sbt compile "start -Dconfig.resource=$configFile.conf $port"
       ;;
     *)
       echo "default"
-      sbt "run $port"
+      sbt "run -Dconfig.resource=$configFile.conf $port"
       ;;
 esac
