@@ -14,13 +14,13 @@ fi
 
 echo "Using port $action $port"
 
-MINDER_DATA_DIR=${HOME}/minder_data_lightest
+MINDER_DATA_DIR=./data
 export MINDER_DATA_DIR
 
-if [[ "$DB_CONF" == "psql" ]]
+if [[ "$DB_CONF" == "h2" ]]
 then
    configFile="application.psql"
-else 
+else
    configFile="application.h2"
 fi
 

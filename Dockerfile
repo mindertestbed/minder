@@ -19,8 +19,6 @@ WORKDIR /minder
 
 COPY target/universal/stage/ startminder ./
 
-ENV JAVA_OPTS="${JAVA_OPTS} -DmtdlConfig.properties=conf/application.conf"
-
 EXPOSE 9000
 
 CMD ["./startminder"]

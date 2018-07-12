@@ -6,9 +6,4 @@ then
    cp conf/initialdata/h2/h2db.mv.db data/db/h2db.mv.db
 fi
 
-if [ ! -f data/maven-settings.xml ]
-then
-   cp conf/maven-settings.xml data/maven-settings.xml
-fi
-
 bin/minder
