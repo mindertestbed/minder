@@ -1,5 +1,19 @@
 #!/bin/bash
 
+MINDER_DATA_DIR=./data
+PSQL_HOST=localhost
+PSQL_USER_NAME=postgres
+PSQL_PASSWORD=12345
+DB_CONF=psql
+PSQL_DB_NAME=mykanepe
+
+export MINDER_DATA_DIR
+export PSQL_HOST
+export PSQL_USER_NAME
+export PSQL_PASSWORD
+export DB_CONF
+export PSQL_DB_NAME
+
 action="run"
 port=9000
 
@@ -14,33 +28,31 @@ fi
 
 echo "Using port $action $port"
 
-MINDER_DATA_DIR=./data
-export MINDER_DATA_DIR
 
 if [[ "$DB_CONF" == "psql" ]]
 then
-   configFile="application.psql"
+   configResource="application.psql"
 else
-   configFile="application.h2"
+   configResource="application.h2"
 fi
 
-echo "Config file $configFile"
+echo "Config file $configResource"
 
 case $action in
    clean)
-      sbt clean compile "run -Dconfig.resource=$configFile.conf $port"
+      sbt clean compile "run -Dconfig.resource=$configResource.conf $port"
       ;;
    update)
-      sbt update compile "run -Dconfig.resource=$configFile.conf $port"
+      sbt update compile "run -Dconfig.resource=$configResource.conf $port"
       ;;
    compile)
-      sbt compile "run -Dconfig.resource=$configFile.conf $port"
+      sbt compile "run -Dconfig.resource=$configResource.conf $port"
       ;;
    start)
-      sbt compile "start -Dconfig.resource=$configFile.conf $port"
+      sbt compile "start -Dconfig.resource=$configResource.conf $port"
       ;;
     *)
       echo "default"
-      sbt "run -Dconfig.resource=$configFile.conf $port"
+      sbt "run -Dconfig.resource=$configResource.conf $port"
       ;;
 esac

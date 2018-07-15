@@ -1,9 +1,30 @@
-#!/bin/sh
+#!/bin/bash
 
-if [ ! -f data/db/h2db.mv.db ]
+if [[ "$DB_CONF" == "psql" ]]
 then
-   mkdir -p data/db/
-   cp conf/initialdata/h2/h2db.mv.db data/db/h2db.mv.db
+   configResource="application.psql"
+else
+   configResource="application.h2"
+
+   if [ ! -f data/db/h2db.mv.db ]
+   then
+      mkdir -p data/db/
+      cp conf/initialdata/h2/h2db.mv.db data/db/h2db.mv.db
+   fi
+
 fi
+
+
+echo "Options"
+
+echo "MINDER_DATA_DIR = $MINDER_DATA_DIR"
+echo "PSQL_HOST = $PSQL_HOST"
+echo "PSQL_USER_NAME = $PSQL_USER_NAME"
+echo "PSQL_PASSWORD = $PSQL_PASSWORD"
+echo "DB_CONF = $DB_CONF"
+echo "PSQL_DB_NAME = $PSQL_DB_NAME"
+
+JAVA_OPTS="$JAVA_OPTS -Dconfig.resource=$configResource.conf -Dhttp.port=disabled -Dhttps.port=9000"
+export JAVA_OPTS
 
 bin/minder
