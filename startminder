@@ -6,10 +6,10 @@ then
 else
    configResource="application.h2"
 
-   if [ ! -f data/db/h2db.mv.db ]
+   if [ ! -f $MINDER_DATA_DIR/db/h2db.mv.db ]
    then
-      mkdir -p data/db/
-      cp conf/initialdata/h2/h2db.mv.db data/db/h2db.mv.db
+      mkdir -p $MINDER_DATA_DIR/db/
+      cp conf/initialdata/h2/h2db.mv.db $MINDER_DATA_DIR/db/h2db.mv.db
    fi
 
 fi

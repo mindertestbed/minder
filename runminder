@@ -1,10 +1,10 @@
 #!/bin/bash
 
-MINDER_DATA_DIR=./data
+#MINDER_DATA_DIR=$HOME/minderdata
 PSQL_HOST=localhost
 PSQL_USER_NAME=postgres
 PSQL_PASSWORD=12345
-DB_CONF=psql
+DB_CONF=
 PSQL_DB_NAME=mykanepe
 
 export MINDER_DATA_DIR
