@@ -52,7 +52,8 @@ public class MinderSignalRegistry {
     SignalQueue signalQueue = findRelatedQueue(testSession, adapterIdentifier, signature);
 
     if (timeout == 0) {
-      timeout = Long.parseLong(XoolaServer.properties.getProperty(XoolaProperty.NETWORK_RESPONSE_TIMEOUT));
+
+      timeout = (Integer) XoolaServer.properties.get(XoolaProperty.NETWORK_RESPONSE_TIMEOUT);
     }
 
     try {

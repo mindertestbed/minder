@@ -2,10 +2,10 @@
 
 #MINDER_DATA_DIR=$HOME/minderdata
 PSQL_HOST=localhost
-PSQL_USER_NAME=postgres
+PSQL_USER_NAME=minderlord
 PSQL_PASSWORD=12345
-DB_CONF=
-PSQL_DB_NAME=mykanepe
+DB_CONF=psql
+PSQL_DB_NAME=kanepe
 
 export MINDER_DATA_DIR
 export PSQL_HOST
@@ -50,6 +50,10 @@ case $action in
       ;;
    start)
       sbt compile "start -Dconfig.resource=$configResource.conf $port"
+      ;;
+   debug)
+      echo "debug"
+      sbt -jvm-debug 9999 "run -Dconfig.resource=$configResource.conf $port"
       ;;
     *)
       echo "default"

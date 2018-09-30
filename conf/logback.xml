@@ -58,6 +58,6 @@
     <logger name="controllers" level="DEBUG"/>
     <logger name="models" level="DEBUG"/>
     <logger name="mtdl.report.logger" level="DEBUG"/>
-    <logger name="org.beybunproject" level="INFO"/>
+    <logger name="org.beybunproject" level="DEBUG"/>
 
 </configuration>
